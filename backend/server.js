@@ -37,18 +37,22 @@ app.get('/users', (req, res) => {
 app.get('/users/:id', (req, res) => {
     const users = loadUsers();
     const user = users.find(u => u.user_id === req.params.id);
+
     if(!user){
         return res.status(404).json({error: 'User not found.'});
     }
+
     res.json(user);
 })
 
 app.get('/users/:id/simulations', (req, res) => {
     const users = loadUsers();
     const user = users.find(u => u.user_id === req.params.id);
+
     if(!user){
         return res.status(404).json({error: 'User not found.'});
     }
+
     res.json({simulations: user.simulations});
 })
 
@@ -59,6 +63,7 @@ app.post('/users', (req, res) => {
     const lastUserId = lastUser ? lastUser.user_id : "u000"
     const lastUserNumber = parseInt(lastUserId.slice(1));
     const newUserId = `u${(lastUserNumber + 1).toString().padStart(3, '0')}`;
+
     const defaultValues = {
         user_id: newUserId,
         name: "",
@@ -71,81 +76,107 @@ app.post('/users', (req, res) => {
         simulations: [],
         auth: "",
     };
+
     const userWithDefaults = {...defaultValues, ...newUser};
+
     if(!userWithDefaults.user_id || !userWithDefaults.userName){
         return res.status(400).json({error: 'User id and username required.'});
     } 
+
     users.push(userWithDefaults);
     fs.writeFileSync('./data/users.json', JSON.stringify({users}, null, 2));
+
     res.status(201).json(userWithDefaults);
 });
 
 app.patch('/users/:id/profileArt', (req, res) => {
     const users = loadUsers();
     const user = users.find(u => u.user_id === req.params.id);
+
     if(!user){
         return saveUsers.status(404).json({error: 'User not found.'});
     }
+
     const { profileArt } = req.body;
+
     if(!profileArt){
         return res.status(400).json({error: 'Profile image URL required'});
     }
+
     user.profileArt = profileArt;
     saveUsers(users);
+
     res.json({profileArt: user.profileArt});
 });
 
 app.patch('/users/:id/password', (req, res) => {
     const users = loadUsers();
     const user = users.find(u => u.user_id === req.params.id);
+
     if(!user){
         return res.status(404).json({error: 'User not found.'});
     }
+
     const { newPassword } = req.body;
+
     if(!newPassword){
         return res.status(400).json({error: 'New password required.'});
     }
+
     user.auth = newPassword;
     saveUsers(users);
+
     res.json({message: 'Password updated successfully.'});
 });
 
 app.delete('/users/:id', (req, res) => {
     let users = loadUsers();
     const user = users.find(u => u.user_id === req.params.id);
+
     if(!user){
         return res.status(404).json({error: 'User not found.'});
     }
+
     users = users.filter(u => u.user_id !== req.params.id);
     saveUsers(users);
+
     res.json({message: `User ${req.params.id} deleted.`});
 });
 
 app.post('/users/:id/simulations', (req, res) => {
     const users = loadUsers();
     const user = users.find(u => u.user_id === req.params.id);
+
     if(!user){
         return res.status(404).json({error: 'User not found.'});
     }
+
     const { simulation_id } = req.body;
+
     if(!simulation_id){
         return res.status(400).json({error: 'Simulation ID required.'});
     }
+
     if(!user.simulations.includes(simulation_id)){
         user.simulations.push(simulation_id);
     }
+
     saveUsers(users);
+
     res.json({simulations: user.simulations});
 });
 
 app.delete('/users/:id/simulations/:sim_id', (req, res) => {
     const users = loadUsers();
     const user = users.find(u => u.user_id === req.params.id);
+
     if(!user){
         return res.status(404).json({error: 'User not found.'});
     }
+
     user.simulations = user.simulations.filter(sim => sim !== req.params.sim_id);
     saveUsers(users);
+    
     res.json({simulations: user.simulations});
 });
 
