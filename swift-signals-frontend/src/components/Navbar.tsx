@@ -9,17 +9,17 @@ function Navbar() {
       </div>
       <div className="navbar-center">
         <ul className="nav-links">
-          <li><a href="#dashboard">Dashboard</a></li>
-          <li><a href="#intersections">Intersections</a></li>
-          <li><a href="#simulations">Simulations</a></li>
-          <li><a href="#users">Users</a></li>
+          <li><a href="/">Dashboard</a></li>
+          <li><a href="/intersections">Intersections</a></li>
+          <li><a href="/simulations">Simulations</a></li>
+          <li><a href="/users">Users</a></li>
         </ul>
       </div>
       <div className="navbar-right">
         <div className="user-profile">
           <img src="/src/assets/userProfileIcon.png" alt="User" className="user-image" />
           <span>John Doe</span>
-          <a href="#logout" className="logout-icon">
+          <a href="/logout" className="logout-icon">
             <img src="/src/assets/logoutIcon.png" alt="Logout" />
           </a>
         </div>
