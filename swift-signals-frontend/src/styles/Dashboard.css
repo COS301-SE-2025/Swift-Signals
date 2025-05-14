@@ -1,3 +1,7 @@
+body {
+  overflow: hidden;
+}
+
 .chart-container {
   position: relative;
   width: 100%;
@@ -49,7 +53,7 @@ canvas {
   grid-gap: 0px;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 0px;
   margin-bottom: 20px;
 }
 
@@ -60,15 +64,44 @@ canvas {
   padding: 20px;
   margin-bottom: 10px;
   width: 478px;
-  height: 150px;
+  height: 100px;
   position: relative;
 }
 
-.card-icon {
+.card-icon-1 {
   font-size: 2.5em;
-  color: #646cff;
-  margin-top: 10px;
+  color: #3700FF;
+  position: absolute;
+  top: 20px;
+  right: 50px;
   text-align: right;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #D0D3FF;
+}
+
+.card-icon-2 {
+  font-size: 2.5em;
+  color: #008B25;
+  position: absolute;
+  top: 20px;
+  right: 50px;
+  text-align: right;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #87FF95;
+}
+
+.card-icon-3 {
+  font-size: 2.5em;
+  color: #8600B3;
+  position: absolute;
+  top: 20px;
+  right: 50px;
+  text-align: right;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #ED96FF;
 }
 
 .card-h3 {
@@ -78,7 +111,7 @@ canvas {
   color: #656565;
   font-weight: normal;
   position: absolute;
-  top: 30px;
+  top: 15px;
   left: 50px;
 }
 
@@ -89,7 +122,7 @@ canvas {
   color: black;
   font-weight: bold;
   position: absolute;
-  top: 60px;
+  top: 35px;
   left: 50px;
 }
 
@@ -112,4 +145,118 @@ canvas {
   cursor: pointer;
   transition: background-color 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 288px;
+  height: 50px;
+}
+
+.grid {
+  margin-left: 50px;
+}
+
+.recent-simulations-tab {
+  width: 100%;
+  height: 430px;
+  border-collapse: collapse;
+  margin-top: 10px;
+  border-radius: 25px;
+}
+
+.recent-simulations-tab h2 {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  text-align: start;
+  margin-left: 0px;
+  color: black;
+  font-weight: bold;
+}
+
+.recent-simulations-tab table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  border-radius: 25px;
+}
+
+.recent-simulations-tab thead tr th {
+  padding: 10px;
+  background-color: #ffffff;
+  color: #919191;
+  font-weight: bold;
+}
+
+.recent-simulations-tab tbody tr td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  color: #000000;
+  font-weight: bold;
+}
+
+.status {
+  color: #000000;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.view-details-button {
+  background-color: #ffffff;
+  font-weight: bold;
+  text-align: left;
+}
+
+.view-details-button:hover {
+  border-color: #ffffff;
+}
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin-right: 150px;
+  margin-bottom: 83px;
+  gap: 0;
+  height: 510px;
+  width: 700px;
+  border-radius: 25px;
+}
+
+.stats h2 {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+  text-align: left;
+  margin-left: 30px;
+  color: black;
+  font-weight: bold;
+}
+
+.stats .traffic-graph {
+  justify-self: center;
+  align-self: center;
+  width: 500px;
+  height: 100%;
+  margin-bottom: 0;
+}
+
+.top-intersections {
+  width: 90%;
+  margin-left: 30px;
+  margin-right: 30px;
+  margin-top: 0;
+}
+
+.top-intersections h3 {
+  font-size: 1.1em;
+  text-align: left;
+  color: black;
+  font-weight: bold;
+}
+
+.top-intersections span {
+  font-size: 0.9em;
+}
+
+.top-intersections .total span {
+  font-size: 1.0em;
 }

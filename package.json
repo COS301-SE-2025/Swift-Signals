@@ -2,6 +2,7 @@
   "dependencies": {
     "chart.js": "^4.4.9",
     "lucide-react": "^0.510.0",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.0"
   },
   "devDependencies": {

@@ -1,10 +1,12 @@
 import './Navbar.css';
+import { FaCircleUser } from "react-icons/fa6";
+import { IoIosLogOut } from "react-icons/io";
 
 function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <img src="/src/assets/placeholder.png" alt="Logo" className="logo-image" />
+        <img src="/src/assets/SS-Logo.png" alt="Logo" className="logo-image" />
         <div className="logo">Swift Signals</div>
       </div>
       <div className="navbar-center">
@@ -17,10 +19,10 @@ function Navbar() {
       </div>
       <div className="navbar-right">
         <div className="user-profile">
-          <img src="/src/assets/userProfileIcon.png" alt="User" className="user-image" />
+          <FaCircleUser size={45}/>
           <span>John Doe</span>
           <a href="/logout" className="logout-icon">
-            <img src="/src/assets/logoutIcon.png" alt="Logout" />
+            <IoIosLogOut size={35} color='#991915' />
           </a>
         </div>
       </div>

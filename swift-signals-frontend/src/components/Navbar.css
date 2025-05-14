@@ -21,7 +21,7 @@
 
 .logo-image {
   height: 40px;
-  margin-right: 10px;
+  margin-right: 0px;
   margin-left: 50px;
 }
 
@@ -70,9 +70,11 @@
   border-radius: 50%;
 }
 
-.logout-icon img {
-  height: 30px;
-  width: 30px;
-  margin-left: 20px;
+.logout-icon {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
   margin-right: 50px;
 }
