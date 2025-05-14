@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Dashboard from './pages/Dashboard';
 import ErrorBoundary from './components/ErrorBoundary';
 import reactLogo from './assets/react.svg';
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<Dashboard />} />
         </Routes>
       </ErrorBoundary>
+      <Footer />
     </Router>
   );
 }

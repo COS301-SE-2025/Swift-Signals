@@ -1,0 +1,38 @@
+.footer {
+  background-color: #F0F0F0; /* Tailwind's gray-800 */
+  color: #000000; /* White text */
+  z-index: 2000; /* Ensure it stays on top */
+  text-align: center; /* Center-align text */
+  position: relative;
+  bottom: 0;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  height: 70px;
+  padding: 1rem 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center; /* Vertically align logo and text */
+  left: 50%;
+}
+
+.footer-logo img {
+  height: 40px; /* Adjust logo size */
+  margin-right: 0.5rem; /* Space between logo and text */
+}
+
+.footer-copyright {
+  font-size: 0.875rem; /* Small text */
+  margin-left: 20px; /* Remove any default margin */
+}
+
+.container {
+  display: flex;
+  justify-content: center; /* Align sections horizontally */
+  align-items: center; /* Align sections vertically */
+  gap: 0; /* Remove any gap between sections */
+}

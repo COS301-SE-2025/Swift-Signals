@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import '../styles/Dashboard.css';
 import { Chart, registerables } from 'chart.js';
 
@@ -147,7 +148,7 @@ const Dashboard: React.FC = () => {
       <Navbar />
       <div className="main-content">
         <h1 className="Dashboard-h1">Dashboard Overview</h1>
-        <p className="Dashboard-p">Monitor and manage traffic signal operations</p>
+        {/* <p className="Dashboard-p">Monitor and manage traffic signal operations</p> */}
 
         {/* Summary Cards */}
         <div className="card-grid">
@@ -249,6 +250,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

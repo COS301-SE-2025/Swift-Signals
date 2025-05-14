@@ -1,11 +1,15 @@
 {
   "dependencies": {
+    "@tailwindcss/postcss": "^4.1.6",
     "chart.js": "^4.4.9",
     "lucide-react": "^0.510.0",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.6.0"
   },
   "devDependencies": {
-    "@types/react-router-dom": "^5.3.3"
+    "@types/react-router-dom": "^5.3.3",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.6"
   }
 }

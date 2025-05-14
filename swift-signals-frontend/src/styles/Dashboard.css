@@ -33,17 +33,17 @@ canvas {
   margin-left: 50px;
   color: black;
   font-weight: bold;
-  margin-bottom: 0;
+  margin-bottom: 20px;
 }
 
-.Dashboard-p {
+/* .Dashboard-p {
   font-size: 1.2em;
   margin-bottom: 20px;
   text-align: left;
   margin-left: 50px;
   color: #656565;
   font-weight: normal;
-}
+} */
 
 .card-grid {
   margin-left: 50px;
@@ -215,7 +215,7 @@ canvas {
   bottom: 0;
   right: 0;
   margin-right: 150px;
-  margin-bottom: 83px;
+  margin-bottom: 115px;
   gap: 0;
   height: 510px;
   width: 700px;
