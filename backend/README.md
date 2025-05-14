@@ -1,6 +1,6 @@
-<!-- This layout was inspired by https://github.com/golang-standards/
+This layout was inspired by https://github.com/golang-standards/
 project-layout/tree/master combined with AI recommendations to integrate 
-node.js and python-->
+node.js and python
 
 ```/backend
 ├── /cmd
