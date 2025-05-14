@@ -2,7 +2,7 @@
 project-layout/tree/master combined with AI recommendations to integrate 
 node.js and python-->
 
-/backend
+```/backend
 ├── /cmd
 │   ├── api-gateway             # Entry point for API Gateway 
 │   └── go-user-service         # Entry point for Go microservice
@@ -67,4 +67,4 @@ node.js and python-->
 │
 └── /assets
     └── /images                 # Diagrams, ML charts, etc.
-
+```
