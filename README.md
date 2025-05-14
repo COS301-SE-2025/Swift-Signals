@@ -1,6 +1,6 @@
 # Swift-Signals
 
-# Project Structure
+# UI Project Structure
 ```
 swift-signals-frontend/
 ├── public/                # Static assets
