@@ -1,6 +1,7 @@
 import './Navbar.css';
 import { FaCircleUser } from "react-icons/fa6";
 import { IoIosLogOut } from "react-icons/io";
+import ThemeToggle from './ThemeToggle';
 
 function Navbar() {
   return (
@@ -18,11 +19,12 @@ function Navbar() {
         </ul>
       </div>
       <div className="navbar-right">
+        {/* <ThemeToggle /> */}
         <div className="user-profile">
           <FaCircleUser size={45}/>
           <span>John Doe</span>
           <a href="/logout" className="logout-icon">
-            <IoIosLogOut size={35} color='#991915' />
+            <IoIosLogOut size={35} color='#991915 dark: color=#fff'/>
           </a>
         </div>
       </div>

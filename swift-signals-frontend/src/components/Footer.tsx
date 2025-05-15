@@ -1,4 +1,5 @@
 import './Footer.css';
+import ThemeToggle from './ThemeToggle';
 
 const Footer: React.FC = () => {
   return (
@@ -7,9 +8,9 @@ const Footer: React.FC = () => {
         {/* Logo Section */}
         <div className="footer-logo flex items-center">
           <img src="/src/assets/scs-logo.png" alt="Logo" className="h-10 mr-3" />
-          <span className="text-lg font-semibold">Southern Cross Solutions</span>
+          <span className="text-lg font-semibold">A Southern Cross Solutions Product</span>
         </div>
-
+        <ThemeToggle />
         {/* Copyright Section
         <div className="footer-copyright text-sm">
           © {new Date().getFullYear()} Swift Signals. All rights reserved.

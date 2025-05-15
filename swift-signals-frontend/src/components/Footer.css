@@ -1,8 +1,8 @@
 .footer {
-  background-color: #F0F0F0; /* Tailwind's gray-800 */
-  color: #000000; /* White text */
-  z-index: 2000; /* Ensure it stays on top */
-  text-align: center; /* Center-align text */
+  background-color: #F0F0F0;
+  color: #000000;
+  z-index: 2000;
+  text-align: center;
   position: relative;
   bottom: 0;
   position: fixed;
@@ -14,25 +14,31 @@
   justify-content: center;
 }
 
+.dark .footer {
+  background-color: #000000;
+  color: #ffffff;
+}
+
 .footer-logo {
   display: flex;
-  align-items: center; /* Vertically align logo and text */
+  align-items: center;
   left: 50%;
+  margin-right: 20px;
 }
 
 .footer-logo img {
-  height: 40px; /* Adjust logo size */
-  margin-right: 0.5rem; /* Space between logo and text */
+  height: 40px;
+  margin-right: 0.5rem;
 }
 
 .footer-copyright {
-  font-size: 0.875rem; /* Small text */
-  margin-left: 20px; /* Remove any default margin */
+  font-size: 0.875rem;
+  margin-left: 20px;
 }
 
 .container {
   display: flex;
-  justify-content: center; /* Align sections horizontally */
-  align-items: center; /* Align sections vertically */
-  gap: 0; /* Remove any gap between sections */
+  justify-content: center;
+  align-items: center;
+  gap: 0;
 }

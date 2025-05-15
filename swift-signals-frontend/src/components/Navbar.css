@@ -8,10 +8,13 @@
   align-items: center;
   padding: 0 20px;
   background-color: #fff;
-  border-bottom: 1px solid #ddd;
   height: 80px;
   box-sizing: border-box;
   z-index: 1000;
+}
+
+.dark .navbar {
+  background-color: #000000;
 }
 
 .navbar-left {
@@ -32,6 +35,10 @@
   margin-top: 40px;
 }
 
+.dark .logo {
+  color: #DADADA;
+}
+
 .navbar-center .nav-links {
   display: flex;
   list-style: none;
@@ -46,8 +53,16 @@
   font-size: 18px;
 }
 
+.dark .navbar-center .nav-links li a {
+  color: #DADADA;
+}
+
 .navbar-center .nav-links li a:hover {
   color: #a33;
+}
+
+.dark .navbar-center .nav-links li a:hover {
+  color: #4B6FFF;
 }
 
 .navbar-right {
@@ -64,6 +79,10 @@
   font-size: 18px;
 }
 
+.dark .user-profile {
+  color: #DADADA;
+}
+
 .user-image {
   height: 40px;
   width: 40px;
@@ -77,4 +96,8 @@
   justify-content: center;
   margin-left: 10px;
   margin-right: 50px;
+}
+
+.dark .logout-icon {
+  color: #DADADA;
 }

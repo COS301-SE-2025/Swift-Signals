@@ -26,6 +26,10 @@ canvas {
   position: fixed;
 }
 
+.dark .main-content {
+  background-color: #000000;
+}
+
 .Dashboard-h1 {
   font-size: 2.5em;
   margin-bottom: 20px;
@@ -34,6 +38,10 @@ canvas {
   color: black;
   font-weight: bold;
   margin-bottom: 20px;
+}
+
+.dark .Dashboard-h1 {
+  color: #fff;
 }
 
 /* .Dashboard-p {
@@ -66,6 +74,11 @@ canvas {
   width: 478px;
   height: 100px;
   position: relative;
+}
+
+.dark .card {
+  background-color: #2A2A2A;
+  color: #F9FAFB;
 }
 
 .card-icon-1 {
@@ -115,6 +128,10 @@ canvas {
   left: 50px;
 }
 
+.dark .card-h3 {
+  color: #DADADA;
+}
+
 .card-p {
   font-size: 2.5em;
   margin: 0;
@@ -124,6 +141,10 @@ canvas {
   position: absolute;
   top: 35px;
   left: 50px;
+}
+
+.dark .card-p {
+  color: #FFFFFF;
 }
 
 .quick-actions {
@@ -147,6 +168,8 @@ canvas {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 288px;
   height: 50px;
+  display: flex;
+  justify-content: center;
 }
 
 .grid {
@@ -161,6 +184,11 @@ canvas {
   border-radius: 25px;
 }
 
+.dark .recent-simulations-tab {
+  background-color: #2A2A2A;
+  color: #F9FAFB;
+}
+
 .recent-simulations-tab h2 {
   font-size: 1.5em;
   margin-bottom: 20px;
@@ -168,6 +196,10 @@ canvas {
   margin-left: 0px;
   color: black;
   font-weight: bold;
+}
+
+.dark .recent-simulations-tab h2 {
+  color: #FFFFFF;
 }
 
 .recent-simulations-tab table {
@@ -184,6 +216,11 @@ canvas {
   font-weight: bold;
 }
 
+.dark .recent-simulations-tab thead tr th {
+  background-color: #2A2A2A;
+  color: #DADADA;
+}
+
 .recent-simulations-tab tbody tr td {
   padding: 10px;
   border-bottom: 1px solid #ddd;
@@ -191,10 +228,15 @@ canvas {
   font-weight: bold;
 }
 
+.dark .recent-simulations-tab tbody tr td {
+  background-color: #2A2A2A;
+  color: #fff;
+}
+
 .status {
-  color: #000000;
   font-weight: bold;
-  font-size: 0.9em;
+  font-size: 1.1em;
+  padding: 1 1 1;
 }
 
 .view-details-button {
@@ -203,8 +245,17 @@ canvas {
   text-align: left;
 }
 
+.dark .view-details-button {
+  background-color: #2A2A2A;
+  color: #5287FA;
+}
+
 .view-details-button:hover {
   border-color: #ffffff;
+}
+
+.dark .view-details-button:hover {
+  border-color: #2A2A2A;
 }
 
 .stats {
@@ -218,8 +269,13 @@ canvas {
   margin-bottom: 115px;
   gap: 0;
   height: 510px;
-  width: 700px;
+  width: 100%;
+  max-width: 700px;
   border-radius: 25px;
+}
+
+.dark .stats {
+  background-color: #2A2A2A;
 }
 
 .stats h2 {
@@ -231,12 +287,21 @@ canvas {
   font-weight: bold;
 }
 
+.dark .stats h2 {
+  color: #FFFFFF;
+}
+
 .stats .traffic-graph {
   justify-self: center;
   align-self: center;
-  width: 500px;
+  width: 100%;
+  max-width: 500px;
   height: 100%;
   margin-bottom: 0;
+}
+
+.dark .stats .traffic-graph {
+  background-color: #2A2A2A;
 }
 
 .top-intersections {
@@ -253,6 +318,10 @@ canvas {
   font-weight: bold;
 }
 
+.dark .top-intersections h3 {
+  color: #FFFFFF;
+}
+
 .top-intersections span {
   font-size: 0.9em;
 }
@@ -260,3 +329,49 @@ canvas {
 .top-intersections .total span {
   font-size: 1.0em;
 }
+
+@media screen and (max-width: 1700px) {
+  .stats {
+    width: 100%;
+    max-width: 600px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin-right: 60px;
+  }
+  
+  .recent-simulations-tab {
+    width: 110%;
+    max-width: 1000px;
+  }
+}
+
+@media screen and (max-width: 1400px) {
+  .quick-action-button {
+    width: 250px;
+  }
+
+  .card {
+    width: 380px;
+  }
+
+  .grid {
+    width: 110%;
+  }
+
+  .recent-simulations-tab {
+    width: 110%;
+  }
+
+  .stats {
+    width: 100%;
+    max-width: 400px;
+    height: 510px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin-right: 60px;
+    margin-bottom: 110px;
+  }
+}
+

@@ -9,15 +9,16 @@ import { FaRoad } from "react-icons/fa";
 import { FaPlay } from "react-icons/fa";
 import { FaChartLine } from "react-icons/fa6";
 import { FaPlus } from "react-icons/fa";
+import { FaMap } from "react-icons/fa";
 
 // Register Chart.js components
 Chart.register(...registerables);
 
 const simulations = [
-  { id: '#1234', intersection: 'Main St & 5th Ave', status: 'Complete', statusColor: 'bg-green-400' },
-  { id: '#1233', intersection: 'Broadway & 7th St', status: 'Running', statusColor: 'bg-yellow-400' },
-  { id: '#1232', intersection: 'Park Ave & 3rd St', status: 'Failed', statusColor: 'bg-red-400' },
-  { id: '#1231', intersection: 'Broadway & 7th St', status: 'Running', statusColor: 'bg-yellow-400' }
+  { id: '#1234', intersection: 'Main St & 5th Ave', status: 'Complete', statusColor: 'bg-statusGreen', textColor: 'text-statusTextGreen' },
+  { id: '#1233', intersection: 'Broadway & 7th St', status: 'Running', statusColor: 'bg-statusYellow', textColor: 'text-statusTextYellow' },
+  { id: '#1232', intersection: 'Park Ave & 3rd St', status: 'Failed', statusColor: 'bg-statusRed', textColor: 'text-statusTextRed' },
+  { id: '#1231', intersection: 'Broadway & 7th St', status: 'Running', statusColor: 'bg-statusYellow', textColor: 'text-statusTextYellow' }
 ];
 
 const topIntersections = [
@@ -144,9 +145,9 @@ const Dashboard: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
       <Navbar />
-      <div className="main-content">
+      <div className="main-content flex-grow">
         <h1 className="Dashboard-h1">Dashboard Overview</h1>
         {/* <p className="Dashboard-p">Monitor and manage traffic signal operations</p> */}
 
@@ -183,14 +184,17 @@ const Dashboard: React.FC = () => {
 
         {/* Quick Actions */}
         <div className="quick-actions">
-          <button className="quick-action-button bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-            + New Intersection
+          <button className="quick-action-button bg-customIndigo text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+            <FaPlus /> {/* Add Plus Icon */}
+            New Intersection
           </button>
-          <button className="quick-action-button bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-            ▶ Run Simulation
+          <button className="quick-action-button bg-customGreen text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2">
+            <FaPlay /> {/* Add Play Icon */}
+            Run Simulation
           </button>
-          <button className="quick-action-button bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">
-            ≡ View Map
+          <button className="quick-action-button bg-customPurple text-white px-4 py-2 rounded-lg hover:bg-gray-700 flex items-center gap-2">
+            <FaMap /> {/* Add Map Icon */}
+            View Map
           </button>
         </div>
 
@@ -214,7 +218,7 @@ const Dashboard: React.FC = () => {
                     <td className="p-2">{sim.id}</td>
                     <td className="p-2">{sim.intersection}</td>
                     <td className="p-2">
-                      <span className={`status px-2 py-1 rounded-full text-xs ${sim.statusColor}`}>
+                      <span className={`status px-2 py-1 rounded-full text-xs ${sim.statusColor} ${sim.textColor}`}>
                         {sim.status}
                       </span>
                     </td>
@@ -239,13 +243,13 @@ const Dashboard: React.FC = () => {
             <h3 className="text-md font-semibold text-gray-700 mb-2">Top Intersections</h3>
             {topIntersections.map((intersection, index) => (
               <div key={index} className="flex justify-between py-2 border-t">
-            <span className="text-gray-600">{intersection.name}</span>
-            <span className="text-gray-800 font-semibold">{intersection.volume}</span>
+            <span className="text-gray-600 dark:text-gray-200">{intersection.name}</span>
+            <span className="text-gray-800 font-semibold dark:text-gray-200">{intersection.volume}</span>
               </div>
             ))}
             <div className="total flex justify-between py-2 border-t">
-              <span className="text-gray-600 font-bold">Avg Daily Volume:</span>
-              <span className="text-gray-800 font-bold">12,000 vehicles</span>
+              <span className="text-gray-600 font-bold dark:text-gray-100">Avg Daily Volume:</span>
+              <span className="text-gray-800 font-bold dark:text-gray-100">12,000 vehicles</span>
             </div>
           </div>
         </div>
