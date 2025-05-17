@@ -1,1 +1,15 @@
-#to be added will run on main
+name: Main Workflow
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  noop:
+    name: No Operation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Do nothing
+        run: echo "This is a placeholder. Nothing to do yet, will update once ready to push to main."
