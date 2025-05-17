@@ -22,5 +22,6 @@ module.exports = {
   ],
   rules: {
     // add any project-specific rules here
+    'react/react-in-jsx-scope': 'off'
   },
 };
