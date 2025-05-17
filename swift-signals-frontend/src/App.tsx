@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Login from './pages/Login';
+import SignUp from './pages/SignUp';
 import Dashboard from './pages/Dashboard';
 import ErrorBoundary from './components/ErrorBoundary';
 import reactLogo from './assets/react.svg';
@@ -18,6 +19,8 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path='/logout' element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          
         </Routes>
       </ErrorBoundary>
       <Footer />

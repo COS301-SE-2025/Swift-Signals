@@ -13,11 +13,11 @@ html, body, #root {
   background: #000000;
 }
 
-.dark .loginContainer {
+.dark .signUpContainer {
   background: #2A2A2A;
 }
 
-.dark .loginTitle {
+.dark .signUpTitle {
   color: #fff;
 }
 

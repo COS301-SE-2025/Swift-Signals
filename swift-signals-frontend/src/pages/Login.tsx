@@ -37,13 +37,13 @@ const TrafficLight = ({ redActive, yellowActive, greenActive }: TrafficLightProp
 
 const Login = () => {
   const [username, setUsername] = React.useState('');
-  const [email, setEmail] = React.useState('');
+  // const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const navigate = useNavigate(); 
 
   interface LoginFormValues {
     username: string;
-    email: string;
+    // email: string;
     password: string;
   }
 
@@ -51,11 +51,11 @@ const Login = () => {
 
   const handleSubmit = (event: HandleSubmitEvent): void => {
     event.preventDefault();
-    if (!username || !email || !password) {
+    if (!username || !password) {
       console.log('Please fill in all fields.');
       return;
     }
-    const formValues: LoginFormValues = { username, email, password };
+    const formValues: LoginFormValues = { username, password };
     console.log('Logging in with:', formValues);
     // Add your login logic here
     navigate('/dashboard');
@@ -64,11 +64,11 @@ const Login = () => {
   return (
     <div className="min-h-screen min-w-screen w-full h-full flex flex-col sm:flex-row items-center justify-center font-sans  from-slate-100 to-sky-100">
       {/* Login Form Container */}
-      <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md"
+      <div className="loginContainer bg-white p-8 rounded-xl shadow-2xl w-full max-w-md"
       style={{
           boxShadow: '0 8px 40px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12)'
         }}>
-        <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Login</h1>
+        <h1 className="loginTitle text-4xl font-bold text-center text-gray-800 mb-8">Login</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Username Input */}
           <div>
@@ -87,7 +87,7 @@ const Login = () => {
             />
           </div>
           {/* Email Input */}
-          <div>
+          {/* <div>
             <label htmlFor="email" className="sr-only">
               Email
             </label>
@@ -101,7 +101,7 @@ const Login = () => {
               className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
             />
-          </div>
+          </div> */}
           {/* Password Input */}
           <div>
             <label htmlFor="password" className="sr-only">
@@ -120,7 +120,7 @@ const Login = () => {
           </div>
           {/* Forgot Password Link */}
           <div className="text-right">
-            <a href="#" className="text-sm text-indigo-600 hover:text-indigo-800 hover:underline transition-colors">
+            <a href="#" className="text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors">
               Forgot Password?
             </a>
           </div>
@@ -135,11 +135,16 @@ const Login = () => {
           </div>
         </form>
         {/* Registration Link */}
-        <p className="mt-8 text-center text-sm text-gray-600">
+        <p className="regLink mt-8 text-center text-sm text-gray-600">
           Don't have an account?{' '}
-          <a href="#" className="font-medium text-indigo-600 hover:text-indigo-800 hover:underline transition-colors">
+          <button
+            type="button"
+            onClick={() => navigate('/signup')}
+            className="font-medium text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors bg-transparent border-none p-0 m-0 cursor-pointer"
+            style={{ background: 'none' }}
+          >
             Register Here
-          </a>
+          </button>
         </p>
       </div>
 
@@ -147,7 +152,7 @@ const Login = () => {
       <div className="mt-8 sm:mt-0 sm:ml-12 flex justify-center">
         <TrafficLight
           redActive={username.length > 0}
-          yellowActive={email.length > 0}
+          yellowActive={username.length > 0}
           greenActive={password.length > 0}
         />
       </div>
