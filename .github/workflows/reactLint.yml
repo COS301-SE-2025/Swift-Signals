@@ -2,9 +2,9 @@ name: Lint React TS App
 
 on:
   push:
-    branches: [Joshua-UI-Updates]
+    branches: [Joshua-UI-Updates, UI-Linting-Fixes]
   pull_request:
-    branches: [Joshua-UI-Updates]
+    branches: [Joshua-UI-Updates, UI-Linting-Fixes]
 
 jobs:
   lint:
