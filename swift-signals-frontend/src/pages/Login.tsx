@@ -47,9 +47,7 @@ const Login = () => {
     password: string;
   }
 
-  interface HandleSubmitEvent extends React.FormEvent<HTMLFormElement> {}
-
-  const handleSubmit = (event: HandleSubmitEvent): void => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     if (!username || !password) {
       console.log('Please fill in all fields.');
@@ -120,9 +118,12 @@ const Login = () => {
           </div>
           {/* Forgot Password Link */}
           <div className="text-right">
-            <a href="#" className="text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors">
+            <button
+              type="button"
+              onClick={() => {/* Add forgot password logic here*/}}
+              className="text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors">
               Forgot Password?
-            </a>
+            </button>
           </div>
           {/* Login Button */}
           <div>
@@ -136,7 +137,7 @@ const Login = () => {
         </form>
         {/* Registration Link */}
         <p className="regLink mt-8 text-center text-sm text-gray-600">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <button
             type="button"
             onClick={() => navigate('/signup')}

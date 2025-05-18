@@ -1,7 +1,7 @@
 import './Navbar.css';
 import { FaCircleUser } from "react-icons/fa6";
 import { IoIosLogOut } from "react-icons/io";
-import ThemeToggle from './ThemeToggle';
+//import ThemeToggle from './ThemeToggle';
 
 function Navbar() {
   return (
