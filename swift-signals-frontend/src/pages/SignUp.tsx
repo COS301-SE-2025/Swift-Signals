@@ -47,9 +47,7 @@ const SignUp = () => {
     password: string;
   }
 
-  interface HandleSubmitEvent extends React.FormEvent<HTMLFormElement> {}
-
-  const handleSubmit = (event: HandleSubmitEvent): void => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
     if (!username || !email || !password) {
       console.log('Please fill in all fields.');
