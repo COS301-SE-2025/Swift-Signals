@@ -1,0 +1,40 @@
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  min-width: 100vw;
+  background: #F0F0F0;
+  overflow: hidden;
+}
+
+.dark body, .dark #root, .dark #root > div {
+  background: #000000;
+}
+
+.dark .loginContainer {
+  background: #2A2A2A;
+}
+
+.dark .loginTitle {
+  color: #fff;
+}
+
+.dark input {
+  background: #2A2A2A;
+  color: #fff;
+}
+
+.dark .regLink {
+  color: #b3b2b2;
+}
+
+.welcomeMessage {
+  font-size: 1.9rem;
+  margin-top: 30px;
+}
+
+.welcomeMessage span {
+  font-size: 3.2rem;
+}

@@ -1,0 +1,63 @@
+body {
+  overflow: hidden;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #F0F0F0;
+  top: 80px;
+  left: 0;
+  position: absolute;
+  padding: 20px;
+  position: fixed;
+}
+
+.dark .main-content {
+  background-color: #000000;
+}
+
+.carContainer {
+    margin-top: 0px;
+    top: 0px;
+}
+
+.c-card {
+    background-color: #fff;
+    border-radius: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.view-results-btn {
+  border-radius: 50px;
+  background-color: #92A4FB;
+  color: black;
+}
+
+.delete-btn {
+  border-radius: 50px;
+  background-color: #EF3E3E;
+  color: black;
+  font-weight: bold;
+}
+
+.title {
+  font-size: 30px;
+}
+
+.bg-maroon {
+  background-color: #800000;
+}
+
+.dropdown {
+  border-radius: 50px;
+  border-color: #800000;
+}
+
+.run-btn {
+  border-radius: 50px;
+  background-color: #86CD8E;
+}
