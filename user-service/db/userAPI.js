@@ -121,40 +121,34 @@ app.delete('/users/:id', async (req, res) => {
     res.json({message: `User ${req.params.id} deleted.`});
 });
 
-app.post('/users/:id/simulations', (req, res) => {
-    const users = loadUsers();
-    const user = users.find(u => u.user_id === req.params.id);
-
-    if(!user){
-        return res.status(404).json({error: 'User not found.'});
-    }
-
+app.post('/users/:id/simulations', async (req, res) => {
     const { simulation_id } = req.body;
+    if (!simulation_id){
+        return res.status(400).json({error: 'Simulation ID required'});
+    } 
 
-    if(!simulation_id){
-        return res.status(400).json({error: 'Simulation ID required.'});
-    }
+    const user = await User.findOne({user_id: req.params.id});
+    if (!user){
+        return res.status(404).json({ error: 'User not found' });
+    } 
 
-    if(!user.simulations.includes(simulation_id)){
+    if (!user.simulations.includes(simulation_id)) {
         user.simulations.push(simulation_id);
+        await user.save();
     }
-
-    saveUsers(users);
 
     res.json({simulations: user.simulations});
 });
 
-app.delete('/users/:id/simulations/:sim_id', (req, res) => {
-    const users = loadUsers();
-    const user = users.find(u => u.user_id === req.params.id);
-
-    if(!user){
-        return res.status(404).json({error: 'User not found.'});
-    }
+app.delete('/users/:id/simulations/:sim_id', async (req, res) => {
+    const user = await User.findOne({user_id: req.params.id});
+    if (!user){
+        return res.status(404).json({error: 'User not found'});
+    } 
 
     user.simulations = user.simulations.filter(sim => sim !== req.params.sim_id);
-    saveUsers(users);
-    
+    await user.save();
+
     res.json({simulations: user.simulations});
 });
 
