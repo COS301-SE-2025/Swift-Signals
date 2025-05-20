@@ -375,3 +375,31 @@ canvas {
   }
 }
 
+@media screen and (max-height: 900px) {
+  .quick-action-button {
+    width: 15%;
+  }
+
+  .card {
+    width: 90%;
+  }
+
+  .grid {
+    width: 110%;
+  }
+
+  .recent-simulations-tab {
+    width: 110%;
+  }
+
+  .stats {
+    width: 100%;
+    max-width: 400px;
+    height: 510px;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin-right: 70px;
+    margin-bottom: 85px;
+  }
+}
