@@ -1,10 +1,18 @@
 const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
-const { json } = require('stream/consumers');
+const User = require('./models/User.js');
+const mongoose = require('mongoose');
 
 const app = express();
 const PORT = 3001;
+
+mongoose.connect('mongodb+srv://u17104361:ThisIsInsideInsights1@swiftsignalsdb.m860tfn.mongodb.net/?retryWrites=true&w=majority&appName=SWiftSignalsDB', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('Connected to DB'))
+.catch((err) => console.error('DB connection error:', err));
 
 app.use(cors());
 app.use(express.json());
@@ -19,24 +27,13 @@ app.get('/api/optimizations', (_, res) => res.json(loadJSON('optimizations.json'
 app.get('/api/traffic', (_, res) => res.json(loadJSON('traffic_data.json')));
 
 //user routes
-function loadUsers(){
-    const raw = fs.readFileSync('./data/users.json');
-    const data = JSON.parse(raw);
-    return data.users;
-}
-
-function saveUsers(users){
-    fs.writeFileSync('./data/users.json', JSON.stringify({users}, null, 2));
-}
-
-app.get('/users', (req, res) => {
-    const users = loadUsers();
+app.get('/users', async (req, res) => {
+    const users = await User.find();
     res.json(users);
 });
 
-app.get('/users/:id', (req, res) => {
-    const users = loadUsers();
-    const user = users.find(u => u.user_id === req.params.id);
+app.get('/users/:id', async (req, res) => {
+    const users = await User.fnidOne({user_id: req.params.id});
 
     if(!user){
         return res.status(404).json({error: 'User not found.'});
