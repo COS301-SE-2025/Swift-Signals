@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import Dashboard from './pages/Dashboard';
 import Simulations from './pages/Simulations';
+import Intersections from './pages/Intersections';
+import Users from './pages/Users';
 import ErrorBoundary from './components/ErrorBoundary';
 //import reactLogo from './assets/react.svg';
 //import viteLogo from '/vite.svg';
@@ -22,6 +24,8 @@ function App() {
           <Route path='/logout' element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/simulations" element={<Simulations />} />
+          <Route path="/intersections" element={<Intersections />} />
+          <Route path="/Users" element={<Users />} />
           {/* Add more routes as needed */}
         </Routes>
       </ErrorBoundary>
