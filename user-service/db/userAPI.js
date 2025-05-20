@@ -42,9 +42,8 @@ app.get('/users/:id', async (req, res) => {
     res.json(user);
 })
 
-app.get('/users/:id/simulations', (req, res) => {
-    const users = loadUsers();
-    const user = users.find(u => u.user_id === req.params.id);
+app.get('/users/:id/simulations', async (req, res) => {
+    const users = await User.findOne({user_id: req.params.id});
 
     if(!user){
         return res.status(404).json({error: 'User not found.'});
@@ -53,12 +52,9 @@ app.get('/users/:id/simulations', (req, res) => {
     res.json({simulations: user.simulations});
 })
 
-app.post('/users', (req, res) => {
-    const users = loadUsers();
-    const newUser = req.body;
-    const lastUser = users[users.length - 1];
-    const lastUserId = lastUser ? lastUser.user_id : "u000"
-    const lastUserNumber = parseInt(lastUserId.slice(1));
+app.post('/users', async (req, res) => {
+    const lastUser = await User.fnidOne().sort({user_id: -1}).exec();
+    const lastUserNumber = parseInt(lastUser.user_id.slice(1));
     const newUserId = `u${(lastUserNumber + 1).toString().padStart(3, '0')}`;
 
     const defaultValues = {
@@ -74,69 +70,54 @@ app.post('/users', (req, res) => {
         auth: "",
     };
 
-    const userWithDefaults = {...defaultValues, ...newUser};
+    const user = new User({...defaultValues, ...req.body});
+    await user.save();
+    res.status(201).json(user);
+});
 
-    if(!userWithDefaults.user_id || !userWithDefaults.userName){
-        return res.status(400).json({error: 'User id and username required.'});
+app.patch('/users/:id/profileArt', async (req, res) => {
+    const {profileArt} = req.body;
+    if (!profileArt){
+        return res.status(400).json({error: 'ProfileArt required'});
     } 
 
-    users.push(userWithDefaults);
-    fs.writeFileSync('./data/users.json', JSON.stringify({users}, null, 2));
+    const user = await User.findOneAndUpdate(
+        {user_id: req.params.id},
+        {profileArt},
+        {new: true}
+    );
 
-    res.status(201).json(userWithDefaults);
+    if (!user){
+        return res.status(404).json({error: 'User not found'});
+    } 
+
+    res.json({ profileArt: user.profileArt });
 });
 
-app.patch('/users/:id/profileArt', (req, res) => {
-    const users = loadUsers();
-    const user = users.find(u => u.user_id === req.params.id);
+app.patch('/users/:id/password', async (req, res) => {
+    const {newPassword} = req.body;
+    if (!newPassword){
+        return res.status(400).json({error: 'New password required'});
+    } 
 
-    if(!user){
-        return saveUsers.status(404).json({error: 'User not found.'});
+    const user = await User.findOneAndUpdate(
+        {user_id: req.params.id},
+        {auth: newPassword},
+        {new: true}
+    );
+
+    if (!user){
+        return res.status(404).json({error: 'User not found'});
     }
 
-    const { profileArt } = req.body;
-
-    if(!profileArt){
-        return res.status(400).json({error: 'Profile image URL required'});
-    }
-
-    user.profileArt = profileArt;
-    saveUsers(users);
-
-    res.json({profileArt: user.profileArt});
+    res.json({message: 'Password updated successfully'});
 });
 
-app.patch('/users/:id/password', (req, res) => {
-    const users = loadUsers();
-    const user = users.find(u => u.user_id === req.params.id);
-
-    if(!user){
-        return res.status(404).json({error: 'User not found.'});
-    }
-
-    const { newPassword } = req.body;
-
-    if(!newPassword){
-        return res.status(400).json({error: 'New password required.'});
-    }
-
-    user.auth = newPassword;
-    saveUsers(users);
-
-    res.json({message: 'Password updated successfully.'});
-});
-
-app.delete('/users/:id', (req, res) => {
-    let users = loadUsers();
-    const user = users.find(u => u.user_id === req.params.id);
-
-    if(!user){
-        return res.status(404).json({error: 'User not found.'});
-    }
-
-    users = users.filter(u => u.user_id !== req.params.id);
-    saveUsers(users);
-
+app.delete('/users/:id', async (req, res) => {
+    const user = await User.findOneAndDelete({user_id: req.params.id});
+    if (!user){
+        return res.status(404).json({error: 'User not found'});
+    } 
     res.json({message: `User ${req.params.id} deleted.`});
 });
 
