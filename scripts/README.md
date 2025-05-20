@@ -10,4 +10,5 @@ Note: Make sure to start Minikube: `minikube start`
 
 ## Scripts
 
-- Run `./frontend-dev.sh` to run the frontend locally. 
+- Run `./frontend-dev.sh` to run the frontend locally (On Mac/Linux). 
+- Run `./frontend-dev.ps1` to run the frontend locally (On Windows). 
