@@ -1,13 +1,27 @@
 const express = require('express');
 const fs = require('fs');
 const cors = require('cors');
-const User = require('./models/User.js');
 const mongoose = require('mongoose');
 
 const app = express();
 const PORT = 3001;
 
-mongoose.connect('mongodb+srv://u17104361:ThisIsInsideInsights1@swiftsignalsdb.m860tfn.mongodb.net/?retryWrites=true&w=majority&appName=SWiftSignalsDB', {
+const userSchema = new mongoose.Schema({
+  user_id: String,
+  name: String,
+  lastName: String,
+  userName: String,
+  email: String,
+  role: String,
+  profileArt: String,
+  created_at: Date,
+  simulations: [String],
+  auth: String
+});
+
+const User = mongoose.model('User', userSchema);
+
+mongoose.connect('mongodb+srv://u17104361:ThisIsInsideInsights1@swiftsignalsdb.m860tfn.mongodb.net/Main?retryWrites=true&w=majority&appName=SWiftSignalsDB', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
@@ -17,14 +31,11 @@ mongoose.connect('mongodb+srv://u17104361:ThisIsInsideInsights1@swiftsignalsdb.m
 app.use(cors());
 app.use(express.json());
 
-const loadJSON = (filename) => {
-  return JSON.parse(fs.readFileSync(`./data/${filename}`, 'utf8'));
-};
 
-app.get('/api/simulations', (_, res) => res.json(loadJSON('simulations.json')));
-app.get('/api/intersections', (_, res) => res.json(loadJSON('intersections.json')));
-app.get('/api/optimizations', (_, res) => res.json(loadJSON('optimizations.json')));
-app.get('/api/traffic', (_, res) => res.json(loadJSON('traffic_data.json')));
+//app.get('/api/simulations', (_, res) => res.json(loadJSON('simulations.json')));
+//app.get('/api/intersections', (_, res) => res.json(loadJSON('intersections.json')));
+//app.get('/api/optimizations', (_, res) => res.json(loadJSON('optimizations.json')));
+//app.get('/api/traffic', (_, res) => res.json(loadJSON('traffic_data.json')));
 
 //user routes
 app.get('/users', async (req, res) => {
@@ -33,7 +44,7 @@ app.get('/users', async (req, res) => {
 });
 
 app.get('/users/:id', async (req, res) => {
-    const users = await User.fnidOne({user_id: req.params.id});
+    const user = await User.findOne({user_id: req.params.id});
 
     if(!user){
         return res.status(404).json({error: 'User not found.'});
@@ -43,7 +54,7 @@ app.get('/users/:id', async (req, res) => {
 })
 
 app.get('/users/:id/simulations', async (req, res) => {
-    const users = await User.findOne({user_id: req.params.id});
+    const user = await User.findOne({user_id: req.params.id});
 
     if(!user){
         return res.status(404).json({error: 'User not found.'});
@@ -53,7 +64,7 @@ app.get('/users/:id/simulations', async (req, res) => {
 })
 
 app.post('/users', async (req, res) => {
-    const lastUser = await User.fnidOne().sort({user_id: -1}).exec();
+    const lastUser = await User.findOne().sort({user_id: -1}).exec();
     const lastUserNumber = parseInt(lastUser.user_id.slice(1));
     const newUserId = `u${(lastUserNumber + 1).toString().padStart(3, '0')}`;
 
@@ -91,7 +102,7 @@ app.patch('/users/:id/profileArt', async (req, res) => {
         return res.status(404).json({error: 'User not found'});
     } 
 
-    res.json({ profileArt: user.profileArt });
+    res.json({profileArt: user.profileArt});
 });
 
 app.patch('/users/:id/password', async (req, res) => {
