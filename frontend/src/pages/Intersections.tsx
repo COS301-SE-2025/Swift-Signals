@@ -2,12 +2,6 @@ import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { Search } from 'lucide-react';
 
-// TypeScript interface for user data
-interface User {
-  id: number;
-  name: string;
-}
-
 // TypeScript interface for intersection data
 interface Intersection {
   id: number;

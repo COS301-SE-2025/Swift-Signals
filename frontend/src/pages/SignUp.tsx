@@ -66,9 +66,9 @@ const SignUp = () => {
         style={{ minWidth: 350 }}
       >
         <img
-          src="/src/assets/LOGO.png"
+          src="/src/assets/logo.png"
           alt="Swift Signals Logo"
-          className="h-20 w-20 object-contain drop-shadow-lg"
+          className="signupLogo h-20 w-20 object-contain drop-shadow-lg"
         />
         <span className="text-xl md:text-4xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
           Welcome to Swift Signals
