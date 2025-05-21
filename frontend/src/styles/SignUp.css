@@ -32,9 +32,15 @@ html, body, #root {
 
 .welcomeMessage {
   font-size: 1.9rem;
-  margin-top: 30px;
+  margin-top: 0px;
 }
 
 .welcomeMessage span {
   font-size: 3.2rem;
+}
+
+.signupLogo {
+  width: 130px;
+  height: 130px;
+  margin-top: 0px;
 }

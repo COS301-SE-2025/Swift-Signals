@@ -7,7 +7,7 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <img src="/src/assets/LOGO.png" alt="Logo" className="logo-image" />
+        <img src="/src/assets/logo.png" alt="Logo" className="logo-image" />
         <div className="logo">Swift Signals</div>
       </div>
       <div className="navbar-center">
