@@ -7,8 +7,8 @@ spec:
   selector: 
     app: frontend
   ports:
-    - port: 80
-      targetPort: 80
+    - port: 5173
+      targetPort: 5173
       nodePort: 30080
 ---
 apiVersion: apps/v1
@@ -29,4 +29,4 @@ spec:
         - name: frontend
           image: frontend:dev #defined in the dev scripts
           ports:
-            - containerPort: 80
+            - containerPort: 5173
