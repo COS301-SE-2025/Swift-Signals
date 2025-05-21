@@ -1,8 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Bar } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import type { LatLng } from 'leaflet';
 import '../styles/Simulations.css';
 
 // Register Chart.js components
@@ -26,6 +31,247 @@ const simulationsTable2 = [
   { id: "SIM020", intersection: "Pine St & River Dr", avgWaitTime: 47.3, vehicleThroughput: 1100, status: "Running" },
   { id: "SIM007", intersection: "Maple Rd & 2nd Ave", avgWaitTime: 35.6, vehicleThroughput: 1300, status: "Failed" },
 ];
+
+const LocationMarker: React.FC<{ setSelectedLocation: (location: string) => void; setCoordinates: (coords: string) => void }> = ({ setSelectedLocation, setCoordinates }) => {
+  const [position, setPosition] = useState<LatLng | null>(null);
+  useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
+      const coordinates = `${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
+      setSelectedLocation(coordinates);
+      setCoordinates(coordinates);
+      console.log(`Marker placed at coordinates: ${coordinates}`);
+    },
+  });
+
+  return position === null ? null : <Marker position={position} />;
+};
+
+// New Simulation Modal Component
+const NewSimulationModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: { name: string; description: string; intersections: string[] }) => void;
+  intersections: string[];
+  type: 'simulations' | 'optimizations';
+}> = ({ isOpen, onClose, onSubmit, intersections, type }) => {
+  const navigate = useNavigate();
+  const [simulationName, setSimulationName] = useState('');
+  const [simulationDescription, setSimulationDescription] = useState('');
+  const [selectedIntersections, setSelectedIntersections] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'List' | 'Search' | 'Map'>('List');
+  const [coordinates, setCoordinates] = useState<string | null>(null);
+
+  // Handle adding an intersection from the List or Search tab
+  const handleAddIntersection = (intersection: string) => {
+    if (intersection && !selectedIntersections.includes(intersection)) {
+      setSelectedIntersections([...selectedIntersections, intersection]);
+    }
+  };
+
+  // Handle removing an intersection
+  const handleRemoveIntersection = (intersection: string) => {
+    setSelectedIntersections(selectedIntersections.filter((item) => item !== intersection));
+  };
+
+  // Handle search action
+  const handleSearch = () => {
+    if (searchQuery && !selectedIntersections.includes(searchQuery)) {
+      console.log(`Searching for location: ${searchQuery}`);
+      setSelectedIntersections([...selectedIntersections, searchQuery]);
+      setSearchQuery('');
+    }
+  };
+
+  // Handle map click to add coordinates as an intersection
+  const handleMapSelection = (location: string) => {
+    if (!selectedIntersections.includes(location)) {
+      setSelectedIntersections([...selectedIntersections, location]);
+    }
+  };
+
+  const handleSubmit = () => {
+    if (!simulationName || selectedIntersections.length === 0) {
+      alert('Please provide a simulation name and select at least one intersection.');
+      return;
+    }
+    const simulationData = { name: simulationName, description: simulationDescription, intersections: selectedIntersections };
+    onSubmit(simulationData);
+    setSimulationName('');
+    setSimulationDescription('');
+    setSelectedIntersections([]);
+    setSearchQuery('');
+    setCoordinates(null);
+    navigate('/simulation-results', { state: simulationData });
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 relative">
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="crossBtn absolute top-4 right-4 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
+        >
+          ✕
+        </button>
+
+        {/* Modal Header */}
+        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+          New {type === 'simulations' ? 'Simulation' : 'Optimization'}
+        </h2>
+
+        {/* Form */}
+        <div className="space-y-4">
+          {/* Simulation Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Simulation Name
+            </label>
+            <input
+              type="text"
+              value={simulationName}
+              onChange={(e) => setSimulationName(e.target.value)}
+              className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Enter simulation name"
+            />
+          </div>
+
+          {/* Simulation Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Simulation Description
+            </label>
+            <textarea
+              value={simulationDescription}
+              onChange={(e) => setSimulationDescription(e.target.value)}
+              className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder="Enter simulation description"
+              rows={3}
+            />
+          </div>
+
+          {/* Intersection Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Intersections
+            </label>
+
+            {/* Selected Intersections as Pills */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {selectedIntersections.map((intersection) => (
+                <div
+                  key={intersection}
+                  className="intersection-pill flex items-center px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-700 dark:text-indigo-100 text-xs"
+                >
+                  {intersection}
+                  <button
+                    onClick={() => handleRemoveIntersection(intersection)}
+                    className="ml-1 text-indigo-600 hover:text-indigo-800 dark:text-indigo-300 dark:hover:text-indigo-100 remove-cross"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            {/* Tabs */}
+            <div className="flex space-x-2 mb-3">
+              <button
+                onClick={() => setActiveTab('List')}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === 'List' ? 'bg-indigo-600 text-white dark:bg-indigo-500' : 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500'} transition-all duration-300`}
+              >
+                List
+              </button>
+              <button
+                onClick={() => setActiveTab('Search')}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === 'Search' ? 'bg-indigo-600 text-white dark:bg-indigo-500' : 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500'} transition-all duration-300`}
+              >
+                Search
+              </button>
+              <button
+                onClick={() => setActiveTab('Map')}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === 'Map' ? 'bg-indigo-600 text-white dark:bg-indigo-500' : 'bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500'} transition-all duration-300`}
+              >
+                Map
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            {activeTab === 'List' && (
+              <select
+                value=""
+                onChange={(e) => handleAddIntersection(e.target.value)}
+                className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="">Select an intersection</option>
+                {intersections.map((intersection) => (
+                  <option key={intersection} value={intersection}>
+                    {intersection}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {activeTab === 'Search' && (
+              <div className="flex space-x-2">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Search for a location"
+                />
+                <button
+                  onClick={handleSearch}
+                  className="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-all duration-300"
+                >
+                  Add
+                </button>
+              </div>
+            )}
+
+            {activeTab === 'Map' && (
+              <div>
+                <MapContainer center={[-26.2041, 28.0473]} zoom={6} style={{ height: '200px', width: '100%' }}>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  />
+                  <LocationMarker setSelectedLocation={handleMapSelection} setCoordinates={setCoordinates} />
+                </MapContainer>
+                {coordinates && (
+                  <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+                    Last Clicked Coordinates: <span className="font-medium">{coordinates}</span>
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Modal Footer */}
+        <div className="mt-6 flex justify-end space-x-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-md text-sm font-medium bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 transition-all duration-300"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 dark:from-green-400 dark:to-green-500 dark:hover:from-green-500 dark:hover:to-green-600 transition-all duration-300"
+          >
+            Create
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Simulation Table Component
 const SimulationTable: React.FC<{ simulations: Array<{ id: string; intersection: string; avgWaitTime: number; vehicleThroughput: number; status: string }>, currentPage: number, setCurrentPage: (page: number) => void }> = ({ simulations, currentPage, setCurrentPage }) => {
@@ -95,7 +341,7 @@ const SimulationTable: React.FC<{ simulations: Array<{ id: string; intersection:
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden table-fixed-height relative">
+    <div className="simTable bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden table-fixed-height relative">
       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead className="bg-gray-50 dark:bg-gray-700">
           <tr>
@@ -207,14 +453,24 @@ const Simulations: React.FC = () => {
   const [filter2, setFilter2] = useState<string>('All Intersections');
   const [page1, setPage1] = useState<number>(0);
   const [page2, setPage2] = useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState<'simulations' | 'optimizations'>('simulations');
 
   // Filter simulations based on selected intersection
   const filteredSimulations1 = filter1 === 'All Intersections' ? simulationsTable1 : simulationsTable1.filter(sim => sim.intersection === filter1);
   const filteredSimulations2 = filter2 === 'All Intersections' ? simulationsTable2 : simulationsTable2.filter(sim => sim.intersection === filter2);
 
-  const handleNewSimulation = (table: 'simulations' | 'optimizations') => {
-    alert(`Creating new ${table === 'simulations' ? 'simulation' : 'optimization'}`);
-    // Replace with actual logic, e.g., navigate to a form or open a modal
+  // Get all unique intersections for the dropdown
+  const allIntersections = Array.from(new Set([...simulationsTable1, ...simulationsTable2].map(sim => sim.intersection)));
+
+  const handleNewSimulation = (type: 'simulations' | 'optimizations') => {
+    setModalType(type);
+    setIsModalOpen(true);
+  };
+
+  const handleModalSubmit = (data: { name: string; description: string; intersections: string[] }) => {
+    console.log(`New ${modalType === 'simulations' ? 'Simulation' : 'Optimization'} Created:`, data);
+    // Replace with actual logic, e.g., API call to save the new simulation/optimization
   };
 
   return (
@@ -251,12 +507,6 @@ const Simulations: React.FC = () => {
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Recent Optimizations</h1>
               <div className="flex items-center space-x-2">
-                {/* <button
-                  onClick={() => handleNewSimulation('optimizations')}
-                  className="px-4 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 dark:from-green-400 dark:to-green-500 dark:hover:from-green-500 dark:hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg"
-                >
-                  New Optimization
-                </button> */}
                 <select
                   value={filter2}
                   onChange={(e) => { setFilter2(e.target.value); setPage2(0); }}
@@ -275,8 +525,16 @@ const Simulations: React.FC = () => {
         </div>
       </div>
       <Footer />
+      <NewSimulationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleModalSubmit}
+        intersections={allIntersections}
+        type={modalType}
+      />
     </div>
   );
 };
 
 export default Simulations;
+

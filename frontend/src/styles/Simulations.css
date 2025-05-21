@@ -1,3 +1,4 @@
+/* Existing styles */
 body {
   overflow: hidden;
 }
@@ -15,7 +16,6 @@ body {
   position: fixed;
   justify-content: center;
   align-items: center;
-  
 }
 
 .dark .sim-main-content {
@@ -38,11 +38,65 @@ body {
 
 .deleteBtn {
   border-radius: 50px;
-  background-color: #EF3E3E;
+  background-color: #ca5252;
   color: #000000;
 }
 
 .simGrid {
   justify-self: center;
-  margin-right: 50px;
+  margin-right: 40px;
+}
+
+.crossBtn {
+  background-color: transparent;
+  color: #000000;
+  font-weight: bold;
+  font-size: 30px;
+  padding: 0px;
+  padding-right: 10px;
+  outline: none;
+}
+
+.crossBtn:hover {
+  outline: none;
+}
+
+.intersection-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  margin: 0.125rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+.dark .intersection-pill {
+  background-color: #4f46e5;
+  color: #e0e7ff;
+}
+
+.intersection-pill .remove-cross {
+  margin-left: 0.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: #4f46e5;
+  padding: 0;
+}
+
+.dark .intersection-pill .remove-cross {
+  color: #c7d2fe;
+}
+
+.intersection-pill .remove-cross:hover {
+  color: #1e40af;
+}
+
+.dark .intersection-pill .remove-cross:hover {
+  color: #e0e7ff;
 }
