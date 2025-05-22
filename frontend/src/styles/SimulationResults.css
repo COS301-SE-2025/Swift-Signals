@@ -1,32 +1,162 @@
-.results {
+.simulation-results-page .results {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
+  margin-top: 50px;
+  margin-bottom: 100px;
 }
 
-.simRes-main-content {
+.simulation-results-page .simRes-main-content {
   width: 100%;
-  height: 100%;
-  background-color: #F0F0F0;
-  top: 0px;
-  left: 0;
+  height: 100vh;
   padding: 20px;
-  position: relative;
-  justify-content: center;
-  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  overflow-y: auto;
+  margin: 0;
+  background-color: #F0F0F0;
 }
 
-.dark .simRes-main-content {
+.dark .simulation-results-page .simRes-main-content {
   background-color: #000000;
 }
 
-.simRes-grid {
-  margin-top: 20px;
-  justify-content: center;
-  align-items: center;
+.simulation-results-page .visualization-box {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-#statisticsChart {
-  max-height: 200px;
+.simulation-results-page canvas {
+  max-width: 100%;
+  height: 100% !important;
+}
+
+.simulation-results-page input[type="number"] {
+  appearance: textfield;
+}
+
+.simulation-results-page input[type="number"]::-webkit-outer-spin-button,
+.simulation-results-page input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.simulation-results-page .flex-2 {
+  width: 600px;
+  background-color: #fff;
+}
+
+.dark .simulation-results-page .flex-2 {
+  background-color: #2A2A2A;
+}
+
+/* Ensure the parameters section takes up the specified width and aligns properly */
+.simulation-results-page .md\:w-1\/3 {
+  min-width: 20px; /* Ensure the parameters section doesn't shrink too much */
+}
+
+.simulation-results-page .parameters {
+  width: 180px;
+  background-color: #fff;
+}
+
+.dark .simulation-results-page .parameters {
+  background-color: #2A2A2A;
+}
+
+.simulation-results-page .visSection {
+  width: 700px;
+  background-color: #fff;
+}
+
+.dark .simulation-results-page .visSection {
+  background-color: #2A2A2A;
+}
+
+.simulation-results-page .grid {
+  justify-content: center;
+  justify-items: center;
+}
+
+.simulation-results-page .paramInput {
+  background-color: #fff;
+  color: #000000;
+}
+
+.dark .simulation-results-page .paramInput {
+  background-color: #2A2A2A;
+  color: #fff;
+}
+
+.simulation-results-page .simName {
+  color: #000000;
+}
+
+.dark .simulation-results-page .simName {
+  color: #fff;
+}
+
+.simulation-results-page .simDesc {
+  color: #000000;
+}
+
+.dark .simulation-results-page .simDesc {
+  color: #fff;
+}
+
+.simulation-results-page .simInt {
+  color: #3730a3;
+  border-color: #e0e7ff;
+  background-color: #e0e7ff;
+}
+
+.dark .simulation-results-page .simInt {
+  color: #e0e7ff;
+  border-color: #4f46e5;
+  background-color: #4f46e5;
+}
+
+.simulation-results-page .statTitle {
+  color: #000000;
+}
+
+.dark .simulation-results-page .statTitle {
+  color: #fff;
+}
+
+/* Add to existing CSS */
+.simulation-results-page .chart-container {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.simulation-results-page .chart-container:hover {
+  transform: scale(1.02);
+}
+
+.simulation-results-page .fullscreen-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  margin-bottom: 80px;
+}
+
+.simulation-results-page .fullscreen-modal canvas {
+  max-height: 90vh;
+  max-width: 100%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  color: #000000;
+}
+
+.dark .simulation-results-page .fullscreen-modal canvas {
+  background-color: #2A2A2A;
 }

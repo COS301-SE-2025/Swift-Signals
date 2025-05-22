@@ -9,6 +9,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { LatLng } from 'leaflet';
 import '../styles/Simulations.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -400,15 +401,15 @@ const SimulationTable: React.FC<{ simulations: Array<{ id: string; intersection:
                   <div className="flex flex-col space-y-2">
                     <button
                       onClick={() => handleViewResults(sim.id)}
-                      className="viewBtn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium w-full text-center"
+                      className="viewBtn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium w-full text-center" title="View Results"
                     >
-                      View
+                      <i className="fas fa-eye"></i>
                     </button>
                     <button
                       onClick={() => handleDelete(sim.id)}
-                      className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center"
+                      className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center" title="Delete Simulation"
                     >
-                      Delete
+                      <i className="fas fa-trash"></i>
                     </button>
                   </div>
                 </td>
@@ -424,7 +425,7 @@ const SimulationTable: React.FC<{ simulations: Array<{ id: string; intersection:
             disabled={currentPage === 0}
             className={`px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-indigo-500 to-indigo-600 text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${currentPage === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Previous
+            Prev
           </button>
           {Array.from({ length: totalPages }, (_, index) => (
             <button

@@ -34,12 +34,14 @@ body {
   border-radius: 50px;
   background-color: #92A4FB;
   color: #000000;
+  width: 50px;
 }
 
 .deleteBtn {
   border-radius: 50px;
   background-color: #ca5252;
   color: #000000;
+  width: 50px;
 }
 
 .simGrid {
