@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { Search } from 'lucide-react';
+import IntersectionCard from '../components/IntersectionCard';
 
 // TypeScript interface for intersection data
 interface Intersection {
