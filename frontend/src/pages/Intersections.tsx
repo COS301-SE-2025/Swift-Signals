@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import { Search } from 'lucide-react';
 import IntersectionCard from '../components/IntersectionCard';
+import '../styles/Intersections.css';
 
 // TypeScript interface for intersection data
 interface Intersection {
@@ -43,16 +44,16 @@ const Intersections = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 overflow-y-auto">
+    <div className="intersectionBody min-h-screen bg-gray-100 overflow-y-auto">
       <Navbar />
-
+    <div className="main-content flex-grow">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <div className="relative w-full max-w-md">
             <input
               type="text"
               placeholder="Search by Name or ID..."
-              className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="searchBar w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -69,7 +70,7 @@ const Intersections = () => {
           </button>
         </div>
 
-        <div className="space-y-6 overflow-y-auto max-h-[calc(100vh-200px)] pr-2">
+        <div className="intersections space-y-6 overflow-y-auto max-h-[calc(100vh-200px)] pr-2">
           {filteredIntersections.map((intersection) => (
             <IntersectionCard
               key={intersection.id}
@@ -81,7 +82,9 @@ const Intersections = () => {
           ))}
         </div>
       </div>
+      </div>
     </div>
+    
   );
 };
 

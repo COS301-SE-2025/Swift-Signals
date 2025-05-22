@@ -1,0 +1,51 @@
+.intersectionBody .main-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #F0F0F0;
+  top: 80px;
+  left: 0;
+  position: absolute;
+  padding: 20px;
+  position: fixed;
+  overflow-y: auto;
+}
+
+.intersections {
+    overflow-y: hidden;
+    margin-bottom: 120px;
+}
+
+.intersectionBody .searchBar {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: red;
+    color: black;
+}
+
+.dark .intersectionBody .searchBar {
+    background-color: #2A2A2A;
+    border-color: #2A2A2A;
+    color: #fff;
+}
+
+.dark .intersectionBody .main-content {
+    background-color: #000;
+}
+
+.dark .intersectionName {
+    color: #fff;
+}
+
+.dark .intersectionID {
+    color: #fff;
+}
+
+.dark .intersectionLocation {
+    color: #fff;
+}
+
+.dark .intersectionLanes {
+    color: #fff;
+}

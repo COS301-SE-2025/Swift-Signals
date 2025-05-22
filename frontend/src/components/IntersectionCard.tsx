@@ -1,3 +1,5 @@
+import '../styles/IntersectionCard.css'
+
 interface IntersectionCardProps {
   id: number;
   name: string;
@@ -20,7 +22,7 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
   onDelete,
 }) => {
   return (
-    <div className="bg-white p-8 rounded-2xl shadow-lg flex justify-between items-center min-h-[220px]">
+    <div className="intersectionCard bg-white p-8 rounded-2xl shadow-lg flex justify-between items-center min-h-[220px]">
       <div className="flex items-center space-x-8">
         <div className="w-36 h-36 bg-gray-200 rounded-lg flex items-center justify-center">
           {image ? (
@@ -34,10 +36,10 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
         </div>
 
         <div>
-          <h3 className="text-3xl font-extrabold text-black mb-2">{name}</h3>
-          <p className="text-xl text-gray-700">ID: {id}</p>
-          <p className="text-xl text-gray-700">Location: {location}</p>
-          <p className="text-xl text-gray-700">Lanes: {lanes}</p>
+          <h3 className="intersectionName text-3xl font-extrabold text-black mb-2">{name}</h3>
+          <p className="intersectionID text-xl text-gray-700">ID: {id}</p>
+          <p className="intersectionLocation text-xl text-gray-700">Location: {location}</p>
+          <p className="intersectionLanes text-xl text-gray-700">Lanes: {lanes}</p>
         </div>
       </div>
 
