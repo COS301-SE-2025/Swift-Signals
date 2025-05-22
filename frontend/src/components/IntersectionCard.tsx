@@ -9,5 +9,17 @@ interface IntersectionCardProps {
   onDelete: (id: number) => void;
 }
 
+const IntersectionCard: React.FC<IntersectionCardProps> = ({
+  id,
+  name,
+  location,
+  lanes,
+  image,
+  onSimulate,
+  onEdit,
+  onDelete,
+}) => {
+  
+};
 
 export default IntersectionCard;
