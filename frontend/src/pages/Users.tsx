@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Navbar from '../components/Navbar';
+import UsersTable from '../components/UsersTable';
 
 // TypeScript interface for user data
 interface User {
