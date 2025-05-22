@@ -343,8 +343,8 @@ const SimulationTable: React.FC<{ simulations: Array<{ id: string; intersection:
 
   return (
     <div className="simTable bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden table-fixed-height relative">
-      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="bg-gray-50 dark:bg-gray-700">
+      <table className="simulationTable min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="simTableHead bg-gray-50 dark:bg-gray-700">
           <tr>
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Simulation ID</th>
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Intersection</th>

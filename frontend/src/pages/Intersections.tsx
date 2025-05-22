@@ -48,8 +48,8 @@ const Intersections = () => {
       <Navbar />
     <div className="main-content flex-grow">
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <div className="relative w-full max-w-md">
+        <div className="topBar flex justify-between items-center mb-6">
+          <div className="searchContainer relative w-full max-w-md">
             <input
               type="text"
               placeholder="Search by Name or ID..."
@@ -64,13 +64,13 @@ const Intersections = () => {
 
           <button
             onClick={() => console.log('Add Intersection')}
-            className="bg-red-700 hover:bg-red-800 text-white font-medium py-2 px-4 rounded-md"
+            className="addIntersectionBtn bg-red-700 hover:bg-red-800 text-white font-medium py-2 px-4 rounded-md"
           >
             Add Intersection
           </button>
         </div>
 
-        <div className="intersections space-y-6 overflow-y-auto max-h-[calc(100vh-200px)] pr-2">
+        <div className="intersections space-y-6 overflow-y-auto max-h-[calc(100vh-0px)] pr-2">
           {filteredIntersections.map((intersection) => (
             <IntersectionCard
               key={intersection.id}

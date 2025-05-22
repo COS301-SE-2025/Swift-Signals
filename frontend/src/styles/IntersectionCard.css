@@ -1,3 +1,62 @@
 .dark .intersectionCard {
     background-color: #2A2A2A;
 }
+
+.mobileIntBtns {
+    display: none;
+}
+
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .intersectionCard {
+        width: 50px;
+    }
+
+}
+
+@media screen and (max-width: 480px) {
+    .intersectionCard {
+        width: 100%;
+        height: 200px;
+        text-align: left;
+        position: relative; /* Add this to make position: absolute work relative to the card */
+    }
+
+    .cardImage {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .intersectionName {
+        font-size: 1.0em;
+    }
+
+    .intersectionID {
+        font-size: 0.8em;
+    }
+    .intersectionLocation {
+        font-size: 0.8em;
+    }
+    .intersectionLanes {
+        font-size: 0.8em;
+    }
+
+    .intBtns {
+        display: none;
+    }
+
+    .mobileIntBtns {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        position: absolute;
+        bottom: 10px; /* Position at the bottom with some padding */
+        left: 10px; /* Optional: add padding from left */
+        right: 10px; /* Optional: add padding from right */
+    }
+
+    .intersectionBtn {
+        font-size: 0.8em;
+        height: 40px;
+        width: 40px;
+    }
+}
