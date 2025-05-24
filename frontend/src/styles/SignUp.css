@@ -44,3 +44,14 @@ html, body, #root {
   height: 130px;
   margin-top: 0px;
 }
+
+@media screen and (max-width: 500px) {
+  .traffic-light {
+    display: none;
+  }
+
+  .welcomeMessage .welcomeText{
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+}
