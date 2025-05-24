@@ -183,7 +183,7 @@ const SimulationResults: React.FC = () => {
             ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-80">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-60">
             {/* Simulation Visualization Section */}
             <div className="visSection bg-white/5 backdrop-blur-md p-6 rounded-xl shadow-lg border border-gray-800/50 hover:shadow-xl transition-all duration-300">
               <h2 className="text-2xl font-semibold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-4">Simulation Visualization</h2>

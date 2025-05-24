@@ -350,7 +350,7 @@ const SimulationTable: React.FC<{ simulations: Array<{ id: string; intersection:
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Intersection</th>
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Avg Wait Time</th>
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Throughput</th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Graph</th>
+            <th className="graphTHead px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Graph</th>
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
           </tr>
@@ -384,16 +384,16 @@ const SimulationTable: React.FC<{ simulations: Array<{ id: string; intersection:
             return (
               <tr key={sim.id}>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{sim.id}</td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{sim.intersection}</td>
+                <td className="intersectionCell px-4 py-3 whitespace-wrap text-sm text-gray-900 dark:text-gray-200">{sim.intersection}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{sim.avgWaitTime.toFixed(1)}</td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">{sim.vehicleThroughput}</td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm">
+                <td className="chartCell px-4 py-3 whitespace-nowrap text-sm">
                   <div className="h-16 w-24">
                     <Bar data={chartData} options={chartOptions} />
                   </div>
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full border ${statusClass(sim.status)}`}>
+                  <span className={`sim-status inline-flex items-center px-3 py-1 rounded-full border ${statusClass(sim.status)}`}>
                     {sim.status}
                   </span>
                 </td>
@@ -475,11 +475,11 @@ const Simulations: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="simulationBody min-h-screen bg-gray-100 dark:bg-gray-900">
       <Navbar />
       <div className="sim-main-content flex-grow p-6">
         <div className="simGrid grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
+          <div className="simTableContainer">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Recent Simulations</h1>
               <div className="flex items-center space-x-2">
@@ -504,7 +504,7 @@ const Simulations: React.FC = () => {
             </div>
             <SimulationTable simulations={filteredSimulations1} currentPage={page1} setCurrentPage={setPage1} />
           </div>
-          <div>
+          <div className="simTableContainer">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-200">Recent Optimizations</h1>
               <div className="flex items-center space-x-2">

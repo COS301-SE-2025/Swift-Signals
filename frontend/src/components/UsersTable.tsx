@@ -1,4 +1,5 @@
 import React from 'react';
+import '../styles/UsersTable.css';
 
 // TypeScript interface for user data
 interface User {
@@ -17,8 +18,8 @@ interface UsersTableProps {
 
 const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onDelete }) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <table className="w-full border-collapse">
+    <div className="usersTablePage bg-white rounded-lg shadow-sm overflow-hidden">
+      <table className="usersTable w-full border-collapse">
         <thead className="border-b bg-gray-50">
           <tr>
             <th className="px-4 py-3 font-bold text-black text-center">ID</th>
