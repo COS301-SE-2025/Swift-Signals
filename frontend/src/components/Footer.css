@@ -42,3 +42,11 @@
   align-items: center;
   gap: 0;
 }
+
+@media screen and (max-width: 500px) {
+  .footerText {
+    font-size: 0.6rem;
+    font-weight: bold;
+  }
+  
+}
