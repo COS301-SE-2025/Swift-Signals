@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<edges>
+    <!-- Four-way stop -->
+    <edge id="n1n5" from="n1" to="n5" type="car" priority="3"/>
+    <edge id="n2n5" from="n2" to="n5" type="car" priority="3"/>
+    <edge id="n3n5" from="n3" to="n5" type="car" priority="3"/>
+    <edge id="n4n5" from="n4" to="n5" type="car" priority="3"/>
+    <edge id="n5n1" from="n5" to="n1" type="car"/>
+    <edge id="n5n2" from="n5" to="n2" type="car"/>
+    <edge id="n5n3" from="n5" to="n3" type="car"/>
+    <edge id="n5n4" from="n5" to="n4" type="car"/>
+
+    <!-- Traffic light -->
+    <edge id="n6n9" from="n6" to="n9" type="car"/>
+    <edge id="n7n9" from="n7" to="n9" type="car"/>
+    <edge id="n8n9" from="n8" to="n9" type="car"/>
+    <edge id="n9n6" from="n9" to="n6" type="car"/>
+    <edge id="n9n7" from="n9" to="n7" type="car"/>
+    <edge id="n9n8" from="n9" to="n8" type="car"/>
+
+    <edge id="n9n5" from="n9" to="n5" type="car"/>
+    <edge id="n5n9" from="n5" to="n9" type="car"/>
+
+</edges>

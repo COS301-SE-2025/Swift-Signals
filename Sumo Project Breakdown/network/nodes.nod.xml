@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nodes>
+    <!-- Four way stop -->
+    <node id="n1" x="0" y="100" type="priority"/>
+    <node id="n2" x="0" y="0" type="priority"/>
+    <node id="n3" x="-100" y="50" type="priority"/>
+    <node id="n4" x="100" y="50" type="priority"/>
+    <node id="n5" x="0" y="50" type="priority"/> <!-- center -->
+
+    <!-- Traffic light int -->
+    <node id="n6" x="0" y="-100" type="traffic_light"/>
+    <node id="n7" x="100" y="-50" type="traffic_light"/>
+    <node id="n8" x="-100" y="-50" type="traffic_light"/>
+    <node id="n9" x="0" y="-50" type="traffic_light"/> <!-- center -->
+</nodes>
