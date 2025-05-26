@@ -7,8 +7,8 @@ spec:
   selector: 
     app: frontend
   ports:
-    - port: 5173
-      targetPort: 5173
+    - port: 80
+      targetPort: 80
       nodePort: 30080
 ---
 apiVersion: apps/v1
@@ -27,6 +27,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: frontend:dev #defined in the dev scripts
+          image: swift-signals-frontend
+          imagePullPolicy: Never
           ports:
-            - containerPort: 5173
+            - containerPort: 80
+ 

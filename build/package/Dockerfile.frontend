@@ -16,6 +16,6 @@ FROM nginx:alpine
 #For Vite use /app/dist but if using React then /app/build
 COPY --from=build /app/dist /usr/share/nginx/html
 
-EXPOSE 5173
+EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
