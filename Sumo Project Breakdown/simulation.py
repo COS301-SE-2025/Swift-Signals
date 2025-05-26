@@ -3,7 +3,7 @@ import traci
 import sys
 import json
 
-sumo_binary = "sumo" #sumo-gui for debugging
+sumo_binary = "sumo-gui" #sumo-gui for debugging
 sumo_config = "config/simulation.sumocfg"
 
 traci.start([sumo_binary, "-c", sumo_config])
