@@ -2,12 +2,24 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
 var port = ":9090"
 
 func main() {
+
+	mux := http.NewServeMux()
+
+	// Simulation Service Routes
+	mux.HandleFunc("GET /simulations", getAllSimulations)
+	mux.HandleFunc("GET /simulations/{id}", getSimulationByID)
+	mux.HandleFunc("POST /simulations", createSimulation)
+	mux.HandleFunc("DELETE /simulations/{id}", deleteSimulation)
+
+	log.Println("API Gateway running on :9090")
+	log.Fatal(http.ListenAndServe(":9090", mux))
 
 }
 
