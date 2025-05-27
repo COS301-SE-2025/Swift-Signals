@@ -41,7 +41,7 @@ elective stream. His academic experience has provided him with a strong foundati
 problem-solving, algorithm design, and logical reasoning — strengths he actively applies to
 real-world software development challenges.
 
-[LinkedIn](https://www.linkedin.com/in/clara-lee)
+[LinkedIn](http://www.linkedin.com/in/shravan-seebran-045594291)
 
 ### Kgosi Segale  
 **Frontend Developer | UI/UX Specialist | Documentation**  
