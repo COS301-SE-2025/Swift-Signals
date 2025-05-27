@@ -123,7 +123,7 @@
 │   ├── go.mod
 │   └── go.sum
 │
-├── /ai-service
+├── /optimization-service
 │   ├── /models                # ML models (saved as .pt, .h5, etc.)
 │   ├── /inference             # Python AI inference code
 │   ├── /training              # Model training scripts
