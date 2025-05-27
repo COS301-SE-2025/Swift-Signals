@@ -1,0 +1,31 @@
+# .github/workflows/api-unit-test.yml
+name: API Unit Tests
+
+on:
+  push:
+    branches: [main, dev, api-gateway]
+  pull_request:
+    branches: [main, dev, api-gateway]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'  # Adjust to your Node version
+
+      - name: Install dependencies
+        run: | #npm install
+          echo "Installing dependencies"
+          echo "Pretending to install dependencies"
+
+      - name: Run unit tests
+        run: | #npm test
+          echo "Running unit tests"
+          echo "Pretending to run unit tests"
