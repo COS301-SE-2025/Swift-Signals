@@ -92,8 +92,7 @@
 │   │   └── /config
 │   ├── README.md               # Service-specific documentation
 │   ├── go.mod
-│   ├── go.sum
-│   └── Dockerfile             # Service-specific Dockerfile
+│   └── go.sum
 │
 ├── /user-service
 │   ├── /cmd
@@ -109,8 +108,8 @@
 │   │   └── migrations/        # Database schema migrations
 │   ├── README.md              # Service-specific documentation
 │   ├── go.mod
-│   ├── go.sum
-│   └── Dockerfile             # Service-specific Dockerfile
+│   └── go.sum
+│    
 │
 ├── /simulation-service
 │   ├── /cmd
@@ -122,10 +121,9 @@
 │   ├── /sumo-config           # Network & route files
 │   ├── README.md              # Service-specific documentation
 │   ├── go.mod
-│   ├── go.sum
-│   └── Dockerfile
+│   └── go.sum
 │
-├── /ai-service
+├── /optimization-service
 │   ├── /models                # ML models (saved as .pt, .h5, etc.)
 │   ├── /inference             # Python AI inference code
 │   ├── /training              # Model training scripts
@@ -133,8 +131,7 @@
 │   │   └── mongo-setup.js     # Optional for model metadata
 │   ├── /tests                 # Python tests
 │   ├── README.md              # Service-specific documentation
-│   ├── requirements.txt       # Python dependencies
-│   └── Dockerfile
+│   └── requirements.txt       # Python dependencies
 │
 ├── /control-service
 │   ├── /cmd
@@ -145,8 +142,7 @@
 │   │   └── /config
 │   ├── README.md              # Service-specific documentation
 │   ├── go.mod
-│   ├── go.sum
-│   └── Dockerfile
+│   └── go.sum
 │
 ├── /metrics-service
 │   ├── /cmd
@@ -159,8 +155,7 @@
 │   │   └── setup.sql          # PostgreSQL or InfluxDB schema
 │   ├── README.md              # Service-specific documentation
 │   ├── go.mod
-│   ├── go.sum
-│   └── Dockerfile
+│   └── go.sum
 │
 ├── /frontend
 │   ├── /public
@@ -170,26 +165,7 @@
 │   │   └── /pages
 │   ├── /tests                 # Frontend tests
 │   ├── README.md              # Dashboard documentation
-│   ├── package.json
-│   └── Dockerfile
-│
-├── /shared
-│   ├── go.mod                 # Separate Go module for shared code
-│   ├── go.sum
-│   ├── /auth
-│   │   └── jwt.go             # JWT encode/decode, token validation
-│   ├── /db
-│   │   └── mongo.go           # MongoDB connection pool setup
-│   ├── /config
-│   │   └── loader.go          # YAML/ENV config parsing
-│   ├── /logger
-│   │   └── logger.go          # Zap or logrus wrapper
-│   ├── /proto                 # Protocol buffer definitions
-│   │   ├── user.proto
-│   │   └── simulation.proto
-│   └── /client                # Client libraries for services
-│       ├── user_client.go
-│       └── simulation_client.go
+│   └── package.json
 │
 ├── README.md                  # Project overview and setup guide
 ├── .env.example               # Template for environment variables
