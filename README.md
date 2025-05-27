@@ -82,4 +82,4 @@ design.
 
 ## Documentation
 
-See the [Development Guide](https://github.com/COS301-SE-2025/Swift-Signals/docs/development-guide.md) for detailed setup and contribution steps.
+See the [Development Guide](docs/development-guide.md) for detailed setup and contribution steps.
