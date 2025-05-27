@@ -3,6 +3,7 @@
 ![Swift Signals Logo](assets/images/SwiftLogo.png)
 
 **Team InsideInsights - Swift-Signals**  
+
 Swift Signals is a data-driven, simulation-powered traffic light optimization platform designed to address traffic congestion in urban environments. Developed in collaboration with Southern Cross Solutions, the project aims to equip municipal traffic departments with advanced tools to analyse intersection performance and improve traffic signal efficiency using machine learning.
 Traffic congestion remains one of South Africa’s most costly infrastructure challenges, with the South African Road Federation estimating annual productivity losses of approximately R1 billion. Swift Signals tackles this issue by providing a modular, web-based platform capable of simulating real-world intersection behaviour and dynamically optimizing traffic light phase configurations using historical traffic data. The system leverages modern software engineering principles—microservices, containerization, and continuous deployment pipelines—to deliver a scalable and maintainable solution.
 
