@@ -3,9 +3,9 @@ name: API Unit Tests
 
 on:
   push:
-    branches: [api-gateway]
+    branches: [main, dev, api-gateway]
   pull_request:
-    branches: [api-gateway]
+    branches: [main, dev, api-gateway]
 
 jobs:
   run-tests:
