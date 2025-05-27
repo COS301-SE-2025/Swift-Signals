@@ -23,7 +23,7 @@ Pretoria, specializing in the Data Science stream. He is a hands-on developer wh
 love for clean code and smart design with a passion for turning ideas into functional, well-crafted
 software.
 
-[LinkedIn](https://www.linkedin.com/in/joshua-garner-a893ba286?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app))
+[LinkedIn](https://www.linkedin.com/in/joshua-garner-a893ba286?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app)
 
 ### Patterson Rainbird-Webb  
 **Database Engineer | Simulation Developer**  
