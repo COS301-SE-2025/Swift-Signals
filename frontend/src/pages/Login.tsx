@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
 
 interface TrafficLightProps {
@@ -21,7 +21,7 @@ const TrafficLight = ({ redActive, yellowActive, greenActive }: TrafficLightProp
   const innerHighlightBase = "w-6 h-6 rounded-full absolute top-1/3 left-1/3 transform -translate-x-1/2 -translate-y-1/2 opacity-80 blur-[2px]";
 
   return (
-    <div className="bg-gradient-to-b from-neutral-800 to-neutral-900 via-neutral-900 p-4 rounded-xl shadow-2xl flex flex-col space-y-4 w-30 items-center border border-neutral-700/70">
+    <div className="traffic-light bg-gradient-to-b from-neutral-800 to-neutral-900 via-neutral-900 p-4 rounded-xl shadow-2xl flex flex-col space-y-4 w-30 items-center border border-neutral-700/70">
       <div className={`${baseLightClasses} ${redActive ? activeBorderColor : inactiveBorderColor} ${redActive ? activeRed : inactiveRed}`}>
         {redActive && <div className={`${innerHighlightBase} bg-red-300`}></div>}
       </div>
@@ -35,17 +35,16 @@ const TrafficLight = ({ redActive, yellowActive, greenActive }: TrafficLightProp
   );
 };
 
+// Rest of the Login component remains unchanged
 const Login = () => {
   const [username, setUsername] = React.useState('');
-  // const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [resetEmail, setResetEmail] = React.useState('');
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   interface LoginFormValues {
     username: string;
-    // email: string;
     password: string;
   }
 
@@ -57,7 +56,6 @@ const Login = () => {
     }
     const formValues: LoginFormValues = { username, password };
     console.log('Logging in with:', formValues);
-    // Add your login logic here
     navigate('/dashboard');
   };
 
@@ -66,11 +64,10 @@ const Login = () => {
     console.log('Password reset requested for:', resetEmail);
     setIsModalOpen(false);
     setResetEmail('');
-    // Add your password reset logic here
   };
 
   return (
-    <div className="min-h-screen min-w-screen w-full h-full flex flex-col sm:flex-row items-center justify-center font-sans  from-slate-100 to-sky-100">
+    <div className="loginScreen min-h-screen min-w-screen w-full h-full flex flex-col sm:flex-row items-center justify-center font-sans from-slate-100 to-sky-100">
       <div
         className="welcomeMessage absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-2 z-10 animate-fade-in-down"
         style={{ minWidth: 350 }}
@@ -80,18 +77,18 @@ const Login = () => {
           alt="Swift Signals Logo"
           className="loginLogo h-20 w-20 object-contain drop-shadow-lg"
         />
-        <span className="text-xl md:text-4xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+        <span className="welcomeText text-xl md:text-4xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
           Welcome to Swift Signals
         </span>
       </div>
-      {/* Login Form Container */}
-      <div className="loginContainer bg-white p-8 rounded-xl shadow-2xl w-full max-w-md"
-      style={{
-          boxShadow: '0 8px 40px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12)'
-        }}>
+      <div
+        className="loginContainer bg-white p-8 rounded-xl shadow-2xl w-full max-w-md"
+        style={{
+          boxShadow: '0 8px 40px rgba(0,0,0,0.18), 0 1.5px 6px rgba(0,0,0,0.12)',
+        }}
+      >
         <h1 className="loginTitle text-4xl font-bold text-center text-gray-800 mb-8">Login</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Username Input */}
           <div>
             <label htmlFor="username" className="sr-only">
               Username
@@ -107,23 +104,6 @@ const Login = () => {
               required
             />
           </div>
-          {/* Email Input */}
-          {/* <div>
-            <label htmlFor="email" className="sr-only">
-              Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email"
-              className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
-              required
-            />
-          </div> */}
-          {/* Password Input */}
           <div>
             <label htmlFor="password" className="sr-only">
               Password
@@ -139,18 +119,18 @@ const Login = () => {
               required
             />
           </div>
-          {/* Forgot Password Link */}
           <div className="text-right">
-            <a href="#"
-            onClick={(e) => {
-              e.preventDefault(); // Prevent default link behavior
-              setIsModalOpen(true); // Open the modal
-            }}
-            className="text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors">
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setIsModalOpen(true);
+              }}
+              className="text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors"
+            >
               Forgot Password?
             </a>
           </div>
-          {/* Login Button */}
           <div>
             <button
               type="submit"
@@ -160,9 +140,8 @@ const Login = () => {
             </button>
           </div>
         </form>
-        {/* Registration Link */}
         <p className="regLink mt-8 text-center text-sm text-gray-600">
-          Don&apos;t have an account?{' '}
+          Don't have an account?{' '}
           <button
             type="button"
             onClick={() => navigate('/signup')}
@@ -173,7 +152,6 @@ const Login = () => {
           </button>
         </p>
       </div>
-      {/* Forgot Password Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-2xl w-full max-w-sm">
@@ -213,8 +191,7 @@ const Login = () => {
           </div>
         </div>
       )}
-      {/* Traffic Light Container */}
-      <div className="mt-8 sm:mt-0 sm:ml-12 flex justify-center">
+      <div className="traffic-light-container mt-8 sm:mt-0 sm:ml-12 flex justify-center">
         <TrafficLight
           redActive={username.length > 0}
           yellowActive={username.length > 0}
