@@ -1,0 +1,112 @@
+.intersectionBody .main-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background-color: #F0F0F0;
+    top: 80px;
+    left: 0;
+    position: absolute;
+    padding: 20px;
+    position: fixed;
+    overflow-y: auto;
+}
+
+.intersections {
+    overflow-y: hidden;
+    margin-bottom: 120px;
+}
+
+.intersectionBody .searchBar {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: red;
+    color: black;
+}
+
+.dark .intersectionBody .searchBar {
+    background-color: #2A2A2A;
+    border-color: #2A2A2A;
+    color: #fff;
+}
+
+.dark .intersectionBody .main-content {
+    background-color: #000;
+}
+
+.dark .intersectionName {
+    color: #fff;
+}
+
+.dark .intersectionID {
+    color: #fff;
+}
+
+.dark .intersectionLocation {
+    color: #fff;
+}
+
+.dark .intersectionLanes {
+    color: #fff;
+}
+
+@media screen and (max-width: 1400px) and (max-height: 800px) {
+    .intersectionBody .main-content {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        background-color: #F0F0F0;
+        top: 80px;
+        left: 0;
+        position: absolute;
+        padding: 20px;
+        position: fixed;
+        overflow-y: auto;
+    }
+
+    .intersections {
+        overflow-y: hidden;
+        margin-bottom: 120px;
+    }
+}
+
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .intersectionBody .main-content {
+        overflow-y: auto;
+        align-items: center;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .intersectionBody .main-content {
+        overflow-y: auto;
+        align-items: center;
+    }
+
+    .intersectionBody .searchContainer {
+        width: 45%;
+    }
+
+    .intersectionBody .searchBar {
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-color: red;
+        color: black;
+        width: 100%;
+    }
+
+    .topBar {
+        display: flex;
+        justify-content: unset;
+        align-items: center;
+        width: 100%;
+    }
+
+    .addIntersectionBtn {
+        margin-left: 20px;
+        width: 130px;
+        height: 50px;
+        font-size: 12px;
+    }
+}
