@@ -110,7 +110,7 @@ def generateTrips(netFile, tripFile, density):
         os.makedirs(tripDir, exist_ok=True)
 
     cmd = [
-        "python", os.path.join(TOOLS_PATH, "randomTips.py"),
+        "python", os.path.join(TOOLS_PATH, "randomTrips.py"),
         "-n", netFile,
         "-o", tripFile,
         "--prefix", "veh",
