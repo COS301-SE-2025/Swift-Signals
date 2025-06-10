@@ -2,6 +2,7 @@
         <input>
             <net-file value="stop_intersection.net.xml"/>
             <route-files value="stop_intersection.rou.xml"/>
+            <additional-files value="stop_intersection.add.xml"/>
         </input>
         <time>
             <begin value="0"/>

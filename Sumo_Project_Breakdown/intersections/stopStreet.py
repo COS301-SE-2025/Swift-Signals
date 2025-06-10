@@ -6,6 +6,7 @@ def generate(params):
     netFile = f"{base}.net.xml"
     routeFile = f"{base}.rou.xml"
     configFile = f"{base}.sumocfg"
+    stopIntFile = f"{base}.add.xml"
 
     nodeFile = "stopInt.nod.xml"
     edgeFile = "stopInt.edg.xml"
@@ -14,6 +15,7 @@ def generate(params):
     writeNodeFile(nodeFile)
     writeEdgeFile(edgeFile)
     writeConnectionFile(conFile)
+    writeStopLogic(stopIntFile)
 
     print("Generating stop street intersection with params:", params)
 
@@ -32,6 +34,7 @@ def generate(params):
         <input>
             <net-file value="{netFile}"/>
             <route-files value="{routeFile}"/>
+            <additional-files value="{stopIntFile}"/>
         </input>
         <time>
             <begin value="0"/>
@@ -88,6 +91,15 @@ def writeConnectionFile(filename):
 </connections>"""
     with open(filename, "w") as f:
         f.write(content)
+
+def writeStopLogic(filename):
+    with open(filename, "w") as tl:
+        tl.write(f"""<additional>
+    <stopSign lane="in_n2_1_0" startPos="0" endPos="5"/>
+    <stopSign lane="in_n3_1_0" startPos="0" endPos="5"/>
+    <stopSign lane="in_n4_1_0" startPos="0" endPos="5"/>
+    <stopSign lane="in_n5_1_0" startPos="0" endPos="5"/>
+</additional>""")
 
 def generateTrips(netFile, tripFile, density):
     import os
