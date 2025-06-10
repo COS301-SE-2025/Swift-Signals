@@ -1,6 +1,0 @@
-<edges>
-    <edge id="e1" from="n1" to="n2" priority="1"/>
-    <edge id="e2" from="n2" to="n3" priority="1"/>
-    <edge id="e3" from="n3" to="n4" priority="1"/>\
-    <edge id="e4" from="n4" to="n1" priority="1"/>
-</edges>
