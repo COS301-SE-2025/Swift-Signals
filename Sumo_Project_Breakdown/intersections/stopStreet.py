@@ -43,14 +43,7 @@ def generate(params):
     </configuration>""")
 
     print("Running SUMO simulation...")
-    #subprocess.run(["sumo-gui", "-c", configFile])
-    subprocess.run([
-    "sumo-gui",
-    "-c", configFile,
-    "--verbose",
-    "--log", "sumo.log",
-    "--no-step-log"
-])
+    subprocess.run(["sumo-gui", "-c", configFile])
 
 def writeNodeFile(filename):
     content = """<nodes>
@@ -102,10 +95,10 @@ def writeConnectionFile(filename):
 def writeStopLogic(filename):
     with open(filename, "w") as tl:
         tl.write(f"""<additional>
-    <stopSign lane="in_n2_1_0" startPos="20" endPos="25"/>
-    <stopSign lane="in_n3_1_0" startPos="20" endPos="25"/>
-    <stopSign lane="in_n4_1_0" startPos="20" endPos="25"/>
-    <stopSign lane="in_n5_1_0" startPos="20" endPos="25"/>
+    <priority id="priority0" type="stop" lane="in_n2_1_0" startPos="0" endPos="5"/>
+    <priority id="priority1" type="stop" lane="in_n3_1_0" startPos="0" endPos="5"/>
+    <priority id="priority2" type="stop" lane="in_n4_1_0" startPos="0" endPos="5"/>
+    <priority id="priority3" type="stop" lane="in_n5_1_0" startPos="0" endPos="5"/>
 </additional>""")
 
 def generateTrips(netFile, tripFile, density):
