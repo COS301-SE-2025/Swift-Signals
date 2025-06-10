@@ -52,3 +52,73 @@ def writeNodeFile(filename):
 </nodes>"""
     with open(filename, "w") as f:
         f.write(content)
+
+def writeEdgeFile(filename):
+    content = """<edges>
+    <edge id="in_n2_1" from="n2" to="n1" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="in_n3_1" from="n3" to="n1" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="in_n4_1" from="n4" to="n1" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="in_n5_1" from="n5" to="n1" priority="1" numLanes="1" speed="13.9"/>
+
+    <edge id="out_n1_n2" from="n1" to="n2" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="out_n1_n3" from="n1" to="n3" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="out_n1_n4" from="n1" to="n4" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="out_n1_n5" from="n1" to="n5" priority="1" numLanes="1" speed="13.9"/>
+</edges>"""
+    with open(filename, "w") as f:
+        f.write(content)
+
+def writeConnectionFile(filename):
+    content = """<connections>
+    <connection from="in_n2_1" to="out_n1_n3" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n2_1" to="out_n1_n5" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n2_1" to="out_n1_n4" fromLane="0" toLane="0" tl="false"/>
+
+    <connection from="in_n3_1" to="out_n1_n4" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n3_1" to="out_n1_n5" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n3_1" to="out_n1_n2" fromLane="0" toLane="0" tl="false"/>
+
+    <connection from="in_n4_1" to="out_n1_n5" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n4_1" to="out_n1_n2" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n4_1" to="out_n1_n3" fromLane="0" toLane="0" tl="false"/>
+
+    <connection from="in_n5_1" to="out_n1_n2" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n5_1" to="out_n1_n3" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n5_1" to="out_n1_n4" fromLane="0" toLane="0" tl="false"/>
+</connections>"""
+    with open(filename, "w") as f:
+        f.write(content)
+
+def generateTrips(netFile, tripFile, density):
+    import os
+    import subprocess
+
+    SUMO_HOME = os.environ.get("SUMO_HOME")
+    TOOLS_PATH = os.path.join(SUMO_HOME, "tools")
+
+    if density == "low":
+        period = "10"
+    elif density == "medium":
+        period = "5"
+    elif density == "high":
+        period = "2"
+    else:
+        period = "5"
+
+    tripDir = os.path.dirname(tripFile)
+    if tripDir:
+        os.makedirs(tripDir, exist_ok=True)
+
+    cmd = [
+        "python", os.path.join(TOOLS_PATH, "randomTips.py"),
+        "-n", netFile,
+        "-o", tripFile,
+        "--prefix", "veh",
+        "--seed", "13",
+        "--min-distance", "20",
+        "--trip-attributes", 'departLane="best" departSpeed="max"',
+        "--period", period
+    ]
+
+    subprocess.run(cmd, check=True)
+    print("Trips generated.")

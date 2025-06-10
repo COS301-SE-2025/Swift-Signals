@@ -145,7 +145,7 @@ def generateTrips(netFile, tripFile, density):
         "-n", netFile,
         "-o", tripFile,
         "--prefix", "veh",
-        "--seed", "42",
+        "--seed", "13",
         "--min-distance", "20",
         "--trip-attributes", 'departLane="best" departSpeed="max"',
         "--period", period
