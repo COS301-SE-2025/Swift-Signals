@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2025-06-10 16:30:13 by Eclipse SUMO netconvert Version 1.23.1
+<!-- generated on 2025-06-10 16:49:40 by Eclipse SUMO netconvert Version 1.23.1
 <netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
@@ -75,28 +75,28 @@
         <lane id=":n5_0_0" index="0" speed="3.65" length="4.67" shape="200.00,98.40 201.20,99.20 201.60,100.00 201.20,100.80 200.00,101.60"/>
     </edge>
 
-    <edge id="in_n2_1" from="n2" to="n1" priority="1">
+    <edge id="in_n2_1" from="n2" to="n1" priority="0">
         <lane id="in_n2_1_0" index="0" speed="13.90" length="92.80" shape="98.40,200.00 98.40,107.20"/>
     </edge>
-    <edge id="in_n3_1" from="n3" to="n1" priority="1">
+    <edge id="in_n3_1" from="n3" to="n1" priority="0">
         <lane id="in_n3_1_0" index="0" speed="13.90" length="92.80" shape="101.60,0.00 101.60,92.80"/>
     </edge>
-    <edge id="in_n4_1" from="n4" to="n1" priority="1">
+    <edge id="in_n4_1" from="n4" to="n1" priority="0">
         <lane id="in_n4_1_0" index="0" speed="13.90" length="92.80" shape="0.00,98.40 92.80,98.40"/>
     </edge>
-    <edge id="in_n5_1" from="n5" to="n1" priority="1">
+    <edge id="in_n5_1" from="n5" to="n1" priority="0">
         <lane id="in_n5_1_0" index="0" speed="13.90" length="92.80" shape="200.00,101.60 107.20,101.60"/>
     </edge>
-    <edge id="out_n1_n2" from="n1" to="n2" priority="1">
+    <edge id="out_n1_n2" from="n1" to="n2" priority="0">
         <lane id="out_n1_n2_0" index="0" speed="13.90" length="92.80" shape="101.60,107.20 101.60,200.00"/>
     </edge>
-    <edge id="out_n1_n3" from="n1" to="n3" priority="1">
+    <edge id="out_n1_n3" from="n1" to="n3" priority="0">
         <lane id="out_n1_n3_0" index="0" speed="13.90" length="92.80" shape="98.40,92.80 98.40,0.00"/>
     </edge>
-    <edge id="out_n1_n4" from="n1" to="n4" priority="1">
+    <edge id="out_n1_n4" from="n1" to="n4" priority="0">
         <lane id="out_n1_n4_0" index="0" speed="13.90" length="92.80" shape="92.80,101.60 0.00,101.60"/>
     </edge>
-    <edge id="out_n1_n5" from="n1" to="n5" priority="1">
+    <edge id="out_n1_n5" from="n1" to="n5" priority="0">
         <lane id="out_n1_n5_0" index="0" speed="13.90" length="92.80" shape="107.20,98.40 200.00,98.40"/>
     </edge>
 

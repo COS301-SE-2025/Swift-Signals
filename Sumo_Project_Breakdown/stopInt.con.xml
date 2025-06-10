@@ -1,17 +1,17 @@
 <connections>
-    <connection from="in_n2_1" to="out_n1_n3" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n2_1" to="out_n1_n5" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n2_1" to="out_n1_n4" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n2_1" to="out_n1_n3" fromLane="0" toLane="0"/>
+    <connection from="in_n2_1" to="out_n1_n5" fromLane="0" toLane="0"/>
+    <connection from="in_n2_1" to="out_n1_n4" fromLane="0" toLane="0"/>
 
-    <connection from="in_n3_1" to="out_n1_n4" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n3_1" to="out_n1_n5" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n3_1" to="out_n1_n2" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n3_1" to="out_n1_n4" fromLane="0" toLane="0"/>
+    <connection from="in_n3_1" to="out_n1_n5" fromLane="0" toLane="0"/>
+    <connection from="in_n3_1" to="out_n1_n2" fromLane="0" toLane="0"/>
 
-    <connection from="in_n4_1" to="out_n1_n5" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n4_1" to="out_n1_n2" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n4_1" to="out_n1_n3" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n4_1" to="out_n1_n5" fromLane="0" toLane="0"/>
+    <connection from="in_n4_1" to="out_n1_n2" fromLane="0" toLane="0"/>
+    <connection from="in_n4_1" to="out_n1_n3" fromLane="0" toLane="0"/>
 
-    <connection from="in_n5_1" to="out_n1_n2" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n5_1" to="out_n1_n3" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n5_1" to="out_n1_n4" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n5_1" to="out_n1_n2" fromLane="0" toLane="0"/>
+    <connection from="in_n5_1" to="out_n1_n3" fromLane="0" toLane="0"/>
+    <connection from="in_n5_1" to="out_n1_n4" fromLane="0" toLane="0"/>
 </connections>

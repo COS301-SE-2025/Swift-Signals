@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-06-10 16:46:24 by Eclipse SUMO netconvert Version 1.23.1
+-->
+
+<netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <node-files value="check.nod.xml"/>
+        <edge-files value="check.edg.xml"/>
+        <connection-files value="check.con.xml"/>
+        <tllogic-files value="check.tll.xml"/>
+    </input>
+
+    <output>
+        <output-file value="stop_intersection.net.xml"/>
+    </output>
+
+</netconvertConfiguration>

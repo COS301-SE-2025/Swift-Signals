@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 2025-06-10 16:46:24 by Eclipse SUMO netconvert Version 1.23.1
+<netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <node-files value="stopInt.nod.xml"/>
+        <edge-files value="stopInt.edg.xml"/>
+        <connection-files value="stopInt.con.xml"/>
+    </input>
+
+    <output>
+        <output-file value="stop_intersection.net.xml"/>
+        <plain-output-prefix value="check"/>
+    </output>
+
+</netconvertConfiguration>
+-->
+
+<connections version="1.20" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/connections_file.xsd">
+    <connection from="in_n2_1" to="out_n1_n4" fromLane="0" toLane="0"/>
+    <connection from="in_n2_1" to="out_n1_n3" fromLane="0" toLane="0"/>
+    <connection from="in_n2_1" to="out_n1_n5" fromLane="0" toLane="0"/>
+
+    <connection from="in_n3_1" to="out_n1_n5" fromLane="0" toLane="0"/>
+    <connection from="in_n3_1" to="out_n1_n2" fromLane="0" toLane="0"/>
+    <connection from="in_n3_1" to="out_n1_n4" fromLane="0" toLane="0"/>
+
+    <connection from="in_n4_1" to="out_n1_n3" fromLane="0" toLane="0"/>
+    <connection from="in_n4_1" to="out_n1_n5" fromLane="0" toLane="0"/>
+    <connection from="in_n4_1" to="out_n1_n2" fromLane="0" toLane="0"/>
+
+    <connection from="in_n5_1" to="out_n1_n2" fromLane="0" toLane="0"/>
+    <connection from="in_n5_1" to="out_n1_n4" fromLane="0" toLane="0"/>
+    <connection from="in_n5_1" to="out_n1_n3" fromLane="0" toLane="0"/>
+
+    <connection from="out_n1_n2" to="in_n2_1" fromLane="0" toLane="0"/>
+
+    <connection from="out_n1_n3" to="in_n3_1" fromLane="0" toLane="0"/>
+
+    <connection from="out_n1_n4" to="in_n4_1" fromLane="0" toLane="0"/>
+
+    <connection from="out_n1_n5" to="in_n5_1" fromLane="0" toLane="0"/>
+
+</connections>

@@ -43,7 +43,14 @@ def generate(params):
     </configuration>""")
 
     print("Running SUMO simulation...")
-    subprocess.run(["sumo-gui", "-c", configFile])
+    #subprocess.run(["sumo-gui", "-c", configFile])
+    subprocess.run([
+    "sumo-gui",
+    "-c", configFile,
+    "--verbose",
+    "--log", "sumo.log",
+    "--no-step-log"
+])
 
 def writeNodeFile(filename):
     content = """<nodes>
@@ -58,36 +65,36 @@ def writeNodeFile(filename):
 
 def writeEdgeFile(filename):
     content = """<edges>
-    <edge id="in_n2_1" from="n2" to="n1" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="in_n3_1" from="n3" to="n1" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="in_n4_1" from="n4" to="n1" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="in_n5_1" from="n5" to="n1" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="in_n2_1" from="n2" to="n1" priority="0" numLanes="1" speed="13.9"/>
+    <edge id="in_n3_1" from="n3" to="n1" priority="0" numLanes="1" speed="13.9"/>
+    <edge id="in_n4_1" from="n4" to="n1" priority="0" numLanes="1" speed="13.9"/>
+    <edge id="in_n5_1" from="n5" to="n1" priority="0" numLanes="1" speed="13.9"/>
 
-    <edge id="out_n1_n2" from="n1" to="n2" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="out_n1_n3" from="n1" to="n3" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="out_n1_n4" from="n1" to="n4" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="out_n1_n5" from="n1" to="n5" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="out_n1_n2" from="n1" to="n2" priority="0" numLanes="1" speed="13.9"/>
+    <edge id="out_n1_n3" from="n1" to="n3" priority="0" numLanes="1" speed="13.9"/>
+    <edge id="out_n1_n4" from="n1" to="n4" priority="0" numLanes="1" speed="13.9"/>
+    <edge id="out_n1_n5" from="n1" to="n5" priority="0" numLanes="1" speed="13.9"/>
 </edges>"""
     with open(filename, "w") as f:
         f.write(content)
 
 def writeConnectionFile(filename):
     content = """<connections>
-    <connection from="in_n2_1" to="out_n1_n3" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n2_1" to="out_n1_n5" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n2_1" to="out_n1_n4" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n2_1" to="out_n1_n3" fromLane="0" toLane="0"/>
+    <connection from="in_n2_1" to="out_n1_n5" fromLane="0" toLane="0"/>
+    <connection from="in_n2_1" to="out_n1_n4" fromLane="0" toLane="0"/>
 
-    <connection from="in_n3_1" to="out_n1_n4" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n3_1" to="out_n1_n5" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n3_1" to="out_n1_n2" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n3_1" to="out_n1_n4" fromLane="0" toLane="0"/>
+    <connection from="in_n3_1" to="out_n1_n5" fromLane="0" toLane="0"/>
+    <connection from="in_n3_1" to="out_n1_n2" fromLane="0" toLane="0"/>
 
-    <connection from="in_n4_1" to="out_n1_n5" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n4_1" to="out_n1_n2" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n4_1" to="out_n1_n3" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n4_1" to="out_n1_n5" fromLane="0" toLane="0"/>
+    <connection from="in_n4_1" to="out_n1_n2" fromLane="0" toLane="0"/>
+    <connection from="in_n4_1" to="out_n1_n3" fromLane="0" toLane="0"/>
 
-    <connection from="in_n5_1" to="out_n1_n2" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n5_1" to="out_n1_n3" fromLane="0" toLane="0" tl="false"/>
-    <connection from="in_n5_1" to="out_n1_n4" fromLane="0" toLane="0" tl="false"/>
+    <connection from="in_n5_1" to="out_n1_n2" fromLane="0" toLane="0"/>
+    <connection from="in_n5_1" to="out_n1_n3" fromLane="0" toLane="0"/>
+    <connection from="in_n5_1" to="out_n1_n4" fromLane="0" toLane="0"/>
 </connections>"""
     with open(filename, "w") as f:
         f.write(content)
@@ -95,10 +102,10 @@ def writeConnectionFile(filename):
 def writeStopLogic(filename):
     with open(filename, "w") as tl:
         tl.write(f"""<additional>
-    <stopSign lane="in_n2_1_0" startPos="0" endPos="5"/>
-    <stopSign lane="in_n3_1_0" startPos="0" endPos="5"/>
-    <stopSign lane="in_n4_1_0" startPos="0" endPos="5"/>
-    <stopSign lane="in_n5_1_0" startPos="0" endPos="5"/>
+    <stopSign lane="in_n2_1_0" startPos="20" endPos="25"/>
+    <stopSign lane="in_n3_1_0" startPos="20" endPos="25"/>
+    <stopSign lane="in_n4_1_0" startPos="20" endPos="25"/>
+    <stopSign lane="in_n5_1_0" startPos="20" endPos="25"/>
 </additional>""")
 
 def generateTrips(netFile, tripFile, density):
