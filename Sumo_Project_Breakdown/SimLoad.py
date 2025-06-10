@@ -20,11 +20,15 @@ def getParams(tL: bool):
     if tL == True:
         greenTime = int(input("Enter green light duration in seconds: ").strip())
         redTime = int(input("Enter red light duration in seconds: ").strip())
-    return {
-        "Traffic Density": trafficDensity,
-        "Green": greenTime,
-        "Red": redTime
-    }
+        return {
+            "Traffic Density": trafficDensity,
+            "Green": greenTime,
+            "Red": redTime
+        }
+    else:
+        return {
+            "Traffic Density": trafficDensity
+        }
 
 def main():
     tl = False
