@@ -27,8 +27,8 @@ jobs:
 
         - name: Run Linting with Flake8
           run: |
-            flake8 .
+            flake8 Sumo_Project_Breakdown
 
         - name: Run Tests with Pytest
           run: |
-            pytest
+            pytest Sumo_Project_Breakdown
