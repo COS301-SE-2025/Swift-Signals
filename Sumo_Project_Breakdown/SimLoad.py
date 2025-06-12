@@ -1,11 +1,9 @@
-import os
-import sys
-import json
-import traci
-
 from intersections import circle, stopStreet, tJunction, trafficLight
 
+
 print("Welcome to Sumo!")
+
+
 def showMenu():
     print("Select an instersection type:")
     print("1. Traffic circle")
@@ -15,9 +13,11 @@ def showMenu():
     choice = input("Enter choice (1-4): ").strip()
     return choice
 
+
+
 def getParams(tL: bool):
     trafficDensity = input("Enter traffic density (low/medium/high): ").strip().lower()
-    if tL == True:
+    if tL:
         greenTime = int(input("Enter green light duration in seconds: ").strip())
         redTime = int(input("Enter red light duration in seconds: ").strip())
         return {
@@ -29,6 +29,7 @@ def getParams(tL: bool):
         return {
             "Traffic Density": trafficDensity
         }
+
 
 def main():
     tl = False
@@ -50,6 +51,7 @@ def main():
     else: 
         print("Invalid choice.")
         main()
+
 
 if __name__ == "__main__":
     main()
