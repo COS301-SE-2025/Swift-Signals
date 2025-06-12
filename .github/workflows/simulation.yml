@@ -24,6 +24,7 @@ jobs:
             python -m pip install --upgrade pip
             pip install sumolib traci
             pip install flake8 pytest
+            pip install pytest-mock
 
         - name: Run Linting with Flake8
           run: |
