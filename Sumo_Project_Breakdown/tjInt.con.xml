@@ -1,0 +1,10 @@
+<connections>
+    <connection from="in_nNorth_J1" to="out_J1_nEast" fromLane="0" toLane="0"/>
+    <connection from="in_nNorth_J1" to="out_J1_nWest" fromLane="0" toLane="0"/>
+
+    <connection from="in_nEast_J1" to="out_J1_nNorth" fromLane="0" toLane="0"/>
+    <connection from="in_nEast_J1" to="out_J1_nWest" fromLane="0" toLane="0"/>
+
+    <connection from="in_nWest_J1" to="out_J1_nNorth" fromLane="0" toLane="0"/>
+    <connection from="in_nWest_J1" to="out_J1_nEast" fromLane="0" toLane="0"/>
+</connections>

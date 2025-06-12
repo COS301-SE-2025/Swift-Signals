@@ -1,0 +1,10 @@
+<configuration>
+    <input>
+        <net-file value="t_junction.net.xml"/>
+        <route-files value="t_junction.rou.xml"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="1000"/>
+    </time>
+</configuration>

@@ -1,7 +1,11 @@
 <nodes>
-    <node id="1" x="0" y="0" type="traffic_light"/>
-    <node id="n2" x="0" y="100" type="priority"/>
-    <node id="n3" x="0" y="-100" type="priority"/>
-    <node id="n4" x="-100" y="0" type="priority"/>
-    <node id="n5" x="100" y="0" type="priority"/>
+    <node id="r1" x="0" y="20" type="priority"/>
+    <node id="r2" x="20" y="0" type="priority"/>
+    <node id="r3" x="0" y="-20" type="priority"/>
+    <node id="r4" x="-20" y="0" type="priority"/>
+
+    <node id="nN" x="0" y="100" type="priority"/>
+    <node id="nE" x="100" y="0" type="priority"/>
+    <node id="nS" x="0" y="-100" type="priority"/>
+    <node id="nW" x="-100" y="0" type="priority"/>
 </nodes>
