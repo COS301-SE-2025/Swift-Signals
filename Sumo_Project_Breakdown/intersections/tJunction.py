@@ -1,5 +1,5 @@
-import os
 import subprocess
+
 
 def generate(params):
     base = "t_junction"
@@ -42,6 +42,7 @@ def generate(params):
     print("Running SUMO simulation...")
     subprocess.run(["sumo-gui", "-c", configFile])
 
+
 def writeNodeFile(filename):
     content = """<nodes>
     <node id="J1" x="0" y="0" type="priority"/> <!-- T-junction -->
@@ -51,6 +52,7 @@ def writeNodeFile(filename):
 </nodes>"""
     with open(filename, "w") as f:
         f.write(content)
+
 
 def writeEdgeFile(filename):
     content = """<edges>
@@ -65,6 +67,7 @@ def writeEdgeFile(filename):
     with open(filename, "w") as f:
         f.write(content)
 
+
 def writeConnectionFile(filename):
     content = """<connections>
     <connection from="in_nNorth_J1" to="out_J1_nEast" fromLane="0" toLane="0"/>
@@ -78,6 +81,7 @@ def writeConnectionFile(filename):
 </connections>"""
     with open(filename, "w") as f:
         f.write(content)
+
 
 def generateTrips(netFile, tripFile, density):
     SUMO_HOME = os.environ.get("SUMO_HOME")

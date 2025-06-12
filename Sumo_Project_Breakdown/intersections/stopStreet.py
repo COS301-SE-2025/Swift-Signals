@@ -1,5 +1,5 @@
-import os
 import subprocess
+
 
 def generate(params):
     base = "stop_intersection"
@@ -45,6 +45,7 @@ def generate(params):
     print("Running SUMO simulation...")
     subprocess.run(["sumo-gui", "-c", configFile])
 
+
 def writeNodeFile(filename):
     content = """<nodes>
     <node id="n1" x="0" y="0" type="priority"/>
@@ -55,6 +56,7 @@ def writeNodeFile(filename):
 </nodes>"""
     with open(filename, "w") as f:
         f.write(content)
+
 
 def writeEdgeFile(filename):
     content = """<edges>
@@ -70,6 +72,7 @@ def writeEdgeFile(filename):
 </edges>"""
     with open(filename, "w") as f:
         f.write(content)
+
 
 def writeConnectionFile(filename):
     content = """<connections>
@@ -92,6 +95,7 @@ def writeConnectionFile(filename):
     with open(filename, "w") as f:
         f.write(content)
 
+
 def writeStopLogic(filename):
     with open(filename, "w") as tl:
         tl.write(f"""<additional>
@@ -101,8 +105,8 @@ def writeStopLogic(filename):
     <priority id="priority3" type="stop" lane="in_n5_1_0" startPos="0" endPos="5"/>
 </additional>""")
 
+
 def generateTrips(netFile, tripFile, density):
-    import os
     import subprocess
 
     SUMO_HOME = os.environ.get("SUMO_HOME")

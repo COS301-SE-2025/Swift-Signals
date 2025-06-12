@@ -1,5 +1,5 @@
-import os
 import subprocess
+
 
 def generate(params):
     #filenames
@@ -17,9 +17,7 @@ def generate(params):
     writeEdgeFile(edgeFile)
     writeConnectionFile(conFile)
 
-
     print("Generating traffic light intersection with params:", params)
-    #TODO: add sumo net, route and simulation generation logic
 
     writeTrafficLightLogic(tllFile, params["Green"], params["Red"])
 
@@ -49,8 +47,8 @@ def generate(params):
     print("Running SUMO simulation...")
     subprocess.run(["sumo-gui", "-c", configFile])
 
+
 def writeNodeFile(filename):
-    #four nodes + center
     content = """<nodes>
     <node id="1" x="0" y="0" type="traffic_light"/>
     <node id="n2" x="0" y="100" type="priority"/>
@@ -60,6 +58,7 @@ def writeNodeFile(filename):
 </nodes>"""
     with open(filename, "w") as f:
         f.write(content)
+
 
 def writeEdgeFile(filename):
     content = """<edges>
@@ -75,6 +74,7 @@ def writeEdgeFile(filename):
 </edges>"""
     with open(filename, "w") as f:
         f.write(content)
+
 
 def writeConnectionFile(filename):
     content = """<connections>
@@ -96,6 +96,7 @@ def writeConnectionFile(filename):
 </connections>"""
     with open(filename, "w") as f:
         f.write(content)
+
 
 def writeTrafficLightLogic(filename, greenDuration, redDuration):
     # phase 1: green for tl 0,1,2 (from in_n2_n1) and tl 6,7,8 (from in_n4_n1)
@@ -126,7 +127,6 @@ def generateTrips(netFile, tripFile, density):
     SUMO_HOME = os.environ.get("SUMO_HOME")
     TOOLS_PATH = os.path.join(SUMO_HOME, "tools")
 
-    # Determine period based on density
     if density == "low":
         period = "10"
     elif density == "medium":

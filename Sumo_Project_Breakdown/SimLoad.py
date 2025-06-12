@@ -14,7 +14,6 @@ def showMenu():
     return choice
 
 
-
 def getParams(tL: bool):
     trafficDensity = input("Enter traffic density (low/medium/high): ").strip().lower()
     if tL:
@@ -48,10 +47,11 @@ def main():
         tl = True
         params = getParams(tl)
         trafficLight.generate(params)
-    else: 
+    else:
         print("Invalid choice.")
         main()
 
 
 if __name__ == "__main__":
     main()
+    

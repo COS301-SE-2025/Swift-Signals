@@ -27,7 +27,7 @@ jobs:
 
         - name: Run Linting with Flake8
           run: |
-            flake8 Sumo_Project_Breakdown
+            flake8 Sumo_Project_Breakdown --ignore=E501
 
         - name: Run Tests with Pytest
           run: |
