@@ -121,4 +121,3 @@ def test_generateTrips_default_density(mock_run, tmp_path):
     assert any("randomTrips" in arg for arg in args)
     assert "--period" in args
     assert "5" in args  # Default fallback
-    
