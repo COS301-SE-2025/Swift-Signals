@@ -26,6 +26,9 @@ jobs:
             pip install flake8 pytest
             pip install pytest-mock
 
+        - name: Set SUMO_HOME
+          run: echo "SUMO_HOME=/path/to/sumo/home" >> $GITHUB_ENV
+
         - name: Run Linting with Flake8
           run: |
             flake8 Sumo_Project_Breakdown --ignore=E501
