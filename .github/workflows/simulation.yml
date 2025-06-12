@@ -25,6 +25,7 @@ jobs:
             pip install sumolib traci
             pip install flake8 pytest
             pip install pytest-mock
+            pip install pytest-cov
 
         - name: Set SUMO_HOME
           run: echo "SUMO_HOME=/path/to/sumo/home" >> $GITHUB_ENV
@@ -33,6 +34,6 @@ jobs:
           run: |
             flake8 Sumo_Project_Breakdown --ignore=E501
 
-        - name: Run Tests with Pytest
+        - name: Run Tests with coverage using Pytest
           run: |
-            pytest Sumo_Project_Breakdown
+            pytest --cov=SimLoad --cov-report=term-missing Sumo_Project_Breakdown/tests/
