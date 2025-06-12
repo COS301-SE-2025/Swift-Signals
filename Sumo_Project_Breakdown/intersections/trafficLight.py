@@ -2,7 +2,6 @@ import subprocess
 
 
 def generate(params):
-    #filenames
     base = "tl_intersection"
     netFile = f"{base}.net.xml"
     routeFile = f"{base}.rou.xml"
@@ -99,15 +98,13 @@ def writeConnectionFile(filename):
 
 
 def writeTrafficLightLogic(filename, greenDuration, redDuration):
-    # phase 1: green for tl 0,1,2 (from in_n2_n1) and tl 6,7,8 (from in_n4_n1)
     phase1_state = list("r" * 12)
-    for i in [0,1,2,6,7,8]:
+    for i in [0, 1, 2, 6, 7, 8]:
         phase1_state[i] = "G"
     phase1_state = "".join(phase1_state)
 
-    # phase 2: green for tl 3,4,5 (from in_n3_n1) and tl 9,10,11 (from in_n5_n1)
     phase2_state = list("r" * 12)
-    for i in [3,4,5,9,10,11]:
+    for i in [3, 4, 5, 9, 10, 11]:
         phase2_state[i] = "G"
     phase2_state = "".join(phase2_state)
 
