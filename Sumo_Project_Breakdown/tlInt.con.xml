@@ -1,16 +1,19 @@
 <connections>
-    <connection from="in_N_r1" to="r1_r2" fromLane="0" toLane="0"/>
-    <connection from="in_E_r2" to="r2_r3" fromLane="0" toLane="0"/>
-    <connection from="in_S_r3" to="r3_r4" fromLane="0" toLane="0"/>
-    <connection from="in_W_r4" to="r4_r1" fromLane="0" toLane="0"/>
+    <!-- Incoming edges yield to circulating edges -->
+    <connection from="in_N_r1" to="r1_r2" fromLane="0" toLane="0" priority="1"/>
+    <connection from="in_E_r2" to="r2_r3" fromLane="0" toLane="0" priority="1"/>
+    <connection from="in_S_r3" to="r3_r4" fromLane="0" toLane="0" priority="1"/>
+    <connection from="in_W_r4" to="r4_r1" fromLane="0" toLane="0" priority="1"/>
 
-    <connection from="r1_r2" to="r2_r3" fromLane="0" toLane="0"/>
-    <connection from="r2_r3" to="r3_r4" fromLane="0" toLane="0"/>
-    <connection from="r3_r4" to="r4_r1" fromLane="0" toLane="0"/>
-    <connection from="r4_r1" to="r1_r2" fromLane="0" toLane="0"/>
+    <!-- Circulating edges have higher priority -->
+    <connection from="r1_r2" to="r2_r3" fromLane="0" toLane="0" priority="2"/>
+    <connection from="r2_r3" to="r3_r4" fromLane="0" toLane="0" priority="2"/>
+    <connection from="r3_r4" to="r4_r1" fromLane="0" toLane="0" priority="2"/>
+    <connection from="r4_r1" to="r1_r2" fromLane="0" toLane="0" priority="2"/>
 
-    <connection from="r1_r2" to="out_r2_E" fromLane="0" toLane="0"/>
-    <connection from="r2_r3" to="out_r3_S" fromLane="0" toLane="0"/>
-    <connection from="r3_r4" to="out_r4_W" fromLane="0" toLane="0"/>
-    <connection from="r4_r1" to="out_r1_N" fromLane="0" toLane="0"/>
+    <!-- Exiting edges yield to circulating edges -->
+    <connection from="r1_r2" to="out_r2_E" fromLane="0" toLane="0" priority="1"/>
+    <connection from="r2_r3" to="out_r3_S" fromLane="0" toLane="0" priority="1"/>
+    <connection from="r3_r4" to="out_r4_W" fromLane="0" toLane="0" priority="1"/>
+    <connection from="r4_r1" to="out_r1_N" fromLane="0" toLane="0" priority="1"/>
 </connections>
