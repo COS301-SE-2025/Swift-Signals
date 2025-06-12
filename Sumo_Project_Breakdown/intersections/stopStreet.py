@@ -99,7 +99,7 @@ def writeConnectionFile(filename):
 
 def writeStopLogic(filename):
     with open(filename, "w") as tl:
-        tl.write(f"""<additional>
+        tl.write("""<additional>
     <priority id="priority0" type="stop" lane="in_n2_1_0" startPos="0" endPos="5"/>
     <priority id="priority1" type="stop" lane="in_n3_1_0" startPos="0" endPos="5"/>
     <priority id="priority2" type="stop" lane="in_n4_1_0" startPos="0" endPos="5"/>
