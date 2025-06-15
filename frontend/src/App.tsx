@@ -10,6 +10,7 @@ import Intersections from './pages/Intersections';
 import Users from './pages/Users';
 import SimulationResults from './pages/SimulationResults';
 import ErrorBoundary from './components/ErrorBoundary';
+import WelcomePage from './pages/WelcomePage';
 //import reactLogo from './assets/react.svg';
 //import viteLogo from '/vite.svg';
 import './App.css';
@@ -20,7 +21,8 @@ function App() {
       {/* <Navbar /> */}
       <ErrorBoundary>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path='/logout' element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
@@ -31,7 +33,7 @@ function App() {
           {/* Add more routes as needed */}
         </Routes>
       </ErrorBoundary>
-      <Footer />
+      {/* <Footer /> */}
     </Router>
   );
 }
