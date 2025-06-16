@@ -1,5 +1,6 @@
 import React from "react";
 import "../styles/WelcomePage.css"; // Make sure this path is correct
+import Carousel from "../components/Carousel";
 
 const WelcomePage: React.FC = () => {
   const handleLoginClick = () => {
@@ -32,19 +33,16 @@ const WelcomePage: React.FC = () => {
           </div>
         </div>
         <div className="glass-block-right">
-          <p>
-            Swift Signals is a simulation-driven traffic light optimization
-            platform developed with Southern Cross Solutions to combat urban
-            congestion. Designed for municipal traffic departments, it uses
-            machine learning and historical traffic data to analyse
-            intersections and optimize signal timing. With traffic congestion
-            costing South Africa an estimated R1 billion annually in lost
-            productivity, Swift Signals offers a scalable, modular web platform
-            that simulates real-world traffic patterns and adjusts signal phases
-            dynamically. Built using microservices, containerization, and CI/CD
-            pipelines, it ensures long-term maintainability and deployment
-            efficiency.
-          </p>
+          <div style={{ height: "300px", position: "relative" }}>
+            <Carousel
+              baseWidth={350}
+              autoplay={true}
+              autoplayDelay={5000}
+              pauseOnHover={true}
+              loop={true}
+              round={false}
+            />
+          </div>
         </div>
       </div>
     </div>
