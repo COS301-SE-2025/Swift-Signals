@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import UsersTable from '../components/UsersTable';
 import '../styles/Users.css';
+import Footer from '../components/Footer';
 
 // TypeScript interface for user data
 interface User {
@@ -145,6 +146,7 @@ const Users = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

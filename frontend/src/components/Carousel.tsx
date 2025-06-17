@@ -3,11 +3,17 @@ import { motion, useMotionValue, useTransform } from "framer-motion";
 import type { PanInfo } from "framer-motion";
 // replace icons with your own if needed
 import {
+  FiBarChart2,
   FiCircle,
   FiCode,
   FiFileText,
+  FiGlobe,
+  FiInfo,
   FiLayers,
   FiLayout,
+  FiTarget,
+  FiTrendingUp,
+  FiUsers,
 } from "react-icons/fi";
 import "../styles/Carousel.css";
 
@@ -16,6 +22,7 @@ export interface CarouselItem {
   description: string;
   id: number;
   icon: React.ReactElement;
+  backgroundColor?: string;
 }
 
 export interface CarouselProps {
@@ -33,31 +40,36 @@ const DEFAULT_ITEMS: CarouselItem[] = [
     title: "Overview",
     description: "Swift Signals is a smart traffic light optimization platform built to reduce congestion in cities.",
     id: 1,
-    icon: <FiFileText className="carousel-icon" />,
+    icon: <FiInfo className="carousel-icon" />,
+    backgroundColor: "rgba(11, 80, 33, 0.3)",
   },
   {
     title: "Purpose & Impact",
     description: "Addresses one of South Africa’s biggest infrastructure challenges—R1 billion lost annually due to traffic.",
     id: 2,
-    icon: <FiCircle className="carousel-icon" />,
+    icon: <FiTarget className="carousel-icon" />,
+    backgroundColor: "rgba(62, 228, 12, 0.3)",
   },
   {
     title: "Intelligent Optimization",
     description: "Uses machine learning and historical traffic data to improve traffic signal timing.",
     id: 3,
-    icon: <FiLayers className="carousel-icon" />,
+    icon: <FiBarChart2 className="carousel-icon" />,
+    backgroundColor: "rgba(56, 78, 107, 0.3)",
   },
   {
     title: "Realistic Simulation",
     description: "Simulates real-world intersection behaviour to support dynamic signal phase adjustments.",
     id: 4,
-    icon: <FiLayout className="carousel-icon" />,
+    icon: <FiTrendingUp className="carousel-icon" />,
+    backgroundColor: "rgba(58, 143, 240, 0.3)",
   },
   {
     title: "Strategic Partnership",
     description: "Developed in collaboration with Southern Cross Solutions for real-world municipal deployment.",
     id: 5,
-    icon: <FiCode className="carousel-icon" />,
+    icon: <FiUsers className="carousel-icon" />,
+    backgroundColor: "rgba(226, 250, 8, 0.3)",
   },
 ];
 
@@ -205,6 +217,7 @@ export default function Carousel({
               className={`carousel-item ${round ? "round" : ""}`}
               style={{
                 width: itemWidth,
+                backgroundColor: item.backgroundColor,
                 height: round ? itemWidth : "100%",
                 rotateY: rotateY,
                 ...(round && { borderRadius: "50%" }),

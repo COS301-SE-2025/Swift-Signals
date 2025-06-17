@@ -1,16 +1,19 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/WelcomePage.css"; // Make sure this path is correct
 import Carousel from "../components/Carousel";
 
 const WelcomePage: React.FC = () => {
+  const navigate = useNavigate(); // Initialize useNavigate
+
   const handleLoginClick = () => {
     console.log("Login button clicked!");
-    // Add navigation logic here, e.g., history.push('/login');
+    navigate("/login"); // Navigate to the Login page
   };
 
   const handleRegisterClick = () => {
     console.log("Register button clicked!");
-    // Add navigation logic here, e.g., history.push('/register');
+    navigate("/signup"); // Navigate to the Signup page
   };
 
   return (
@@ -37,7 +40,7 @@ const WelcomePage: React.FC = () => {
             <Carousel
               baseWidth={350}
               autoplay={true}
-              autoplayDelay={5000}
+              autoplayDelay={9000}
               pauseOnHover={true}
               loop={true}
               round={false}
