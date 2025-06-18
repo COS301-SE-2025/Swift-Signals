@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"google.golang.org/grpc"
 	userpb "github.com/COS301-SE-2025/Swift-Signals/api-gateway/protos/user"
+	"google.golang.org/grpc"
 )
 
 type UserClient struct {
@@ -51,4 +51,12 @@ func (uc *UserClient) LogoutUser(ctx context.Context, userID string) (*userpb.Lo
 	return uc.client.LogoutUser(ctx, req)
 }
 
+// NOTE: Creates stub for testing
+type UserClientInterface interface {
+	RegisterUser(ctx context.Context, name, email, password string) (*userpb.UserResponse, error)
+	LoginUser(ctx context.Context, email, password string) (*userpb.AuthResponse, error)
+	LogoutUser(ctx context.Context, userID string) (*userpb.LogoutResponse, error)
+}
 
+// NOTE: Asserts Interface Implementation
+var _ UserClientInterface = (*UserClient)(nil)
