@@ -11,7 +11,7 @@ import (
 )
 
 type AuthHandler struct {
-	UserClient *client.UserClient
+	UserClient client.UserClientInterface
 }
 
 func (h *AuthHandler) PostLogin(w http.ResponseWriter, r *http.Request) {
