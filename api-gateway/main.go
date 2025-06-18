@@ -4,13 +4,18 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/api"
 )
 
 var port = ":9090"
 
 func main() {
+	handler := &api.AuthHandler{}
 
 	mux := http.NewServeMux()
+
+	api.HandlerFromMux(handler, mux)
 
 	// Simulation Service Routes
 	mux.HandleFunc("GET /simulations", getAllSimulations)
