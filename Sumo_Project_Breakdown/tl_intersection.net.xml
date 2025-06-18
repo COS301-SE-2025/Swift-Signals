@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2025-06-18 10:37:55 by Eclipse SUMO netconvert Version 1.23.1
+<!-- generated on 2025-06-18 11:23:34 by Eclipse SUMO netconvert Version 1.23.1
 <netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
@@ -24,7 +24,7 @@
         <lane id=":1_0_0" index="0" speed="6.51" length="9.03" shape="98.40,107.20 98.05,104.75 97.00,103.00 95.25,101.95 92.80,101.60"/>
     </edge>
     <edge id=":1_1" function="internal">
-        <lane id=":1_1_0" index="0" speed="13.90" length="14.40" shape="98.40,107.20 98.40,92.80"/>
+        <lane id=":1_1_0" index="0" speed="16.67" length="14.40" shape="98.40,107.20 98.40,92.80"/>
     </edge>
     <edge id=":1_2" function="internal">
         <lane id=":1_2_0" index="0" speed="8.00" length="4.07" shape="98.40,107.20 98.95,103.35 99.04,103.20"/>
@@ -36,7 +36,7 @@
         <lane id=":1_3_0" index="0" speed="6.51" length="9.03" shape="107.20,101.60 104.75,101.95 103.00,103.00 101.95,104.75 101.60,107.20"/>
     </edge>
     <edge id=":1_4" function="internal">
-        <lane id=":1_4_0" index="0" speed="13.90" length="14.40" shape="107.20,101.60 92.80,101.60"/>
+        <lane id=":1_4_0" index="0" speed="16.67" length="14.40" shape="107.20,101.60 92.80,101.60"/>
     </edge>
     <edge id=":1_5" function="internal">
         <lane id=":1_5_0" index="0" speed="8.00" length="4.07" shape="107.20,101.60 103.35,101.05 103.20,100.96"/>
@@ -48,7 +48,7 @@
         <lane id=":1_6_0" index="0" speed="6.51" length="9.03" shape="101.60,92.80 101.95,95.25 103.00,97.00 104.75,98.05 107.20,98.40"/>
     </edge>
     <edge id=":1_7" function="internal">
-        <lane id=":1_7_0" index="0" speed="13.90" length="14.40" shape="101.60,92.80 101.60,107.20"/>
+        <lane id=":1_7_0" index="0" speed="16.67" length="14.40" shape="101.60,92.80 101.60,107.20"/>
     </edge>
     <edge id=":1_8" function="internal">
         <lane id=":1_8_0" index="0" speed="8.00" length="4.07" shape="101.60,92.80 101.05,96.65 100.96,96.80"/>
@@ -60,7 +60,7 @@
         <lane id=":1_9_0" index="0" speed="6.51" length="9.03" shape="92.80,98.40 95.25,98.05 97.00,97.00 98.05,95.25 98.40,92.80"/>
     </edge>
     <edge id=":1_10" function="internal">
-        <lane id=":1_10_0" index="0" speed="13.90" length="14.40" shape="92.80,98.40 107.20,98.40"/>
+        <lane id=":1_10_0" index="0" speed="16.67" length="14.40" shape="92.80,98.40 107.20,98.40"/>
     </edge>
     <edge id=":1_11" function="internal">
         <lane id=":1_11_0" index="0" speed="8.00" length="4.07" shape="92.80,98.40 96.65,98.95 96.80,99.04"/>
@@ -82,35 +82,35 @@
     </edge>
 
     <edge id="in_n2_1" from="n2" to="1" priority="1">
-        <lane id="in_n2_1_0" index="0" speed="13.90" length="92.80" shape="98.40,200.00 98.40,107.20"/>
+        <lane id="in_n2_1_0" index="0" speed="16.67" length="92.80" shape="98.40,200.00 98.40,107.20"/>
     </edge>
     <edge id="in_n3_1" from="n3" to="1" priority="1">
-        <lane id="in_n3_1_0" index="0" speed="13.90" length="92.80" shape="101.60,0.00 101.60,92.80"/>
+        <lane id="in_n3_1_0" index="0" speed="16.67" length="92.80" shape="101.60,0.00 101.60,92.80"/>
     </edge>
     <edge id="in_n4_1" from="n4" to="1" priority="1">
-        <lane id="in_n4_1_0" index="0" speed="13.90" length="92.80" shape="0.00,98.40 92.80,98.40"/>
+        <lane id="in_n4_1_0" index="0" speed="16.67" length="92.80" shape="0.00,98.40 92.80,98.40"/>
     </edge>
     <edge id="in_n5_1" from="n5" to="1" priority="1">
-        <lane id="in_n5_1_0" index="0" speed="13.90" length="92.80" shape="200.00,101.60 107.20,101.60"/>
+        <lane id="in_n5_1_0" index="0" speed="16.67" length="92.80" shape="200.00,101.60 107.20,101.60"/>
     </edge>
     <edge id="out_1_n2" from="1" to="n2" priority="1">
-        <lane id="out_1_n2_0" index="0" speed="13.90" length="92.80" shape="101.60,107.20 101.60,200.00"/>
+        <lane id="out_1_n2_0" index="0" speed="16.67" length="92.80" shape="101.60,107.20 101.60,200.00"/>
     </edge>
     <edge id="out_1_n3" from="1" to="n3" priority="1">
-        <lane id="out_1_n3_0" index="0" speed="13.90" length="92.80" shape="98.40,92.80 98.40,0.00"/>
+        <lane id="out_1_n3_0" index="0" speed="16.67" length="92.80" shape="98.40,92.80 98.40,0.00"/>
     </edge>
     <edge id="out_1_n4" from="1" to="n4" priority="1">
-        <lane id="out_1_n4_0" index="0" speed="13.90" length="92.80" shape="92.80,101.60 0.00,101.60"/>
+        <lane id="out_1_n4_0" index="0" speed="16.67" length="92.80" shape="92.80,101.60 0.00,101.60"/>
     </edge>
     <edge id="out_1_n5" from="1" to="n5" priority="1">
-        <lane id="out_1_n5_0" index="0" speed="13.90" length="92.80" shape="107.20,98.40 200.00,98.40"/>
+        <lane id="out_1_n5_0" index="0" speed="16.67" length="92.80" shape="107.20,98.40 200.00,98.40"/>
     </edge>
 
     <tlLogic id="1" type="static" programID="0" offset="0">
-        <phase duration="42" state="GGgrrrGGgrrr"/>
-        <phase duration="3"  state="yyyrrryyyrrr"/>
-        <phase duration="42" state="rrrGGgrrrGGg"/>
-        <phase duration="3"  state="rrryyyrrryyy"/>
+        <phase duration="41" state="GGgrrrGGgrrr"/>
+        <phase duration="4"  state="yyyrrryyyrrr"/>
+        <phase duration="41" state="rrrGGgrrrGGg"/>
+        <phase duration="4"  state="rrryyyrrryyy"/>
     </tlLogic>
 
     <junction id="1" type="traffic_light" x="100.00" y="100.00" incLanes="in_n2_1_0 in_n5_1_0 in_n3_1_0 in_n4_1_0" intLanes=":1_0_0 :1_1_0 :1_12_0 :1_3_0 :1_4_0 :1_13_0 :1_6_0 :1_7_0 :1_14_0 :1_9_0 :1_10_0 :1_15_0" shape="96.80,107.20 103.20,107.20 103.64,104.98 104.20,104.20 104.98,103.64 105.98,103.31 107.20,103.20 107.20,96.80 104.98,96.36 104.20,95.80 103.64,95.02 103.31,94.02 103.20,92.80 96.80,92.80 96.36,95.02 95.80,95.80 95.02,96.36 94.02,96.69 92.80,96.80 92.80,103.20 95.02,103.64 95.80,104.20 96.36,104.98 96.69,105.98">

@@ -13,15 +13,45 @@ def showMenu():
     return choice
 
 
+def getDefaultTimingsBySpeed(speed):
+    if speed <= 40:
+        return {"Green":25, "Yellow":3, "Red":30}
+    elif speed <= 60:
+        return {"Green":25, "Yellow":4, "Red":30}
+    elif speed <= 80:
+        return {"Green":30, "Yellow":5, "Red":35}
+    else:
+        print("Speed exceeds reccomended safety for traffic lights, using default for 80km/h")
+        return {"Green":30, "Yellow":5, "Red":35}
+
+
 def getParams(tL: bool):
     trafficDensity = input("Enter traffic density (low/medium/high): ").strip().lower()
     if tL:
-        greenTime = int(input("Enter green light duration in seconds: ").strip())
-        redTime = int(input("Enter red light duration in seconds: ").strip())
+        use_default = input("Use default light timings based on road speed? (y/n): ").strip().lower()
+        if use_default == 'y':
+            try:
+                speed = int(input("Enter road speed limit in km/h (e.g. 40, 60, 80): ").strip())
+                timings = getDefaultTimingsBySpeed(speed)
+            except ValueError:
+                print("Invalid speed. Falling back to default (40 km/h).")
+                timings = getDefaultTimingsBySpeed(40)
+        else:
+            try:
+                green = int(input("Enter green light duration in seconds: ").strip())
+                yellow = int(input("Enter yellow light duration in seconds: ").strip())
+                red = int(input("Enter red light duration in seconds: ").strip())
+                timings = {"Green": green, "Yellow": yellow, "Red": red}
+            except ValueError:
+                print("Invalid input. Using default for (60 km/h).")
+                timings = getDefaultTimingsBySpeed(60)
+
         return {
             "Traffic Density": trafficDensity,
-            "Green": greenTime,
-            "Red": redTime
+            "Green": timings["Green"],
+            "Yellow": timings["Yellow"],
+            "Red": timings["Red"],
+            "Speed": speed
         }
     else:
         return {

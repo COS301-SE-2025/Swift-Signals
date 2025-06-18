@@ -4,6 +4,13 @@ import xml.etree.ElementTree as ET
 
 
 def generate(params):
+    allowedSpeeds = [40,60,80,100,120]
+    speedKm = params.get("Speed", 40)
+    if speedKm not in allowedSpeeds:
+        print(f"Warnig: Speed {speedKm}km/h not allowed. Using default 40km/h.")
+        speedKm = 40
+    speedInMs = speedKm*(1000/3600)
+
     base = "tl_intersection"
     netFile = f"{base}.net.xml"
     routeFile = f"{base}.rou.xml"
@@ -16,12 +23,12 @@ def generate(params):
     conFile = "tlInt.con.xml"
 
     writeNodeFile(nodeFile)
-    writeEdgeFile(edgeFile)
+    writeEdgeFile(edgeFile, speedInMs)
     writeConnectionFile(conFile)
 
     print("Generating traffic light intersection with params:", params)
 
-    writeTrafficLightLogic(tllFile, params["Green"], params["Red"])
+    writeTrafficLightLogic(tllFile, params["Green"], params["Yellow"], params["Red"])
 
     subprocess.run([
         "netconvert",
@@ -51,7 +58,7 @@ def generate(params):
     logfile = f"{base}_warnings.log"
     with open(logfile, "w") as log:
         subprocess.run([
-            "sumo-gui",
+            "sumo",
             "-c", configFile,
             "--tripinfo-output", tripinfoFile,
             "--no-warnings", "false", #print warnings
@@ -62,13 +69,31 @@ def generate(params):
 
     emergency_brakes = 0
     emergency_stops = 0
+    near_collisions = []
 
     with open(logfile, "r") as f:
-        for line in f:
-            if "performs emergency braking" in line:
-                emergency_brakes += 1
-            elif "performs emergency stop" in line:
-                emergency_stops += 1
+        lines = f.readlines()
+
+    for i in range(len(lines)):
+        line = lines[i].strip()
+        if "performs emergency braking" in line:
+            vehicle_id = line.split("'")[1]
+            emergency_brakes += 1
+
+            if i + 1 < len(lines) and vehicle_id in lines[i + 1] and "because of a red traffic light" in lines[i + 1]:
+                continue #red light, skip
+            else:
+                near_collisions.append(line)
+
+        elif "performs emergency stop" in line:
+            vehicle_id = line.split("'")[1]
+            emergency_stops += 1
+
+            if i + 1 < len(lines) and vehicle_id in lines[i + 1] and "because of a red traffic light" in lines[i + 1]:
+                continue #red light, skip
+            else:
+                near_collisions.append(line)
+
 
     tree = ET.parse(tripinfoFile)
     root = tree.getroot()
@@ -105,7 +130,8 @@ def generate(params):
         "Total Waiting Time": total_waiting_time,
         "Generated Vehicles": total_vehicles,
         "Emergency Brakes": emergency_brakes,
-        "Emergency Stops": emergency_stops
+        "Emergency Stops": emergency_stops,
+        "Near collisions": len(near_collisions)
     }
 
     print("Results:", results)
@@ -124,17 +150,17 @@ def writeNodeFile(filename):
         f.write(content)
 
 
-def writeEdgeFile(filename):
-    content = """<edges>
-    <edge id="in_n2_1" from="n2" to="1" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="in_n3_1" from="n3" to="1" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="in_n4_1" from="n4" to="1" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="in_n5_1" from="n5" to="1" priority="1" numLanes="1" speed="13.9"/>
+def writeEdgeFile(filename, speed=11.11):
+    content = f"""<edges>
+    <edge id="in_n2_1" from="n2" to="1" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="in_n3_1" from="n3" to="1" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="in_n4_1" from="n4" to="1" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="in_n5_1" from="n5" to="1" priority="1" numLanes="1" speed="{speed}"/>
 
-    <edge id="out_1_n2" from="1" to="n2" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="out_1_n3" from="1" to="n3" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="out_1_n4" from="1" to="n4" priority="1" numLanes="1" speed="13.9"/>
-    <edge id="out_1_n5" from="1" to="n5" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="out_1_n2" from="1" to="n2" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="out_1_n3" from="1" to="n3" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="out_1_n4" from="1" to="n4" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="out_1_n5" from="1" to="n5" priority="1" numLanes="1" speed="{speed}"/>
 </edges>"""
     with open(filename, "w") as f:
         f.write(content)
@@ -162,22 +188,38 @@ def writeConnectionFile(filename):
         f.write(content)
 
 
-def writeTrafficLightLogic(filename, greenDuration, redDuration):
+def writeTrafficLightLogic(filename, greenDuration, yellowDuration, redDuration):
+    # Phase 1: green for some lanes
     phase1_state = list("r" * 12)
     for i in [0,1,2,6,7,8]:
         phase1_state[i] = "G"
     phase1_state = "".join(phase1_state)
 
+    # Phase 2: yellow for same lanes (transitional)
     phase2_state = list("r" * 12)
-    for i in [3,4,5,9,10,11]:
-        phase2_state[i] = "G"
+    for i in [0,1,2,6,7,8]:
+        phase2_state[i] = "y"
     phase2_state = "".join(phase2_state)
+
+    # Phase 3: green for other lanes
+    phase3_state = list("r" * 12)
+    for i in [3,4,5,9,10,11]:
+        phase3_state[i] = "G"
+    phase3_state = "".join(phase3_state)
+
+    # Phase 4: yellow for other lanes
+    phase4_state = list("r" * 12)
+    for i in [3,4,5,9,10,11]:
+        phase4_state[i] = "y"
+    phase4_state = "".join(phase4_state)
 
     with open(filename, "w") as tl:
         tl.write(f"""<additional>
     <tlLogic id="1" type="static" programID="custom" offset="0">
         <phase duration="{greenDuration}" state="{phase1_state}"/>
-        <phase duration="{redDuration}" state="{phase2_state}"/>
+        <phase duration="{yellowDuration}" state="{phase2_state}"/>
+        <phase duration="{redDuration}" state="{phase3_state}"/>
+        <phase duration="{yellowDuration}" state="{phase4_state}"/>
     </tlLogic>
 </additional>""")
 
