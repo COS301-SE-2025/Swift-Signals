@@ -3,7 +3,6 @@ from intersections import circle, stopStreet, tJunction, trafficLight
 
 print("Welcome to Sumo!")
 
-
 def showMenu():
     print("Select an instersection type:")
     print("1. Traffic circle")
@@ -50,3 +49,6 @@ def main():
     else:
         print("Invalid choice.")
         main()
+
+if __name__ == "__main__":
+    main()

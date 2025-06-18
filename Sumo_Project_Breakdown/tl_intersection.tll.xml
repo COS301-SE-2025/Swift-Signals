@@ -1,6 +1,6 @@
 <additional>
     <tlLogic id="1" type="static" programID="custom" offset="0">
-        <phase duration="15" state="GGGrrrGGGrrr"/>
-        <phase duration="35" state="rrrGGGrrrGGG"/>
+        <phase duration="20" state="GGGrrrGGGrrr"/>
+        <phase duration="20" state="rrrGGGrrrGGG"/>
     </tlLogic>
 </additional>

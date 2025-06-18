@@ -1,4 +1,6 @@
+import os
 import subprocess
+import xml.etree.ElementTree as ET
 
 
 def generate(params):
@@ -7,6 +9,7 @@ def generate(params):
     routeFile = f"{base}.rou.xml"
     configFile = f"{base}.sumocfg"
     tllFile = f"{base}.tll.xml"
+    tripinfoFile = f"{base}_tripinfo.xml"
 
     nodeFile = "tlInt.nod.xml"
     edgeFile = "tlInt.edg.xml"
@@ -39,15 +42,77 @@ def generate(params):
         </input>
         <time>
             <begin value="0"/>
-            <end value="1000"/>
+            <end value="3600"/>
         </time>
     </configuration>""")
 
     print("Running SUMO simulation...")
-    subprocess.run(["sumo-gui", "-c", configFile])
+    #run GUI by using sumo-gui
+    logfile = f"{base}_warnings.log"
+    with open(logfile, "w") as log:
+        subprocess.run([
+            "sumo-gui",
+            "-c", configFile,
+            "--tripinfo-output", tripinfoFile,
+            "--no-warnings", "false", #print warnings
+            "--message-log", logfile
+        ], check=True, stdout=log, stderr=log)
 
+    print("Simulation finished. Parsing results...")
+
+    emergency_brakes = 0
+    emergency_stops = 0
+
+    with open(logfile, "r") as f:
+        for line in f:
+            if "performs emergency braking" in line:
+                emergency_brakes += 1
+            elif "performs emergency stop" in line:
+                emergency_stops += 1
+
+    tree = ET.parse(tripinfoFile)
+    root = tree.getroot()
+
+    total_vehicles = 0
+    total_travel_time = 0.0
+    total_waiting_time = 0.0
+    total_distance = 0.0
+    speeds = []
+
+    for trip in root.findall("tripinfo"):
+        total_vehicles += 1
+        travel_time = float(trip.get("duration"))
+        waiting_time = float(trip.get("waitingTime"))
+        distance = float(trip.get("routeLength"))
+
+        total_travel_time += travel_time
+        total_waiting_time += waiting_time
+        total_distance += distance
+
+        if travel_time > 0:
+            speeds.append(distance / travel_time)
+
+    avg_speed = sum(speeds) / len(speeds) if speeds else 0
+    avg_waiting_time = total_waiting_time/total_vehicles if total_vehicles > 0 else 0
+    avg_travel_time = total_travel_time/total_vehicles if total_vehicles > 0 else 0
+
+    results = {
+        "Total Vehicles": total_vehicles,
+        "Average Travel Time": avg_travel_time,
+        "Total Travel Time": total_travel_time,
+        "Average Speed": avg_speed,
+        "Average Waiting Time": avg_waiting_time,
+        "Total Waiting Time": total_waiting_time,
+        "Generated Vehicles": total_vehicles,
+        "Emergency Brakes": emergency_brakes,
+        "Emergency Stops": emergency_stops
+    }
+
+    print("Results:", results)
+    return results
 
 def writeNodeFile(filename):
+    #four nodes + center
     content = """<nodes>
     <node id="1" x="0" y="0" type="traffic_light"/>
     <node id="n2" x="0" y="100" type="priority"/>
@@ -99,12 +164,12 @@ def writeConnectionFile(filename):
 
 def writeTrafficLightLogic(filename, greenDuration, redDuration):
     phase1_state = list("r" * 12)
-    for i in [0, 1, 2, 6, 7, 8]:
+    for i in [0,1,2,6,7,8]:
         phase1_state[i] = "G"
     phase1_state = "".join(phase1_state)
 
     phase2_state = list("r" * 12)
-    for i in [3, 4, 5, 9, 10, 11]:
+    for i in [3,4,5,9,10,11]:
         phase2_state[i] = "G"
     phase2_state = "".join(phase2_state)
 
@@ -125,13 +190,16 @@ def generateTrips(netFile, tripFile, density):
     TOOLS_PATH = os.path.join(SUMO_HOME, "tools")
 
     if density == "low":
-        period = "10"
+        period = "12"
+        #300 vehicles p/h
     elif density == "medium":
-        period = "5"
+        period = "6"
+        #600 vehicles p/h
     elif density == "high":
-        period = "2"
+        period = "3"
+        #1200 vehicles p/h
     else:
-        period = "5"
+        period = "6"
 
     tripDir = os.path.dirname(tripFile)
     if tripDir:

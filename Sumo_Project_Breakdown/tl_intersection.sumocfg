@@ -2,9 +2,10 @@
         <input>
             <net-file value="tl_intersection.net.xml"/>
             <route-files value="tl_intersection.rou.xml"/>
+            <additional-files value="tl_intersection.tll.xml"/>
         </input>
         <time>
             <begin value="0"/>
-            <end value="1000"/>
+            <end value="3600"/>
         </time>
     </configuration>
