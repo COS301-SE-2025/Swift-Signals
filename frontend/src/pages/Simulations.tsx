@@ -10,6 +10,7 @@ import 'leaflet/dist/leaflet.css';
 import type { LatLng } from 'leaflet';
 import '../styles/Simulations.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import HelpMenu from "../components/HelpMenu";
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -533,6 +534,7 @@ const Simulations: React.FC = () => {
         intersections={allIntersections}
         type={modalType}
       />
+      <HelpMenu />
     </div>
   );
 };

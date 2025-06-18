@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar';
 import UsersTable from '../components/UsersTable';
 import '../styles/Users.css';
 import Footer from '../components/Footer';
+import HelpMenu from "../components/HelpMenu";
 
 // TypeScript interface for user data
 interface User {
@@ -147,6 +148,7 @@ const Users = () => {
         </div>
       </div>
       <Footer />
+      <HelpMenu />
     </div>
   );
 };

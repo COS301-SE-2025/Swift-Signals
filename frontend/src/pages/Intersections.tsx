@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import IntersectionCard from '../components/IntersectionCard';
 import '../styles/Intersections.css';
 import Footer from '../components/Footer';
+import HelpMenu from "../components/HelpMenu";
 
 // TypeScript interface for intersection data
 interface Intersection {
@@ -85,6 +86,7 @@ const Intersections = () => {
       </div>
       </div>
       <Footer />
+      <HelpMenu />
     </div>
     
   );
