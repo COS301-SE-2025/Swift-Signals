@@ -93,7 +93,6 @@ def generate(params):
             else:
                 near_collisions.append(line)
 
-
     tree = ET.parse(tripinfoFile)
     root = tree.getroot()
 
@@ -208,7 +207,7 @@ def writeTrafficLightLogic(filename, greenDuration, yellowDuration, redDuration)
 
     '''Phase 4: yellow for other lanes'''
     phase4_state = list("r" * 12)
-    for i in [3, 4, 5, 9, 10,    11]:
+    for i in [3, 4, 5, 9, 10, 11]:
         phase4_state[i] = "y"
     phase4_state = "".join(phase4_state)
 
