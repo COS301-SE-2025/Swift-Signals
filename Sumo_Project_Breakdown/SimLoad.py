@@ -156,7 +156,7 @@ def main():
 
     output = {
         "_id": {
-            "$oid": str(uuid.uuid4())[:24].replace("-", "0")  '''fake MongoDB-style ID'''
+            "$oid": str(uuid.uuid4())[:24].replace("-", "0")  
         },
         "simulation": {
             "id": simId,

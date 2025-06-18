@@ -62,7 +62,7 @@ def generate(params):
             "--tripinfo-output", tripinfoFile,
             "--no-warnings", "false", 
             "--message-log", logfile
-        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        ], check=True, stdout=log, stderr=log)
 
     print("Simulation finished. Parsing results...")
 
@@ -80,7 +80,7 @@ def generate(params):
             emergency_brakes += 1
 
             if i + 1 < len(lines) and vehicle_id in lines[i + 1] and "because of a red traffic light" in lines[i + 1]:
-                continue #red light, skip
+                continue 
             else:
                 near_collisions.append(line)
 
@@ -89,7 +89,7 @@ def generate(params):
             emergency_stops += 1
 
             if i + 1 < len(lines) and vehicle_id in lines[i + 1] and "because of a red traffic light" in lines[i + 1]:
-                continue #red light, skip
+                continue 
             else:
                 near_collisions.append(line)
 
@@ -137,7 +137,7 @@ def generate(params):
 
 
 def writeNodeFile(filename):
-    #four nodes + center
+    '''four nodes + center'''
     content = """<nodes>
     <node id="1" x="0" y="0" type="traffic_light"/>
     <node id="n2" x="0" y="100" type="priority"/>
