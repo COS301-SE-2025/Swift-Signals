@@ -6,15 +6,22 @@ import (
 	"net/http"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/api"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
+	"google.golang.org/grpc"
 )
 
-var port = ":9090"
+var REST_PORT = ":9090"
 
 func main() {
-	handler := &api.AuthHandler{}
+	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure()) // adjust for TLS if needed
+	if err != nil {
+		log.Fatalf("failed to connect to gRPC server: %v", err)
+	}
 
+	userClient := client.NewUserClient(conn)
+
+	handler := &api.AuthHandler{UserClient: userClient}
 	mux := http.NewServeMux()
-
 	api.HandlerFromMux(handler, mux)
 
 	// Simulation Service Routes
@@ -23,8 +30,8 @@ func main() {
 	mux.HandleFunc("POST /simulations", createSimulation)
 	mux.HandleFunc("DELETE /simulations/{id}", deleteSimulation)
 
-	log.Println("API Gateway running on :9090")
-	log.Fatal(http.ListenAndServe(":9090", mux))
+	log.Printf("API Gateway running on %s\n", REST_PORT)
+	log.Fatal(http.ListenAndServe(REST_PORT, mux))
 
 }
 
