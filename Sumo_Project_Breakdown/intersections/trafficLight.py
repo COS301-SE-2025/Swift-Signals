@@ -38,7 +38,7 @@ def generate(params):
         "-o", netFile
     ], check=True)
 
-    generateTrips(netFile, routeFile, params["Traffic Density"])
+    generateTrips(netFile, routeFile, params["Traffic Density"], params)
 
     with open(configFile, "w") as cfg:
         cfg.write(f"""<configuration>
@@ -53,17 +53,16 @@ def generate(params):
         </time>
     </configuration>""")
 
-    print("Running SUMO simulation...")
-    #run GUI by using sumo-gui
+    '''run GUI by using sumo-gui'''
     logfile = f"{base}_warnings.log"
     with open(logfile, "w") as log:
         subprocess.run([
             "sumo",
             "-c", configFile,
             "--tripinfo-output", tripinfoFile,
-            "--no-warnings", "false", #print warnings
+            "--no-warnings", "false", 
             "--message-log", logfile
-        ], check=True, stdout=log, stderr=log)
+        ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     print("Simulation finished. Parsing results...")
 
@@ -134,8 +133,8 @@ def generate(params):
         "Near collisions": len(near_collisions)
     }
 
-    print("Results:", results)
     return results
+
 
 def writeNodeFile(filename):
     #four nodes + center
@@ -189,25 +188,25 @@ def writeConnectionFile(filename):
 
 
 def writeTrafficLightLogic(filename, greenDuration, yellowDuration, redDuration):
-    # Phase 1: green for some lanes
+    '''Phase 1: green for some lanes'''
     phase1_state = list("r" * 12)
     for i in [0,1,2,6,7,8]:
         phase1_state[i] = "G"
     phase1_state = "".join(phase1_state)
 
-    # Phase 2: yellow for same lanes (transitional)
+    '''Phase 2: yellow for same lanes (transitional)'''
     phase2_state = list("r" * 12)
     for i in [0,1,2,6,7,8]:
         phase2_state[i] = "y"
     phase2_state = "".join(phase2_state)
 
-    # Phase 3: green for other lanes
+    '''Phase 3: green for other lanes'''
     phase3_state = list("r" * 12)
     for i in [3,4,5,9,10,11]:
         phase3_state[i] = "G"
     phase3_state = "".join(phase3_state)
 
-    # Phase 4: yellow for other lanes
+    '''Phase 4: yellow for other lanes'''
     phase4_state = list("r" * 12)
     for i in [3,4,5,9,10,11]:
         phase4_state[i] = "y"
@@ -224,7 +223,7 @@ def writeTrafficLightLogic(filename, greenDuration, yellowDuration, redDuration)
 </additional>""")
 
 
-def generateTrips(netFile, tripFile, density):
+def generateTrips(netFile, tripFile, density, params):
     import os
     import subprocess
 
@@ -233,13 +232,13 @@ def generateTrips(netFile, tripFile, density):
 
     if density == "low":
         period = "12"
-        #300 vehicles p/h
+        '''300 vehicles p/h'''
     elif density == "medium":
         period = "6"
-        #600 vehicles p/h
+        '''600 vehicles p/h'''
     elif density == "high":
         period = "3"
-        #1200 vehicles p/h
+        '''1200 vehicles p/h'''
     else:
         period = "6"
 
@@ -252,11 +251,12 @@ def generateTrips(netFile, tripFile, density):
         "-n", netFile,
         "-o", tripFile,
         "--prefix", "veh",
-        "--seed", "13",
+        "--seed", str(params["seed"]),
         "--min-distance", "20",
         "--trip-attributes", 'departLane="best" departSpeed="max"',
         "--period", period
     ]
 
-    subprocess.run(cmd, check=True)
+    with open(os.devnull, 'w') as devnull:
+        subprocess.run(cmd, check=True, stderr=devnull)
     print("Trips generated.")

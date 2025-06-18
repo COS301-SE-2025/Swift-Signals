@@ -4,9 +4,11 @@ import json
 import time
 import uuid
 import os
+import warnings
 
 
-print("Welcome to Sumo!")
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+
 
 def showMenu():
     print("Select an instersection type:")
@@ -29,6 +31,7 @@ def loadParams():
         data = json.load(f)
 
     return data["simulation"]["parameters"]
+
 
 def loadRunCount(counter_file="run_count.txt"):
     if os.path.exists(counter_file):
@@ -102,9 +105,9 @@ def saveParams(params, intersectionType, simName):
             "$oid": fake_oid
         },
         "simulation": {
-            "id": "simId",                      # Placeholder
+            "id": "simId",                      '''Placeholder'''
             "name": simName,
-            "owner": "username",                # Placeholder
+            "owner": "username",                '''Placeholder'''
             "created_at": timestamp,
             "last_run_at": timestamp,
             "status": "completed",
@@ -135,7 +138,7 @@ def main():
     runCount += 1
     saveRunCount(runCount)
 
-    # Run correct generator based on type
+    '''Run correct generator based on type'''
     if intersection_type == "trafficlight":
         results = trafficLight.generate(params)
     elif intersection_type == "roundabout":
@@ -153,7 +156,7 @@ def main():
 
     output = {
         "_id": {
-            "$oid": str(uuid.uuid4())[:24].replace("-", "0")  # fake MongoDB-style ID
+            "$oid": str(uuid.uuid4())[:24].replace("-", "0")  '''fake MongoDB-style ID'''
         },
         "simulation": {
             "id": simId,
@@ -168,11 +171,12 @@ def main():
         }
     }
 
-    # Save the output to a file
+    '''Save the output to a file'''
     with open("simulation_output.json", "w") as f:
         json.dump(output, f, indent=4)
 
     print("Simulation saved to simulation_output.json")
+
 
 if __name__ == "__main__":
     main()

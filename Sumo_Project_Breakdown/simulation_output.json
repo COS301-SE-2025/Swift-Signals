@@ -1,15 +1,15 @@
 {
     "_id": {
-        "$oid": "24bf0cd604e98045fe0a26b0"
+        "$oid": "9135798206254043f70ba7c0"
     },
     "simulation": {
         "id": "simId",
         "name": "Trafficlight",
         "owner": "username",
         "created_at": "unknown",
-        "last_run_at": "2025-06-18T12:26:32.320808Z",
+        "last_run_at": "2025-06-18T12:39:16.355607Z",
         "status": "completed",
-        "run_count": 3,
+        "run_count": 10,
         "parameters": {
             "Intersection Type": "trafficlight",
             "Traffic Density": "high",
@@ -20,16 +20,16 @@
             "seed": 13
         },
         "results": {
-            "Total Vehicles": 1188,
-            "Average Travel Time": 30.462962962962962,
-            "Total Travel Time": 36190.0,
-            "Average Speed": 8.326773813806259,
-            "Average Waiting Time": 11.216329966329967,
-            "Total Waiting Time": 13325.0,
-            "Generated Vehicles": 1188,
-            "Emergency Brakes": 6,
+            "Total Vehicles": 262,
+            "Average Travel Time": 30.270992366412212,
+            "Total Travel Time": 7931.0,
+            "Average Speed": 8.491204938802776,
+            "Average Waiting Time": 11.450381679389313,
+            "Total Waiting Time": 3000.0,
+            "Generated Vehicles": 262,
+            "Emergency Brakes": 0,
             "Emergency Stops": 0,
-            "Near collisions": 6
+            "Near collisions": 0
         }
     }
 }
