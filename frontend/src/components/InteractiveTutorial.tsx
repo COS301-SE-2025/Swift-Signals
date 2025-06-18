@@ -2,57 +2,13 @@ import React, { useEffect, useLayoutEffect, useState, useCallback } from 'react'
 import '../styles/InteractiveTutorial.css';
 import { FaTimes } from 'react-icons/fa';
 
-type TutorialStep = {
+// The definition of a single step remains the same
+export type TutorialStep = {
     selector: string;
     title: string;
     text: string;
     position?: 'top' | 'bottom' | 'left' | 'right';
 };
-
-const tutorialSteps: TutorialStep[] = [
-    {
-        selector: '.card-grid', 
-        title: 'Summary Cards',
-        text: 'These cards give you a quick, at-a-glance overview of your key metrics, like total simulations and active intersections.',
-        position: 'bottom',
-    },
-    {
-        selector: '.recent-simulations-tab', 
-        title: 'Simulations Table',
-        text: 'Here you can see a list of all your recent simulations. Click on any row to see more details.',
-        position: 'right',
-    },
-    {
-        selector: '.quick-action-button.bg-customIndigo', 
-        title: 'Add a New Intersection',
-        text: 'Click this button to open the form for creating a new traffic intersection.',
-        position: 'bottom',
-    },
-    {
-        selector: '.quick-action-button.bg-customGreen',
-        title: 'Run a Simulation',
-        text: 'Click this button to open the form for running a traffic simulation.',
-        position: 'bottom',
-    },
-    {
-        selector: '.quick-action-button.bg-customPurple',
-        title: 'View Map',
-        text: 'This will take you to a full-screen map view of all your monitored intersections.',
-        position: 'bottom',
-    },
-    {
-        selector: '.graph-card',
-        title: 'Traffic Volume Chart',
-        text: 'This chart shows the traffic volume over time for your key intersections, helping you identify peak hours and trends.',
-        position: 'left',
-    },
-    {
-        selector: '.inter-card',
-        title: 'Top Intersections',
-        text: 'This card displays the top intersections based on traffic volume, helping you focus on the busiest areas.',
-        position: 'left',
-    },
-];
 
 type Position = {
     highlight: React.CSSProperties;
@@ -60,15 +16,20 @@ type Position = {
     isError?: boolean;
 }
 
+// --- PROPS ARE UPDATED ---
+// It now accepts an array of steps
 type Props = {
+    steps: TutorialStep[];
     onClose: () => void;
 };
 
-const InteractiveTutorial: React.FC<Props> = ({ onClose }) => {
+// --- The hardcoded 'tutorialSteps' array has been REMOVED from this file ---
+
+const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => { // Accept 'steps' from props
     const [stepIndex, setStepIndex] = useState(0);
     const [position, setPosition] = useState<Position | null>(null);
 
-    const currentStep = tutorialSteps[stepIndex];
+    const currentStep = steps[stepIndex]; // Use the 'steps' prop
 
     const calculatePosition = useCallback(() => {
         if (!currentStep) return;
@@ -88,22 +49,14 @@ const InteractiveTutorial: React.FC<Props> = ({ onClose }) => {
             return;
         }
         
-        // --- THE FIX IS HERE ---
-        // First, we get the element's current position on the screen.
         let rect = element.getBoundingClientRect();
-
-        // Then, we check if it's already fully inside the visible area of the window.
         const isElementInViewport = rect.top >= 0 && rect.bottom <= window.innerHeight;
 
-        // We ONLY scroll the page if the element is NOT already fully visible.
         if (!isElementInViewport) {
             element.scrollIntoView({ behavior: 'auto', block: 'center' });
-            // After the instant scroll, we MUST re-measure the element's position
-            // because its `top` and `left` values will have changed.
             rect = element.getBoundingClientRect();
         }
 
-        // Now we can proceed with a `rect` variable that has the correct, final coordinates.
         const popoverRect = { width: 320, height: 150 };
 
         const highlightStyles: React.CSSProperties = {
@@ -156,7 +109,7 @@ const InteractiveTutorial: React.FC<Props> = ({ onClose }) => {
     }, [calculatePosition]);
 
     const handleNext = () => {
-        if (stepIndex < tutorialSteps.length - 1) {
+        if (stepIndex < steps.length - 1) { // Use 'steps' prop
             setStepIndex(stepIndex + 1);
         } else {
             onClose();
@@ -195,11 +148,12 @@ const InteractiveTutorial: React.FC<Props> = ({ onClose }) => {
                          </>
                      )}
                      <div className="tutorial-navigation">
-                         <span className="tutorial-step-count">{stepIndex + 1} / {tutorialSteps.length}</span>
+                         {/* Use 'steps' prop for the count */}
+                         <span className="tutorial-step-count">{stepIndex + 1} / {steps.length}</span>
                          <div className='nav-buttons'>
                              {stepIndex > 0 && <button onClick={handlePrev}>Previous</button>}
                              <button onClick={handleNext}>
-                                 {stepIndex === tutorialSteps.length - 1 ? 'Finish' : 'Next'}
+                                 {stepIndex === steps.length - 1 ? 'Finish' : 'Next'}
                              </button>
                          </div>
                      </div>
