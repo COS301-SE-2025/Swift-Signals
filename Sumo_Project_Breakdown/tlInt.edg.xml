@@ -1,11 +1,16 @@
 <edges>
-    <edge id="in_n2_1" from="n2" to="1" priority="1" numLanes="1" speed="16.666666666666668"/>
-    <edge id="in_n3_1" from="n3" to="1" priority="1" numLanes="1" speed="16.666666666666668"/>
-    <edge id="in_n4_1" from="n4" to="1" priority="1" numLanes="1" speed="16.666666666666668"/>
-    <edge id="in_n5_1" from="n5" to="1" priority="1" numLanes="1" speed="16.666666666666668"/>
+    <edge id="in_N_r1" from="nN" to="r1" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="in_E_r2" from="nE" to="r2" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="in_S_r3" from="nS" to="r3" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="in_W_r4" from="nW" to="r4" priority="1" numLanes="1" speed="13.9"/>
 
-    <edge id="out_1_n2" from="1" to="n2" priority="1" numLanes="1" speed="16.666666666666668"/>
-    <edge id="out_1_n3" from="1" to="n3" priority="1" numLanes="1" speed="16.666666666666668"/>
-    <edge id="out_1_n4" from="1" to="n4" priority="1" numLanes="1" speed="16.666666666666668"/>
-    <edge id="out_1_n5" from="1" to="n5" priority="1" numLanes="1" speed="16.666666666666668"/>
+    <edge id="out_r1_N" from="r1" to="nN" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="out_r2_E" from="r2" to="nE" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="out_r3_S" from="r3" to="nS" priority="1" numLanes="1" speed="13.9"/>
+    <edge id="out_r4_W" from="r4" to="nW" priority="1" numLanes="1" speed="13.9"/>
+
+    <edge id="r1_r2" from="r1" to="r2" priority="2" numLanes="1" speed="8.3"/>
+    <edge id="r2_r3" from="r2" to="r3" priority="2" numLanes="1" speed="8.3"/>
+    <edge id="r3_r4" from="r3" to="r4" priority="2" numLanes="1" speed="8.3"/>
+    <edge id="r4_r1" from="r4" to="r1" priority="2" numLanes="1" speed="8.3"/>
 </edges>
