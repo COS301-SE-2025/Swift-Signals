@@ -47,14 +47,14 @@ def saveRunCount(count, counter_file="run_count.txt"):
 
 def getDefaultTimingsBySpeed(speed):
     if speed <= 40:
-        return {"Green":25, "Yellow":3, "Red":30}
+        return {"Green": 25, "Yellow": 3, "Red": 30}
     elif speed <= 60:
-        return {"Green":25, "Yellow":4, "Red":30}
+        return {"Green": 25, "Yellow": 4, "Red": 30}
     elif speed <= 80:
-        return {"Green":30, "Yellow":5, "Red":35}
+        return {"Green": 30, "Yellow": 5, "Red": 35}
     else:
         print("Speed exceeds reccomended safety for traffic lights, using default for 80km/h")
-        return {"Green":30, "Yellow":5, "Red":35}
+        return {"Green": 30, "Yellow": 5, "Red": 35}
 
 
 def getParams(tL: bool):
@@ -105,9 +105,9 @@ def saveParams(params, intersectionType, simName):
             "$oid": fake_oid
         },
         "simulation": {
-            "id": "simId",                      '''Placeholder'''
+            "id": "simId",
             "name": simName,
-            "owner": "username",                '''Placeholder'''
+            "owner": "username",
             "created_at": timestamp,
             "last_run_at": timestamp,
             "status": "completed",
@@ -142,13 +142,10 @@ def main():
     if intersection_type == "trafficlight":
         results = trafficLight.generate(params)
     elif intersection_type == "roundabout":
-        import circle
         results = circle.generate(params)
     elif intersection_type == "fourwaystop":
-        import stopStreet
         results = stopStreet.generate(params)
     elif intersection_type == "tjunction":
-        import tJunction
         results = tJunction.generate(params)
     else:
         print("Invalid intersection type in parameters.")

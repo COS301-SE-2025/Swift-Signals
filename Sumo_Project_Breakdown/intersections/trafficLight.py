@@ -4,12 +4,12 @@ import xml.etree.ElementTree as ET
 
 
 def generate(params):
-    allowedSpeeds = [40,60,80,100,120]
+    allowedSpeeds = [40, 60, 80, 100, 120]
     speedKm = params.get("Speed", 40)
     if speedKm not in allowedSpeeds:
         print(f"Warnig: Speed {speedKm}km/h not allowed. Using default 40km/h.")
         speedKm = 40
-    speedInMs = speedKm*(1000/3600)
+    speedInMs = speedKm * (1000 / 3600)
 
     base = "tl_intersection"
     netFile = f"{base}.net.xml"
@@ -60,7 +60,7 @@ def generate(params):
             "sumo",
             "-c", configFile,
             "--tripinfo-output", tripinfoFile,
-            "--no-warnings", "false", 
+            "--no-warnings", "false",
             "--message-log", logfile
         ], check=True, stdout=log, stderr=log)
 
@@ -80,7 +80,7 @@ def generate(params):
             emergency_brakes += 1
 
             if i + 1 < len(lines) and vehicle_id in lines[i + 1] and "because of a red traffic light" in lines[i + 1]:
-                continue 
+                continue
             else:
                 near_collisions.append(line)
 
@@ -89,7 +89,7 @@ def generate(params):
             emergency_stops += 1
 
             if i + 1 < len(lines) and vehicle_id in lines[i + 1] and "because of a red traffic light" in lines[i + 1]:
-                continue 
+                continue
             else:
                 near_collisions.append(line)
 
@@ -117,8 +117,8 @@ def generate(params):
             speeds.append(distance / travel_time)
 
     avg_speed = sum(speeds) / len(speeds) if speeds else 0
-    avg_waiting_time = total_waiting_time/total_vehicles if total_vehicles > 0 else 0
-    avg_travel_time = total_travel_time/total_vehicles if total_vehicles > 0 else 0
+    avg_waiting_time = total_waiting_time / total_vehicles if total_vehicles > 0 else 0
+    avg_travel_time = total_travel_time / total_vehicles if total_vehicles > 0 else 0
 
     results = {
         "Total Vehicles": total_vehicles,
@@ -190,25 +190,25 @@ def writeConnectionFile(filename):
 def writeTrafficLightLogic(filename, greenDuration, yellowDuration, redDuration):
     '''Phase 1: green for some lanes'''
     phase1_state = list("r" * 12)
-    for i in [0,1,2,6,7,8]:
+    for i in [0, 1, 2, 6, 7, 8]:
         phase1_state[i] = "G"
     phase1_state = "".join(phase1_state)
 
     '''Phase 2: yellow for same lanes (transitional)'''
     phase2_state = list("r" * 12)
-    for i in [0,1,2,6,7,8]:
+    for i in [0, 1, 2, 6, 7, 8]:
         phase2_state[i] = "y"
     phase2_state = "".join(phase2_state)
 
     '''Phase 3: green for other lanes'''
     phase3_state = list("r" * 12)
-    for i in [3,4,5,9,10,11]:
+    for i in [3, 4, 5, 9, 10, 11]:
         phase3_state[i] = "G"
     phase3_state = "".join(phase3_state)
 
     '''Phase 4: yellow for other lanes'''
     phase4_state = list("r" * 12)
-    for i in [3,4,5,9,10,11]:
+    for i in [3, 4, 5, 9, 10,    11]:
         phase4_state[i] = "y"
     phase4_state = "".join(phase4_state)
 
@@ -224,7 +224,6 @@ def writeTrafficLightLogic(filename, greenDuration, yellowDuration, redDuration)
 
 
 def generateTrips(netFile, tripFile, density, params):
-    import os
     import subprocess
 
     SUMO_HOME = os.environ.get("SUMO_HOME")
