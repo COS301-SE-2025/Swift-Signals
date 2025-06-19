@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid'; // Import uuid to generate unique session IDs
 import "../styles/HelpMenu.css";
 import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
 
@@ -7,22 +8,16 @@ import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
 import { FaTimes, FaCommentDots, FaBook, FaChevronLeft, FaChevronDown } from "react-icons/fa";
 import { IoSend } from "react-icons/io5";
 
-import { intents } from "../lib/botLogic";
-import type { ChatResponse } from "../lib/botLogic";
-
-// Import all tutorial preview images
-import DashboardTutPreview from "../assets/Dashboard_Tutorial.png";
-import NavigationTutPreview from "../assets/Navigation_Tutorial.png";
-import IntersectionsTutPreview from "../assets/Intersections_Tutorial.png";
-// --- FIXED: Corrected image path for simulations tutorial ---
-import SimulationsTutPreview from "../assets/Intersections_Tutorial.png"; 
+// --- REMOVED: Old bot logic imports are no longer needed ---
+// import { intents } from "../lib/botLogic";
+// import type { ChatResponse } from "../lib/botLogic";
 
 // Other types
 type QuickReply = { text: string; payload: string; };
 type ChatMessage = { text: string; sender: "user" | "bot"; quickReplies?: QuickReply[]; };
 type TutorialType = 'dashboard' | 'navigation' | 'intersections' | 'simulations' | 'users';
 
-// --- TUTORIAL STEP DEFINITIONS ---
+// --- TUTORIAL STEP DEFINITIONS (No changes here, they remain as they are) ---
 const dashboardTutorialSteps: TutorialStep[] = [
     { selector: '.card-grid', title: 'Summary Cards', text: 'These cards give you a quick, at-a-glance overview of your key metrics.', position: 'bottom' },
     { selector: '.recent-simulations-tab', title: 'Simulations Table', text: 'Here you can see a list of all your recent simulations. Click on any row to see more details.', position: 'right' },
@@ -78,6 +73,7 @@ const usersTutorialSteps: TutorialStep[] = [
     { selector: '.usersPaging', title: 'Users Page Navigation', text: 'Here you can navigate to view multiple pages of users.', position: 'right' },
 ];
 
+
 const faqData = [ { question: "What do the different status colors mean?", answer: "Green indicates optimal traffic flow. Yellow suggests moderate congestion. Red signals heavy congestion or an incident. Grey means the intersection is offline or data is unavailable." }, { question: "How often is the traffic data updated?", answer: "Traffic data is updated in real-time, with a typical delay of less than 5 seconds." }, { question: "Can I export data from a simulation?", answer: "Yes, on the simulation results page, you will find an 'Export' button that allows you to download the data in various formats like CSV or PDF." } ];
 
 const HelpMenu: React.FC = () => {
@@ -86,12 +82,11 @@ const HelpMenu: React.FC = () => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [userInput, setUserInput] = useState("");
     const [isBotTyping, setIsBotTyping] = useState(false);
-    const [context, setContext] = useState<string | null>(null);
+    // --- NEW: A unique session ID for the conversation ---
+    const [sessionId] = useState<string>(uuidv4()); 
     const chatBodyRef = useRef<HTMLDivElement | null>(null);
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
-
     const [activeTutorial, setActiveTutorial] = useState<TutorialType | null>(null);
-
     const [confirmationDetails, setConfirmationDetails] = useState<{
         pageName: string;
         path: string;
@@ -103,7 +98,7 @@ const HelpMenu: React.FC = () => {
 
     useEffect(() => {
         const tutorialToStart = location.state?.startTutorial as TutorialType;
-        if (tutorialToStart === 'dashboard' || tutorialToStart === 'intersections' || tutorialToStart === 'simulations' || tutorialToStart === 'users') {
+        if (tutorialToStart) {
             setTimeout(() => {
                 setActiveTutorial(tutorialToStart);
             }, 150);
@@ -112,9 +107,84 @@ const HelpMenu: React.FC = () => {
     }, [location]);
 
     useEffect(() => { if (chatBodyRef.current) { chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight; } }, [messages, isBotTyping]);
-    useEffect(() => { if (isOpen && messages.length === 0) { const welcomeMessage: ChatMessage = { text: "Hello! I'm here to help. What can I assist you with today?", sender: "bot", quickReplies: [ { text: "Tell me about simulations", payload: "simulations" }, { text: "How do I see the map?", payload: "map" }, { text: "What do the statuses mean?", payload: "status_colors" }, ], }; setMessages([welcomeMessage]); } }, [isOpen, messages.length]);
-    const getBotResponse = ( input: string, currentContext: string | null ): { response: ChatResponse; newContext: string | null } => { const text = input.toLowerCase(); let intent = intents.find(i => i.name.toLowerCase() === text); if (!intent) { intent = intents.find(i => i.name === currentContext); } if (!intent) { intent = intents.find(i => i.keywords.some(k => text.includes(k))); } if (intent) { return { response: intent.getResponse(), newContext: intent.nextContext !== undefined ? intent.nextContext : currentContext, }; } return { response: { text: "I'm sorry, I don't understand that. Could you try rephrasing? You can ask me about 'simulations', 'maps', or the 'chart'.", sender: "bot", }, newContext: null, }; };
-    const handleSendMessage = (text: string) => { if (text.trim() === "") return; const newUserMessage: ChatMessage = { text, sender: "user" }; setMessages(prev => [...prev, newUserMessage]); setUserInput(""); setIsBotTyping(true); setTimeout(() => { const { response, newContext } = getBotResponse(text, context); setMessages(prev => [...prev, response]); setContext(newContext); setIsBotTyping(false); }, 1200); };
+
+    // --- UPDATED: Welcome message is now fetched from Dialogflow ---
+    useEffect(() => {
+        if (isOpen && messages.length === 0) {
+            // Send a welcome event to Dialogflow to get the initial message
+            handleSendMessage("Welcome", true);
+        }
+    }, [isOpen, messages.length]);
+
+
+    // --- NEW: The core function to communicate with your Dialogflow backend ---
+    const handleSendMessage = async (text: string, isWelcomeEvent = false) => {
+        console.log('Sending message with Session ID:', sessionId);
+        if (text.trim() === "") return;
+
+        // Add user message to chat only if it's not the hidden welcome event
+        if (!isWelcomeEvent) {
+            const newUserMessage: ChatMessage = { text, sender: "user" };
+            setMessages(prev => [...prev, newUserMessage]);
+        }
+
+        setUserInput("");
+        setIsBotTyping(true);
+
+        try {
+            const response = await fetch('http://localhost:3001/api/chatbot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, sessionId: sessionId }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            
+            const data = await response.json();
+
+            // Extract quick replies from the fulfillmentMessages if they exist
+            let quickReplies: QuickReply[] = [];
+            if (data.fulfillmentMessages) {
+                const payload = data.fulfillmentMessages.find((msg: any) => msg.payload);
+                if (payload && payload.payload.fields.richContent) {
+                    const options = payload.payload.fields.richContent.listValue.values[0].listValue.values[0].structValue.fields.options.listValue.values;
+                    quickReplies = options.map((option: any) => ({
+                        text: option.structValue.fields.text.stringValue,
+                        payload: option.structValue.fields.link.stringValue || option.structValue.fields.text.stringValue,
+                    }));
+                }
+            }
+
+            const botResponse: ChatMessage = {
+                text: data.fulfillmentText,
+                sender: "bot",
+                quickReplies: quickReplies.length > 0 ? quickReplies : undefined,
+            };
+
+            setMessages(prev => [...prev, botResponse]);
+
+            // --- ACTION HANDLER: Check if Dialogflow requested an action ---
+            if (data.action === 'start.tutorial' && data.parameters.fields.TutorialTopic) {
+                const tutorialType = data.parameters.fields.TutorialTopic.stringValue as TutorialType;
+                if (tutorialType) {
+                    startTutorial(tutorialType);
+                }
+            }
+
+        } catch (error) {
+            console.error("Error communicating with chatbot backend:", error);
+            const errorResponse: ChatMessage = {
+                text: "Sorry, I'm having trouble connecting to my brain right now. Please try again later.",
+                sender: "bot",
+            };
+            setMessages(prev => [...prev, errorResponse]);
+        } finally {
+            setIsBotTyping(false);
+        }
+    };
+
     const toggleSection = (section: string) => { setOpenSections(prev => ({ ...prev, [section]: !prev[section] })); };
 
     const startTutorial = (tutorialType: TutorialType) => {
@@ -127,6 +197,7 @@ const HelpMenu: React.FC = () => {
         };
 
         const config = tutorialConfig[tutorialType];
+        if (!config) return; // Guard against invalid tutorial types
 
         if (!config.path) {
             setIsOpen(false);
@@ -157,6 +228,7 @@ const HelpMenu: React.FC = () => {
         setIsOpen(false);
     };
 
+    // --- No changes to the JSX (return statement) are needed ---
     return (
         <>
             {activeTutorial === 'dashboard' && <InteractiveTutorial steps={dashboardTutorialSteps} onClose={() => setActiveTutorial(null)} />}
@@ -195,108 +267,93 @@ const HelpMenu: React.FC = () => {
 
                     {activeTab === "chat" ? (
                         <div className="chatbot-container">
-                             <div className="chatbot-body" ref={chatBodyRef}>
-                                 {messages.map((msg, index) => (
-                                     <div key={index} className={`message-wrapper ${msg.sender}`}>
-                                         <div className="chat-message">
-                                             <p dangerouslySetInnerHTML={{ __html: msg.text.replace(/\n/g, "<br />") }} />
-                                         </div>
-                                         {msg.quickReplies && (
-                                             <div className="quick-replies">
-                                                 {msg.quickReplies.map((reply, i) => (
-                                                     <button key={i} onClick={() => handleSendMessage(reply.payload)}>
-                                                         {reply.text}
-                                                     </button>
-                                                 ))}
-                                             </div>
-                                         )}
-                                     </div>
-                                 ))}
-                                 {isBotTyping && (
-                                     <div className="message-wrapper bot">
-                                         <div className="chat-message">
-                                             <div className="typing-indicator">
-                                                 <span></span><span></span><span></span>
-                                             </div>
-                                         </div>
-                                     </div>
-                                 )}
-                             </div>
-                             <div className="chatbot-input">
-                                 <input type="text" placeholder="Type your message..." value={userInput} onChange={(e) => setUserInput(e.target.value)} onKeyPress={(e) => e.key === "Enter" && handleSendMessage(userInput)} />
-                                 <button onClick={() => handleSendMessage(userInput)}> <IoSend /> </button>
-                             </div>
+                            <div className="chatbot-body" ref={chatBodyRef}>
+                                {messages.map((msg, index) => (
+                                    <div key={index} className={`message-wrapper ${msg.sender}`}>
+                                        <div className="chat-message">
+                                            <p dangerouslySetInnerHTML={{ __html: msg.text.replace(/\n/g, "<br />") }} />
+                                        </div>
+                                        {msg.quickReplies && (
+                                            <div className="quick-replies">
+                                                {msg.quickReplies.map((reply, i) => (
+                                                    <button key={i} onClick={() => handleSendMessage(reply.payload)}>
+                                                        {reply.text}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                                {isBotTyping && (
+                                    <div className="message-wrapper bot">
+                                        <div className="chat-message">
+                                            <div className="typing-indicator">
+                                                <span></span><span></span><span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="chatbot-input">
+                                <input type="text" placeholder="Type your message..." value={userInput} onChange={(e) => setUserInput(e.target.value)} onKeyPress={(e) => e.key === "Enter" && handleSendMessage(userInput)} />
+                                <button onClick={() => handleSendMessage(userInput)}> <IoSend /> </button>
+                            </div>
                         </div>
                     ) : (
                         <div className="general-help-container">
-                            <div className="accordion-section">
-                                <button className="accordion-header" onClick={() => toggleSection('tutorials')}>
-                                    <span>Tutorials</span>
-                                    <FaChevronDown className={`accordion-icon ${openSections['tutorials'] ? 'open' : ''}`} />
-                                </button>
-                                <div className={`accordion-content ${openSections['tutorials'] ? 'open' : ''}`}>
-                                    <div className="accordion-item tutorial-launcher">
-                                        <button onClick={() => startTutorial('navigation')}>
-                                            <h4>Navigation Tutorial</h4>
-                                            <p>Learn how to use the site's navbar and footer.</p>
-                                            {/* <div className="tutorial-launcher-image-container">
-                                                <img src={NavigationTutPreview} alt="Navigation preview" />
-                                            </div> */}
-                                        </button>
-                                    </div>
-                                    <div className="accordion-item tutorial-launcher">
-                                        <button onClick={() => startTutorial('dashboard')}>
-                                            <h4>Dashboard Tutorial</h4>
-                                            <p>An interactive walkthrough of the main dashboard.</p>
-                                            {/* <div className="tutorial-launcher-image-container">
-                                                <img src={DashboardTutPreview} alt="Dashboard preview" />
-                                            </div> */}
-                                        </button>
-                                    </div>
-                                    <div className="accordion-item tutorial-launcher">
-                                        <button onClick={() => startTutorial('intersections')}>
-                                            <h4>Intersections Tutorial</h4>
-                                            <p>Learn how to search, add, and manage intersections.</p>
-                                            {/* <div className="tutorial-launcher-image-container">
-                                                <img src={IntersectionsTutPreview} alt="Intersections preview" />
-                                            </div> */}
-                                        </button>
-                                    </div>
-                                    <div className="accordion-item tutorial-launcher">
-                                        <button onClick={() => startTutorial('simulations')}>
-                                            <h4>Simulations Tutorial</h4>
-                                            <p>Learn how to run simulations and optimizations.</p>
-                                            {/* <div className="tutorial-launcher-image-container">
-                                                <img src={SimulationsTutPreview} alt="Simulations preview" />
-                                            </div> */}
-                                        </button>
-                                    </div>
-                                    <div className="accordion-item tutorial-launcher">
-                                        <button onClick={() => startTutorial('users')}>
-                                            <h4>Users Tutorial</h4>
-                                            <p>Learn how to run view, edit, and delete users.</p>
-                                            {/* <div className="tutorial-launcher-image-container">
-                                                <img src={SimulationsTutPreview} alt="Simulations preview" />
-                                            </div> */}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="accordion-section">
-                                <button className="accordion-header" onClick={() => toggleSection('faq')}>
-                                    <span>FAQ</span>
-                                    <FaChevronDown className={`accordion-icon ${openSections['faq'] ? 'open' : ''}`} />
-                                </button>
-                                <div className={`accordion-content ${openSections['faq'] ? 'open' : ''}`}>
-                                    {faqData.map((item, index) => (
-                                        <div key={index} className="accordion-item">
-                                            <h4>{item.question}</h4>
-                                            <p>{item.answer}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
+                             <div className="accordion-section">
+                                 <button className="accordion-header" onClick={() => toggleSection('tutorials')}>
+                                     <span>Tutorials</span>
+                                     <FaChevronDown className={`accordion-icon ${openSections['tutorials'] ? 'open' : ''}`} />
+                                 </button>
+                                 <div className={`accordion-content ${openSections['tutorials'] ? 'open' : ''}`}>
+                                     <div className="accordion-item tutorial-launcher">
+                                         <button onClick={() => startTutorial('navigation')}>
+                                             <h4>Navigation Tutorial</h4>
+                                             <p>Learn how to use the site's navbar and footer.</p>
+                                         </button>
+                                     </div>
+                                     <div className="accordion-item tutorial-launcher">
+                                         <button onClick={() => startTutorial('dashboard')}>
+                                             <h4>Dashboard Tutorial</h4>
+                                             <p>An interactive walkthrough of the main dashboard.</p>
+                                         </button>
+                                     </div>
+                                     <div className="accordion-item tutorial-launcher">
+                                         <button onClick={() => startTutorial('intersections')}>
+                                             <h4>Intersections Tutorial</h4>
+                                             <p>Learn how to search, add, and manage intersections.</p>
+                                         </button>
+                                     </div>
+                                     <div className="accordion-item tutorial-launcher">
+                                         <button onClick={() => startTutorial('simulations')}>
+                                             <h4>Simulations Tutorial</h4>
+                                             <p>Learn how to run simulations and optimizations.</p>
+                                         </button>
+                                     </div>
+                                     <div className="accordion-item tutorial-launcher">
+                                         <button onClick={() => startTutorial('users')}>
+                                             <h4>Users Tutorial</h4>
+                                             <p>Learn how to run view, edit, and delete users.</p>
+                                         </button>
+                                     </div>
+                                 </div>
+                             </div>
+                             <div className="accordion-section">
+                                 <button className="accordion-header" onClick={() => toggleSection('faq')}>
+                                     <span>FAQ</span>
+                                     <FaChevronDown className={`accordion-icon ${openSections['faq'] ? 'open' : ''}`} />
+                                 </button>
+                                 <div className={`accordion-content ${openSections['faq'] ? 'open' : ''}`}>
+                                     {faqData.map((item, index) => (
+                                         <div key={index} className="accordion-item">
+                                             <h4>{item.question}</h4>
+                                             <p>{item.answer}</p>
+                                         </div>
+                                     ))}
+                                 </div>
+                             </div>
+                         </div>
                     )}
                 </div>
             </div>
