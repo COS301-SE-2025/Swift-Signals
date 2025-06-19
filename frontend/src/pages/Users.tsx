@@ -104,7 +104,7 @@ const Users = () => {
             onDelete={handleDelete}
           />
           
-          <div className="flex justify-center items-center py-4 gap-2 mt-4">
+          <div className="usersPaging flex justify-center items-center py-4 gap-2 mt-4">
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}

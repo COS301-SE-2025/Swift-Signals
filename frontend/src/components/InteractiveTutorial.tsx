@@ -2,12 +2,14 @@ import React, { useEffect, useLayoutEffect, useState, useCallback } from 'react'
 import '../styles/InteractiveTutorial.css';
 import { FaTimes } from 'react-icons/fa';
 
-// The definition of a single step remains the same
+// --- TYPE IS UPDATED ---
+// Added optional 'action' function and 'center' position
 export type TutorialStep = {
     selector: string;
     title: string;
     text: string;
-    position?: 'top' | 'bottom' | 'left' | 'right';
+    position?: 'top' | 'bottom' | 'left' | 'right' | 'center';
+    action?: () => void;
 };
 
 type Position = {
@@ -16,23 +18,40 @@ type Position = {
     isError?: boolean;
 }
 
-// --- PROPS ARE UPDATED ---
-// It now accepts an array of steps
 type Props = {
     steps: TutorialStep[];
     onClose: () => void;
 };
 
-// --- The hardcoded 'tutorialSteps' array has been REMOVED from this file ---
-
-const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => { // Accept 'steps' from props
+const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
     const [stepIndex, setStepIndex] = useState(0);
     const [position, setPosition] = useState<Position | null>(null);
 
-    const currentStep = steps[stepIndex]; // Use the 'steps' prop
+    const currentStep = steps[stepIndex];
+
+    // --- NEW: useEffect to handle actions ---
+    // This hook runs when the step changes. If the new step has an action, it executes it.
+    useEffect(() => {
+        if (currentStep && typeof currentStep.action === 'function') {
+            currentStep.action();
+        }
+    }, [currentStep]);
 
     const calculatePosition = useCallback(() => {
         if (!currentStep) return;
+
+        // --- UPDATED: Handle 'center' position for action steps ---
+        if (currentStep.position === 'center') {
+            setPosition({
+                highlight: { display: 'none' }, // No highlight for centered steps
+                popover: {
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)'
+                }
+            });
+            return;
+        }
 
         const element = document.querySelector(currentStep.selector) as HTMLElement;
 
@@ -107,9 +126,10 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => { // Accept
             clearTimeout(timer);
         };
     }, [calculatePosition]);
+    
 
     const handleNext = () => {
-        if (stepIndex < steps.length - 1) { // Use 'steps' prop
+        if (stepIndex < steps.length - 1) {
             setStepIndex(stepIndex + 1);
         } else {
             onClose();
@@ -132,32 +152,31 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => { // Accept
             
             {position && (
                  <div className="tutorial-popover" style={position.popover}>
-                     {position.isError ? (
-                         <>
-                             <h4>Element Not Found</h4>
-                             <p>
-                                 Could not find the element for this step.
-                                 <br/>
-                                 Required selector: <code>{currentStep.selector}</code>
-                             </p>
-                         </>
-                     ) : (
-                         <>
-                             <h4>{currentStep.title}</h4>
-                             <p>{currentStep.text}</p>
-                         </>
-                     )}
-                     <div className="tutorial-navigation">
-                         {/* Use 'steps' prop for the count */}
-                         <span className="tutorial-step-count">{stepIndex + 1} / {steps.length}</span>
-                         <div className='nav-buttons'>
-                             {stepIndex > 0 && <button onClick={handlePrev}>Previous</button>}
-                             <button onClick={handleNext}>
-                                 {stepIndex === steps.length - 1 ? 'Finish' : 'Next'}
-                             </button>
-                         </div>
-                     </div>
-                     <button className="tutorial-close-button" onClick={onClose}><FaTimes/></button>
+                       {position.isError ? (
+                             <>
+                                 <h4>Element Not Found</h4>
+                                 <p>
+                                     Could not find the element for this step.
+                                     <br/>
+                                     Required selector: <code>{currentStep.selector}</code>
+                                 </p>
+                             </>
+                       ) : (
+                             <>
+                                 <h4>{currentStep.title}</h4>
+                                 <p>{currentStep.text}</p>
+                             </>
+                       )}
+                       <div className="tutorial-navigation">
+                             <span className="tutorial-step-count">{stepIndex + 1} / {steps.length}</span>
+                             <div className='nav-buttons'>
+                                 {stepIndex > 0 && <button onClick={handlePrev}>Previous</button>}
+                                 <button onClick={handleNext}>
+                                     {stepIndex === steps.length - 1 ? 'Finish' : 'Next'}
+                                 </button>
+                             </div>
+                       </div>
+                       <button className="tutorial-close-button" onClick={onClose}><FaTimes/></button>
                  </div>
             )}
         </div>
