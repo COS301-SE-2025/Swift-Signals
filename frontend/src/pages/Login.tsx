@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Login.css';
+import Footer from '../components/Footer';
 
 interface TrafficLightProps {
   redActive: boolean;
@@ -198,6 +199,7 @@ const Login = () => {
           greenActive={password.length > 0}
         />
       </div>
+      <Footer />
     </div>
   );
 };
