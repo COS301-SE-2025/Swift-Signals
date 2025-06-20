@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package user;
+
+option go_package = "github.com/COS301-SE-2025/Swift-Signals/user-service/proto;userpb";
+
+service UserService {
+  rpc RegisterUser(RegisterUserRequest) returns (UserResponse);
+  rpc LoginUser(LoginUserRequest) returns (AuthResponse);
+  rpc LogoutUser(LogoutUserRequest) returns (LogoutResponse);
+}
+
+message RegisterUserRequest {
+  string name = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message LoginUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LogoutUserRequest { string user_id = 1; }
+
+message UserResponse {
+  string id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message AuthResponse { string token = 1; }
+
+message LogoutResponse { bool success = 1; }
