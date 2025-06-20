@@ -145,7 +145,7 @@ const Dashboard: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="dashboard-screen min-h-screen bg-gray-100 dark:bg-gray-900">
       <Navbar />
       <div className="main-content flex-grow">
         <h1 className="Dashboard-h1">Dashboard Overview</h1>

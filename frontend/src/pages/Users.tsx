@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+import UsersTable from '../components/UsersTable';
+import '../styles/Users.css';
 
 // TypeScript interface for user data
 interface User {
@@ -12,9 +14,8 @@ interface User {
 
 const Users = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(9);
 
-  // Sample user data
   const users: User[] = [
     { id: 1, name: 'John Doe', email: 'email@email.com', role: 'Admin', lastLogin: '2025-05-13 09:00' },
     { id: 2, name: 'Jane Smith', email: 'email@email.com', role: 'Engineer', lastLogin: '2025-05-13 09:00' },
@@ -25,89 +26,121 @@ const Users = () => {
     { id: 7, name: 'Kgosi Segale', email: 'email@email.com', role: 'Viewer', lastLogin: '2025-05-13 09:00' },
     { id: 8, name: 'John Flavel', email: 'email@email.com', role: 'Viewer', lastLogin: '2025-05-13 09:00' },
     { id: 9, name: 'John Owen', email: 'email@email.com', role: 'Viewer', lastLogin: '2025-05-13 09:00' },
+    { id: 10, name: 'John Doe', email: 'email@email.com', role: 'Admin', lastLogin: '2025-05-13 09:00' },
+    { id: 11, name: 'Jane Smith', email: 'email@email.com', role: 'Engineer', lastLogin: '2025-05-13 09:00' },
+    { id: 12, name: 'John Calvin', email: 'email@email.com', role: 'Viewer', lastLogin: '2025-05-13 09:00' },
+    { id: 13, name: 'Paul Washer', email: 'email@email.com', role: 'Viewer', lastLogin: '2025-05-13 09:00' },
+    { id: 14, name: 'Joshua Garner', email: 'email@email.com', role: 'Viewer', lastLogin: '2025-05-13 09:00' },
+    { id: 15, name: 'Chris Xides', email: 'email@email.com', role: 'Engineer', lastLogin: '2025-05-13 09:00' },
+    { id: 16, name: 'Kgosi Segale', email: 'email@email.com', role: 'Viewer', lastLogin: '2025-05-13 09:00' },
+    { id: 17, name: 'John Flavel', email: 'email@email.com', role: 'Viewer', lastLogin: '2025-05-13 09:00' },
+    { id: 18, name: 'John Owen', email: 'email@email.com', role: 'Viewer', lastLogin: '2025-05-13 09:00' },
   ];
+
+  // Detect screen size and adjust rowsPerPage
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(max-width: 1400px) and (max-height: 800px)');
+    const handleMediaChange = (e: MediaQueryListEvent | MediaQueryList) => {
+      setRowsPerPage(e.matches ? 7 : 9);
+      // Reset to first page when rowsPerPage changes to avoid invalid page
+      setCurrentPage(1);
+    };
+
+    handleMediaChange(mediaQuery);
+    mediaQuery.addEventListener('change', handleMediaChange);
+
+    return () => mediaQuery.removeEventListener('change', handleMediaChange);
+  }, []);
+
+  const totalPages = Math.ceil(users.length / rowsPerPage);
+
+  // Calculate the start and end indices for the current page
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const currentUsers = users.slice(startIndex, endIndex);
 
   const handleEdit = (id: number) => console.log(`Edit user ${id}`);
   const handleDelete = (id: number) => console.log(`Delete user ${id}`);
 
-  const goToNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  const goToPreviousPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  // Generate page numbers with ellipsis
+  const getPageNumbers = () => {
+    const pageNumbers: (number | string)[] = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    const leftBound = Math.max(2, currentPage - 1);
+    const rightBound = Math.min(totalPages - 1, currentPage + 1);
+
+    pageNumbers.push(1);
+    if (leftBound > 2) pageNumbers.push('...');
+
+    for (let i = leftBound; i <= rightBound; i++) {
+      pageNumbers.push(i);
+    }
+
+    if (rightBound < totalPages - 1) pageNumbers.push('...');
+    if (totalPages > 1) pageNumbers.push(totalPages);
+
+    return pageNumbers;
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="userBody min-h-screen bg-gray-100">
       <Navbar />
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <table className="w-full border-collapse">
-            <thead className="text-left border-b">
-              <tr>
-                <th className="px-4 py-3 font-bold">ID</th>
-                <th className="px-4 py-3 font-bold">Name</th>
-                <th className="px-4 py-3 font-bold">Email</th>
-                <th className="px-4 py-3 font-bold">Role</th>
-                <th className="px-4 py-3 font-bold">Last Login</th>
-                <th className="px-4 py-3 font-bold">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="border-b hover:bg-gray-50">
-                  <td className="px-4 py-3">{user.id}</td>
-                  <td className="px-4 py-3">{user.name}</td>
-                  <td className="px-4 py-3">{user.email}</td>
-                  <td className="px-4 py-3">{user.role}</td>
-                  <td className="px-4 py-3">{user.lastLogin}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2 justify-center">
-                      <button
-                        onClick={() => handleEdit(user.id)}
-                        className="p-2 bg-green-500 text-white rounded-full flex items-center justify-center"
-                        aria-label="Edit user"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        className="p-2 bg-red-500 text-white rounded-full flex items-center justify-center"
-                        aria-label="Delete user"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <polyline points="3 6 5 6 21 6" />
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div className="flex justify-center items-center py-4 gap-4">
+      <div className="user-main-content flex-grow">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <UsersTable 
+            users={currentUsers}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+          
+          <div className="flex justify-center items-center py-4 gap-2 mt-4">
             <button
-              onClick={goToPreviousPage}
+              onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-3 py-1 border rounded-md hover:bg-gray-100 disabled:opacity-50"
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              aria-label="Previous page"
             >
-              &lt;
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              </svg>
             </button>
-            <span className="text-gray-700">Page {currentPage} of {totalPages}</span>
+
+            {getPageNumbers().map((page, index) => (
+              typeof page === 'string' ? (
+                <span key={index} className="px-4 py-2 text-gray-500">...</span>
+              ) : (
+                <button
+                  key={page}
+                  onClick={() => goToPage(page)}
+                  className={`px-4 py-2 rounded-full transition-colors duration-200 ${
+                    currentPage === page
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                >
+                  {page}
+                </button>
+              )
+            ))}
+
             <button
-              onClick={goToNextPage}
+              onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 border rounded-md hover:bg-gray-100 disabled:opacity-50"
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              aria-label="Next page"
             >
-              &gt;
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
         </div>

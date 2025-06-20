@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
         {/* Logo Section */}
         <div className="footer-logo flex items-center">
           <img src="/src/assets/scs-logo.png" alt="Logo" className="h-10 mr-3" />
-          <span className="text-lg font-semibold">A Southern Cross Solutions Product</span>
+          <span className="footerText text-lg font-semibold">A Southern Cross Solutions Product</span>
         </div>
         <ThemeToggle />
         {/* Copyright Section
