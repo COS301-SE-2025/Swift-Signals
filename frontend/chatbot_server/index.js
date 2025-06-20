@@ -1,23 +1,15 @@
-// server/index.js
-
 const express = require('express');
 const cors = require('cors');
-const dialogflow = require('@google-cloud/dialogflow');
-require('dotenv').config(); // Load environment variables from .env file
+const dialogflow = require('@google-cloud/dialogflow').v2beta1;
+require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3001; // Use port 3001 or one from environment
+const port = process.env.PORT || 3001;
 
 // --- CONFIGURATION ---
-
-// Use CORS to allow communication from your React app's origin
-// (e.g., http://localhost:3000)
 app.use(cors()); 
-
-// Middleware to parse JSON bodies from incoming requests
 app.use(express.json());
 
-// Configure the Dialogflow credentials
 const credentials = {
   client_email: process.env.DIALOGFLOW_CLIENT_EMAIL,
   private_key: process.env.DIALOGFLOW_PRIVATE_KEY.replace(/\\n/g, '\n'),
@@ -29,10 +21,7 @@ const sessionClient = new dialogflow.SessionsClient({
 });
 
 // --- API ENDPOINT ---
-
-// Define the single endpoint for your chatbot
 app.post('/api/chatbot', async (req, res) => {
-  // It can receive a 'message' for text, or an 'event' for things like the welcome signal
   const { message, event, sessionId } = req.body;
   const projectId = process.env.DIALOGFLOW_PROJECT_ID;
 
@@ -45,9 +34,14 @@ app.post('/api/chatbot', async (req, res) => {
   const request = {
     session: sessionPath,
     queryInput: {},
+    queryParams: {
+      knowledgeBaseNames: [
+        // Please meticulously double-check this ID one last time
+        `projects/swift-signals/knowledgeBases/MTUzOTA5NDkxOTcwNzkzNzk5Njk`
+      ]
+    }
   };
 
-  // This logic is CRUCIAL. It builds the request differently for events vs. text.
   if (event) {
     request.queryInput.event = {
       name: event,
@@ -60,20 +54,39 @@ app.post('/api/chatbot', async (req, res) => {
     };
   }
 
+  // --- THIS IS THE CRUCIAL DIAGNOSTIC STEP ---
+  console.log('--- FINAL REQUEST BEING SENT TO DIALOGFLOW ---');
+  console.log(JSON.stringify(request, null, 2));
+  // -------------------------------------------------
+
   try {
     const responses = await sessionClient.detectIntent(request);
     const result = responses[0].queryResult;
+
+    // --- ENHANCED DIAGNOSTIC LOG ---
+    console.log('--- FULL DIALOGFLOW RESPONSE ---');
+    console.log(JSON.stringify(result, null, 2));
+
+    // Specifically check for the presence of knowledge answers
+    if (result.knowledgeAnswers && result.knowledgeAnswers.answers && result.knowledgeAnswers.answers.length > 0) {
+        console.log('✅ SUCCESS: Knowledge base answer was found by Dialogflow.');
+    } else {
+        console.log('❌ FAILURE: No knowledge base answer was returned by Dialogflow.');
+        if (result.intent) {
+            console.log(`Instead, the '${result.intent.displayName}' intent was matched with confidence: ${result.intentDetectionConfidence}`);
+        }
+    }
+    // ------------------------------------
+
     res.status(200).send(result);
-  } catch (error) {
+
+} catch (error) {
     console.error('Dialogflow Error:', error);
     res.status(500).send({ error: 'Internal Server Error' });
-  }
+}
 });
 
-
-
 // --- START THE SERVER ---
-
 app.listen(port, () => {
   console.log(`Chatbot backend server listening at http://localhost:${port}`);
 });

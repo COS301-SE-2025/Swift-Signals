@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from 'uuid'; // Import uuid to generate unique session IDs
+import { v4 as uuidv4 } from 'uuid';
 import "../styles/HelpMenu.css";
 import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
 
@@ -8,16 +8,12 @@ import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
 import { FaTimes, FaCommentDots, FaBook, FaChevronLeft, FaChevronDown } from "react-icons/fa";
 import { IoSend } from "react-icons/io5";
 
-// --- REMOVED: Old bot logic imports are no longer needed ---
-// import { intents } from "../lib/botLogic";
-// import type { ChatResponse } from "../lib/botLogic";
-
 // Other types
 type QuickReply = { text: string; payload: string; };
 type ChatMessage = { text: string; sender: "user" | "bot"; quickReplies?: QuickReply[]; };
 type TutorialType = 'dashboard' | 'navigation' | 'intersections' | 'simulations' | 'users';
 
-// --- TUTORIAL STEP DEFINITIONS (No changes here, they remain as they are) ---
+// --- TUTORIAL STEP DEFINITIONS ---
 const dashboardTutorialSteps: TutorialStep[] = [
     { selector: '.card-grid', title: 'Summary Cards', text: 'These cards give you a quick, at-a-glance overview of your key metrics.', position: 'bottom' },
     { selector: '.recent-simulations-tab', title: 'Simulations Table', text: 'Here you can see a list of all your recent simulations. Click on any row to see more details.', position: 'right' },
@@ -73,7 +69,6 @@ const usersTutorialSteps: TutorialStep[] = [
     { selector: '.usersPaging', title: 'Users Page Navigation', text: 'Here you can navigate to view multiple pages of users.', position: 'right' },
 ];
 
-
 const faqData = [ { question: "What do the different status colors mean?", answer: "Green indicates optimal traffic flow. Yellow suggests moderate congestion. Red signals heavy congestion or an incident. Grey means the intersection is offline or data is unavailable." }, { question: "How often is the traffic data updated?", answer: "Traffic data is updated in real-time, with a typical delay of less than 5 seconds." }, { question: "Can I export data from a simulation?", answer: "Yes, on the simulation results page, you will find an 'Export' button that allows you to download the data in various formats like CSV or PDF." } ];
 
 const HelpMenu: React.FC = () => {
@@ -82,7 +77,6 @@ const HelpMenu: React.FC = () => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [userInput, setUserInput] = useState("");
     const [isBotTyping, setIsBotTyping] = useState(false);
-    // --- NEW: A unique session ID for the conversation ---
     const [sessionId] = useState<string>(uuidv4()); 
     const chatBodyRef = useRef<HTMLDivElement | null>(null);
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
@@ -107,48 +101,38 @@ const HelpMenu: React.FC = () => {
     }, [location]);
 
     useEffect(() => { if (chatBodyRef.current) { chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight; } }, [messages, isBotTyping]);
+    
+    // This single, unified function handles all communication with the bot
+    const sendQueryToBot = async (query: { text?: string; event?: string }) => {
+        const { text, event } = query;
 
-    // --- UPDATED: Welcome message is now fetched from Dialogflow ---
-    useEffect(() => {
-        if (isOpen && messages.length === 0) {
-            // Send a welcome event to Dialogflow to get the initial message
-            handleSendMessage("Welcome", true);
-        }
-    }, [isOpen, messages.length]);
+        // Exit if the user tries to send an empty text message
+        if (text && text.trim() === "") return;
 
-
-    // --- NEW: The core function to communicate with your Dialogflow backend ---
-    const handleSendMessage = async (text: string, isWelcomeEvent = false) => {
-        console.log('Sending message with Session ID:', sessionId);
-        if (text.trim() === "") return;
-
-        // Add user message to chat only if it's not the hidden welcome event
-        if (!isWelcomeEvent) {
+        // Add the user's message to the chat window UI only if it's a text message
+        if (text) {
             const newUserMessage: ChatMessage = { text, sender: "user" };
             setMessages(prev => [...prev, newUserMessage]);
+            setUserInput("");
         }
 
-        setUserInput("");
         setIsBotTyping(true);
 
         try {
             const response = await fetch('http://localhost:3001/api/chatbot', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, sessionId: sessionId }),
+                body: JSON.stringify({ message: text, event: event, sessionId: sessionId }),
             });
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+            if (!response.ok) throw new Error('Network response was not ok');
             
             const data = await response.json();
-
-            // Extract quick replies from the fulfillmentMessages if they exist
+            
             let quickReplies: QuickReply[] = [];
             if (data.fulfillmentMessages) {
                 const payload = data.fulfillmentMessages.find((msg: any) => msg.payload);
-                if (payload && payload.payload.fields.richContent) {
+                if (payload?.payload?.fields?.richContent) {
                     const options = payload.payload.fields.richContent.listValue.values[0].listValue.values[0].structValue.fields.options.listValue.values;
                     quickReplies = options.map((option: any) => ({
                         text: option.structValue.fields.text.stringValue,
@@ -165,11 +149,17 @@ const HelpMenu: React.FC = () => {
 
             setMessages(prev => [...prev, botResponse]);
 
-            // --- ACTION HANDLER: Check if Dialogflow requested an action ---
-            if (data.action === 'start.tutorial' && data.parameters.fields.TutorialTopic) {
-                const tutorialType = data.parameters.fields.TutorialTopic.stringValue as TutorialType;
+            // --- THE CORRECTED AND FINAL ACTION HANDLER ---
+            // It now looks inside the 'fields' object for the lowercase 'tutorialtopic'
+            if (data.action === 'start.tutorial' && data.parameters?.fields?.tutorialtopic) {
+                // Get the actual value from inside the object structure
+                const tutorialType = data.parameters.fields.tutorialtopic.stringValue as TutorialType;
+                
                 if (tutorialType) {
-                    startTutorial(tutorialType);
+                    console.log(`%c✅ ACTION HANDLER PASSED: Starting tutorial for [${tutorialType}]`, 'color: green; font-weight: bold;');
+                    setTimeout(() => {
+                        startTutorial(tutorialType);
+                    }, 500); 
                 }
             }
 
@@ -184,8 +174,13 @@ const HelpMenu: React.FC = () => {
             setIsBotTyping(false);
         }
     };
-
-    const toggleSection = (section: string) => { setOpenSections(prev => ({ ...prev, [section]: !prev[section] })); };
+    
+    // This useEffect hook correctly calls our unified function for the welcome message
+    useEffect(() => {
+        if (isOpen && messages.length === 0) {
+            sendQueryToBot({ event: 'WELCOME' });
+        }
+    }, [isOpen]);
 
     const startTutorial = (tutorialType: TutorialType) => {
         const tutorialConfig = {
@@ -197,7 +192,7 @@ const HelpMenu: React.FC = () => {
         };
 
         const config = tutorialConfig[tutorialType];
-        if (!config) return; // Guard against invalid tutorial types
+        if (!config) return;
 
         if (!config.path) {
             setIsOpen(false);
@@ -228,7 +223,8 @@ const HelpMenu: React.FC = () => {
         setIsOpen(false);
     };
 
-    // --- No changes to the JSX (return statement) are needed ---
+    const toggleSection = (section: string) => { setOpenSections(prev => ({ ...prev, [section]: !prev[section] })); };
+
     return (
         <>
             {activeTutorial === 'dashboard' && <InteractiveTutorial steps={dashboardTutorialSteps} onClose={() => setActiveTutorial(null)} />}
@@ -276,7 +272,8 @@ const HelpMenu: React.FC = () => {
                                         {msg.quickReplies && (
                                             <div className="quick-replies">
                                                 {msg.quickReplies.map((reply, i) => (
-                                                    <button key={i} onClick={() => handleSendMessage(reply.payload)}>
+                                                    // This now correctly calls our single, unified function
+                                                    <button key={i} onClick={() => sendQueryToBot({ text: reply.payload })}>
                                                         {reply.text}
                                                     </button>
                                                 ))}
@@ -295,8 +292,9 @@ const HelpMenu: React.FC = () => {
                                 )}
                             </div>
                             <div className="chatbot-input">
-                                <input type="text" placeholder="Type your message..." value={userInput} onChange={(e) => setUserInput(e.target.value)} onKeyPress={(e) => e.key === "Enter" && handleSendMessage(userInput)} />
-                                <button onClick={() => handleSendMessage(userInput)}> <IoSend /> </button>
+                                {/* This also correctly calls our single, unified function */}
+                                <input type="text" placeholder="Type your message..." value={userInput} onChange={(e) => setUserInput(e.target.value)} onKeyPress={(e) => e.key === "Enter" && sendQueryToBot({ text: userInput })} />
+                                <button onClick={() => sendQueryToBot({ text: userInput })}> <IoSend /> </button>
                             </div>
                         </div>
                     ) : (
