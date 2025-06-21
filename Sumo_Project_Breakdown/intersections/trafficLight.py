@@ -255,7 +255,6 @@ def extractTrajectories(fcdOutputFile):
 
 
 def writeNodeFile(filename):
-    '''four nodes + center'''
     content = """<nodes>
     <node id="1" x="0" y="0" type="traffic_light"/>
     <node id="n2" x="0" y="100" type="priority"/>
