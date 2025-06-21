@@ -1,6 +1,0 @@
-<nodes>
-    <node id="J1" x="0" y="0" type="priority"/> <!-- T-junction -->
-    <node id="nNorth" x="0" y="100" type="priority"/>
-    <node id="nEast" x="100" y="0" type="priority"/>
-    <node id="nWest" x="-100" y="0" type="priority"/>
-</nodes>

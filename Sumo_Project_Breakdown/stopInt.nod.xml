@@ -1,7 +1,0 @@
-<nodes>
-    <node id="n1" x="0" y="0" type="priority"/>
-    <node id="n2" x="0" y="100" type="priority"/>
-    <node id="n3" x="0" y="-100" type="priority"/>
-    <node id="n4" x="-100" y="0" type="priority"/>
-    <node id="n5" x="100" y="0" type="priority"/>
-</nodes>

@@ -169,10 +169,18 @@ def main():
     }
 
     '''Save the output to a file'''
-    with open("simulation_results.json", "w") as f:
+    with open("out/results/simulation_results.json", "w") as f:
         json.dump(output, f, indent=4)
 
     print("Simulation saved to simulation_results.json")
+
+    try:
+        os.remove("run_count.txt")
+        print("Cleaned up run_count.txt")
+    except FileNotFoundError:
+        pass 
+    except Exception as e:
+        print(f"Warning: Could not delete run_count.txt - {e}")
 
 
 if __name__ == "__main__":

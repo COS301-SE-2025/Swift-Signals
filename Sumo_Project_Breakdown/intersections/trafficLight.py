@@ -1,6 +1,7 @@
 import os
 import subprocess
 import xml.etree.ElementTree as ET
+import json
 
 
 def generate(params):
@@ -55,11 +56,14 @@ def generate(params):
 
     '''run GUI by using sumo-gui'''
     logfile = f"{base}_warnings.log"
+    fcdOutputFile = f"{base}_fcd.xml"
+
     with open(logfile, "w") as log:
         subprocess.run([
             "sumo",
             "-c", configFile,
             "--tripinfo-output", tripinfoFile,
+            "--fcd-output", fcdOutputFile,
             "--no-warnings", "false",
             "--message-log", logfile
         ], check=True, stdout=log, stderr=log)
@@ -132,7 +136,122 @@ def generate(params):
         "Near collisions": len(near_collisions)
     }
 
+    trajectories = extractTrajectories(fcdOutputFile)
+
+    fullOutput = {
+        "intersection": {
+            "nodes": parseNodes(nodeFile),
+            "edges": parseEdges(edgeFile),
+            "connections": parseConnections(conFile),
+            "trafficLights": parseTrafficLights(tllFile)
+        },
+        "vehicles": trajectories
+    }
+
+    with open("out/simulationOut/simulation_output.json", "w") as jf:
+        json.dump(fullOutput, jf, indent=2)
+
+    print("Simulation output saved to simulation_output.json")
+
+    tempFiles = [
+        netFile, routeFile, configFile, tllFile, tripinfoFile,
+        nodeFile, edgeFile, conFile, fcdOutputFile, logfile
+    ]
+
+    for file in tempFiles:
+        try:
+            os.remove(file)
+        except OSError as e:
+            print(f"Warning: Could not delete {file} - {e}")
+
     return results
+
+
+def parseNodes(filename):
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    return [
+        {"id": n.get("id"), "x": float(n.get("x")), "y": float(n.get("y")), "type": n.get("type")}
+        for n in root.findall("node")
+    ]
+
+
+def parseEdges(filename):
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    return [
+        {
+            "id": e.get("id"),
+            "from": e.get("from"),
+            "to": e.get("to"),
+            "speed": float(e.get("speed")),
+            "lanes": int(e.get("numLanes"))
+        }
+        for e in root.findall("edge")
+    ]
+
+
+def parseConnections(filename):
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    return [
+        {
+            "from": c.get("from"),
+            "to": c.get("to"),
+            "fromLane": int(c.get("fromLane")),
+            "toLane": int(c.get("toLane")),
+            "tl": c.get("tl")
+        }
+        for c in root.findall("connection")
+    ]
+
+
+def parseTrafficLights(filename):
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    result = []
+    for logic in root.findall("tlLogic"):
+        result.append({
+            "id": logic.get("id"),
+            "type": logic.get("type"),
+            "phases": [
+                {
+                    "duration": int(phase.get("duration")),
+                    "state": phase.get("state")
+                }
+                for phase in logic.findall("phase")
+            ]
+        })
+    return result
+
+
+def extractTrajectories(fcdOutputFile):
+    tree = ET.parse(fcdOutputFile)
+    root = tree.getroot()
+    trajectories = {}
+
+    for timestep in root.findall("timestep"):
+        time = float(timestep.get("time"))
+        for vehicle in timestep.findall("vehicle"):
+            vid = vehicle.get("id")
+            x = float(vehicle.get("x"))
+            y = float(vehicle.get("y"))
+            speed = float(vehicle.get("speed"))
+
+            if vid not in trajectories:
+                trajectories[vid] = {
+                    "id": vid,
+                    "positions": []
+                }
+
+            trajectories[vid]["positions"].append({
+                "time": time,
+                "x": x,
+                "y": y,
+                "speed": speed
+            })
+
+    return list(trajectories.values())
 
 
 def writeNodeFile(filename):
