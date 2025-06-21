@@ -173,7 +173,6 @@ def main():
     with open("out/results/simulation_results.json", "w") as f:
         json.dump(output, f, indent=2)
 
-
     print("Simulation saved to simulation_results.json")
 
     try:
