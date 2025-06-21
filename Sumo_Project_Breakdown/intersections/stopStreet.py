@@ -130,7 +130,7 @@ def generate(params):
             "nodes": parseNodes(nodeFile),
             "edges": parseEdges(edgeFile),
             "connections": parseConnections(conFile),
-            "trafficLights": []  # no traffic lights
+            "trafficLights": []
         },
         "vehicles": trajectories
     }
