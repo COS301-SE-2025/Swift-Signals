@@ -11,47 +11,6 @@ if "SimLoad" not in sys.modules:
 
 class TestSimLoad(unittest.TestCase):
 
-    '''def test_run_as_main_module(self):
-        json_content = """
-        {
-            "Traffic Density": "high",
-            "intersection": {
-                "simulation_parameters": {
-                    "Intersection Type": "trafficlight",
-                    "Green": 25,
-                    "Yellow": 4,
-                    "Red": 30,
-                    "Speed": 80,
-                    "seed": 13
-                }
-            }
-        }
-        """
-
-        with tempfile.TemporaryDirectory() as tmpdir:
-            json_path = os.path.join(tmpdir, "params_test.json")
-            with open(json_path, "w") as f:
-                f.write(json_content)
-
-            project_root = str(pathlib.Path(__file__).resolve().parent.parent)
-
-            proc = subprocess.Popen(
-                [sys.executable, "-m", "SimLoad"],
-                cwd=project_root,
-                stdin=subprocess.PIPE,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-            )
-
-            stdout, stderr = proc.communicate(input=json_path + "\n")
-
-            print("STDOUT:", stdout)
-            print("STDERR:", stderr)
-
-            self.assertIn("Enter path to parameter JSON file", stdout)
-            self.assertEqual(proc.returncode, 0)'''
-
     @patch("builtins.input", side_effect=["2"])
     def test_showMenu(self, mock_input):
         choice = SimLoad.showMenu()
