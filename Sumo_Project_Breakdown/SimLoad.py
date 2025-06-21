@@ -30,7 +30,13 @@ def loadParams():
     with open(filePath, "r") as f:
         data = json.load(f)
 
-    return data["intersection"]["simulation_parameters"]
+    sim_params = data["intersection"]["simulation_parameters"]
+    traffic_density = data["intersection"].get("Traffic Density", "medium")
+
+    return {
+        **sim_params,
+        "Traffic Density": traffic_density
+    }
 
 
 def loadRunCount(counter_file="run_count.txt"):
