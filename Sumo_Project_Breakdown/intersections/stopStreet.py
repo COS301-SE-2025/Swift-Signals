@@ -1,24 +1,32 @@
 import os
 import subprocess
+import xml.etree.ElementTree as ET
+import json
 
 
 def generate(params):
+    allowedSpeeds = [40, 60, 80, 100, 120]
+    speedKm = params.get("Speed", 40)
+    if speedKm not in allowedSpeeds:
+        print(f"Warning: Speed {speedKm}km/h not allowed. Using default 40km/h.")
+        speedKm = 40
+    speedInMs = speedKm * (1000 / 3600)
+
     base = "stop_intersection"
     netFile = f"{base}.net.xml"
     routeFile = f"{base}.rou.xml"
     configFile = f"{base}.sumocfg"
-    stopIntFile = f"{base}.add.xml"
+    tripinfoFile = f"{base}_tripinfo.xml"
 
     nodeFile = "stopInt.nod.xml"
     edgeFile = "stopInt.edg.xml"
     conFile = "stopInt.con.xml"
 
     writeNodeFile(nodeFile)
-    writeEdgeFile(edgeFile)
+    writeEdgeFile(edgeFile, speedInMs)
     writeConnectionFile(conFile)
-    writeStopLogic(stopIntFile)
 
-    print("Generating stop street intersection with params:", params)
+    print("Generating stop-controlled intersection with params:", params)
 
     subprocess.run([
         "netconvert",
@@ -28,28 +36,127 @@ def generate(params):
         "-o", netFile
     ], check=True)
 
-    generateTrips(netFile, routeFile, params["Traffic Density"])
+    generateTrips(netFile, routeFile, params["Traffic Density"], params)
 
     with open(configFile, "w") as cfg:
         cfg.write(f"""<configuration>
-        <input>
-            <net-file value="{netFile}"/>
-            <route-files value="{routeFile}"/>
-            <additional-files value="{stopIntFile}"/>
-        </input>
-        <time>
-            <begin value="0"/>
-            <end value="1000"/>
-        </time>
-    </configuration>""")
+    <input>
+        <net-file value="{netFile}"/>
+        <route-files value="{routeFile}"/>
+    </input>
+    <time>
+        <begin value="0"/>
+        <end value="3600"/>
+    </time>
+</configuration>""")
 
-    print("Running SUMO simulation...")
-    subprocess.run(["sumo-gui", "-c", configFile])
+    logfile = f"{base}_warnings.log"
+    fcdOutputFile = f"{base}_fcd.xml"
+
+    with open(logfile, "w") as log:
+        subprocess.run([
+            "sumo",
+            "-c", configFile,
+            "--tripinfo-output", tripinfoFile,
+            "--fcd-output", fcdOutputFile,
+            "--no-warnings", "false",
+            "--message-log", logfile
+        ], check=True, stdout=log, stderr=log)
+
+    print("Simulation finished. Parsing results...")
+
+    emergency_brakes = 0
+    emergency_stops = 0
+    near_collisions = []
+
+    with open(logfile, "r") as f:
+        lines = f.readlines()
+
+    for i in range(len(lines)):
+        line = lines[i].strip()
+        if "performs emergency braking" in line:
+            vehicle_id = line.split("'")[1]
+            emergency_brakes += 1
+            near_collisions.append(line)
+        elif "performs emergency stop" in line:
+            vehicle_id = line.split("'")[1]
+            print(vehicle_id)
+            emergency_stops += 1
+            near_collisions.append(line)
+
+    tree = ET.parse(tripinfoFile)
+    root = tree.getroot()
+
+    total_vehicles = 0
+    total_travel_time = 0.0
+    total_waiting_time = 0.0
+    total_distance = 0.0
+    speeds = []
+
+    for trip in root.findall("tripinfo"):
+        total_vehicles += 1
+        travel_time = float(trip.get("duration"))
+        waiting_time = float(trip.get("waitingTime"))
+        distance = float(trip.get("routeLength"))
+
+        total_travel_time += travel_time
+        total_waiting_time += waiting_time
+        total_distance += distance
+
+        if travel_time > 0:
+            speeds.append(distance / travel_time)
+
+    avg_speed = sum(speeds) / len(speeds) if speeds else 0
+    avg_waiting_time = total_waiting_time / total_vehicles if total_vehicles > 0 else 0
+    avg_travel_time = total_travel_time / total_vehicles if total_vehicles > 0 else 0
+
+    results = {
+        "Total Vehicles": total_vehicles,
+        "Average Travel Time": avg_travel_time,
+        "Total Travel Time": total_travel_time,
+        "Average Speed": avg_speed,
+        "Average Waiting Time": avg_waiting_time,
+        "Total Waiting Time": total_waiting_time,
+        "Generated Vehicles": total_vehicles,
+        "Emergency Brakes": emergency_brakes,
+        "Emergency Stops": emergency_stops,
+        "Near collisions": len(near_collisions)
+    }
+
+    trajectories = extractTrajectories(fcdOutputFile)
+
+    fullOutput = {
+        "intersection": {
+            "nodes": parseNodes(nodeFile),
+            "edges": parseEdges(edgeFile),
+            "connections": parseConnections(conFile),
+            "trafficLights": []  # no traffic lights
+        },
+        "vehicles": trajectories
+    }
+
+    os.makedirs("out/simulationOut", exist_ok=True)
+    with open("out/simulationOut/simulation_output.json", "w") as jf:
+        json.dump(fullOutput, jf, indent=2)
+
+    print("Simulation output saved to simulation_output.json")
+
+    tempFiles = [
+        netFile, routeFile, configFile, tripinfoFile,
+        nodeFile, edgeFile, conFile, fcdOutputFile, logfile, f"{base}.add.xml"
+    ]
+    for file in tempFiles:
+        try:
+            os.remove(file)
+        except OSError as e:
+            print(f"Warning: Could not delete {file} - {e}")
+
+    return results
 
 
 def writeNodeFile(filename):
     content = """<nodes>
-    <node id="n1" x="0" y="0" type="priority"/>
+    <node id="1" x="0" y="0" type="priority"/>
     <node id="n2" x="0" y="100" type="priority"/>
     <node id="n3" x="0" y="-100" type="priority"/>
     <node id="n4" x="-100" y="0" type="priority"/>
@@ -59,17 +166,17 @@ def writeNodeFile(filename):
         f.write(content)
 
 
-def writeEdgeFile(filename):
-    content = """<edges>
-    <edge id="in_n2_1" from="n2" to="n1" priority="0" numLanes="1" speed="13.9"/>
-    <edge id="in_n3_1" from="n3" to="n1" priority="0" numLanes="1" speed="13.9"/>
-    <edge id="in_n4_1" from="n4" to="n1" priority="0" numLanes="1" speed="13.9"/>
-    <edge id="in_n5_1" from="n5" to="n1" priority="0" numLanes="1" speed="13.9"/>
+def writeEdgeFile(filename, speed=11.11):
+    content = f"""<edges>
+    <edge id="in_n2_1" from="n2" to="1" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="in_n3_1" from="n3" to="1" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="in_n4_1" from="n4" to="1" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="in_n5_1" from="n5" to="1" priority="1" numLanes="1" speed="{speed}"/>
 
-    <edge id="out_n1_n2" from="n1" to="n2" priority="0" numLanes="1" speed="13.9"/>
-    <edge id="out_n1_n3" from="n1" to="n3" priority="0" numLanes="1" speed="13.9"/>
-    <edge id="out_n1_n4" from="n1" to="n4" priority="0" numLanes="1" speed="13.9"/>
-    <edge id="out_n1_n5" from="n1" to="n5" priority="0" numLanes="1" speed="13.9"/>
+    <edge id="out_1_n2" from="1" to="n2" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="out_1_n3" from="1" to="n3" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="out_1_n4" from="1" to="n4" priority="1" numLanes="1" speed="{speed}"/>
+    <edge id="out_1_n5" from="1" to="n5" priority="1" numLanes="1" speed="{speed}"/>
 </edges>"""
     with open(filename, "w") as f:
         f.write(content)
@@ -77,50 +184,105 @@ def writeEdgeFile(filename):
 
 def writeConnectionFile(filename):
     content = """<connections>
-    <connection from="in_n2_1" to="out_n1_n3" fromLane="0" toLane="0"/>
-    <connection from="in_n2_1" to="out_n1_n5" fromLane="0" toLane="0"/>
-    <connection from="in_n2_1" to="out_n1_n4" fromLane="0" toLane="0"/>
+    <connection from="in_n2_1" to="out_1_n3" fromLane="0" toLane="0"/>
+    <connection from="in_n2_1" to="out_1_n5" fromLane="0" toLane="0"/>
+    <connection from="in_n2_1" to="out_1_n4" fromLane="0" toLane="0"/>
 
-    <connection from="in_n3_1" to="out_n1_n4" fromLane="0" toLane="0"/>
-    <connection from="in_n3_1" to="out_n1_n5" fromLane="0" toLane="0"/>
-    <connection from="in_n3_1" to="out_n1_n2" fromLane="0" toLane="0"/>
+    <connection from="in_n3_1" to="out_1_n4" fromLane="0" toLane="0"/>
+    <connection from="in_n3_1" to="out_1_n5" fromLane="0" toLane="0"/>
+    <connection from="in_n3_1" to="out_1_n2" fromLane="0" toLane="0"/>
 
-    <connection from="in_n4_1" to="out_n1_n5" fromLane="0" toLane="0"/>
-    <connection from="in_n4_1" to="out_n1_n2" fromLane="0" toLane="0"/>
-    <connection from="in_n4_1" to="out_n1_n3" fromLane="0" toLane="0"/>
+    <connection from="in_n4_1" to="out_1_n5" fromLane="0" toLane="0"/>
+    <connection from="in_n4_1" to="out_1_n2" fromLane="0" toLane="0"/>
+    <connection from="in_n4_1" to="out_1_n3" fromLane="0" toLane="0"/>
 
-    <connection from="in_n5_1" to="out_n1_n2" fromLane="0" toLane="0"/>
-    <connection from="in_n5_1" to="out_n1_n3" fromLane="0" toLane="0"/>
-    <connection from="in_n5_1" to="out_n1_n4" fromLane="0" toLane="0"/>
+    <connection from="in_n5_1" to="out_1_n2" fromLane="0" toLane="0"/>
+    <connection from="in_n5_1" to="out_1_n3" fromLane="0" toLane="0"/>
+    <connection from="in_n5_1" to="out_1_n4" fromLane="0" toLane="0"/>
 </connections>"""
     with open(filename, "w") as f:
         f.write(content)
 
 
-def writeStopLogic(filename):
-    with open(filename, "w") as tl:
-        tl.write("""<additional>
-    <priority id="priority0" type="stop" lane="in_n2_1_0" startPos="0" endPos="5"/>
-    <priority id="priority1" type="stop" lane="in_n3_1_0" startPos="0" endPos="5"/>
-    <priority id="priority2" type="stop" lane="in_n4_1_0" startPos="0" endPos="5"/>
-    <priority id="priority3" type="stop" lane="in_n5_1_0" startPos="0" endPos="5"/>
-</additional>""")
+def parseNodes(filename):
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    return [
+        {"id": n.get("id"), "x": float(n.get("x")), "y": float(n.get("y")), "type": n.get("type")}
+        for n in root.findall("node")
+    ]
 
 
-def generateTrips(netFile, tripFile, density):
-    import subprocess
+def parseEdges(filename):
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    return [
+        {
+            "id": e.get("id"),
+            "from": e.get("from"),
+            "to": e.get("to"),
+            "speed": float(e.get("speed")),
+            "lanes": int(e.get("numLanes"))
+        }
+        for e in root.findall("edge")
+    ]
 
+
+def parseConnections(filename):
+    tree = ET.parse(filename)
+    root = tree.getroot()
+    return [
+        {
+            "from": c.get("from"),
+            "to": c.get("to"),
+            "fromLane": int(c.get("fromLane")),
+            "toLane": int(c.get("toLane"))
+        }
+        for c in root.findall("connection")
+    ]
+
+
+def extractTrajectories(fcdOutputFile):
+    tree = ET.parse(fcdOutputFile)
+    root = tree.getroot()
+    trajectories = {}
+
+    for timestep in root.findall("timestep"):
+        time = float(timestep.get("time"))
+        for vehicle in timestep.findall("vehicle"):
+            vid = vehicle.get("id")
+            x = float(vehicle.get("x"))
+            y = float(vehicle.get("y"))
+            speed = float(vehicle.get("speed"))
+
+            if vid not in trajectories:
+                trajectories[vid] = {
+                    "id": vid,
+                    "positions": []
+                }
+
+            trajectories[vid]["positions"].append({
+                "time": time,
+                "x": x,
+                "y": y,
+                "speed": speed
+            })
+
+    return list(trajectories.values())
+
+
+def generateTrips(netFile, tripFile, density, params):
     SUMO_HOME = os.environ.get("SUMO_HOME")
     TOOLS_PATH = os.path.join(SUMO_HOME, "tools")
 
     if density == "low":
-        period = "10"
+        period = "12"
     elif density == "medium":
-        period = "5"
+        period = "6"
     elif density == "high":
-        period = "2"
+        period = "3"
     else:
-        period = "5"
+        period = "6"
 
     tripDir = os.path.dirname(tripFile)
     if tripDir:
@@ -131,11 +293,13 @@ def generateTrips(netFile, tripFile, density):
         "-n", netFile,
         "-o", tripFile,
         "--prefix", "veh",
-        "--seed", "13",
+        "--seed", str(params["seed"]),
         "--min-distance", "20",
         "--trip-attributes", 'departLane="best" departSpeed="max"',
         "--period", period
     ]
 
-    subprocess.run(cmd, check=True)
+    with open(os.devnull, 'w') as devnull:
+        subprocess.run(cmd, check=True, stderr=devnull)
+
     print("Trips generated.")

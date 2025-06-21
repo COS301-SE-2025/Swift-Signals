@@ -178,7 +178,7 @@ def main():
         os.remove("run_count.txt")
         print("Cleaned up run_count.txt")
     except FileNotFoundError:
-        pass 
+        pass
     except Exception as e:
         print(f"Warning: Could not delete run_count.txt - {e}")
 

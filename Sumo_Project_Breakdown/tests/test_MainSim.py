@@ -15,7 +15,7 @@ class TestSimLoad(unittest.TestCase):
 
     @patch("builtins.input", return_value="params_test.json")
     @patch("os.path.exists", return_value=True)
-    @patch("builtins.open", new_callable=mock_open, read_data='{"simulation":{"parameters":{"Intersection Type":"trafficlight"}}}')
+    @patch("builtins.open", new_callable=mock_open, read_data='{"intersection":{"simulation_parameters":{"Intersection Type":"trafficlight"}}}')
     def test_run_as_main_module(self, mock_file, mock_exists, mock_input):
         result = subprocess.run([sys.executable, "-m", "SimLoad"], capture_output=True, text=True)
         self.assertIn("Enter path to parameter JSON file", result.stdout)
@@ -28,7 +28,7 @@ class TestSimLoad(unittest.TestCase):
 
     @patch("builtins.input", side_effect=["params_test.json"])
     @patch("os.path.exists", return_value=True)
-    @patch("builtins.open", new_callable=mock_open, read_data='{"simulation":{"parameters":{"Intersection Type":"trafficlight"}}}')
+    @patch("builtins.open", new_callable=mock_open, read_data='{"intersection":{"simulation_parameters":{"Intersection Type":"trafficlight"}}}')
     def test_loadParams(self, mock_open_file, mock_exists, mock_input):
         params = SimLoad.loadParams()
         self.assertEqual(params["Intersection Type"], "trafficlight")
@@ -76,8 +76,8 @@ class TestSimLoad(unittest.TestCase):
         SimLoad.main()
         args, kwargs = mock_json_dump.call_args
         data_written = args[0]  # this is the object passed to json.dump
-        self.assertIn("simulation", data_written)
-        self.assertEqual(data_written["simulation"]["parameters"]["Intersection Type"], "trafficlight")
+        self.assertIn("intersection", data_written)
+        self.assertEqual(data_written["intersection"]["parameters"]["Intersection Type"], "trafficlight")
 
     @patch("builtins.input", return_value="nonexistent.json")
     @patch("os.path.exists", return_value=False)

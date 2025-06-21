@@ -2,7 +2,7 @@
     "_id": {
         "$oid": "c3cc443a386440ffbfef2a6f"
     },
-    "simulation": {
+    "intersection": {
         "id": "simId",
         "name": "Fourwaystop",
         "owner": "username",
@@ -10,11 +10,30 @@
         "last_run_at": "2025-06-18T13:55:07Z",
         "status": "completed",
         "run_count": 0,
-        "parameters": {
+        "simulation_parameters": {
             "Intersection Type": "fourwaystop",
             "Traffic Density": "high",
             "Speed": 40,
             "seed": 13
+        }, 
+        "simulation_data": {
+            "$oid": "0e76da9107084c5e8bc96330"
+        },
+        "simulation_results": {
+            "$oid": "0e76da9107084c5e8bc96330"
+        },
+        "optimized_parameters": {
+            "optimization_type": "gridsearch",
+            "Intersection Type": "trafficlight",
+            "Traffic Density": "high",
+            "Speed": 40,
+            "seed": 0
+        },
+        "optimization_data": {
+            "$oid": "0e76da9107084c5e8bc96330"
+        },
+        "optimization_results":{
+            "$oid": "0e76da9107084c5e8bc96330"
         }
     }
 }
