@@ -17,10 +17,10 @@ class TestSimLoad(unittest.TestCase):
     def test_run_as_main_module(self):
         json_content = """
         {
+            "Traffic Density": "high",
             "intersection": {
                 "simulation_parameters": {
                     "Intersection Type": "trafficlight",
-                    "Traffic Density": "high",
                     "Green": 25,
                     "Yellow": 4,
                     "Red": 30,
