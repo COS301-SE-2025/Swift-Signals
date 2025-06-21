@@ -15,10 +15,18 @@ class TestSimLoad(unittest.TestCase):
     @patch("builtins.input", return_value="params_test.json")
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data='{"intersection":{"simulation_parameters":{"Intersection Type":"trafficlight"}}}')
-    def test_run_as_main_module(self, mock_file, mock_exists, mock_input):
-        result = subprocess.run([sys.executable, "-m", "SimLoad"], capture_output=True, text=True)
-        self.assertIn("Enter path to parameter JSON file", result.stdout)
-        self.assertEqual(result.returncode, 1)
+    def test_run_as_main_module(self, mock_open_file, mock_exists, mock_input):
+        proc = subprocess.Popen(
+            [sys.executable, "-m", "SimLoad"],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+        stdout, stderr = proc.communicate(input="params_test.json\n")
+
+        self.assertIn("Enter path to parameter JSON file", stdout)
+        self.assertEqual(proc.returncode, 1)
 
     @patch("builtins.input", side_effect=["2"])
     def test_showMenu(self, mock_input):
