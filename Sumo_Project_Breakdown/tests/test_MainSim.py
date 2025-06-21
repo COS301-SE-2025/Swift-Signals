@@ -4,6 +4,8 @@ from unittest.mock import patch, mock_open
 import uuid
 import subprocess
 import pathlib
+import tempfile
+import os
 
 if "SimLoad" not in sys.modules:
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
@@ -12,21 +14,47 @@ if "SimLoad" not in sys.modules:
 
 class TestSimLoad(unittest.TestCase):
 
-    @patch("builtins.input", return_value="params_test.json")
-    @patch("os.path.exists", return_value=True)
-    @patch("builtins.open", new_callable=mock_open, read_data='{"intersection":{"simulation_parameters":{"Intersection Type":"trafficlight"}}}')
-    def test_run_as_main_module(self, mock_open_file, mock_exists, mock_input):
-        proc = subprocess.Popen(
-            [sys.executable, "-m", "SimLoad"],
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-        stdout, stderr = proc.communicate(input="params_test.json\n")
+    def test_run_as_main_module(self):
+        json_content = """
+        {
+            "intersection": {
+                "simulation_parameters": {
+                    "Intersection Type": "trafficlight",
+                    "Traffic Density": "high",
+                    "Green": 25,
+                    "Yellow": 4,
+                    "Red": 30,
+                    "Speed": 80,
+                    "seed": 13
+                }
+            }
+        }
+        """
 
-        self.assertIn("Enter path to parameter JSON file", stdout)
-        self.assertEqual(proc.returncode, 0)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_path = os.path.join(tmpdir, "params_test.json")
+            with open(json_path, "w") as f:
+                f.write(json_content)
+
+            project_root = str(pathlib.Path(__file__).resolve().parent.parent)
+
+            proc = subprocess.Popen(
+                [sys.executable, "-m", "SimLoad"],
+                cwd=project_root,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+
+            stdout, stderr = proc.communicate(input=json_path + "\n")
+
+            print("STDOUT:", stdout)
+            print("STDERR:", stderr)
+
+            self.assertIn("Enter path to parameter JSON file", stdout)
+            self.assertEqual(proc.returncode, 0)
+
 
     @patch("builtins.input", side_effect=["2"])
     def test_showMenu(self, mock_input):
