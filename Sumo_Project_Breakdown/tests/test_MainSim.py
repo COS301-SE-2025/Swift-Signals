@@ -12,9 +12,9 @@ if "SimLoad" not in sys.modules:
     import SimLoad
 
 
-'''class TestSimLoad(unittest.TestCase):
+class TestSimLoad(unittest.TestCase):
 
-    def test_run_as_main_module(self):
+    '''def test_run_as_main_module(self):
         json_content = """
         {
             "Traffic Density": "high",
