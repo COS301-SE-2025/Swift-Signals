@@ -1,15 +1,15 @@
 {
     "_id": {
-        "$oid": "cc722cfd7475471b9f7fe832"
+        "$oid": "a35ead92b42348cf8b2a63ad"
     },
     "intersection": {
         "id": "simId",
         "name": "Trafficlight",
         "owner": "username",
         "created_at": "unknown",
-        "last_run_at": "2025-06-21T08:21:41.452348Z",
+        "last_run_at": "2025-06-21T08:22:35.959402Z",
         "status": "completed",
-        "run_count": 30,
+        "run_count": 31,
         "parameters": {
             "Intersection Type": "trafficlight",
             "Traffic Density": "high",

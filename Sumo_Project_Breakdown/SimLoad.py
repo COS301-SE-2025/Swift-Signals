@@ -30,7 +30,7 @@ def loadParams():
     with open(filePath, "r") as f:
         data = json.load(f)
 
-    return data["simulation"]["parameters"]
+    return data["intersection"]["simulation_parameters"]
 
 
 def loadRunCount(counter_file="run_count.txt"):
@@ -98,13 +98,13 @@ def saveParams(params, intersectionType, simName):
     timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ")
     time_for_file = time.strftime("%Y%m%d-%H%M%S")
     fileName = f"params_{simName}_{time_for_file}.json"
-    fake_oid = str(uuid.uuid4()).hex[:24]
+    fake_oid = uuid.uuid4().hex[:24]
 
     simulationData = {
         "_id": {
             "$oid": fake_oid
         },
-        "simulation": {
+        "intersection": {
             "id": "simId",
             "name": simName,
             "owner": "username",
@@ -112,7 +112,7 @@ def saveParams(params, intersectionType, simName):
             "last_run_at": timestamp,
             "status": "completed",
             "run_count": 0,
-            "parameters": {
+            "simulation_parameters": {
                 "Intersection Type": intersectionType,
                 **params,
                 "seed": 13
@@ -153,9 +153,9 @@ def main():
 
     output = {
         "_id": {
-            "$oid": str(uuid.uuid4())[:24].replace("-", "0")
+            "$oid": uuid.uuid4().hex[:24]
         },
-        "simulation": {
+        "intersection": {
             "id": simId,
             "name": simName,
             "owner": owner,
@@ -169,10 +169,10 @@ def main():
     }
 
     '''Save the output to a file'''
-    with open("simulation_output.json", "w") as f:
+    with open("simulation_results.json", "w") as f:
         json.dump(output, f, indent=4)
 
-    print("Simulation saved to simulation_output.json")
+    print("Simulation saved to simulation_results.json")
 
 
 if __name__ == "__main__":
