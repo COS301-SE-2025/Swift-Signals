@@ -69,7 +69,58 @@ const usersTutorialSteps: TutorialStep[] = [
     { selector: '.usersPaging', title: 'Users Page Navigation', text: 'Here you can navigate to view multiple pages of users.', position: 'right' },
 ];
 
-const faqData = [ { question: "What do the different status colors mean?", answer: "Green indicates optimal traffic flow. Yellow suggests moderate congestion. Red signals heavy congestion or an incident. Grey means the intersection is offline or data is unavailable." }, { question: "How often is the traffic data updated?", answer: "Traffic data is updated in real-time, with a typical delay of less than 5 seconds." }, { question: "Can I export data from a simulation?", answer: "Yes, on the simulation results page, you will find an 'Export' button that allows you to download the data in various formats like CSV or PDF." } ];
+// --- UPDATED: New, more detailed FAQ data ---
+const faqData = [
+    {
+        question: "What is Swift Signals?",
+        answer: "Swift Signals is a simulation-powered, machine-learning-based platform that helps traffic departments optimize traffic light timing at intersections to reduce congestion and improve traffic flow."
+    },
+    {
+        question: "Who is Swift Signals designed for?",
+        answer: "The platform is built for municipal traffic departments and urban planners who need a scalable, data-driven tool to monitor and improve intersection performance."
+    },
+    {
+        question: "What problems will Swift Signals solve?",
+        answer: "It addresses urban traffic congestion, which costs South Africa's economy an estimated R1 billion annually in productivity losses. By optimizing traffic light cycles based on real-world data, Swift Signals aims to reduce wait times, improve vehicle throughput, and enhance overall intersection efficiency."
+    },
+    {
+        question: "How does the platform work?",
+        answer: "Simulates traffic flow using historical and real-time data.<br/>Applies Swarm Optimization Algorithms to test multiple traffic light timing strategies.<br/>Selects the most efficient timing plans based on metrics like average wait time and throughput."
+    },
+    {
+        question: "What technologies power Swift Signals?",
+        answer: "<b>Frontend:</b> React.js + TailwindCSS<br/><b>Backend:</b> Microservices architecture (containerized)<br/><b>Database:</b> MongoDB (for scalable time-series data storage)<br/><b>Optimization:</b> Particle Swarm Optimization (PSO) and other swarm algorithms"
+    },
+    {
+        question: "Can Swift Signals be used for multiple intersections?",
+        answer: "Yes, the system is designed for scalability, including support for optimizing multiple intersections simultaneously and accommodating more complex models (e.g., turn-only lanes)."
+    },
+    {
+        question: "How is the system deployed?",
+        answer: "Swift Signals uses modern DevOps pipelines, including containerization and CI/CD, allowing seamless deployment, updates, and modular testing of services."
+    },
+    {
+        question: "Does it support real-time traffic?",
+        answer: "Currently, the focus is on historical data, but the platform is designed to integrate real-time feeds in future iterations."
+    },
+    {
+        question: "How are intersections configured in the system?",
+        answer: "Through a responsive web portal, users can:<br/>- Configure custom intersection layouts and signal sequences.<br/>- Monitor simulation performance.<br/>- View optimization results via interactive reports and visualizations."
+    },
+    {
+        question: "What kind of reports or analytics does the system generate?",
+        answer: "Users can access:<br/>- Visual simulations of traffic flow<br/>- Performance dashboards (e.g., wait times, flow efficiency)<br/>- Alerts and improvement suggestions<br/>- Exportable optimization reports"
+    },
+    {
+        question: "Is this product finished or in development?",
+        answer: "Swift Signals is currently under active development using an Agile process, with updates and new features released every sprint. Stakeholder feedback is integrated regularly to align with real-world needs."
+    },
+    {
+        question: "How can I start using Swift Signals?",
+        answer: "You can reach out to Southern Cross Solutions for pilot access, deployment support, and integration consultation. Full release timelines will be communicated upon request."
+    }
+];
+
 
 const HelpMenu: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -86,6 +137,9 @@ const HelpMenu: React.FC = () => {
         path: string;
         tutorialType: TutorialType;
     } | null>(null);
+    
+    // --- ADDED: State to manage the open FAQ item ---
+    const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -225,6 +279,11 @@ const HelpMenu: React.FC = () => {
 
     const toggleSection = (section: string) => { setOpenSections(prev => ({ ...prev, [section]: !prev[section] })); };
 
+    // --- ADDED: Handler to toggle individual FAQ items ---
+    const toggleFaq = (index: number) => {
+        setOpenFaqIndex(prevIndex => (prevIndex === index ? null : index));
+    };
+
     return (
         <>
             {activeTutorial === 'dashboard' && <InteractiveTutorial steps={dashboardTutorialSteps} onClose={() => setActiveTutorial(null)} />}
@@ -272,7 +331,6 @@ const HelpMenu: React.FC = () => {
                                         {msg.quickReplies && (
                                             <div className="quick-replies">
                                                 {msg.quickReplies.map((reply, i) => (
-                                                    // This now correctly calls our single, unified function
                                                     <button key={i} onClick={() => sendQueryToBot({ text: reply.payload })}>
                                                         {reply.text}
                                                     </button>
@@ -292,7 +350,6 @@ const HelpMenu: React.FC = () => {
                                 )}
                             </div>
                             <div className="chatbot-input">
-                                {/* This also correctly calls our single, unified function */}
                                 <input type="text" placeholder="Type your message..." value={userInput} onChange={(e) => setUserInput(e.target.value)} onKeyPress={(e) => e.key === "Enter" && sendQueryToBot({ text: userInput })} />
                                 <button onClick={() => sendQueryToBot({ text: userInput })}> <IoSend /> </button>
                             </div>
@@ -339,19 +396,29 @@ const HelpMenu: React.FC = () => {
                              </div>
                              <div className="accordion-section">
                                  <button className="accordion-header" onClick={() => toggleSection('faq')}>
-                                     <span>FAQ</span>
+                                     <span>Frequently Asked Questions</span>
                                      <FaChevronDown className={`accordion-icon ${openSections['faq'] ? 'open' : ''}`} />
                                  </button>
                                  <div className={`accordion-content ${openSections['faq'] ? 'open' : ''}`}>
-                                     {faqData.map((item, index) => (
-                                         <div key={index} className="accordion-item">
-                                             <h4>{item.question}</h4>
-                                             <p>{item.answer}</p>
-                                         </div>
-                                     ))}
+                                    {/* --- UPDATED: Renders the new nested FAQ accordion --- */}
+                                    <div className="faq-list">
+                                        {faqData.map((item, index) => (
+                                            <div key={index} className="faq-item">
+                                                <button className="faq-question" onClick={() => toggleFaq(index)}>
+                                                    <span>{item.question}</span>
+                                                    <FaChevronDown className={`faq-icon ${openFaqIndex === index ? 'open' : ''}`} />
+                                                </button>
+                                                <div className={`faq-answer ${openFaqIndex === index ? 'open' : ''}`}>
+                                                    <div className="faq-answer-content">
+                                                        <p dangerouslySetInnerHTML={{ __html: item.answer }} />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                  </div>
                              </div>
-                         </div>
+                        </div>
                     )}
                 </div>
             </div>
