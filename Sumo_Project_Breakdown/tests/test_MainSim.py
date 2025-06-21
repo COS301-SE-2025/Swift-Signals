@@ -111,7 +111,16 @@ class TestSimLoad(unittest.TestCase):
         self.assertEqual(result["Yellow"], 4)
         self.assertEqual(result["Red"], 30)
 
-    @patch("builtins.open", new_callable=mock_open)  # <--- add this
+    @patch("builtins.open", new_callable=mock_open)
+    @patch("SimLoad.circle.generate", return_value={"result": "stop_ok"})
+    @patch("SimLoad.loadParams", return_value={"Intersection Type": "roundabout"})
+    @patch("SimLoad.saveRunCount")
+    @patch("SimLoad.loadRunCount", return_value=0)
+    def test_main_roundabout(self, mock_run_count, mock_save_run_count, mock_params, mock_generate, mock_file):
+        SimLoad.main()
+        mock_generate.assert_called_once_with({"Intersection Type": "roundabout"})
+
+    @patch("builtins.open", new_callable=mock_open)
     @patch("SimLoad.stopStreet.generate", return_value={"result": "stop_ok"})
     @patch("SimLoad.loadParams", return_value={"Intersection Type": "fourwaystop"})
     @patch("SimLoad.saveRunCount")
@@ -120,32 +129,21 @@ class TestSimLoad(unittest.TestCase):
         SimLoad.main()
         mock_generate.assert_called_once_with({"Intersection Type": "fourwaystop"})
 
-    @patch("builtins.open", new_callable=mock_open)  # <--- add this
-    @patch("SimLoad.stopStreet.generate", return_value={"result": "stop_ok"})
-    @patch("SimLoad.loadParams", return_value={"Intersection Type": "fourwaystop"})
+    @patch("builtins.open", new_callable=mock_open)
+    @patch("SimLoad.tJunction.generate", return_value={"result": "stop_ok"})
+    @patch("SimLoad.loadParams", return_value={"Intersection Type": "tjunction"})
     @patch("SimLoad.saveRunCount")
     @patch("SimLoad.loadRunCount", return_value=0)
-    def test_main_fourwaystop(self, mock_run_count, mock_save_run_count, mock_params, mock_generate, mock_file):
+    def test_main_tjunction(self, mock_run_count, mock_save_run_count, mock_params, mock_generate, mock_file):
         SimLoad.main()
         mock_generate.assert_called_once_with({"Intersection Type": "fourwaystop"})
 
-    @patch("builtins.open", new_callable=mock_open)  # <--- add this
-    @patch("SimLoad.stopStreet.generate", return_value={"result": "stop_ok"})
-    @patch("SimLoad.loadParams", return_value={"Intersection Type": "fourwaystop"})
-    @patch("SimLoad.saveRunCount")
-    @patch("SimLoad.loadRunCount", return_value=0)
-    def test_main_fourwaystop(self, mock_run_count, mock_save_run_count, mock_params, mock_generate, mock_file):
-        SimLoad.main()
-        mock_generate.assert_called_once_with({"Intersection Type": "fourwaystop"})
-
-    @patch("builtins.open", new_callable=mock_open)  # <--- add this
-    @patch("SimLoad.stopStreet.generate", return_value={"result": "stop_ok"})
-    @patch("SimLoad.loadParams", return_value={"Intersection Type": "fourwaystop"})
-    @patch("SimLoad.saveRunCount")
-    @patch("SimLoad.loadRunCount", return_value=0)
-    def test_main_fourwaystop(self, mock_run_count, mock_save_run_count, mock_params, mock_generate, mock_file):
-        SimLoad.main()
-        mock_generate.assert_called_once_with({"Intersection Type": "fourwaystop"})
+    @patch("SimLoad.loadParams", return_value={"Intersection Type": "invalidtype"})
+    @patch("builtins.print")
+    def test_main_invalid_intersection_type(self, mock_print, mock_params):
+        result = SimLoad.main()
+        mock_print.assert_called_with("Invalid intersection type in parameters.")
+        self.assertIsNone(result)
 
 
 if __name__ == "__main__":
