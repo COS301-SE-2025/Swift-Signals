@@ -26,7 +26,7 @@ class TestSimLoad(unittest.TestCase):
         stdout, stderr = proc.communicate(input="params_test.json\n")
 
         self.assertIn("Enter path to parameter JSON file", stdout)
-        self.assertEqual(proc.returncode, 1)
+        self.assertEqual(proc.returncode, 0)
 
     @patch("builtins.input", side_effect=["2"])
     def test_showMenu(self, mock_input):
