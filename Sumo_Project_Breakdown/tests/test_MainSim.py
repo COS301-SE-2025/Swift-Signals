@@ -61,11 +61,11 @@ class TestSimLoad(unittest.TestCase):
     @patch("SimLoad.loadParams", return_value={"Intersection Type": "trafficlight", "Speed": 60})
     @patch("SimLoad.saveRunCount")
     @patch("SimLoad.loadRunCount", return_value=0)
-    @patch("SimLoad.json.dump")  # <-- patch json.dump instead of open().write
+    @patch("SimLoad.json.dump")
     def test_main_traffic_light(self, mock_json_dump, mock_run_count, mock_save_run_count, mock_params, mock_generate):
         SimLoad.main()
         args, kwargs = mock_json_dump.call_args
-        data_written = args[0]  # this is the object passed to json.dump
+        data_written = args[0]
         self.assertIn("intersection", data_written)
         self.assertEqual(data_written["intersection"]["parameters"]["Intersection Type"], "trafficlight")
 
@@ -85,7 +85,7 @@ class TestSimLoad(unittest.TestCase):
     def test_getParams_invalid_speed_defaults_to_40(self, mock_input):
         result = SimLoad.getParams(True)
         self.assertEqual(result["Speed"], 40)
-        self.assertIn("Green", result)  # Confirm light timings were added
+        self.assertIn("Green", result)
 
     @patch("builtins.input", side_effect=["high", "80", "n", "20", "4", "25"])
     def test_getParams_custom_light_timings(self, mock_input):
@@ -98,7 +98,7 @@ class TestSimLoad(unittest.TestCase):
     @patch("builtins.input", side_effect=["high", "60", "n", "oops", "nope", "uhh"])
     def test_getParams_invalid_light_timings_fallback(self, mock_input):
         result = SimLoad.getParams(True)
-        self.assertEqual(result["Green"], 25)   # default for 60 km/h
+        self.assertEqual(result["Green"], 25)
         self.assertEqual(result["Yellow"], 4)
         self.assertEqual(result["Red"], 30)
 
