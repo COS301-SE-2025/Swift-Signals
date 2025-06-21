@@ -27,6 +27,9 @@ jobs:
             pip install pytest-mock
             pip install pytest-cov
 
+        - name: Install SUMO
+          run: sudo apt-get update && sudo apt-get install -y sumo sumo-tools sumo-doc
+
         - name: Set SUMO_HOME
           run: echo "SUMO_HOME=/path/to/sumo/home" >> $GITHUB_ENV
 
