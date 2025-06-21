@@ -136,7 +136,7 @@ class TestSimLoad(unittest.TestCase):
     @patch("SimLoad.loadRunCount", return_value=0)
     def test_main_tjunction(self, mock_run_count, mock_save_run_count, mock_params, mock_generate, mock_file):
         SimLoad.main()
-        mock_generate.assert_called_once_with({"Intersection Type": "fourwaystop"})
+        mock_generate.assert_called_once_with({"Intersection Type": "tjunction"})
 
     @patch("SimLoad.loadParams", return_value={"Intersection Type": "invalidtype"})
     @patch("builtins.print")
