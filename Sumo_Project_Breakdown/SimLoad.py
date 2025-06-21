@@ -169,8 +169,10 @@ def main():
     }
 
     '''Save the output to a file'''
+    os.makedirs("out/results", exist_ok=True)
     with open("out/results/simulation_results.json", "w") as f:
-        json.dump(output, f, indent=4)
+        json.dump(output, f, indent=2)
+
 
     print("Simulation saved to simulation_results.json")
 

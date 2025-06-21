@@ -34,6 +34,9 @@ jobs:
           run: |
             flake8 Sumo_Project_Breakdown --ignore=E501
 
+        - name: Create results directory
+          run: mkdir -p out/results
+
         - name: Run Tests with coverage using Pytest
           run: |
             pytest --cov=SimLoad --cov-report=term-missing Sumo_Project_Breakdown/tests/
