@@ -55,7 +55,6 @@ class TestSimLoad(unittest.TestCase):
             self.assertIn("Enter path to parameter JSON file", stdout)
             self.assertEqual(proc.returncode, 0)
 
-
     @patch("builtins.input", side_effect=["2"])
     def test_showMenu(self, mock_input):
         choice = SimLoad.showMenu()
