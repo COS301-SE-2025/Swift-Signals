@@ -2,10 +2,7 @@ import sys
 import unittest
 from unittest.mock import patch, mock_open
 import uuid
-import subprocess
 import pathlib
-import tempfile
-import os
 
 if "SimLoad" not in sys.modules:
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
