@@ -5,32 +5,12 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
 )
-
-// MockRepository is a mock implementation of the repository interface
-type MockRepository struct {
-	mock.Mock
-}
-
-func (m *MockRepository) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
-	args := m.Called(ctx, user)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.User), args.Error(1)
-}
-
-func (m *MockRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
-	args := m.Called(ctx, email)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*models.User), args.Error(1)
-}
 
 func TestService_RegisterUser(t *testing.T) {
 	tests := []struct {
@@ -38,7 +18,7 @@ func TestService_RegisterUser(t *testing.T) {
 		inputName      string
 		inputEmail     string
 		inputPassword  string
-		setupMock      func(*MockRepository)
+		setupMock      func(*db.MockRepository)
 		expectedError  error
 		validateResult func(*testing.T, *models.User)
 	}{
@@ -47,7 +27,7 @@ func TestService_RegisterUser(t *testing.T) {
 			inputName:     "John Doe",
 			inputEmail:    "john.doe@example.com",
 			inputPassword: "password123",
-			setupMock: func(repo *MockRepository) {
+			setupMock: func(repo *db.MockRepository) {
 				repo.On("GetUserByEmail", mock.Anything, "john.doe@example.com").
 					Return(nil, models.ErrUserNotFound)
 				repo.On("CreateUser", mock.Anything, mock.AnythingOfType("*models.User")).
@@ -69,7 +49,7 @@ func TestService_RegisterUser(t *testing.T) {
 			inputName:     "",
 			inputEmail:    "john.doe@example.com",
 			inputPassword: "password123",
-			setupMock:     func(repo *MockRepository) {},
+			setupMock:     func(repo *db.MockRepository) {},
 			expectedError: ErrInvalidName,
 		},
 		{
@@ -77,7 +57,7 @@ func TestService_RegisterUser(t *testing.T) {
 			inputName:     "   ",
 			inputEmail:    "john.doe@example.com",
 			inputPassword: "password123",
-			setupMock:     func(repo *MockRepository) {},
+			setupMock:     func(repo *db.MockRepository) {},
 			expectedError: ErrInvalidName,
 		},
 		{
@@ -85,7 +65,7 @@ func TestService_RegisterUser(t *testing.T) {
 			inputName:     "John Doe",
 			inputEmail:    "invalid-email",
 			inputPassword: "password123",
-			setupMock:     func(repo *MockRepository) {},
+			setupMock:     func(repo *db.MockRepository) {},
 			expectedError: ErrInvalidEmail,
 		},
 		{
@@ -93,7 +73,7 @@ func TestService_RegisterUser(t *testing.T) {
 			inputName:     "John Doe",
 			inputEmail:    "",
 			inputPassword: "password123",
-			setupMock:     func(repo *MockRepository) {},
+			setupMock:     func(repo *db.MockRepository) {},
 			expectedError: ErrInvalidEmail,
 		},
 		{
@@ -101,7 +81,7 @@ func TestService_RegisterUser(t *testing.T) {
 			inputName:     "John Doe",
 			inputEmail:    "john.doe@example.com",
 			inputPassword: "short",
-			setupMock:     func(repo *MockRepository) {},
+			setupMock:     func(repo *db.MockRepository) {},
 			expectedError: ErrInvalidPassword,
 		},
 		{
@@ -109,7 +89,7 @@ func TestService_RegisterUser(t *testing.T) {
 			inputName:     "John Doe",
 			inputEmail:    "john.doe@example.com",
 			inputPassword: "password123",
-			setupMock: func(repo *MockRepository) {
+			setupMock: func(repo *db.MockRepository) {
 				repo.On("GetUserByEmail", mock.Anything, "john.doe@example.com").
 					Return(&models.User{Email: "john.doe@example.com"}, nil)
 			},
@@ -120,7 +100,7 @@ func TestService_RegisterUser(t *testing.T) {
 			inputName:     "John Doe",
 			inputEmail:    "john.doe@example.com",
 			inputPassword: "password123",
-			setupMock: func(repo *MockRepository) {
+			setupMock: func(repo *db.MockRepository) {
 				repo.On("GetUserByEmail", mock.Anything, "john.doe@example.com").
 					Return(nil, errors.New("database error"))
 			},
@@ -131,7 +111,7 @@ func TestService_RegisterUser(t *testing.T) {
 			inputName:     "John Doe",
 			inputEmail:    "john.doe@example.com",
 			inputPassword: "password123",
-			setupMock: func(repo *MockRepository) {
+			setupMock: func(repo *db.MockRepository) {
 				repo.On("GetUserByEmail", mock.Anything, "john.doe@example.com").
 					Return(nil, models.ErrUserNotFound)
 				repo.On("CreateUser", mock.Anything, mock.AnythingOfType("*models.User")).
@@ -144,7 +124,7 @@ func TestService_RegisterUser(t *testing.T) {
 			inputName:     "  John Doe  ",
 			inputEmail:    "  JOHN.DOE@EXAMPLE.COM  ",
 			inputPassword: "password123",
-			setupMock: func(repo *MockRepository) {
+			setupMock: func(repo *db.MockRepository) {
 				repo.On("GetUserByEmail", mock.Anything, "john.doe@example.com").
 					Return(nil, models.ErrUserNotFound)
 				repo.On("CreateUser", mock.Anything, mock.MatchedBy(func(user *models.User) bool {
@@ -166,7 +146,7 @@ func TestService_RegisterUser(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockRepo := new(MockRepository)
+			mockRepo := new(db.MockRepository)
 			tt.setupMock(mockRepo)
 
 			service := &Service{repo: mockRepo}
@@ -191,7 +171,7 @@ func TestService_RegisterUser(t *testing.T) {
 }
 
 func TestService_RegisterUser_PasswordHashing(t *testing.T) {
-	mockRepo := new(MockRepository)
+	mockRepo := new(db.MockRepository)
 	mockRepo.On("GetUserByEmail", mock.Anything, "test@example.com").
 		Return(nil, models.ErrUserNotFound)
 

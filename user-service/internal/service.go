@@ -7,16 +7,17 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/models"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service struct {
-	repo models.UserRepository
+	repo db.UserRepository
 }
 
-func NewService(r models.UserRepository) *Service {
+func NewService(r db.UserRepository) *Service {
 	return &Service{repo: r}
 }
 
@@ -30,8 +31,15 @@ var (
 // emailRegex is a simple regex for basic email validation
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
+func normalizeEmail(email string) string {
+	return strings.ToLower(strings.TrimSpace(email))
+}
+
 // RegisterUser creates a new user with proper validation and password hashing
 func (s *Service) RegisterUser(ctx context.Context, name, email, password string) (*models.User, error) {
+
+	email = normalizeEmail(email)
+
 	// Validate input
 	if err := s.validateUserInput(name, email, password); err != nil {
 		return nil, err
