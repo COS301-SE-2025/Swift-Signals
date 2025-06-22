@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import '../styles/SignUp.css';
+import Footer from '../components/Footer';
 
 interface TrafficLightProps {
   redActive: boolean;
@@ -150,7 +151,7 @@ const SignUp = () => {
           Already have an account?{' '}
           <button
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/login')}
             className="font-medium text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors bg-transparent border-none p-0 m-0 cursor-pointer"
             style={{ background: 'none' }}
           >
@@ -167,6 +168,7 @@ const SignUp = () => {
           greenActive={password.length > 0}
         />
       </div>
+      <Footer />
     </div>
   );
 };

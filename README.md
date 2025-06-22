@@ -9,9 +9,10 @@ Traffic congestion remains one of South Africa’s most costly infrastructure ch
 
 ## Key Links
 
-- [Functional Requirements (SRS)](docs/SRS.pdf)
+- [Functional Requirements (SRS)](docs/SRS_Swift_Signals.pdf)
 - [GitHub Project Board](https://github.com/orgs/COS301-SE-2025/projects/116)
 - [Team Wiki](https://github.com/COS301-SE-2025/Swift-Signals/wiki)
+- [Demo 1 Video](https://drive.google.com/drive/folders/1atNvpmhXaGXENKEQayBK2XgDB_K1cdJR?usp=sharing)
 
 ## Team Members
 

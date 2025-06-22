@@ -1,29 +1,14 @@
+/* General Layout & Theming */
 body {
-  overflow: hidden;
-}
-
-.chart-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
-canvas {
-  width: 100% !important;
-  height: 100% !important;
+  overflow-x: hidden;
 }
 
 .dashboard-screen .main-content {
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  height: 100vh;
-  background-color: #F0F0F0;
-  top: 80px;
-  left: 0;
-  position: absolute;
-  padding: 20px;
-  position: fixed;
+  min-height: 100vh;
+  background-color: #f0f0f0;
+  padding: 2rem;
+  padding-top: 6rem;
 }
 
 .dark .main-content {
@@ -32,911 +17,303 @@ canvas {
 
 .Dashboard-h1 {
   font-size: 2.5em;
-  margin-bottom: 20px;
-  text-align: left;
-  margin-left: 50px;
+  margin-bottom: 1.5rem;
   color: black;
   font-weight: bold;
-  margin-bottom: 20px;
 }
 
 .dark .Dashboard-h1 {
   color: #fff;
 }
 
-/* .Dashboard-p {
-  font-size: 1.2em;
-  margin-bottom: 20px;
-  text-align: left;
-  margin-left: 50px;
-  color: #656565;
-  font-weight: normal;
-} */
-
+/* Summary Cards Grid */
 .card-grid {
-  margin-left: 50px;
-  gap: 0px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(300px, 1fr));
-  grid-gap: 0px;
-  justify-content: center;
-  align-items: center;
-  margin-top: 0px;
-  margin-bottom: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
+/* Updated Card Layout */
 .card {
   background-color: #ffffff;
-  border-radius: 25px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 10px;
-  width: 478px;
-  height: 100px;
-  position: relative;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+  padding: 1rem;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  gap: 1rem;
 }
 
 .dark .card {
-  background-color: #2A2A2A;
-  color: #F9FAFB;
+  background-color: #2a2a2a;
+  color: #f9fafb;
+}
+
+.card-icon-1,
+.card-icon-2,
+.card-icon-3 {
+  font-size: 2.5em;
+  padding: 0.75rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .card-icon-1 {
-  font-size: 2.5em;
-  color: #3700FF;
-  position: absolute;
-  top: 20px;
-  right: 50px;
-  text-align: right;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: #D0D3FF;
+  color: #3700ff;
+  background-color: #d0d3ff;
 }
 
 .card-icon-2 {
-  font-size: 2.5em;
-  color: #008B25;
-  position: absolute;
-  top: 20px;
-  right: 50px;
-  text-align: right;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: #87FF95;
+  color: #008b25;
+  background-color: #87ff95;
 }
 
 .card-icon-3 {
-  font-size: 2.5em;
-  color: #8600B3;
-  position: absolute;
-  top: 20px;
-  right: 50px;
-  text-align: right;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: #ED96FF;
+  color: #8600b3;
+  background-color: #ed96ff;
+}
+
+.card-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .card-h3 {
-  font-size: 1.5em;
-  margin: 0;
-  text-align: left;
+  font-size: 1.2em;
   color: #656565;
-  font-weight: normal;
-  position: absolute;
-  top: 15px;
-  left: 50px;
+  margin: 0 0 0.25rem 0;
 }
 
 .dark .card-h3 {
-  color: #DADADA;
+  color: #dadada;
 }
 
 .card-p {
   font-size: 2.5em;
-  margin: 0;
-  text-align: left;
   color: black;
   font-weight: bold;
-  position: absolute;
-  top: 35px;
-  left: 50px;
+  margin: 0;
 }
 
 .dark .card-p {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
-.quick-actions {
+/* Two-Column Main Layout */
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .dashboard-main-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.main-column, .side-column {
   display: flex;
-  justify-content: start;
-  align-items: center;
-  margin-top: 0px;
-  margin-bottom: 20px;
-  gap: 20px;
-  margin-left: 50px;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1280px) {
+  .side-column {
+    flex-direction: row;
+  }
+}
+
+/* Recent Simulations Table */
+.recent-simulations-tab {
+  border-radius: 16px;
+  overflow: hidden;
 }
 
 .quick-action-button {
-  color: white;
   border: none;
-  border-radius: 15px;
-  padding: 10px 20px;
-  font-size: 1.2em;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1em;
+  font-weight: 500;
   cursor: pointer;
   transition: background-color 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 288px;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-}
-
-.grid {
-  margin-left: 50px;
-}
-
-.recent-simulations-tab {
-  width: 100%;
-  height: 430px;
-  border-collapse: collapse;
-  margin-top: 10px;
-  border-radius: 25px;
+  width: 32%;
 }
 
 .dark .recent-simulations-tab {
-  background-color: #2A2A2A;
-  color: #F9FAFB;
+  background-color: #2a2a2a;
 }
 
 .recent-simulations-tab h2 {
   font-size: 1.5em;
-  margin-bottom: 20px;
-  text-align: start;
-  margin-left: 0px;
-  color: black;
   font-weight: bold;
 }
 
 .dark .recent-simulations-tab h2 {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
-.recent-simulations-tab table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  border-radius: 25px;
+.recent-simulations-tab th, .recent-simulations-tab td {
+  border-color: #e5e7eb;
 }
 
-.recent-simulations-tab thead tr th {
-  padding: 10px;
+.dark .recent-simulations-tab th, .dark .recent-simulations-tab td {
+  border-color: #374151;
+}
+
+.status {
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+}
+
+.view-details-button {
+  background-color: transparent;
+  font-weight: 500;
+}
+.dark .view-details-button {
+  color: #60a5fa;
+}
+.view-details-button:hover {
+  text-decoration: underline;
+}
+
+/* Base Card Structure */
+.graph-card, .inter-card {
   background-color: #ffffff;
-  color: #919191;
-  font-weight: bold;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem;
+}
+.dark .graph-card, .dark .inter-card {
+  background-color: #2a2a2a;
 }
 
-.dark .recent-simulations-tab thead tr th {
-  background-color: #2A2A2A;
-  color: #DADADA;
+/* Graph Card Header */
+.graph-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0 0.25rem;
 }
 
-.recent-simulations-tab tbody tr td {
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
-  color: #000000;
-  font-weight: bold;
+.view-report-button {
+  background: none;
+  border: none;
+  color: #991915;
+  font-weight: 500;
+  font-size: 0.9em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.2s;
 }
 
-.dark .recent-simulations-tab tbody tr td {
-  background-color: #2A2A2A;
+.view-report-button:hover {
+  color: #7a1410;
+}
+
+.dark .view-report-button {
+  color: #e5e7eb;
+}
+
+.dark .view-report-button:hover {
   color: #fff;
 }
 
-.status {
-  font-weight: bold;
-  font-size: 1.1em;
-  padding: 1 1 1;
-}
-
-.view-details-button {
-  background-color: #ffffff;
-  font-weight: bold;
-  text-align: left;
-}
-
-.dark .view-details-button {
-  background-color: #2A2A2A;
-  color: #5287FA;
-}
-
-.view-details-button:hover {
-  border-color: #ffffff;
-}
-
-.dark .view-details-button:hover {
-  border-color: #2A2A2A;
-}
-
-.stats {
-  display: flex;
-  flex-direction: column;
-  margin-top: 0px;
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  margin-right: 150px;
-  margin-bottom: 115px;
-  gap: 0;
-  height: 510px;
-  width: 100%;
-  max-width: 700px;
-  border-radius: 25px;
-}
-
-.dark .stats {
-  background-color: #2A2A2A;
-}
-
-.stats h2 {
-  font-size: 1.5em;
-  margin-bottom: 20px;
-  text-align: left;
-  margin-left: 30px;
-  color: black;
-  font-weight: bold;
-}
-
-.dark .stats h2 {
-  color: #FFFFFF;
-}
-
-.stats .traffic-graph {
-  justify-self: center;
-  align-self: center;
-  width: 100%;
-  max-width: 500px;
-  height: 100%;
-  margin-bottom: 0;
-}
-
-.dark .stats .traffic-graph {
-  background-color: #2A2A2A;
-}
-
-.top-intersections {
-  width: 90%;
-  margin-left: 30px;
-  margin-right: 30px;
-  margin-top: 0;
-}
-
-.top-intersections h3 {
-  font-size: 1.1em;
-  text-align: left;
-  color: black;
-  font-weight: bold;
-}
-
-.dark .top-intersections h3 {
-  color: #FFFFFF;
-}
-
-.top-intersections span {
-  font-size: 0.9em;
-}
-
-.top-intersections .total span {
-  font-size: 1.0em;
-}
-
-@media screen and (max-width: 1700px) {
-  .stats {
-    width: 100%;
-    max-width: 600px;
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    margin-right: 60px;
-  }
-
-  .recent-simulations-tab {
-    width: 110%;
-    max-width: 1000px;
-  }
-}
-
-@media screen and (max-width: 1400px) {
-  .quick-action-button {
-    width: 250px;
-  }
-
-  .card {
-    width: 380px;
-  }
-
-  .grid {
-    width: 110%;
-  }
-
-  .recent-simulations-tab {
-    width: 110%;
-  }
-
-  .stats {
-    width: 100%;
-    max-width: 400px;
-    height: 510px;
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    margin-right: 60px;
-    margin-bottom: 110px;
-  }
-}
-
-@media screen and (max-height: 900px) {
-  .quick-action-button {
-    width: 15%;
-  }
-
-  .card {
-    width: 90%;
-  }
-
-  .grid {
-    width: 110%;
-  }
-
-  .recent-simulations-tab {
-    width: 110%;
-  }
-
-  .stats {
-    width: 100%;
-    max-width: 400px;
-    height: 510px;
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    margin-right: 70px;
-    margin-bottom: 85px;
-  }
-}
-
-@media screen and (min-width: 481px) and (max-width: 768px) {
-  .dashboard-screen .main-content {
-    overflow-y: auto;
-    align-items: center;
-  }
-
-  .Dashboard-h1 {
-    font-size: 1.5em;
-    text-align: center;
-    margin-left: 0px;
-  }
-
-  .card-grid {
-    margin-left: 0px;
-    gap: 0px;
-    display: grid;
-    grid-template-columns: repeat(1, minmax(300px, 1fr));
-    grid-gap: 0px;
-    justify-content: center;
-    align-items: center;
-    margin-top: 0px;
-    margin-bottom: 20px;
-  }
-
-  .quick-actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: start;
-    align-items: center;
-    margin-right: 50px;
-    margin-top: 0px;
-    margin-bottom: 20px;
-    gap: 20px;
-  }
-
-  .grid {
-    margin-left: 0px;
-    width: 100%;
-  }
-
-  .recent-simulations-tab {
-    width: 100%;
-    height: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    border-radius: 25px;
-  }
-
-  .recent-simulations-tab h2 {
-    font-size: 1.5em;
-    margin-bottom: 20px;
-    text-align: start;
-    margin-left: 0px;
-    color: black;
-    font-weight: bold;
-  }
-
-  .recent-simulations-tab table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    border-radius: 25px;
-  }
-
-  .recent-simulations-tab thead tr th {
-    padding: 10px;
-    background-color: #ffffff;
-    color: #919191;
-    font-weight: bold;
-  }
-
-  .recent-simulations-tab tbody tr td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    color: #000000;
-    font-weight: bold;
-  }
-
-  .status {
-    font-weight: bold;
-    font-size: 1.1em;
-    padding: 1 1 1;
-    color: transparent;
-    width: 25px;
-    display: block;
-  }
-
-  .view-details-button {
-    background-color: #ffffff;
-    font-weight: bold;
-    text-align: left;
-  }
-
-  .stats {
-    display: flex;
-    flex-direction: column;
-    margin-top: 30px;
-    position: relative;
-    bottom: 0;
-    right: 0;
-    margin-right: 0px;
-    margin-bottom: 150px;
-    gap: 0;
-    height: 100%;
-    width: 100%;
-    max-width: 700px;
-    border-radius: 25px;
-  }
-}
-
-@media (max-width: 480px) {
-  .dashboard-screen .main-content {
-    overflow-y: auto;
-    align-items: center;
-    overflow-x: hidden;
-  }
-
-  .Dashboard-h1 {
-    font-size: 1.5em;
-    text-align: center;
-    margin-left: 0px;
-  }
-
-  .card-grid {
-    margin-left: 0px;
-    gap: 0px;
-    display: grid;
-    grid-template-columns: repeat(1, minmax(300px, 1fr));
-    grid-gap: 0px;
-    justify-content: center;
-    align-items: center;
-    margin-top: 0px;
-    margin-bottom: 20px;
-  }
-
-  .card {
-    background-color: #ffffff;
-    border-radius: 25px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    margin-bottom: 10px;
-    width: 100%;
-    height: 90px;
-    position: relative;
-  }
-
-  .card-icon-1 {
-    font-size: 1.5em;
-    color: #3700FF;
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    text-align: right;
-    padding: 10px;
-    border-radius: 10px;
-    background-color: #D0D3FF;
-  }
-
-  .card-icon-2 {
-    font-size: 1.5em;
-    color: #008B25;
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    text-align: right;
-    padding: 10px;
-    border-radius: 10px;
-    background-color: #87FF95;
-  }
-
-  .card-icon-3 {
-    font-size: 1.5em;
-    color: #8600B3;
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    text-align: right;
-    padding: 10px;
-    border-radius: 10px;
-    background-color: #ED96FF;
-  }
-
-  .card-h3 {
-    font-size: 1.2em;
-    margin: 0;
-    text-align: left;
-    color: #656565;
-    font-weight: normal;
-    position: absolute;
-    top: 15px;
-    left: 20px;
-  }
-
-  .card-p {
-    font-size: 2.0em;
-    margin: 0;
-    text-align: left;
-    color: black;
-    font-weight: bold;
-    position: absolute;
-    top: 35px;
-    left: 20px;
-  }
-
-  .quick-actions {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    justify-self: center;
-    align-self: center;
-    margin-right: 50px;
-    margin-top: 0px;
-    margin-bottom: 20px;
-    gap: 20px;
-  }
-
-  .quick-action-button {
-    color: white;
-    border: none;
-    border-radius: 15px;
-    padding: 10px 20px;
-    font-size: 1.2em;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 288px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-  }
-
-  .grid {
-    margin-left: 0px;
-    width: 100%;
-  }
-
-  .recent-simulations-tab {
-    width: 100%;
-    height: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    border-radius: 25px;
-  }
-
-  .recent-simulations-tab h2 {
-    font-size: 1.2em;
-    margin-bottom: 20px;
-    text-align: start;
-    margin-left: 0px;
-    color: black;
-    font-weight: bold;
-  }
-
-  .recent-simulations-tab table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    border-radius: 25px;
-  }
-
-  .recent-simulations-tab thead tr th {
-    padding: 10px;
-    background-color: #ffffff;
-    color: #919191;
-    font-weight: bold;
-  }
-
-  .recent-simulations-tab tbody tr td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    color: #000000;
-    font-weight: bold;
-    font-size: 0.8em;
-  }
-
-  .status {
-    font-weight: bold;
-    font-size: 1.1em;
-    padding: 1 1 1;
-    color: transparent;
-    width: 20px;
-    height: 20px;
-    display: block;
-  }
-
-  .view-details-button {
-    background-color: #ffffff;
-    font-weight: bold;
-    text-align: left;
-    font-size: 0.8em;
-  }
-
-  .stats {
-    display: flex;
-    flex-direction: column;
-    margin-top: 30px;
-    position: relative;
-    bottom: 0;
-    right: 0;
-    margin-right: 0px;
-    margin-bottom: 150px;
-    gap: 0;
-    height: 100%;
-    width: 100%;
-    max-width: 700px;
-    border-radius: 25px;
-  }
-}
-
-@media screen and (max-width: 1400px) and (max-height: 800px) {
-  .Dashboard-h1 {
-    font-size: 2.0em;
-  }
-
-  .card-grid {
-  margin-left: 50px;
-  gap: 0px;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(300px, 1fr));
-  grid-gap: 0px;
-  justify-content: center;
-  align-items: center;
-  margin-top: 0px;
-  margin-bottom: 10px;
-}
-
-.card {
-  background-color: #ffffff;
-  border-radius: 25px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  margin-bottom: 10px;
-  width: 90%;
-  height: 90px;
+.traffic-chart-container {
+  flex-grow: 1;
   position: relative;
+  min-height: 250px;
 }
 
-.card-icon-1 {
-  font-size: 2.0em;
-  color: #3700FF;
-  position: absolute;
-  top: 20px;
-  right: 50px;
-  text-align: right;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: #D0D3FF;
+/* Intersections Card */
+.inter-card-header {
+  padding: 0 0.25rem 1rem 0.25rem;
 }
-
-.card-icon-2 {
-  font-size: 2.0em;
-  color: #008B25;
-  position: absolute;
-  top: 20px;
-  right: 50px;
-  text-align: right;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: #87FF95;
-}
-
-.card-icon-3 {
-  font-size: 2.0em;
-  color: #8600B3;
-  position: absolute;
-  top: 20px;
-  right: 50px;
-  text-align: right;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: #ED96FF;
-}
-
-.card-h3 {
-  font-size: 1.4em;
-  margin: 0;
-  text-align: left;
-  color: #656565;
-  font-weight: normal;
-  position: absolute;
-  top: 10px;
-  left: 50px;
-}
-
-.card-p {
-  font-size: 2.5em;
-  margin: 0;
-  text-align: left;
-  color: black;
-  font-weight: bold;
-  position: absolute;
-  top: 30px;
-  left: 50px;
-}
-
-.quick-actions {
-  display: flex;
-  justify-content: start;
-  align-items: center;
-  margin-top: 0px;
-  margin-bottom: 10px;
-  gap: 20px;
-  margin-left: 50px;
-}
-
-.quick-action-button {
-  color: white;
-  border: none;
-  border-radius: 15px;
-  padding: 10px 20px;
-  font-size: 1.2em;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 250px;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-}
-
-.grid {
-  margin-left: 50px;
-  height: 70%;
-}
-
-.simHeading {
-  font-size: 1.0em;
-}
-
-.recent-simulations-tab {
-  width: 110%;
-  height: 70%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  border-radius: 25px;
-}
-
-.recent-simulations-tab h2 {
-  font-size: 1.3em;
-  margin-bottom: 10px;
-  text-align: start;
-  margin-left: 0px;
-  color: black;
-  font-weight: bold;
-}
-
-.recent-simulations-tab table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-  border-radius: 25px;
-}
-
-.recent-simulations-tab thead tr th {
-  padding: 10px;
-  background-color: #ffffff;
-  color: #919191;
-  font-weight: bold;
-}
-
-.recent-simulations-tab tbody tr td {
-  padding: 5px;
-  border-bottom: 1px solid #ddd;
-  color: #000000;
-  font-weight: bold;
-}
-
-.status {
-  font-weight: bold;
-  font-size: 1.1em;
-  padding: 1 1 1;
-}
-
-.view-details-button {
-  background-color: #ffffff;
-  font-weight: bold;
-  text-align: left;
-}
-
-.stats {
+.intersection-list {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  margin-top: 0px;
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  margin-right: 60px;
-  margin-bottom: 80px;
-  gap: 0;
-  height: 420px;
-  width: 100%;
-  max-width: 400px;
-  border-radius: 25px;
+  gap: 1.25rem;
 }
 
-.stats h2 {
-  font-size: 1.3em;
-  margin-bottom: 20px;
-  text-align: left;
-  margin-left: 30px;
-  color: black;
-  font-weight: bold;
+.intersection-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.stats .traffic-graph {
-  justify-self: center;
-  align-self: center;
-  width: 100%;
-  max-width: 340px;
-  height: 100%;
-  margin-bottom: 0;
-}
-
-.top-intersections {
-  width: 90%;
-  margin-left: 30px;
-  margin-right: 30px;
-  margin-top: 0;
-}
-
-.top-intersections h3 {
-  font-size: 1.1em;
-  text-align: left;
-  color: black;
-  font-weight: bold;
-}
-
-.top-intersections span {
-  font-size: 0.8em;
-}
-
-.top-intersections .total span {
+.intersection-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
   font-size: 0.9em;
 }
+
+.intersection-name {
+  color: #374151;
+  font-weight: 500;
+}
+.dark .intersection-name {
+  color: #d1d5db;
+}
+
+.intersection-volume {
+  color: #6b7280;
+  font-size: 0.9em;
+}
+.dark .intersection-volume {
+  color: #9ca3af;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.dark .progress-bar-container {
+  background-color: #374151;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #d84a45, #991915);
+  transition: width 0.5s ease-in-out;
+}
+
+.inter-card-footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  color: #4b5563;
+  font-size: 0.9em;
+}
+.dark .inter-card-footer {
+  border-top-color: #374151;
+  color: #d1d5db;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
 }

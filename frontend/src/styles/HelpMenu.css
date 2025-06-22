@@ -1,0 +1,603 @@
+/* === HELP MENU & CHATBOT STYLES === */
+
+.help-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* New modern help button design */
+.help-button {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 45px;
+  height: 120px;
+  transform: translateY(-50%);
+  background: linear-gradient(135deg, #a8201c, #80100c);
+  color: white;
+  border: none;
+  border-radius: 22px 0 0 22px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px; /* Space between arrow and text */
+  cursor: pointer;
+  box-shadow: -3px 3px 12px rgba(0, 0, 0, 0.25);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: all;
+}
+
+.help-button:hover {
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.help-button-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  letter-spacing: 2px;
+  font-size: 14px;
+}
+
+.help-button-arrow {
+  font-size: 18px;
+}
+
+/* How the button looks when the menu is OPEN */
+.help-container.open .help-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  transform: translate(-380px, -50%);
+  background: #7a1410;
+  font-size: 22px;
+  gap: 0; /* Remove gap when it's a circle */
+}
+
+/* Sliding Menu Panel */
+.help-menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100%;
+  background-color: white;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: all;
+}
+
+.dark .help-menu {
+  background-color: #2a2a2a;
+  color: #f9fafb;
+}
+
+.help-container.open .help-menu {
+  transform: translateX(0);
+}
+
+/* Menu Header and Tabs */
+.help-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+.dark .help-menu-header {
+  border-color: #3a3a3a;
+}
+
+.close-help-menu-button {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dark .close-help-menu-button {
+  color: #ccc;
+}
+.close-help-menu-button:hover {
+  background-color: #f0f0f0;
+}
+.dark .close-help-menu-button:hover {
+  background-color: #3a3a3a;
+}
+
+.help-menu-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.header-spacer {
+  width: 1.2rem;
+  padding: 0.5rem;
+  visibility: hidden;
+}
+
+.help-tab-button {
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dark .help-tab-button {
+  color: #bbb;
+}
+.help-tab-button:hover {
+  background-color: #f0f0f0;
+}
+.dark .help-tab-button:hover {
+  background-color: #3a3a3a;
+}
+.help-tab-button.active {
+  color: #991915;
+  background-color: #fce8e7;
+}
+.dark .help-tab-button.active {
+  color: white;
+  background-color: #7a1410;
+}
+
+/* --- REVISED General Help Content & NEW Accordion Styles --- */
+.general-help-container {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex-grow: 1;
+  /* --- FIX: This line allows the container to shrink and become scrollable --- */
+  min-height: 0;
+}
+
+/* --- NEW: Custom scrollbar for the help container --- */
+.general-help-container::-webkit-scrollbar {
+  width: 8px;
+}
+.general-help-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+.dark .general-help-container::-webkit-scrollbar-track {
+    background: #4a4a4a;
+}
+.general-help-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+.dark .general-help-container::-webkit-scrollbar-thumb {
+    background: #666;
+}
+.general-help-container::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}
+.dark .general-help-container::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+
+.accordion-section {
+  border-bottom: 1px solid #eee;
+}
+.dark .accordion-section {
+  border-color: #3a3a3a;
+}
+.accordion-section:last-child {
+  border-bottom: none;
+}
+
+.accordion-header {
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: color 0.2s;
+}
+.dark .accordion-header {
+    color: #f0f0f0;
+}
+
+.accordion-header:hover {
+    color: #991915;
+}
+
+.accordion-icon {
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.accordion-icon.open {
+  transform: rotate(180deg);
+}
+
+.accordion-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+}
+
+.accordion-content.open {
+  max-height: 1000px; /* Adjust if content is very long */
+  transition: max-height 0.5s ease-in;
+}
+
+.accordion-item {
+    padding: 0.5rem 0 1.5rem 0;
+}
+
+.accordion-item h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #991915;
+  margin-bottom: 0.5rem;
+}
+
+.accordion-item p {
+  line-height: 1.6;
+  color: #444;
+  margin: 0;
+}
+
+.dark .accordion-item p {
+  color: #ddd;
+}
+
+/* Chatbot Container */
+.chatbot-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.chatbot-body {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.chatbot-body::-webkit-scrollbar {
+  width: 6px;
+}
+.chatbot-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chatbot-body::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 20px;
+}
+.dark .chatbot-body::-webkit-scrollbar-thumb {
+  background-color: #555;
+}
+.message-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+  flex-shrink: 0;
+}
+.message-wrapper.user {
+  align-self: flex-end;
+}
+.message-wrapper.bot {
+  align-self: flex-start;
+}
+.chat-message p {
+  margin: 0;
+  padding: 12px 18px;
+  border-radius: 20px;
+  line-height: 1.5;
+  max-width: 100%;
+  word-wrap: break-word;
+}
+.message-wrapper.user .chat-message p {
+  background-color: #991915;
+  color: white;
+  border-bottom-right-radius: 5px;
+}
+.message-wrapper.bot .chat-message p {
+  background-color: #f0f2f5;
+  color: #212121;
+  border-bottom-left-radius: 5px;
+}
+.dark .message-wrapper.bot .chat-message p {
+  background-color: #3a3a3a;
+  color: #e4e6eb;
+}
+.quick-replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0 15px 10px;
+  flex-shrink: 0;
+}
+.quick-replies button {
+  background-color: transparent;
+  border: 1px solid #991915;
+  color: #991915;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: all 0.2s ease;
+}
+.dark .quick-replies button {
+  border-color: #b05a57;
+  color: #b05a57;
+}
+.quick-replies button:hover {
+  background-color: #991915;
+  color: white;
+}
+.dark .quick-replies button:hover {
+  background-color: #b05a57;
+  color: white;
+}
+.chatbot-input {
+  display: flex;
+  padding: 15px;
+  border-top: 1px solid #eee;
+  flex-shrink: 0;
+}
+.dark .chatbot-input {
+  border-top: 1px solid #3a3a3a;
+}
+.chatbot-input input {
+  flex-grow: 1;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 25px;
+  background-color: #f0f2f5;
+  color: #212121;
+}
+.dark .chatbot-input input {
+  background-color: #3a3a3a;
+  color: #e4e6eb;
+}
+.chatbot-input input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(153, 25, 21, 0.3);
+}
+.chatbot-input button {
+  background: none;
+  border: none;
+  color: #991915;
+  font-size: 22px;
+  margin-left: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.chatbot-input button:hover {
+  color: #7a1410;
+}
+.dark .chatbot-input button:hover {
+  color: #b05a57;
+}
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  padding: 12px 18px;
+}
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background-color: #b0b3b8;
+  border-radius: 50%;
+  animation: typing 1s infinite;
+}
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Add this at the end of the file or with other .accordion-item styles */
+
+.accordion-item.tutorial-launcher button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.accordion-item.tutorial-launcher button:hover {
+    background-color: #f9f9f9;
+}
+
+.dark .accordion-item.tutorial-launcher button:hover {
+    background-color: #333;
+}
+
+
+.accordion-item.tutorial-launcher h4,
+.accordion-item.tutorial-launcher p {
+    pointer-events: none; /* Ensures the button click is registered, not the text */
+}
+
+.accordion-item.tutorial-launcher p {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 0.25rem;
+}
+
+.dark .accordion-item.tutorial-launcher p {
+    color: #bbb;
+}
+
+/* Add these new styles to your HelpMenu.css file */
+
+.tutorial-launcher-image-container {
+    width: 100%;
+    aspect-ratio: 16 / 9; /* Common aspect ratio for previews */
+    margin: 0.75rem 0; /* Adds space above and below the image */
+    border-radius: 8px;
+    overflow: hidden; /* Ensures the image respects the border-radius */
+    background-color: #f0f0f0; /* A fallback color while the image loads */
+}
+
+.dark .tutorial-launcher-image-container {
+    background-color: #333;
+}
+
+.tutorial-launcher-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This makes the image cover the container without distortion */
+    transition: transform 0.3s ease;
+}
+
+/* A nice little hover effect for the button */
+.accordion-item.tutorial-launcher button:hover .tutorial-launcher-image-container img {
+    transform: scale(1.05);
+}
+
+/* --- NEW Confirmation Modal Styles --- */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000; /* Ensure it's on top of the help menu */
+  pointer-events: all;
+}
+
+.confirmation-popup {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+  text-align: center;
+}
+
+.dark .confirmation-popup {
+    background-color: #2a2a2a;
+    color: #f9fafb;
+}
+
+.confirmation-popup h4 {
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.dark .confirmation-popup h4 {
+    color: #f0f0f0;
+}
+
+
+.confirmation-popup p {
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  color: #555;
+}
+
+.dark .confirmation-popup p {
+    color: #bbb;
+}
+
+.confirmation-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.confirmation-buttons button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+/* 'No' button */
+.confirmation-buttons button:first-of-type {
+  background-color: #eee;
+  color: #333;
+}
+.dark .confirmation-buttons button:first-of-type {
+    background-color: #3a3a3a;
+    color: #f0f0f0;
+}
+
+.confirmation-buttons button:first-of-type:hover {
+  background-color: #ddd;
+}
+.dark .confirmation-buttons button:first-of-type:hover {
+    background-color: #4a4a4a;
+}
+
+
+/* 'Yes' button */
+.confirmation-buttons button:last-of-type {
+  background-color: #991915;
+  color: white;
+}
+
+.confirmation-buttons button:last-of-type:hover {
+  background-color: #7a1410;
+}
+
+.confirmation-buttons button:active {
+    transform: scale(0.98);
+}
