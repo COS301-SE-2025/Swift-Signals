@@ -1,7 +1,6 @@
 package models
 
 import (
-	"context"
 	"errors"
 	"time"
 )
@@ -34,14 +33,4 @@ func (u *User) PublicUser() *User {
 		UpdatedAt: u.UpdatedAt,
 		// Password is intentionally omitted
 	}
-}
-
-// Repository interface defines the contract for user data operations
-type UserRepository interface {
-	CreateUser(ctx context.Context, user *User) (*User, error)
-	GetUserByID(ctx context.Context, id string) (*User, error)
-	GetUserByEmail(ctx context.Context, email string) (*User, error)
-	UpdateUser(ctx context.Context, user *User) (*User, error)
-	DeleteUser(ctx context.Context, id string) error
-	ListUsers(ctx context.Context, limit, offset int) ([]*User, error)
 }
