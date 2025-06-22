@@ -4,9 +4,9 @@ import (
 	"log"
 	"net"
 
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal"
-	userpb "github.com/COS301-SE-2025/Swift-Signals/user-service/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection" //for development using grpcurl
 )
