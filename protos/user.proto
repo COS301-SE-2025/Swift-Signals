@@ -3,6 +3,7 @@ syntax = "proto3";
 package swiftsignals.user;
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "protos/gen/user";
 
@@ -11,16 +12,19 @@ service UserService {
   rpc LoginUser(LoginUserRequest) returns (AuthResponse);
   rpc LogoutUser(UserIDRequest) returns (google.protobuf.Empty);
   rpc ValidateUser(ValidateUserRequest) returns (ValidateUserResponse);
-  
+
   rpc GetUserByID(UserIDRequest) returns (UserResponse);
   rpc GetUserByEmail(GetUserByEmailRequest) returns (UserResponse);
   rpc GetAllUsers(GetAllUsersRequest) returns (stream UserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc DeleteUser(UserIDRequest) returns (google.protobuf.Empty);
 
-  rpc GetUserIntersectionIDs(UserIDRequest) returns (stream IntersectionIDResponse);
-  rpc AddIntersectionID(AddIntersectionIDRequest) returns (google.protobuf.Empty);
-  rpc RemoveIntersectionID(RemoveIntersectionIDRequest) returns (google.protobuf.Empty);
+  rpc GetUserIntersectionIDs(UserIDRequest)
+      returns (stream IntersectionIDResponse);
+  rpc AddIntersectionID(AddIntersectionIDRequest)
+      returns (google.protobuf.Empty);
+  rpc RemoveIntersectionID(RemoveIntersectionIDRequest)
+      returns (google.protobuf.Empty);
 
   rpc ChangePassword(ChangePasswordRequest) returns (google.protobuf.Empty);
   rpc ResetPassword(ResetPasswordRequest) returns (google.protobuf.Empty);
@@ -30,16 +34,13 @@ service UserService {
 }
 
 // Common Messages
-message UserIDRequest {
-  string user_id = 1;
-}
+message UserIDRequest { string user_id = 1; }
 
 // Authentication Messages
 message RegisterUserRequest {
   string name = 1;
   string email = 2;
   string password = 3;
-  repeated int32 intersection_ids = 4; // Optional initial intersection IDs
 }
 
 message LoginUserRequest {
@@ -47,9 +48,7 @@ message LoginUserRequest {
   string password = 2;
 }
 
-message ValidateUserRequest {
-  string token = 1;
-}
+message ValidateUserRequest { string token = 1; }
 
 message ValidateUserResponse {
   bool is_valid = 1;
@@ -57,9 +56,7 @@ message ValidateUserResponse {
 }
 
 // User CRUD Messages
-message GetUserByEmailRequest {
-  string email = 1;
-}
+message GetUserByEmailRequest { string email = 1; }
 
 message GetAllUsersRequest {
   int32 page = 1;
@@ -74,9 +71,7 @@ message UpdateUserRequest {
 }
 
 // Intersection ID Messages
-message IntersectionIDResponse {
-  int32 intersection_id = 1;
-}
+message IntersectionIDResponse { int32 intersection_id = 1; }
 
 message AddIntersectionIDRequest {
   string user_id = 1;
@@ -95,9 +90,7 @@ message ChangePasswordRequest {
   string new_password = 3;
 }
 
-message ResetPasswordRequest {
-  string email = 1;
-}
+message ResetPasswordRequest { string email = 1; }
 
 // Admin Management Messages
 message MakeAdminRequest {
@@ -117,12 +110,12 @@ message UserResponse {
   string email = 3;
   bool is_admin = 4;
   repeated int32 intersection_ids = 5;
-  int64 created_at = 6; // Unix timestamp
-  int64 updated_at = 7; // Unix timestamp
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
 }
 
-message AuthResponse { 
+message AuthResponse {
   string token = 1;
   UserResponse user = 2; // Include user info in auth response
-  int64 expires_at = 3; // Token expiration timestamp
+  google.protobuf.Timestamp expires_at = 3; // Token expiration timestamp
 }
