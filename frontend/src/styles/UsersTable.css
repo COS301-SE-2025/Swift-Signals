@@ -1,0 +1,27 @@
+.usersTablePage {
+    width: calc(100vw - 100px);
+    justify-self: center;
+    border-radius: 25px;
+}
+
+.dark .usersTable th{
+    background-color: #2A2A2A;
+    color: #fff;
+}
+
+.dark .usersTable td {
+    background-color: #2A2A2A;
+    color: #fff;
+}
+
+@media screen and (max-width: 1400px) and (max-height: 800px) {
+    .usersTablePage {
+        width: calc(100vw - 100px);
+        justify-self: center;
+        border-radius: 25px;
+    }
+
+    .user-main-content {
+        margin-top: 0px;
+    }
+}
