@@ -1,19 +1,20 @@
-package user
+package handler
 
 import (
 	"context"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/service"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Handler struct {
 	userpb.UnimplementedUserServiceServer
-	service *Service
+	service *service.Service
 }
 
-func NewHandler(s *Service) *Handler {
+func NewHandler(s *service.Service) *Handler {
 	return &Handler{service: s}
 }
 
@@ -33,27 +34,15 @@ func (h *Handler) RegisterUser(ctx context.Context, req *userpb.RegisterUserRequ
 	}, nil
 }
 
-func (h *Handler) LoginUser(ctx context.Context, req *userpb.LoginUserRequest) (*userpb.AuthResponse, error) {
-	authResponse, err := h.service.LoginUser(ctx, req.GetEmail(), req.GetPassword())
+func (h *Handler) LoginUser(ctx context.Context, req *userpb.LoginUserRequest) (*userpb.LoginUserResponse, error) {
+	loginResponse, err := h.service.LoginUser(ctx, req.GetEmail(), req.GetPassword())
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert domain User to protobuf UserResponse
-	userResponse := &userpb.UserResponse{
-		Id:              authResponse.User.ID,
-		Name:            authResponse.User.Name,
-		Email:           authResponse.User.Email,
-		IsAdmin:         authResponse.User.IsAdmin,
-		IntersectionIds: authResponse.User.IntersectionIDs,
-		CreatedAt:       timestamppb.New(authResponse.User.CreatedAt),
-		UpdatedAt:       timestamppb.New(authResponse.User.UpdatedAt),
-	}
-
-	return &userpb.AuthResponse{
-		Token:     authResponse.Token,
-		User:      userResponse,
-		ExpiresAt: timestamppb.New(authResponse.ExpiresAt),
+	return &userpb.LoginUserResponse{
+		Token:     loginResponse.Token,
+		ExpiresAt: timestamppb.New(loginResponse.ExpiresAt),
 	}, nil
 }
 

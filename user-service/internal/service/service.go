@@ -1,4 +1,4 @@
-package user
+package service
 
 import (
 	"context"
@@ -7,8 +7,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/COS301-SE-2025/Swift-Signals/user-service/db"
-	"github.com/COS301-SE-2025/Swift-Signals/user-service/models"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -36,7 +36,7 @@ func normalizeEmail(email string) string {
 }
 
 // RegisterUser creates a new user with proper validation and password hashing
-func (s *Service) RegisterUser(ctx context.Context, name, email, password string) (*models.User, error) {
+func (s *Service) RegisterUser(ctx context.Context, name, email, password string) (*model.UserResponse, error) {
 
 	email = normalizeEmail(email)
 
@@ -47,7 +47,7 @@ func (s *Service) RegisterUser(ctx context.Context, name, email, password string
 
 	// Check if user already exists
 	existingUser, err := s.repo.GetUserByEmail(ctx, email)
-	if err != nil && !errors.Is(err, models.ErrUserNotFound) {
+	if err != nil && !errors.Is(err, model.ErrUserNotFound) {
 		return nil, fmt.Errorf("failed to check existing user: %w", err)
 	}
 	if existingUser != nil {
@@ -62,7 +62,7 @@ func (s *Service) RegisterUser(ctx context.Context, name, email, password string
 
 	// Create user
 	id := uuid.New().String()
-	user := &models.User{
+	user := &model.UserResponse{
 		ID:       id,
 		Name:     strings.TrimSpace(name),
 		Email:    strings.ToLower(strings.TrimSpace(email)),
@@ -99,7 +99,7 @@ func (s *Service) validateUserInput(name, email, password string) error {
 }
 
 // LoginUser authenticates a user and returns auth token
-func (s *Service) LoginUser(ctx context.Context, email, password string) (*models.AuthResponse, error) {
+func (s *Service) LoginUser(ctx context.Context, email, password string) (*model.LoginUserResponse, error) {
 	// TODO: Implement user login
 	// - Validate input parameters
 	// - Find user by email
@@ -119,7 +119,7 @@ func (s *Service) LogoutUser(ctx context.Context, userID string) error {
 }
 
 // GetUserByID retrieves a user by their ID
-func (s *Service) GetUserByID(ctx context.Context, userID string) (*models.User, error) {
+func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.UserResponse, error) {
 	// TODO: Implement get user by ID
 	// - Validate user ID
 	// - Query database for user
@@ -128,7 +128,7 @@ func (s *Service) GetUserByID(ctx context.Context, userID string) (*models.User,
 }
 
 // GetUserByEmail retrieves a user by their email address
-func (s *Service) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+func (s *Service) GetUserByEmail(ctx context.Context, email string) (*model.UserResponse, error) {
 	// TODO: Implement get user by email
 	// - Validate email format
 	// - Query database for user by email
@@ -137,17 +137,17 @@ func (s *Service) GetUserByEmail(ctx context.Context, email string) (*models.Use
 }
 
 // GetAllUsers retrieves all users with pagination and filtering
-func (s *Service) GetAllUsers(ctx context.Context, page, pageSize int32, filter string) ([]*models.User, error) {
+func (s *Service) GetAllUsers(ctx context.Context, page, pageSize int32, filter string) ([]*model.UserResponse, error) {
 	// TODO: Implement get all users
 	// - Validate pagination parameters
 	// - Apply filters if provided
 	// - Query database with pagination
-	// - Return slice of user models
+	// - Return slice of user model
 	return nil, nil
 }
 
 // UpdateUser updates user information
-func (s *Service) UpdateUser(ctx context.Context, userID, name, email string) (*models.User, error) {
+func (s *Service) UpdateUser(ctx context.Context, userID, name, email string) (*model.UserResponse, error) {
 	// TODO: Implement user update
 	// - Validate input parameters
 	// - Check if user exists

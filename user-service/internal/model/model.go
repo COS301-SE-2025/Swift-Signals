@@ -1,4 +1,4 @@
-package models
+package model
 
 import (
 	"errors"
@@ -13,8 +13,8 @@ var (
 	ErrInvalidUserData = errors.New("invalid user data")
 )
 
-// User represents a user in the system
-type User struct {
+// UserResponse represents a user in the system
+type UserResponse struct {
 	ID              string    `json:"id" db:"id"`
 	Name            string    `json:"name" db:"name"`
 	Email           string    `json:"email" db:"email"`
@@ -26,8 +26,8 @@ type User struct {
 }
 
 // PublicUser returns a user struct without sensitive information
-func (u *User) PublicUser() *User {
-	return &User{
+func (u *UserResponse) PublicUser() *UserResponse {
+	return &UserResponse{
 		ID:              u.ID,
 		Name:            u.Name,
 		Email:           u.Email,
@@ -37,4 +37,9 @@ func (u *User) PublicUser() *User {
 		UpdatedAt:       u.UpdatedAt,
 		// Password is intentionally omitted
 	}
+}
+
+type LoginUserResponse struct {
+	Token     string    `json:"token"`
+	ExpiresAt time.Time `json:"expires_at"`
 }

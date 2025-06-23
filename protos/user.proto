@@ -9,7 +9,7 @@ option go_package = "protos/gen/user";
 
 service UserService {
   rpc RegisterUser(RegisterUserRequest) returns (UserResponse);
-  rpc LoginUser(LoginUserRequest) returns (LoginResponse);
+  rpc LoginUser(LoginUserRequest) returns (LoginUserResponse);
   rpc LogoutUser(UserIDRequest) returns (google.protobuf.Empty);
 
   rpc GetUserByID(UserIDRequest) returns (UserResponse);
@@ -106,7 +106,7 @@ message UserResponse {
   google.protobuf.Timestamp updated_at = 7;
 }
 
-message LoginResponse {
+message LoginUserResponse {
   string token = 1;
   google.protobuf.Timestamp expires_at = 3; // Token expiration timestamp
 }

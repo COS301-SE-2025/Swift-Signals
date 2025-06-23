@@ -1,12 +1,12 @@
-package user
+package service
 
 import (
 	"context"
 	"errors"
 	"testing"
 
-	"github.com/COS301-SE-2025/Swift-Signals/user-service/db"
-	"github.com/COS301-SE-2025/Swift-Signals/user-service/models"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/crypto/bcrypt"
@@ -20,7 +20,7 @@ func TestService_RegisterUser(t *testing.T) {
 		inputPassword  string
 		setupMock      func(*db.MockRepository)
 		expectedError  error
-		validateResult func(*testing.T, *models.User)
+		validateResult func(*testing.T, *model.UserResponse)
 	}{
 		{
 			name:          "successful registration",
@@ -29,16 +29,16 @@ func TestService_RegisterUser(t *testing.T) {
 			inputPassword: "password123",
 			setupMock: func(repo *db.MockRepository) {
 				repo.On("GetUserByEmail", mock.Anything, "john.doe@example.com").
-					Return(nil, models.ErrUserNotFound)
-				repo.On("CreateUser", mock.Anything, mock.AnythingOfType("*models.User")).
-					Return(&models.User{
+					Return(nil, model.ErrUserNotFound)
+				repo.On("CreateUser", mock.Anything, mock.AnythingOfType("*model.UserResponse")).
+					Return(&model.UserResponse{
 						ID:    "test-id",
 						Name:  "John Doe",
 						Email: "john.doe@example.com",
 					}, nil)
 			},
 			expectedError: nil,
-			validateResult: func(t *testing.T, user *models.User) {
+			validateResult: func(t *testing.T, user *model.UserResponse) {
 				assert.NotNil(t, user)
 				assert.Equal(t, "John Doe", user.Name)
 				assert.Equal(t, "john.doe@example.com", user.Email)
@@ -91,7 +91,7 @@ func TestService_RegisterUser(t *testing.T) {
 			inputPassword: "password123",
 			setupMock: func(repo *db.MockRepository) {
 				repo.On("GetUserByEmail", mock.Anything, "john.doe@example.com").
-					Return(&models.User{Email: "john.doe@example.com"}, nil)
+					Return(&model.UserResponse{Email: "john.doe@example.com"}, nil)
 			},
 			expectedError: ErrUserExists,
 		},
@@ -113,8 +113,8 @@ func TestService_RegisterUser(t *testing.T) {
 			inputPassword: "password123",
 			setupMock: func(repo *db.MockRepository) {
 				repo.On("GetUserByEmail", mock.Anything, "john.doe@example.com").
-					Return(nil, models.ErrUserNotFound)
-				repo.On("CreateUser", mock.Anything, mock.AnythingOfType("*models.User")).
+					Return(nil, model.ErrUserNotFound)
+				repo.On("CreateUser", mock.Anything, mock.AnythingOfType("*model.UserResponse")).
 					Return(nil, errors.New("database error"))
 			},
 			expectedError: errors.New("failed to create user: database error"),
@@ -126,17 +126,17 @@ func TestService_RegisterUser(t *testing.T) {
 			inputPassword: "password123",
 			setupMock: func(repo *db.MockRepository) {
 				repo.On("GetUserByEmail", mock.Anything, "john.doe@example.com").
-					Return(nil, models.ErrUserNotFound)
-				repo.On("CreateUser", mock.Anything, mock.MatchedBy(func(user *models.User) bool {
+					Return(nil, model.ErrUserNotFound)
+				repo.On("CreateUser", mock.Anything, mock.MatchedBy(func(user *model.UserResponse) bool {
 					return user.Name == "John Doe" && user.Email == "john.doe@example.com"
-				})).Return(&models.User{
+				})).Return(&model.UserResponse{
 					ID:    "test-id",
 					Name:  "John Doe",
 					Email: "john.doe@example.com",
 				}, nil)
 			},
 			expectedError: nil,
-			validateResult: func(t *testing.T, user *models.User) {
+			validateResult: func(t *testing.T, user *model.UserResponse) {
 				assert.NotNil(t, user)
 				assert.Equal(t, "John Doe", user.Name)
 				assert.Equal(t, "john.doe@example.com", user.Email)
@@ -173,20 +173,20 @@ func TestService_RegisterUser(t *testing.T) {
 func TestService_RegisterUser_PasswordHashing(t *testing.T) {
 	mockRepo := new(db.MockRepository)
 	mockRepo.On("GetUserByEmail", mock.Anything, "test@example.com").
-		Return(nil, models.ErrUserNotFound)
+		Return(nil, model.ErrUserNotFound)
 
-	var capturedUser *models.User
-	mockRepo.On("CreateUser", mock.Anything, mock.AnythingOfType("*models.User")).
+	var capturedUser *model.UserResponse
+	mockRepo.On("CreateUser", mock.Anything, mock.AnythingOfType("*model.UserResponse")).
 		Run(func(args mock.Arguments) {
-			capturedUser = args.Get(1).(*models.User)
+			capturedUser = args.Get(1).(*model.UserResponse)
 		}).
-		Return(&models.User{ID: "test-id"}, nil)
+		Return(&model.UserResponse{ID: "test-id"}, nil)
 
 	service := &Service{repo: mockRepo}
 	ctx := context.Background()
 
 	password := "testpassword123"
-	_, err := service.RegisterUser(ctx, "Test User", "test@example.com", password)
+	_, err := service.RegisterUser(ctx, "Test UserResponse", "test@example.com", password)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, capturedUser)

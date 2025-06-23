@@ -5,8 +5,9 @@ import (
 	"net"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
-	"github.com/COS301-SE-2025/Swift-Signals/user-service/db"
-	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/handler"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/service"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection" //for development using grpcurl
 )
@@ -21,8 +22,8 @@ func main() {
 	reflection.Register(grpcServer) //for development using grpcurl
 
 	userRepo := db.NewUserRepository()
-	userService := user.NewService(userRepo)
-	userHandler := user.NewHandler(userService)
+	userService := service.NewService(userRepo)
+	userHandler := handler.NewHandler(userService)
 
 	userpb.RegisterUserServiceServer(grpcServer, userHandler)
 

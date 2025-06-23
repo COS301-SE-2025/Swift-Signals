@@ -798,7 +798,7 @@ func (x *UserResponse) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-type LoginResponse struct {
+type LoginUserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"` // Token expiration timestamp
@@ -806,20 +806,20 @@ type LoginResponse struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *LoginResponse) Reset() {
-	*x = LoginResponse{}
+func (x *LoginUserResponse) Reset() {
+	*x = LoginUserResponse{}
 	mi := &file_user_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *LoginResponse) String() string {
+func (x *LoginUserResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*LoginResponse) ProtoMessage() {}
+func (*LoginUserResponse) ProtoMessage() {}
 
-func (x *LoginResponse) ProtoReflect() protoreflect.Message {
+func (x *LoginUserResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_user_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -831,19 +831,19 @@ func (x *LoginResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LoginResponse.ProtoReflect.Descriptor instead.
-func (*LoginResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use LoginUserResponse.ProtoReflect.Descriptor instead.
+func (*LoginUserResponse) Descriptor() ([]byte, []int) {
 	return file_user_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *LoginResponse) GetToken() string {
+func (x *LoginUserResponse) GetToken() string {
 	if x != nil {
 		return x.Token
 	}
 	return ""
 }
 
-func (x *LoginResponse) GetExpiresAt() *timestamppb.Timestamp {
+func (x *LoginUserResponse) GetExpiresAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.ExpiresAt
 	}
@@ -904,15 +904,15 @@ const file_user_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"`\n" +
-	"\rLoginResponse\x12\x14\n" +
+	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"d\n" +
+	"\x11LoginUserResponse\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x129\n" +
 	"\n" +
-	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt2\x88\n" +
+	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt2\x8c\n" +
 	"\n" +
 	"\vUserService\x12W\n" +
-	"\fRegisterUser\x12&.swiftsignals.user.RegisterUserRequest\x1a\x1f.swiftsignals.user.UserResponse\x12R\n" +
-	"\tLoginUser\x12#.swiftsignals.user.LoginUserRequest\x1a .swiftsignals.user.LoginResponse\x12F\n" +
+	"\fRegisterUser\x12&.swiftsignals.user.RegisterUserRequest\x1a\x1f.swiftsignals.user.UserResponse\x12V\n" +
+	"\tLoginUser\x12#.swiftsignals.user.LoginUserRequest\x1a$.swiftsignals.user.LoginUserResponse\x12F\n" +
 	"\n" +
 	"LogoutUser\x12 .swiftsignals.user.UserIDRequest\x1a\x16.google.protobuf.Empty\x12P\n" +
 	"\vGetUserByID\x12 .swiftsignals.user.UserIDRequest\x1a\x1f.swiftsignals.user.UserResponse\x12[\n" +
@@ -958,14 +958,14 @@ var file_user_proto_goTypes = []any{
 	(*MakeAdminRequest)(nil),            // 11: swiftsignals.user.MakeAdminRequest
 	(*RemoveAdminRequest)(nil),          // 12: swiftsignals.user.RemoveAdminRequest
 	(*UserResponse)(nil),                // 13: swiftsignals.user.UserResponse
-	(*LoginResponse)(nil),               // 14: swiftsignals.user.LoginResponse
+	(*LoginUserResponse)(nil),           // 14: swiftsignals.user.LoginUserResponse
 	(*timestamppb.Timestamp)(nil),       // 15: google.protobuf.Timestamp
 	(*emptypb.Empty)(nil),               // 16: google.protobuf.Empty
 }
 var file_user_proto_depIdxs = []int32{
 	15, // 0: swiftsignals.user.UserResponse.created_at:type_name -> google.protobuf.Timestamp
 	15, // 1: swiftsignals.user.UserResponse.updated_at:type_name -> google.protobuf.Timestamp
-	15, // 2: swiftsignals.user.LoginResponse.expires_at:type_name -> google.protobuf.Timestamp
+	15, // 2: swiftsignals.user.LoginUserResponse.expires_at:type_name -> google.protobuf.Timestamp
 	1,  // 3: swiftsignals.user.UserService.RegisterUser:input_type -> swiftsignals.user.RegisterUserRequest
 	2,  // 4: swiftsignals.user.UserService.LoginUser:input_type -> swiftsignals.user.LoginUserRequest
 	0,  // 5: swiftsignals.user.UserService.LogoutUser:input_type -> swiftsignals.user.UserIDRequest
@@ -982,7 +982,7 @@ var file_user_proto_depIdxs = []int32{
 	11, // 16: swiftsignals.user.UserService.MakeAdmin:input_type -> swiftsignals.user.MakeAdminRequest
 	12, // 17: swiftsignals.user.UserService.RemoveAdmin:input_type -> swiftsignals.user.RemoveAdminRequest
 	13, // 18: swiftsignals.user.UserService.RegisterUser:output_type -> swiftsignals.user.UserResponse
-	14, // 19: swiftsignals.user.UserService.LoginUser:output_type -> swiftsignals.user.LoginResponse
+	14, // 19: swiftsignals.user.UserService.LoginUser:output_type -> swiftsignals.user.LoginUserResponse
 	16, // 20: swiftsignals.user.UserService.LogoutUser:output_type -> google.protobuf.Empty
 	13, // 21: swiftsignals.user.UserService.GetUserByID:output_type -> swiftsignals.user.UserResponse
 	13, // 22: swiftsignals.user.UserService.GetUserByEmail:output_type -> swiftsignals.user.UserResponse
