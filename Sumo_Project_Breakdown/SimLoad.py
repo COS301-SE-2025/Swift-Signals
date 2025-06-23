@@ -5,6 +5,7 @@ import time
 import uuid
 import os
 import warnings
+import argparse
 
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
@@ -46,7 +47,14 @@ def showMenu():
 
 
 def loadParams():
-    filePath = input("Enter path to parameter JSON file: ").strip()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--params", help="Path to parameter JSON file", required=False)
+    args = parser.parse_args()
+
+    if args.params and os.path.exists(args.params):
+        filePath = args.params
+    else:
+        filePath = input("Enter path to parameter JSON file: ").strip()
 
     if not os.path.exists(filePath):
         print("File not found. Exiting.")
@@ -58,7 +66,6 @@ def loadParams():
     sim_params = data["intersection"]["simulation_parameters"]
     raw_density = data["intersection"].get("Traffic Density", 1)
     traffic_density = TRAFFIC_DENSITY.get(raw_density, "medium")
-
     raw_type = sim_params.get("Intersection Type", 0)
     intersection_type = INTERSECTION_TYPES.get(raw_type, "unspecified")
 
