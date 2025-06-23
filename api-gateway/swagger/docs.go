@@ -216,6 +216,10 @@ const docTemplate = `{
         "model.ErrorResponse": {
             "type": "object",
             "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "BAD_REQUEST"
+                },
                 "message": {
                     "type": "string",
                     "example": "ERROR_MSG"

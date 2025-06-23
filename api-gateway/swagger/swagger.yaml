@@ -11,6 +11,9 @@ definitions:
     type: object
   model.ErrorResponse:
     properties:
+      code:
+        example: BAD_REQUEST
+        type: string
       message:
         example: ERROR_MSG
         type: string
@@ -165,7 +168,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Resets a user's password in case they forgot it.
+      description: Reset's a user's password in case they forgot it.
       parameters:
       - description: User Email
         in: body
