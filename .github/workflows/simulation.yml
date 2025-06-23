@@ -37,6 +37,9 @@ jobs:
           run: |
             flake8 Sumo_Project_Breakdown --ignore=E501
 
+        - name: Check Python formatting with Black
+          run: black --check .
+
         - name: Create results directory
           run: mkdir -p out/results
 
