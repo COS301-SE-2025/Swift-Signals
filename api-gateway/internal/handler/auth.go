@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
@@ -32,6 +33,11 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO: Implement Service Logic
+	log.Println("Attempting to log in user")
 
-	util.SendJSONResponse(w, http.StatusOK, &model.LogoutResponse{})
+	resp := &model.AuthResponse{
+		Message: "Login Example Successful",
+		Token:   "example-token",
+	}
+	util.SendJSONResponse(w, http.StatusOK, resp)
 }

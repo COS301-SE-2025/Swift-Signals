@@ -1,0 +1,74 @@
+basePath: /
+definitions:
+  model.AuthResponse:
+    properties:
+      message:
+        example: Login successful
+        type: string
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+    type: object
+  model.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.LoginRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: StrongPassword123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+host: localhost:9090
+info:
+  contact:
+    email: support@example.com
+    name: Inside Insights Team
+    url: '...'
+  description: |-
+    This is the API Gateway for the Swift-Signals project,
+    forwarding requests to backend gRPC microservices.
+  termsOfService: http://example.com/terms/
+  title: Authentication API Gateway
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns an authentication token.
+      parameters:
+      - description: Login credentials
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful login
+          schema:
+            $ref: '#/definitions/model.AuthResponse'
+        "400":
+          description: Invalid request payload or credentials
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: User Login
+      tags:
+      - Authentication
+schemes:
+- http
+swagger: "2.0"
