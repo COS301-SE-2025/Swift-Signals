@@ -23,7 +23,6 @@ const (
 	UserService_RegisterUser_FullMethodName           = "/swiftsignals.user.UserService/RegisterUser"
 	UserService_LoginUser_FullMethodName              = "/swiftsignals.user.UserService/LoginUser"
 	UserService_LogoutUser_FullMethodName             = "/swiftsignals.user.UserService/LogoutUser"
-	UserService_ValidateUser_FullMethodName           = "/swiftsignals.user.UserService/ValidateUser"
 	UserService_GetUserByID_FullMethodName            = "/swiftsignals.user.UserService/GetUserByID"
 	UserService_GetUserByEmail_FullMethodName         = "/swiftsignals.user.UserService/GetUserByEmail"
 	UserService_GetAllUsers_FullMethodName            = "/swiftsignals.user.UserService/GetAllUsers"
@@ -43,9 +42,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	RegisterUser(ctx context.Context, in *RegisterUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
-	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*AuthResponse, error)
+	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	LogoutUser(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	ValidateUser(ctx context.Context, in *ValidateUserRequest, opts ...grpc.CallOption) (*ValidateUserResponse, error)
 	GetUserByID(ctx context.Context, in *UserIDRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetUserByEmail(ctx context.Context, in *GetUserByEmailRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	GetAllUsers(ctx context.Context, in *GetAllUsersRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UserResponse], error)
@@ -78,9 +76,9 @@ func (c *userServiceClient) RegisterUser(ctx context.Context, in *RegisterUserRe
 	return out, nil
 }
 
-func (c *userServiceClient) LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*AuthResponse, error) {
+func (c *userServiceClient) LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AuthResponse)
+	out := new(LoginResponse)
 	err := c.cc.Invoke(ctx, UserService_LoginUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -92,16 +90,6 @@ func (c *userServiceClient) LogoutUser(ctx context.Context, in *UserIDRequest, o
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, UserService_LogoutUser_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userServiceClient) ValidateUser(ctx context.Context, in *ValidateUserRequest, opts ...grpc.CallOption) (*ValidateUserResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ValidateUserResponse)
-	err := c.cc.Invoke(ctx, UserService_ValidateUser_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -251,9 +239,8 @@ func (c *userServiceClient) RemoveAdmin(ctx context.Context, in *RemoveAdminRequ
 // for forward compatibility.
 type UserServiceServer interface {
 	RegisterUser(context.Context, *RegisterUserRequest) (*UserResponse, error)
-	LoginUser(context.Context, *LoginUserRequest) (*AuthResponse, error)
+	LoginUser(context.Context, *LoginUserRequest) (*LoginResponse, error)
 	LogoutUser(context.Context, *UserIDRequest) (*emptypb.Empty, error)
-	ValidateUser(context.Context, *ValidateUserRequest) (*ValidateUserResponse, error)
 	GetUserByID(context.Context, *UserIDRequest) (*UserResponse, error)
 	GetUserByEmail(context.Context, *GetUserByEmailRequest) (*UserResponse, error)
 	GetAllUsers(*GetAllUsersRequest, grpc.ServerStreamingServer[UserResponse]) error
@@ -279,14 +266,11 @@ type UnimplementedUserServiceServer struct{}
 func (UnimplementedUserServiceServer) RegisterUser(context.Context, *RegisterUserRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterUser not implemented")
 }
-func (UnimplementedUserServiceServer) LoginUser(context.Context, *LoginUserRequest) (*AuthResponse, error) {
+func (UnimplementedUserServiceServer) LoginUser(context.Context, *LoginUserRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginUser not implemented")
 }
 func (UnimplementedUserServiceServer) LogoutUser(context.Context, *UserIDRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LogoutUser not implemented")
-}
-func (UnimplementedUserServiceServer) ValidateUser(context.Context, *ValidateUserRequest) (*ValidateUserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ValidateUser not implemented")
 }
 func (UnimplementedUserServiceServer) GetUserByID(context.Context, *UserIDRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserByID not implemented")
@@ -395,24 +379,6 @@ func _UserService_LogoutUser_Handler(srv interface{}, ctx context.Context, dec f
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServiceServer).LogoutUser(ctx, req.(*UserIDRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _UserService_ValidateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ValidateUserRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServiceServer).ValidateUser(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: UserService_ValidateUser_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).ValidateUser(ctx, req.(*ValidateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -637,10 +603,6 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LogoutUser",
 			Handler:    _UserService_LogoutUser_Handler,
-		},
-		{
-			MethodName: "ValidateUser",
-			Handler:    _UserService_ValidateUser_Handler,
 		},
 		{
 			MethodName: "GetUserByID",
