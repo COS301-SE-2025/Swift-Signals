@@ -10,6 +10,31 @@ import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
+'''ENUM mappings'''
+INTERSECTION_TYPES = {
+    0: "unspecified",
+    1: "trafficlight",
+    2: "roundabout",
+    3: "fourwaystop",
+    4: "tjunction",
+}
+
+
+TRAFFIC_DENSITY = {
+    0: "low",
+    1: "medium",
+    2: "high"
+}
+
+
+INTERSECTION_STATUS = {
+    0: "unoptimized",
+    1: "optimizing",
+    2: "optimized",
+    3: "failed",
+}
+
+
 def showMenu():
     print("Select an instersection type:")
     print("1. Traffic circle")
@@ -31,11 +56,16 @@ def loadParams():
         data = json.load(f)
 
     sim_params = data["intersection"]["simulation_parameters"]
-    traffic_density = data["intersection"].get("Traffic Density", "medium")
+    raw_density = data["intersection"].get("Traffic Density", 1)
+    traffic_density = TRAFFIC_DENSITY.get(raw_density, "medium")
+
+    raw_type = sim_params.get("Intersection Type", 0)
+    intersection_type = INTERSECTION_TYPES.get(raw_type, "unspecified")
 
     return {
         **sim_params,
-        "Traffic Density": traffic_density
+        "Traffic Density": traffic_density,
+        "Intersection Type": intersection_type
     }
 
 

@@ -18,7 +18,7 @@ class TestSimLoad(unittest.TestCase):
 
     @patch("builtins.input", side_effect=["params_test.json"])
     @patch("os.path.exists", return_value=True)
-    @patch("builtins.open", new_callable=mock_open, read_data='{"intersection":{"simulation_parameters":{"Intersection Type":"trafficlight"}}}')
+    @patch("builtins.open", new_callable=mock_open, read_data='{"intersection":{"simulation_parameters":{"Intersection Type":1}}}')
     def test_loadParams(self, mock_open_file, mock_exists, mock_input):
         params = SimLoad.loadParams()
         self.assertEqual(params["Intersection Type"], "trafficlight")
