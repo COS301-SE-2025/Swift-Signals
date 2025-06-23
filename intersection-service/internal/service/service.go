@@ -1,7 +1,7 @@
-package intersection
+package service
 
 import (
-	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/db"
+	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/db"
 )
 
 type Service struct {

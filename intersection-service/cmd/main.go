@@ -4,8 +4,9 @@ import (
 	"log"
 	"net"
 
-	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/db"
-	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal"
+	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/db"
+	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/handler"
+	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/service"
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection" //for development using grpcurl
@@ -21,8 +22,8 @@ func main() {
 	reflection.Register(grpcServer) //for development using grpcurl
 
 	intersectionRepo := db.NewIntersectionRepository()
-	intersectionService := intersection.NewService(intersectionRepo)
-	intersectionHandler := intersection.NewHandler(intersectionService)
+	intersectionService := service.NewService(intersectionRepo)
+	intersectionHandler := handler.NewHandler(intersectionService)
 
 	intersectionpb.RegisterIntersectionServiceServer(grpcServer, intersectionHandler)
 
