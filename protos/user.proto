@@ -9,9 +9,8 @@ option go_package = "protos/gen/user";
 
 service UserService {
   rpc RegisterUser(RegisterUserRequest) returns (UserResponse);
-  rpc LoginUser(LoginUserRequest) returns (AuthResponse);
+  rpc LoginUser(LoginUserRequest) returns (LoginUserResponse);
   rpc LogoutUser(UserIDRequest) returns (google.protobuf.Empty);
-  rpc ValidateUser(ValidateUserRequest) returns (ValidateUserResponse);
 
   rpc GetUserByID(UserIDRequest) returns (UserResponse);
   rpc GetUserByEmail(GetUserByEmailRequest) returns (UserResponse);
@@ -46,13 +45,6 @@ message RegisterUserRequest {
 message LoginUserRequest {
   string email = 1;
   string password = 2;
-}
-
-message ValidateUserRequest { string token = 1; }
-
-message ValidateUserResponse {
-  bool is_valid = 1;
-  string user_id = 2;
 }
 
 // User CRUD Messages
@@ -114,8 +106,7 @@ message UserResponse {
   google.protobuf.Timestamp updated_at = 7;
 }
 
-message AuthResponse {
+message LoginUserResponse {
   string token = 1;
-  UserResponse user = 2; // Include user info in auth response
   google.protobuf.Timestamp expires_at = 3; // Token expiration timestamp
 }

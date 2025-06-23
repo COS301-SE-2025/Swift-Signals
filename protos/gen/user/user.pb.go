@@ -181,102 +181,6 @@ func (x *LoginUserRequest) GetPassword() string {
 	return ""
 }
 
-type ValidateUserRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ValidateUserRequest) Reset() {
-	*x = ValidateUserRequest{}
-	mi := &file_user_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ValidateUserRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ValidateUserRequest) ProtoMessage() {}
-
-func (x *ValidateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ValidateUserRequest.ProtoReflect.Descriptor instead.
-func (*ValidateUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *ValidateUserRequest) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-type ValidateUserResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	IsValid       bool                   `protobuf:"varint,1,opt,name=is_valid,json=isValid,proto3" json:"is_valid,omitempty"`
-	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ValidateUserResponse) Reset() {
-	*x = ValidateUserResponse{}
-	mi := &file_user_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ValidateUserResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ValidateUserResponse) ProtoMessage() {}
-
-func (x *ValidateUserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ValidateUserResponse.ProtoReflect.Descriptor instead.
-func (*ValidateUserResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *ValidateUserResponse) GetIsValid() bool {
-	if x != nil {
-		return x.IsValid
-	}
-	return false
-}
-
-func (x *ValidateUserResponse) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
 // User CRUD Messages
 type GetUserByEmailRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -287,7 +191,7 @@ type GetUserByEmailRequest struct {
 
 func (x *GetUserByEmailRequest) Reset() {
 	*x = GetUserByEmailRequest{}
-	mi := &file_user_proto_msgTypes[5]
+	mi := &file_user_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -299,7 +203,7 @@ func (x *GetUserByEmailRequest) String() string {
 func (*GetUserByEmailRequest) ProtoMessage() {}
 
 func (x *GetUserByEmailRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[5]
+	mi := &file_user_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -312,7 +216,7 @@ func (x *GetUserByEmailRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUserByEmailRequest.ProtoReflect.Descriptor instead.
 func (*GetUserByEmailRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{5}
+	return file_user_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetUserByEmailRequest) GetEmail() string {
@@ -333,7 +237,7 @@ type GetAllUsersRequest struct {
 
 func (x *GetAllUsersRequest) Reset() {
 	*x = GetAllUsersRequest{}
-	mi := &file_user_proto_msgTypes[6]
+	mi := &file_user_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -345,7 +249,7 @@ func (x *GetAllUsersRequest) String() string {
 func (*GetAllUsersRequest) ProtoMessage() {}
 
 func (x *GetAllUsersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[6]
+	mi := &file_user_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -358,7 +262,7 @@ func (x *GetAllUsersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAllUsersRequest.ProtoReflect.Descriptor instead.
 func (*GetAllUsersRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{6}
+	return file_user_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetAllUsersRequest) GetPage() int32 {
@@ -393,7 +297,7 @@ type UpdateUserRequest struct {
 
 func (x *UpdateUserRequest) Reset() {
 	*x = UpdateUserRequest{}
-	mi := &file_user_proto_msgTypes[7]
+	mi := &file_user_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -405,7 +309,7 @@ func (x *UpdateUserRequest) String() string {
 func (*UpdateUserRequest) ProtoMessage() {}
 
 func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[7]
+	mi := &file_user_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -418,7 +322,7 @@ func (x *UpdateUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{7}
+	return file_user_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *UpdateUserRequest) GetUserId() string {
@@ -452,7 +356,7 @@ type IntersectionIDResponse struct {
 
 func (x *IntersectionIDResponse) Reset() {
 	*x = IntersectionIDResponse{}
-	mi := &file_user_proto_msgTypes[8]
+	mi := &file_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -464,7 +368,7 @@ func (x *IntersectionIDResponse) String() string {
 func (*IntersectionIDResponse) ProtoMessage() {}
 
 func (x *IntersectionIDResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[8]
+	mi := &file_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -477,7 +381,7 @@ func (x *IntersectionIDResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use IntersectionIDResponse.ProtoReflect.Descriptor instead.
 func (*IntersectionIDResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{8}
+	return file_user_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *IntersectionIDResponse) GetIntersectionId() int32 {
@@ -497,7 +401,7 @@ type AddIntersectionIDRequest struct {
 
 func (x *AddIntersectionIDRequest) Reset() {
 	*x = AddIntersectionIDRequest{}
-	mi := &file_user_proto_msgTypes[9]
+	mi := &file_user_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -509,7 +413,7 @@ func (x *AddIntersectionIDRequest) String() string {
 func (*AddIntersectionIDRequest) ProtoMessage() {}
 
 func (x *AddIntersectionIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[9]
+	mi := &file_user_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -522,7 +426,7 @@ func (x *AddIntersectionIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AddIntersectionIDRequest.ProtoReflect.Descriptor instead.
 func (*AddIntersectionIDRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{9}
+	return file_user_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *AddIntersectionIDRequest) GetUserId() string {
@@ -549,7 +453,7 @@ type RemoveIntersectionIDRequest struct {
 
 func (x *RemoveIntersectionIDRequest) Reset() {
 	*x = RemoveIntersectionIDRequest{}
-	mi := &file_user_proto_msgTypes[10]
+	mi := &file_user_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -561,7 +465,7 @@ func (x *RemoveIntersectionIDRequest) String() string {
 func (*RemoveIntersectionIDRequest) ProtoMessage() {}
 
 func (x *RemoveIntersectionIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[10]
+	mi := &file_user_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -574,7 +478,7 @@ func (x *RemoveIntersectionIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveIntersectionIDRequest.ProtoReflect.Descriptor instead.
 func (*RemoveIntersectionIDRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{10}
+	return file_user_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *RemoveIntersectionIDRequest) GetUserId() string {
@@ -603,7 +507,7 @@ type ChangePasswordRequest struct {
 
 func (x *ChangePasswordRequest) Reset() {
 	*x = ChangePasswordRequest{}
-	mi := &file_user_proto_msgTypes[11]
+	mi := &file_user_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -615,7 +519,7 @@ func (x *ChangePasswordRequest) String() string {
 func (*ChangePasswordRequest) ProtoMessage() {}
 
 func (x *ChangePasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[11]
+	mi := &file_user_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -628,7 +532,7 @@ func (x *ChangePasswordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChangePasswordRequest.ProtoReflect.Descriptor instead.
 func (*ChangePasswordRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{11}
+	return file_user_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ChangePasswordRequest) GetUserId() string {
@@ -661,7 +565,7 @@ type ResetPasswordRequest struct {
 
 func (x *ResetPasswordRequest) Reset() {
 	*x = ResetPasswordRequest{}
-	mi := &file_user_proto_msgTypes[12]
+	mi := &file_user_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -673,7 +577,7 @@ func (x *ResetPasswordRequest) String() string {
 func (*ResetPasswordRequest) ProtoMessage() {}
 
 func (x *ResetPasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[12]
+	mi := &file_user_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -686,7 +590,7 @@ func (x *ResetPasswordRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResetPasswordRequest.ProtoReflect.Descriptor instead.
 func (*ResetPasswordRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{12}
+	return file_user_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ResetPasswordRequest) GetEmail() string {
@@ -707,7 +611,7 @@ type MakeAdminRequest struct {
 
 func (x *MakeAdminRequest) Reset() {
 	*x = MakeAdminRequest{}
-	mi := &file_user_proto_msgTypes[13]
+	mi := &file_user_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -719,7 +623,7 @@ func (x *MakeAdminRequest) String() string {
 func (*MakeAdminRequest) ProtoMessage() {}
 
 func (x *MakeAdminRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[13]
+	mi := &file_user_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -732,7 +636,7 @@ func (x *MakeAdminRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MakeAdminRequest.ProtoReflect.Descriptor instead.
 func (*MakeAdminRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{13}
+	return file_user_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *MakeAdminRequest) GetUserId() string {
@@ -759,7 +663,7 @@ type RemoveAdminRequest struct {
 
 func (x *RemoveAdminRequest) Reset() {
 	*x = RemoveAdminRequest{}
-	mi := &file_user_proto_msgTypes[14]
+	mi := &file_user_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -771,7 +675,7 @@ func (x *RemoveAdminRequest) String() string {
 func (*RemoveAdminRequest) ProtoMessage() {}
 
 func (x *RemoveAdminRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[14]
+	mi := &file_user_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -784,7 +688,7 @@ func (x *RemoveAdminRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RemoveAdminRequest.ProtoReflect.Descriptor instead.
 func (*RemoveAdminRequest) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{14}
+	return file_user_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *RemoveAdminRequest) GetUserId() string {
@@ -817,7 +721,7 @@ type UserResponse struct {
 
 func (x *UserResponse) Reset() {
 	*x = UserResponse{}
-	mi := &file_user_proto_msgTypes[15]
+	mi := &file_user_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -829,7 +733,7 @@ func (x *UserResponse) String() string {
 func (*UserResponse) ProtoMessage() {}
 
 func (x *UserResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[15]
+	mi := &file_user_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -842,7 +746,7 @@ func (x *UserResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserResponse.ProtoReflect.Descriptor instead.
 func (*UserResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{15}
+	return file_user_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *UserResponse) GetId() string {
@@ -894,30 +798,29 @@ func (x *UserResponse) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-type AuthResponse struct {
+type LoginUserResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	User          *UserResponse          `protobuf:"bytes,2,opt,name=user,proto3" json:"user,omitempty"`                            // Include user info in auth response
 	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"` // Token expiration timestamp
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AuthResponse) Reset() {
-	*x = AuthResponse{}
-	mi := &file_user_proto_msgTypes[16]
+func (x *LoginUserResponse) Reset() {
+	*x = LoginUserResponse{}
+	mi := &file_user_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AuthResponse) String() string {
+func (x *LoginUserResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AuthResponse) ProtoMessage() {}
+func (*LoginUserResponse) ProtoMessage() {}
 
-func (x *AuthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_user_proto_msgTypes[16]
+func (x *LoginUserResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -928,26 +831,19 @@ func (x *AuthResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AuthResponse.ProtoReflect.Descriptor instead.
-func (*AuthResponse) Descriptor() ([]byte, []int) {
-	return file_user_proto_rawDescGZIP(), []int{16}
+// Deprecated: Use LoginUserResponse.ProtoReflect.Descriptor instead.
+func (*LoginUserResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{14}
 }
 
-func (x *AuthResponse) GetToken() string {
+func (x *LoginUserResponse) GetToken() string {
 	if x != nil {
 		return x.Token
 	}
 	return ""
 }
 
-func (x *AuthResponse) GetUser() *UserResponse {
-	if x != nil {
-		return x.User
-	}
-	return nil
-}
-
-func (x *AuthResponse) GetExpiresAt() *timestamppb.Timestamp {
+func (x *LoginUserResponse) GetExpiresAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.ExpiresAt
 	}
@@ -968,12 +864,7 @@ const file_user_proto_rawDesc = "" +
 	"\bpassword\x18\x03 \x01(\tR\bpassword\"D\n" +
 	"\x10LoginUserRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"+\n" +
-	"\x13ValidateUserRequest\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"J\n" +
-	"\x14ValidateUserResponse\x12\x19\n" +
-	"\bis_valid\x18\x01 \x01(\bR\aisValid\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\"-\n" +
+	"\bpassword\x18\x02 \x01(\tR\bpassword\"-\n" +
 	"\x15GetUserByEmailRequest\x12\x14\n" +
 	"\x05email\x18\x01 \x01(\tR\x05email\"]\n" +
 	"\x12GetAllUsersRequest\x12\x12\n" +
@@ -1013,19 +904,17 @@ const file_user_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x94\x01\n" +
-	"\fAuthResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\x123\n" +
-	"\x04user\x18\x02 \x01(\v2\x1f.swiftsignals.user.UserResponseR\x04user\x129\n" +
+	"updated_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"d\n" +
+	"\x11LoginUserResponse\x12\x14\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\x129\n" +
 	"\n" +
-	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt2\xe8\n" +
+	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt2\x8c\n" +
 	"\n" +
 	"\vUserService\x12W\n" +
-	"\fRegisterUser\x12&.swiftsignals.user.RegisterUserRequest\x1a\x1f.swiftsignals.user.UserResponse\x12Q\n" +
-	"\tLoginUser\x12#.swiftsignals.user.LoginUserRequest\x1a\x1f.swiftsignals.user.AuthResponse\x12F\n" +
+	"\fRegisterUser\x12&.swiftsignals.user.RegisterUserRequest\x1a\x1f.swiftsignals.user.UserResponse\x12V\n" +
+	"\tLoginUser\x12#.swiftsignals.user.LoginUserRequest\x1a$.swiftsignals.user.LoginUserResponse\x12F\n" +
 	"\n" +
-	"LogoutUser\x12 .swiftsignals.user.UserIDRequest\x1a\x16.google.protobuf.Empty\x12_\n" +
-	"\fValidateUser\x12&.swiftsignals.user.ValidateUserRequest\x1a'.swiftsignals.user.ValidateUserResponse\x12P\n" +
+	"LogoutUser\x12 .swiftsignals.user.UserIDRequest\x1a\x16.google.protobuf.Empty\x12P\n" +
 	"\vGetUserByID\x12 .swiftsignals.user.UserIDRequest\x1a\x1f.swiftsignals.user.UserResponse\x12[\n" +
 	"\x0eGetUserByEmail\x12(.swiftsignals.user.GetUserByEmailRequest\x1a\x1f.swiftsignals.user.UserResponse\x12W\n" +
 	"\vGetAllUsers\x12%.swiftsignals.user.GetAllUsersRequest\x1a\x1f.swiftsignals.user.UserResponse0\x01\x12S\n" +
@@ -1053,70 +942,65 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_user_proto_goTypes = []any{
 	(*UserIDRequest)(nil),               // 0: swiftsignals.user.UserIDRequest
 	(*RegisterUserRequest)(nil),         // 1: swiftsignals.user.RegisterUserRequest
 	(*LoginUserRequest)(nil),            // 2: swiftsignals.user.LoginUserRequest
-	(*ValidateUserRequest)(nil),         // 3: swiftsignals.user.ValidateUserRequest
-	(*ValidateUserResponse)(nil),        // 4: swiftsignals.user.ValidateUserResponse
-	(*GetUserByEmailRequest)(nil),       // 5: swiftsignals.user.GetUserByEmailRequest
-	(*GetAllUsersRequest)(nil),          // 6: swiftsignals.user.GetAllUsersRequest
-	(*UpdateUserRequest)(nil),           // 7: swiftsignals.user.UpdateUserRequest
-	(*IntersectionIDResponse)(nil),      // 8: swiftsignals.user.IntersectionIDResponse
-	(*AddIntersectionIDRequest)(nil),    // 9: swiftsignals.user.AddIntersectionIDRequest
-	(*RemoveIntersectionIDRequest)(nil), // 10: swiftsignals.user.RemoveIntersectionIDRequest
-	(*ChangePasswordRequest)(nil),       // 11: swiftsignals.user.ChangePasswordRequest
-	(*ResetPasswordRequest)(nil),        // 12: swiftsignals.user.ResetPasswordRequest
-	(*MakeAdminRequest)(nil),            // 13: swiftsignals.user.MakeAdminRequest
-	(*RemoveAdminRequest)(nil),          // 14: swiftsignals.user.RemoveAdminRequest
-	(*UserResponse)(nil),                // 15: swiftsignals.user.UserResponse
-	(*AuthResponse)(nil),                // 16: swiftsignals.user.AuthResponse
-	(*timestamppb.Timestamp)(nil),       // 17: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),               // 18: google.protobuf.Empty
+	(*GetUserByEmailRequest)(nil),       // 3: swiftsignals.user.GetUserByEmailRequest
+	(*GetAllUsersRequest)(nil),          // 4: swiftsignals.user.GetAllUsersRequest
+	(*UpdateUserRequest)(nil),           // 5: swiftsignals.user.UpdateUserRequest
+	(*IntersectionIDResponse)(nil),      // 6: swiftsignals.user.IntersectionIDResponse
+	(*AddIntersectionIDRequest)(nil),    // 7: swiftsignals.user.AddIntersectionIDRequest
+	(*RemoveIntersectionIDRequest)(nil), // 8: swiftsignals.user.RemoveIntersectionIDRequest
+	(*ChangePasswordRequest)(nil),       // 9: swiftsignals.user.ChangePasswordRequest
+	(*ResetPasswordRequest)(nil),        // 10: swiftsignals.user.ResetPasswordRequest
+	(*MakeAdminRequest)(nil),            // 11: swiftsignals.user.MakeAdminRequest
+	(*RemoveAdminRequest)(nil),          // 12: swiftsignals.user.RemoveAdminRequest
+	(*UserResponse)(nil),                // 13: swiftsignals.user.UserResponse
+	(*LoginUserResponse)(nil),           // 14: swiftsignals.user.LoginUserResponse
+	(*timestamppb.Timestamp)(nil),       // 15: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),               // 16: google.protobuf.Empty
 }
 var file_user_proto_depIdxs = []int32{
-	17, // 0: swiftsignals.user.UserResponse.created_at:type_name -> google.protobuf.Timestamp
-	17, // 1: swiftsignals.user.UserResponse.updated_at:type_name -> google.protobuf.Timestamp
-	15, // 2: swiftsignals.user.AuthResponse.user:type_name -> swiftsignals.user.UserResponse
-	17, // 3: swiftsignals.user.AuthResponse.expires_at:type_name -> google.protobuf.Timestamp
-	1,  // 4: swiftsignals.user.UserService.RegisterUser:input_type -> swiftsignals.user.RegisterUserRequest
-	2,  // 5: swiftsignals.user.UserService.LoginUser:input_type -> swiftsignals.user.LoginUserRequest
-	0,  // 6: swiftsignals.user.UserService.LogoutUser:input_type -> swiftsignals.user.UserIDRequest
-	3,  // 7: swiftsignals.user.UserService.ValidateUser:input_type -> swiftsignals.user.ValidateUserRequest
-	0,  // 8: swiftsignals.user.UserService.GetUserByID:input_type -> swiftsignals.user.UserIDRequest
-	5,  // 9: swiftsignals.user.UserService.GetUserByEmail:input_type -> swiftsignals.user.GetUserByEmailRequest
-	6,  // 10: swiftsignals.user.UserService.GetAllUsers:input_type -> swiftsignals.user.GetAllUsersRequest
-	7,  // 11: swiftsignals.user.UserService.UpdateUser:input_type -> swiftsignals.user.UpdateUserRequest
-	0,  // 12: swiftsignals.user.UserService.DeleteUser:input_type -> swiftsignals.user.UserIDRequest
-	0,  // 13: swiftsignals.user.UserService.GetUserIntersectionIDs:input_type -> swiftsignals.user.UserIDRequest
-	9,  // 14: swiftsignals.user.UserService.AddIntersectionID:input_type -> swiftsignals.user.AddIntersectionIDRequest
-	10, // 15: swiftsignals.user.UserService.RemoveIntersectionID:input_type -> swiftsignals.user.RemoveIntersectionIDRequest
-	11, // 16: swiftsignals.user.UserService.ChangePassword:input_type -> swiftsignals.user.ChangePasswordRequest
-	12, // 17: swiftsignals.user.UserService.ResetPassword:input_type -> swiftsignals.user.ResetPasswordRequest
-	13, // 18: swiftsignals.user.UserService.MakeAdmin:input_type -> swiftsignals.user.MakeAdminRequest
-	14, // 19: swiftsignals.user.UserService.RemoveAdmin:input_type -> swiftsignals.user.RemoveAdminRequest
-	15, // 20: swiftsignals.user.UserService.RegisterUser:output_type -> swiftsignals.user.UserResponse
-	16, // 21: swiftsignals.user.UserService.LoginUser:output_type -> swiftsignals.user.AuthResponse
-	18, // 22: swiftsignals.user.UserService.LogoutUser:output_type -> google.protobuf.Empty
-	4,  // 23: swiftsignals.user.UserService.ValidateUser:output_type -> swiftsignals.user.ValidateUserResponse
-	15, // 24: swiftsignals.user.UserService.GetUserByID:output_type -> swiftsignals.user.UserResponse
-	15, // 25: swiftsignals.user.UserService.GetUserByEmail:output_type -> swiftsignals.user.UserResponse
-	15, // 26: swiftsignals.user.UserService.GetAllUsers:output_type -> swiftsignals.user.UserResponse
-	15, // 27: swiftsignals.user.UserService.UpdateUser:output_type -> swiftsignals.user.UserResponse
-	18, // 28: swiftsignals.user.UserService.DeleteUser:output_type -> google.protobuf.Empty
-	8,  // 29: swiftsignals.user.UserService.GetUserIntersectionIDs:output_type -> swiftsignals.user.IntersectionIDResponse
-	18, // 30: swiftsignals.user.UserService.AddIntersectionID:output_type -> google.protobuf.Empty
-	18, // 31: swiftsignals.user.UserService.RemoveIntersectionID:output_type -> google.protobuf.Empty
-	18, // 32: swiftsignals.user.UserService.ChangePassword:output_type -> google.protobuf.Empty
-	18, // 33: swiftsignals.user.UserService.ResetPassword:output_type -> google.protobuf.Empty
-	18, // 34: swiftsignals.user.UserService.MakeAdmin:output_type -> google.protobuf.Empty
-	18, // 35: swiftsignals.user.UserService.RemoveAdmin:output_type -> google.protobuf.Empty
-	20, // [20:36] is the sub-list for method output_type
-	4,  // [4:20] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	15, // 0: swiftsignals.user.UserResponse.created_at:type_name -> google.protobuf.Timestamp
+	15, // 1: swiftsignals.user.UserResponse.updated_at:type_name -> google.protobuf.Timestamp
+	15, // 2: swiftsignals.user.LoginUserResponse.expires_at:type_name -> google.protobuf.Timestamp
+	1,  // 3: swiftsignals.user.UserService.RegisterUser:input_type -> swiftsignals.user.RegisterUserRequest
+	2,  // 4: swiftsignals.user.UserService.LoginUser:input_type -> swiftsignals.user.LoginUserRequest
+	0,  // 5: swiftsignals.user.UserService.LogoutUser:input_type -> swiftsignals.user.UserIDRequest
+	0,  // 6: swiftsignals.user.UserService.GetUserByID:input_type -> swiftsignals.user.UserIDRequest
+	3,  // 7: swiftsignals.user.UserService.GetUserByEmail:input_type -> swiftsignals.user.GetUserByEmailRequest
+	4,  // 8: swiftsignals.user.UserService.GetAllUsers:input_type -> swiftsignals.user.GetAllUsersRequest
+	5,  // 9: swiftsignals.user.UserService.UpdateUser:input_type -> swiftsignals.user.UpdateUserRequest
+	0,  // 10: swiftsignals.user.UserService.DeleteUser:input_type -> swiftsignals.user.UserIDRequest
+	0,  // 11: swiftsignals.user.UserService.GetUserIntersectionIDs:input_type -> swiftsignals.user.UserIDRequest
+	7,  // 12: swiftsignals.user.UserService.AddIntersectionID:input_type -> swiftsignals.user.AddIntersectionIDRequest
+	8,  // 13: swiftsignals.user.UserService.RemoveIntersectionID:input_type -> swiftsignals.user.RemoveIntersectionIDRequest
+	9,  // 14: swiftsignals.user.UserService.ChangePassword:input_type -> swiftsignals.user.ChangePasswordRequest
+	10, // 15: swiftsignals.user.UserService.ResetPassword:input_type -> swiftsignals.user.ResetPasswordRequest
+	11, // 16: swiftsignals.user.UserService.MakeAdmin:input_type -> swiftsignals.user.MakeAdminRequest
+	12, // 17: swiftsignals.user.UserService.RemoveAdmin:input_type -> swiftsignals.user.RemoveAdminRequest
+	13, // 18: swiftsignals.user.UserService.RegisterUser:output_type -> swiftsignals.user.UserResponse
+	14, // 19: swiftsignals.user.UserService.LoginUser:output_type -> swiftsignals.user.LoginUserResponse
+	16, // 20: swiftsignals.user.UserService.LogoutUser:output_type -> google.protobuf.Empty
+	13, // 21: swiftsignals.user.UserService.GetUserByID:output_type -> swiftsignals.user.UserResponse
+	13, // 22: swiftsignals.user.UserService.GetUserByEmail:output_type -> swiftsignals.user.UserResponse
+	13, // 23: swiftsignals.user.UserService.GetAllUsers:output_type -> swiftsignals.user.UserResponse
+	13, // 24: swiftsignals.user.UserService.UpdateUser:output_type -> swiftsignals.user.UserResponse
+	16, // 25: swiftsignals.user.UserService.DeleteUser:output_type -> google.protobuf.Empty
+	6,  // 26: swiftsignals.user.UserService.GetUserIntersectionIDs:output_type -> swiftsignals.user.IntersectionIDResponse
+	16, // 27: swiftsignals.user.UserService.AddIntersectionID:output_type -> google.protobuf.Empty
+	16, // 28: swiftsignals.user.UserService.RemoveIntersectionID:output_type -> google.protobuf.Empty
+	16, // 29: swiftsignals.user.UserService.ChangePassword:output_type -> google.protobuf.Empty
+	16, // 30: swiftsignals.user.UserService.ResetPassword:output_type -> google.protobuf.Empty
+	16, // 31: swiftsignals.user.UserService.MakeAdmin:output_type -> google.protobuf.Empty
+	16, // 32: swiftsignals.user.UserService.RemoveAdmin:output_type -> google.protobuf.Empty
+	18, // [18:33] is the sub-list for method output_type
+	3,  // [3:18] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_user_proto_init() }
@@ -1130,7 +1014,7 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   17,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
