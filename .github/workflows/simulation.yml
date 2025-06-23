@@ -35,7 +35,7 @@ jobs:
 
         - name: Run Linting with Flake8
           run: |
-            flake8 Sumo_Project_Breakdown --ignore=E501 --ignore=E503
+            flake8 Sumo_Project_Breakdown --ignore=E501,W503
 
         - name: Check Python formatting with Black
           run: black --check .
