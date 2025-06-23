@@ -1,0 +1,205 @@
+basePath: /
+definitions:
+  model.AuthResponse:
+    properties:
+      message:
+        example: Login successful
+        type: string
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+    type: object
+  model.ErrorResponse:
+    properties:
+      code:
+        example: BAD_REQUEST
+        type: string
+      message:
+        example: ERROR_MSG
+        type: string
+    type: object
+  model.LoginRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      password:
+        example: StrongPassword123
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  model.LogoutResponse:
+    properties:
+      message:
+        example: Logout successful
+        type: string
+    type: object
+  model.RegisterRequest:
+    properties:
+      email:
+        example: newuser@example.com
+        type: string
+      password:
+        example: VeryStrongPassword456
+        type: string
+      username:
+        example: johndoe
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  model.ResetPasswordRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+    required:
+    - email
+    type: object
+  model.ResetPasswordResponse:
+    properties:
+      message:
+        example: Password reset instructions sent to your email.
+        type: string
+    type: object
+host: localhost:9090
+info:
+  contact:
+    email: insideinsights2025@gmail.com
+    name: Inside Insights Team
+    url: https://swagger.io/
+  description: |-
+    This is the API Gateway for the Swift-Signals project,
+    forwarding requests to backend gRPC microservices.
+  termsOfService: http://example.com/terms/
+  title: Authentication API Gateway
+  version: "1.0"
+paths:
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user and returns an authentication token.
+      parameters:
+      - description: Login credentials
+        in: body
+        name: loginRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful login
+          schema:
+            $ref: '#/definitions/model.AuthResponse'
+        "400":
+          description: Invalid request payload or credentials
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: User Login
+      tags:
+      - Authentication
+  /logout:
+    post:
+      consumes:
+      - application/json
+      description: Invalidates the user's session or token on the server-side.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful logout
+          schema:
+            $ref: '#/definitions/model.LogoutResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: User Logout
+      tags:
+      - Authentication
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user and returns an authentication token.
+      parameters:
+      - description: User registration details
+        in: body
+        name: registerRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User successfully registered
+          schema:
+            $ref: '#/definitions/model.AuthResponse'
+        "400":
+          description: Invalid request payload or missing fields
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: User Registration
+      tags:
+      - Authentication
+  /reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Reset's a user's password in case they forgot it.
+      parameters:
+      - description: User Email
+        in: body
+        name: resetPasswordRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful password reset
+          schema:
+            $ref: '#/definitions/model.ResetPasswordResponse'
+        "400":
+          description: Invalid request payload or email
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Reset Password
+      tags:
+      - Authentication
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
