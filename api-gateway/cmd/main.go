@@ -29,6 +29,11 @@ import (
 // @host localhost:9090
 // @BasePath /
 // @schemes http
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 func main() {
 	authHandler := handler.NewAuthHandler()
 	log.Println("Initialized Auth Handler.")
@@ -36,6 +41,9 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /login", authHandler.Login)
+	mux.HandleFunc("POST /register", authHandler.Register)
+	mux.HandleFunc("POST /logout", authHandler.Logout)
+	mux.HandleFunc("POST /reset-password", authHandler.ResetPassword)
 	log.Println("Registered API routes.")
 
 	mux.Handle("/docs/", httpSwagger.WrapHandler)
