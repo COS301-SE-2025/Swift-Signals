@@ -2,9 +2,9 @@ name: Python Lint and Test
 
 on: 
     push:
-        branches: [main, dev, SumoSimulationWork]
+        branches: [main, dev, SumoSimulationWork, simulation_testing_branch]
     pull_request:
-        branches: [main, dev, SumoSimulationWork]
+        branches: [main, dev, SumoSimulationWork, simulation_testing_branch]
 
 jobs:
     check-python:
