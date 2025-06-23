@@ -1,0 +1,108 @@
+syntax = "proto3";
+package swiftsignals.simulation;
+
+option go_package = "protos/gen/simulation";
+
+service SimulationService {
+  rpc GetSimulationResults(SimulationRequest) returns (SimulationResultsResponse); // runs the simulation and returns the result
+  rpc GetSimulationOutput(SimulationRequest) returns (SimulationOutputResponse); // runs the simulation with detailed output
+}
+
+message SimulationRequest {
+  string intersection_id = 1; // ID of the intersection to simulate
+  SimulationParameters parameters = 2; // Parameters for the simulation
+}
+
+message SimulationParameters {
+  IntersectionType intersection_type = 1;
+  int32 green = 2;
+  int32 yellow = 3;
+  int32 red = 4;
+  int32 speed = 5;
+  int32 seed = 6;
+}
+
+enum IntersectionType {
+  INTERSECTION_TYPE_UNSPECIFIED = 0;
+  INTERSECTION_TYPE_TRAFFICLIGHT = 1;
+  INTERSECTION_TYPE_ROUNDABOUT = 2;
+  INTERSECTION_TYPE_STOP_SIGN = 3;
+}
+
+message SimulationResultsResponse {
+  string id = 1;
+  int64 total_vehicles = 2; // Total number of vehicles in the simulation
+  int64 avg_travel_time = 3;
+  int64 total_travel_time = 4;
+  int64 avg_speed = 5;
+  int64 avg_waiting_time = 6;
+  int64 waiting_time = 7;
+  int64 generated_vehicles = 8; 
+  int64 emergency_brakes = 9; // Number of emergency brakes applied
+  int64 emergency_stops = 10; // Number of emergency stops
+  int64 near_collisions = 11; // Number of near collisions
+  string date_run = 12;
+}
+
+message SimulationOutputResponse {
+  Intersection intersection = 1;
+  repeated Vehicle vehicles = 2;
+}
+
+message Intersection {
+  repeated Node nodes= 1;
+  repeated Edge edges = 2;
+  repeated Connection connections = 3;
+  repeated TrafficLight traffic_lights = 4;
+}
+
+message Node {
+  string id = 1;
+  float x = 2;
+  float y = 3;
+  NodeType type = 4;
+}
+
+enum NodeType {
+  PRIORITY = 0;
+  TRAFFIC_LIGHT = 1;
+}
+
+message Edge {
+  string id = 1;
+  string from = 2;
+  string to = 3;
+  float speed = 4;
+  int32 lanes = 5;
+}
+
+message Connection {
+  string from = 1;
+  string to = 2;
+  int32 fromLane = 3;
+  int32 toLane = 4;
+  int32 tl = 5;
+}
+
+message TrafficLight {
+  string id = 1;
+  string type = 2;
+  repeated Phase phases = 3;
+}
+
+message Phase {
+  int32 duration = 1;
+  string state = 2;
+}
+
+message Vehicle {
+  string id = 1;
+  repeated Position positions = 2;
+}
+
+message Position {
+  int32 time = 1;
+  float x = 2;
+  float y = 3;
+  float speed = 4;
+}
