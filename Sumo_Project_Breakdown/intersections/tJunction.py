@@ -28,18 +28,23 @@ def generate(params):
 
     print("Generating T-junction with params:", params)
 
-    subprocess.run([
-        "netconvert",
-        f"--node-files={nodeFile}",
-        f"--edge-files={edgeFile}",
-        f"--connection-files={conFile}",
-        "-o", netFile
-    ], check=True)
+    subprocess.run(
+        [
+            "netconvert",
+            f"--node-files={nodeFile}",
+            f"--edge-files={edgeFile}",
+            f"--connection-files={conFile}",
+            "-o",
+            netFile,
+        ],
+        check=True,
+    )
 
     generateTrips(netFile, routeFile, params["Traffic Density"], params)
 
     with open(configFile, "w") as cfg:
-        cfg.write(f"""<configuration>
+        cfg.write(
+            f"""<configuration>
         <input>
             <net-file value="{netFile}"/>
             <route-files value="{routeFile}"/>
@@ -48,20 +53,31 @@ def generate(params):
             <begin value="0"/>
             <end value="3600"/>
         </time>
-    </configuration>""")
+    </configuration>"""
+        )
 
     logfile = f"{base}_warnings.log"
     fcdOutputFile = f"{base}_fcd.xml"
 
     with open(logfile, "w") as log:
-        subprocess.run([
-            "sumo",
-            "-c", configFile,
-            "--tripinfo-output", tripinfoFile,
-            "--fcd-output", fcdOutputFile,
-            "--no-warnings", "false",
-            "--message-log", logfile
-        ], check=True, stdout=log, stderr=log)
+        subprocess.run(
+            [
+                "sumo",
+                "-c",
+                configFile,
+                "--tripinfo-output",
+                tripinfoFile,
+                "--fcd-output",
+                fcdOutputFile,
+                "--no-warnings",
+                "false",
+                "--message-log",
+                logfile,
+            ],
+            check=True,
+            stdout=log,
+            stderr=log,
+        )
 
     print("Simulation finished. Parsing results...")
 
@@ -118,7 +134,7 @@ def generate(params):
         "Generated Vehicles": total_vehicles,
         "Emergency Brakes": emergency_brakes,
         "Emergency Stops": emergency_stops,
-        "Near collisions": len(near_collisions)
+        "Near collisions": len(near_collisions),
     }
 
     trajectories = extractTrajectories(fcdOutputFile)
@@ -127,9 +143,9 @@ def generate(params):
         "intersection": {
             "nodes": parseNodes(nodeFile),
             "edges": parseEdges(edgeFile),
-            "connections": parseConnections(conFile)
+            "connections": parseConnections(conFile),
         },
-        "vehicles": trajectories
+        "vehicles": trajectories,
     }
 
     os.makedirs("out/simulationOut", exist_ok=True)
@@ -139,8 +155,15 @@ def generate(params):
     print("Simulation output saved to simulation_output.json")
 
     tempFiles = [
-        netFile, routeFile, configFile, tripinfoFile,
-        nodeFile, edgeFile, conFile, fcdOutputFile, logfile
+        netFile,
+        routeFile,
+        configFile,
+        tripinfoFile,
+        nodeFile,
+        edgeFile,
+        conFile,
+        fcdOutputFile,
+        logfile,
     ]
 
     for file in tempFiles:
@@ -203,17 +226,25 @@ def generateTrips(netFile, tripFile, density, params):
         os.makedirs(tripDir, exist_ok=True)
 
     cmd = [
-        "python", os.path.join(TOOLS_PATH, "randomTrips.py"),
-        "-n", netFile,
-        "-o", tripFile,
-        "--prefix", "veh",
-        "--seed", str(params["seed"]),
-        "--min-distance", "20",
-        "--trip-attributes", 'departLane="best" departSpeed="max"',
-        "--period", period
+        "python",
+        os.path.join(TOOLS_PATH, "randomTrips.py"),
+        "-n",
+        netFile,
+        "-o",
+        tripFile,
+        "--prefix",
+        "veh",
+        "--seed",
+        str(params["seed"]),
+        "--min-distance",
+        "20",
+        "--trip-attributes",
+        'departLane="best" departSpeed="max"',
+        "--period",
+        period,
     ]
 
-    with open(os.devnull, 'w') as devnull:
+    with open(os.devnull, "w") as devnull:
         subprocess.run(cmd, check=True, stderr=devnull)
     print("Trips generated.")
 
@@ -232,42 +263,48 @@ def extractTrajectories(fcdOutputFile):
             speed = float(vehicle.get("speed"))
             if vid not in trajectories:
                 trajectories[vid] = {"id": vid, "positions": []}
-            trajectories[vid]["positions"].append({
-                "time": time,
-                "x": x,
-                "y": y,
-                "speed": speed
-            })
+            trajectories[vid]["positions"].append(
+                {"time": time, "x": x, "y": y, "speed": speed}
+            )
 
     return list(trajectories.values())
 
 
 def parseNodes(filename):
     tree = ET.parse(filename)
-    return [{
-        "id": n.get("id"),
-        "x": float(n.get("x")),
-        "y": float(n.get("y")),
-        "type": n.get("type")
-    } for n in tree.getroot()]
+    return [
+        {
+            "id": n.get("id"),
+            "x": float(n.get("x")),
+            "y": float(n.get("y")),
+            "type": n.get("type"),
+        }
+        for n in tree.getroot()
+    ]
 
 
 def parseEdges(filename):
     tree = ET.parse(filename)
-    return [{
-        "id": e.get("id"),
-        "from": e.get("from"),
-        "to": e.get("to"),
-        "speed": float(e.get("speed")),
-        "lanes": int(e.get("numLanes"))
-    } for e in tree.getroot()]
+    return [
+        {
+            "id": e.get("id"),
+            "from": e.get("from"),
+            "to": e.get("to"),
+            "speed": float(e.get("speed")),
+            "lanes": int(e.get("numLanes")),
+        }
+        for e in tree.getroot()
+    ]
 
 
 def parseConnections(filename):
     tree = ET.parse(filename)
-    return [{
-        "from": c.get("from"),
-        "to": c.get("to"),
-        "fromLane": int(c.get("fromLane")),
-        "toLane": int(c.get("toLane"))
-    } for c in tree.getroot()]
+    return [
+        {
+            "from": c.get("from"),
+            "to": c.get("to"),
+            "fromLane": int(c.get("fromLane")),
+            "toLane": int(c.get("toLane")),
+        }
+        for c in tree.getroot()
+    ]

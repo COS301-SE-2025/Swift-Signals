@@ -22,9 +22,11 @@ class TestSimLoad(unittest.TestCase):
     @patch("sys.argv", new=["scriptname"])
     def test_loadParams(self, mock_open_file, mock_exists, mock_input):
 
-        def open_side_effect(file, mode='r', *args, **kwargs):
+        def open_side_effect(file, mode="r", *args, **kwargs):
             if file == "params_test.json":
-                return StringIO('{"intersection":{"simulation_parameters":{"Intersection Type":1, "Speed":60}, "Traffic Density":2}}')
+                return StringIO(
+                    '{"intersection":{"simulation_parameters":{"Intersection Type":1, "Speed":60}, "Traffic Density":2}}'
+                )
             else:
                 return real_open(file, mode, *args, **kwargs)
 
@@ -47,9 +49,15 @@ class TestSimLoad(unittest.TestCase):
         mock_file().write.assert_called_with("7")
 
     def test_getDefaultTimingsBySpeed(self):
-        self.assertEqual(SimLoad.getDefaultTimingsBySpeed(40), {"Green": 25, "Yellow": 3, "Red": 30})
-        self.assertEqual(SimLoad.getDefaultTimingsBySpeed(80), {"Green": 30, "Yellow": 5, "Red": 35})
-        self.assertEqual(SimLoad.getDefaultTimingsBySpeed(120), {"Green": 30, "Yellow": 5, "Red": 35})
+        self.assertEqual(
+            SimLoad.getDefaultTimingsBySpeed(40), {"Green": 25, "Yellow": 3, "Red": 30}
+        )
+        self.assertEqual(
+            SimLoad.getDefaultTimingsBySpeed(80), {"Green": 30, "Yellow": 5, "Red": 35}
+        )
+        self.assertEqual(
+            SimLoad.getDefaultTimingsBySpeed(120), {"Green": 30, "Yellow": 5, "Red": 35}
+        )
 
     @patch("builtins.input", side_effect=["medium", "60", "y"])
     def test_getParams_trafficlight_default(self, mock_input):
@@ -68,20 +76,41 @@ class TestSimLoad(unittest.TestCase):
     @patch("time.strftime", return_value="20250623T000000Z")
     @patch("json.dump")
     def test_saveParams(self, mock_json_dump, mock_time, mock_file, mock_uuid):
-        SimLoad.saveParams({"Traffic Density": "medium", "Speed": 60}, "trafficlight", "testSim")
+        SimLoad.saveParams(
+            {"Traffic Density": "medium", "Speed": 60}, "trafficlight", "testSim"
+        )
         args, kwargs = mock_json_dump.call_args
         written_data = args[0]
         self.assertIn("intersection", written_data)
-        self.assertEqual(written_data["intersection"]["simulation_parameters"]["Intersection Type"], "trafficlight")
+        self.assertEqual(
+            written_data["intersection"]["simulation_parameters"]["Intersection Type"],
+            "trafficlight",
+        )
 
     @patch("SimLoad.trafficLight.generate", return_value={"result": "ok"})
-    @patch("SimLoad.loadParams", return_value={"Intersection Type": "trafficlight", "Speed": 60, "Traffic Density": "medium"})
+    @patch(
+        "SimLoad.loadParams",
+        return_value={
+            "Intersection Type": "trafficlight",
+            "Speed": 60,
+            "Traffic Density": "medium",
+        },
+    )
     @patch("SimLoad.saveRunCount")
     @patch("SimLoad.loadRunCount", return_value=0)
     @patch("json.dump")
     @patch("os.makedirs")
     @patch("os.remove")
-    def test_main_traffic_light(self, mock_remove, mock_makedirs, mock_json_dump, mock_run_count, mock_save_run_count, mock_params, mock_generate):
+    def test_main_traffic_light(
+        self,
+        mock_remove,
+        mock_makedirs,
+        mock_json_dump,
+        mock_run_count,
+        mock_save_run_count,
+        mock_params,
+        mock_generate,
+    ):
         SimLoad.main()
         mock_generate.assert_called_once()
 
@@ -120,35 +149,83 @@ class TestSimLoad(unittest.TestCase):
         self.assertEqual(result["Red"], 30)
 
     @patch("SimLoad.circle.generate", return_value={"result": "circle_ok"})
-    @patch("SimLoad.loadParams", return_value={"Intersection Type": "roundabout", "Traffic Density": "medium", "Speed": 60})
+    @patch(
+        "SimLoad.loadParams",
+        return_value={
+            "Intersection Type": "roundabout",
+            "Traffic Density": "medium",
+            "Speed": 60,
+        },
+    )
     @patch("SimLoad.saveRunCount")
     @patch("SimLoad.loadRunCount", return_value=0)
     @patch("os.makedirs")
     @patch("os.remove")
     @patch("builtins.open", new_callable=mock_open)
-    def test_main_roundabout(self, mock_file, mock_remove, mock_makedirs, mock_run_count, mock_save_run_count, mock_params, mock_generate):
+    def test_main_roundabout(
+        self,
+        mock_file,
+        mock_remove,
+        mock_makedirs,
+        mock_run_count,
+        mock_save_run_count,
+        mock_params,
+        mock_generate,
+    ):
         SimLoad.main()
         mock_generate.assert_called_once()
 
     @patch("SimLoad.stopStreet.generate", return_value={"result": "stop_ok"})
-    @patch("SimLoad.loadParams", return_value={"Intersection Type": "fourwaystop", "Traffic Density": "medium", "Speed": 60})
+    @patch(
+        "SimLoad.loadParams",
+        return_value={
+            "Intersection Type": "fourwaystop",
+            "Traffic Density": "medium",
+            "Speed": 60,
+        },
+    )
     @patch("SimLoad.saveRunCount")
     @patch("SimLoad.loadRunCount", return_value=0)
     @patch("os.makedirs")
     @patch("os.remove")
     @patch("builtins.open", new_callable=mock_open)
-    def test_main_fourwaystop(self, mock_file, mock_remove, mock_makedirs, mock_run_count, mock_save_run_count, mock_params, mock_generate):
+    def test_main_fourwaystop(
+        self,
+        mock_file,
+        mock_remove,
+        mock_makedirs,
+        mock_run_count,
+        mock_save_run_count,
+        mock_params,
+        mock_generate,
+    ):
         SimLoad.main()
         mock_generate.assert_called_once()
 
     @patch("SimLoad.tJunction.generate", return_value={"result": "tj_ok"})
-    @patch("SimLoad.loadParams", return_value={"Intersection Type": "tjunction", "Traffic Density": "medium", "Speed": 60})
+    @patch(
+        "SimLoad.loadParams",
+        return_value={
+            "Intersection Type": "tjunction",
+            "Traffic Density": "medium",
+            "Speed": 60,
+        },
+    )
     @patch("SimLoad.saveRunCount")
     @patch("SimLoad.loadRunCount", return_value=0)
     @patch("os.makedirs")
     @patch("os.remove")
     @patch("builtins.open", new_callable=mock_open)
-    def test_main_tjunction(self, mock_file, mock_remove, mock_makedirs, mock_run_count, mock_save_run_count, mock_params, mock_generate):
+    def test_main_tjunction(
+        self,
+        mock_file,
+        mock_remove,
+        mock_makedirs,
+        mock_run_count,
+        mock_save_run_count,
+        mock_params,
+        mock_generate,
+    ):
         SimLoad.main()
         mock_generate.assert_called_once()
 

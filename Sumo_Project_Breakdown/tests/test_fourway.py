@@ -6,7 +6,9 @@ import pathlib
 import xml.etree.ElementTree as ET
 
 if "stopStreet" not in sys.modules:
-    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "intersections"))
+    sys.path.insert(
+        0, str(pathlib.Path(__file__).resolve().parent.parent / "intersections")
+    )
     import stopStreet
 
 
@@ -21,8 +23,18 @@ class TestStopIntersection(unittest.TestCase):
     @patch("stopStreet.subprocess.run")
     @patch("builtins.open", new_callable=mock_open)
     @patch("xml.etree.ElementTree.parse")
-    def test_generate_full_flow(self, mock_et_parse, mock_open_file, mock_subprocess, mock_generateTrips,
-                                mock_parseCon, mock_parseEdg, mock_parseNod, mock_extractTraj, mock_remove):
+    def test_generate_full_flow(
+        self,
+        mock_et_parse,
+        mock_open_file,
+        mock_subprocess,
+        mock_generateTrips,
+        mock_parseCon,
+        mock_parseEdg,
+        mock_parseNod,
+        mock_extractTraj,
+        mock_remove,
+    ):
 
         tripinfo_xml = """<root>
             <tripinfo duration="100" waitingTime="20" routeLength="500"/>
@@ -60,22 +72,34 @@ class TestStopIntersection(unittest.TestCase):
 
         calls = [call[0][0] for call in mock_subprocess.call_args_list]
 
-        self.assertIn([
-            "netconvert",
-            "--node-files=stopInt.nod.xml",
-            "--edge-files=stopInt.edg.xml",
-            "--connection-files=stopInt.con.xml",
-            "-o", "stop_intersection.net.xml"
-        ], calls)
+        self.assertIn(
+            [
+                "netconvert",
+                "--node-files=stopInt.nod.xml",
+                "--edge-files=stopInt.edg.xml",
+                "--connection-files=stopInt.con.xml",
+                "-o",
+                "stop_intersection.net.xml",
+            ],
+            calls,
+        )
 
-        self.assertIn([
-            "sumo",
-            "-c", "stop_intersection.sumocfg",
-            "--tripinfo-output", "stop_intersection_tripinfo.xml",
-            "--fcd-output", "stop_intersection_fcd.xml",
-            "--no-warnings", "false",
-            "--message-log", "stop_intersection_warnings.log"
-        ], calls)
+        self.assertIn(
+            [
+                "sumo",
+                "-c",
+                "stop_intersection.sumocfg",
+                "--tripinfo-output",
+                "stop_intersection_tripinfo.xml",
+                "--fcd-output",
+                "stop_intersection_fcd.xml",
+                "--no-warnings",
+                "false",
+                "--message-log",
+                "stop_intersection_warnings.log",
+            ],
+            calls,
+        )
 
         mock_generateTrips.assert_called_once()
         mock_extractTraj.assert_called_once()

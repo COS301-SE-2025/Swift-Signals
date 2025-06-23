@@ -5,7 +5,9 @@ import sys
 import pathlib
 
 if "tJunction" not in sys.modules:
-    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "intersections"))
+    sys.path.insert(
+        0, str(pathlib.Path(__file__).resolve().parent.parent / "intersections")
+    )
     import tJunction
 
 
@@ -23,14 +25,26 @@ class TestTJunction(unittest.TestCase):
     @patch("tJunction.parseConnections", return_value=[{"from": "e1", "to": "e2"}])
     @patch("os.makedirs")
     @patch("os.remove")
-    def test_generate_full_flow(self, mock_remove, mock_makedirs, mock_parseCon, mock_parseEdg, mock_parseNod,
-                                mock_extractTraj, mock_open_file, mock_subprocess_run, mock_generateTrips,
-                                mock_writeCon, mock_writeEdge, mock_writeNode):
+    def test_generate_full_flow(
+        self,
+        mock_remove,
+        mock_makedirs,
+        mock_parseCon,
+        mock_parseEdg,
+        mock_parseNod,
+        mock_extractTraj,
+        mock_open_file,
+        mock_subprocess_run,
+        mock_generateTrips,
+        mock_writeCon,
+        mock_writeEdge,
+        mock_writeNode,
+    ):
         # Setup mocks for reading logfile and tripinfo XML
         logfile_content = [
             "Vehicle 'veh1' performs emergency braking\n",
             "Vehicle 'veh2' performs emergency stop\n",
-            "No issues here\n"
+            "No issues here\n",
         ]
         tripinfo_xml = """<root>
             <tripinfo duration="100" waitingTime="10" routeLength="500"/>
@@ -38,18 +52,19 @@ class TestTJunction(unittest.TestCase):
         </root>"""
 
         # Mock open() for logfile, tripinfoFile, and simulation_output.json
-        def open_side_effect(file, mode='r', *args, **kwargs):
-            if file == "tjunction_warnings.log" and 'r' in mode:
+        def open_side_effect(file, mode="r", *args, **kwargs):
+            if file == "tjunction_warnings.log" and "r" in mode:
                 mock_file = mock_open(read_data="".join(logfile_content)).return_value
                 mock_file.__iter__.return_value = logfile_content
                 return mock_file
-            elif file == "tjunction_tripinfo.xml" and 'r' in mode:
+            elif file == "tjunction_tripinfo.xml" and "r" in mode:
                 mock_file = mock_open(read_data=tripinfo_xml).return_value
                 return mock_file
-            elif file == "out/simulationOut/simulation_output.json" and 'w' in mode:
+            elif file == "out/simulationOut/simulation_output.json" and "w" in mode:
                 return mock_open().return_value
             else:
                 return mock_open().return_value
+
         mock_open_file.side_effect = open_side_effect
 
         params = {"Speed": 60, "Traffic Density": "medium", "seed": 42}
@@ -72,28 +87,37 @@ class TestTJunction(unittest.TestCase):
 
         # Check subprocess calls for netconvert and sumo run
         calls = [call_args[0][0] for call_args in mock_subprocess_run.call_args_list]
-        self.assertIn([
-            "netconvert",
-            "--node-files=tjInt.nod.xml",
-            "--edge-files=tjInt.edg.xml",
-            "--connection-files=tjInt.con.xml",
-            "-o", "tjunction.net.xml"
-        ], calls)
+        self.assertIn(
+            [
+                "netconvert",
+                "--node-files=tjInt.nod.xml",
+                "--edge-files=tjInt.edg.xml",
+                "--connection-files=tjInt.con.xml",
+                "-o",
+                "tjunction.net.xml",
+            ],
+            calls,
+        )
 
-        self.assertIn([
-            "sumo",
-            "-c", "tjunction.sumocfg",
-            "--tripinfo-output", "tjunction_tripinfo.xml",
-            "--fcd-output", "tjunction_fcd.xml",
-            "--no-warnings", "false",
-            "--message-log", "tjunction_warnings.log"
-        ], calls)
+        self.assertIn(
+            [
+                "sumo",
+                "-c",
+                "tjunction.sumocfg",
+                "--tripinfo-output",
+                "tjunction_tripinfo.xml",
+                "--fcd-output",
+                "tjunction_fcd.xml",
+                "--no-warnings",
+                "false",
+                "--message-log",
+                "tjunction_warnings.log",
+            ],
+            calls,
+        )
 
         mock_generateTrips.assert_called_once_with(
-            "tjunction.net.xml",
-            "tjunction.rou.xml",
-            "medium",
-            params
+            "tjunction.net.xml", "tjunction.rou.xml", "medium", params
         )
 
         # Check JSON output file creation
@@ -104,8 +128,15 @@ class TestTJunction(unittest.TestCase):
 
         # Check temp files removal
         expected_files = [
-            "tjunction.net.xml", "tjunction.rou.xml", "tjunction.sumocfg", "tjunction_tripinfo.xml",
-            "tjInt.nod.xml", "tjInt.edg.xml", "tjInt.con.xml", "tjunction_fcd.xml", "tjunction_warnings.log"
+            "tjunction.net.xml",
+            "tjunction.rou.xml",
+            "tjunction.sumocfg",
+            "tjunction_tripinfo.xml",
+            "tjInt.nod.xml",
+            "tjInt.edg.xml",
+            "tjInt.con.xml",
+            "tjunction_fcd.xml",
+            "tjunction_warnings.log",
         ]
         for filename in expected_files:
             mock_remove.assert_any_call(filename)
@@ -214,10 +245,22 @@ class TestTJunction(unittest.TestCase):
     @patch("os.makedirs")
     @patch("os.remove")
     @patch("xml.etree.ElementTree.parse")
-    def test_generate_speed_warning_and_default(self, mock_et_parse, mock_remove, mock_makedirs, mock_parseCon,
-                                                mock_parseEdg, mock_parseNod, mock_extractTraj, mock_subprocess_run,
-                                                mock_generateTrips, mock_writeCon, mock_writeEdge, mock_writeNode,
-                                                mock_print):
+    def test_generate_speed_warning_and_default(
+        self,
+        mock_et_parse,
+        mock_remove,
+        mock_makedirs,
+        mock_parseCon,
+        mock_parseEdg,
+        mock_parseNod,
+        mock_extractTraj,
+        mock_subprocess_run,
+        mock_generateTrips,
+        mock_writeCon,
+        mock_writeEdge,
+        mock_writeNode,
+        mock_print,
+    ):
 
         tripinfo_xml = """<root>
             <tripinfo duration="100" waitingTime="10" routeLength="500"/>
@@ -227,7 +270,9 @@ class TestTJunction(unittest.TestCase):
         params = {"Speed": 999, "Traffic Density": "low", "seed": 1}
         tJunction.generate(params)
 
-        mock_print.assert_any_call("Warning: Speed 999km/h not allowed. Using default 40km/h.")
+        mock_print.assert_any_call(
+            "Warning: Speed 999km/h not allowed. Using default 40km/h."
+        )
 
 
 if __name__ == "__main__":

@@ -31,18 +31,23 @@ def generate(params):
 
     writeTrafficLightLogic(tllFile, params["Green"], params["Yellow"], params["Red"])
 
-    subprocess.run([
-        "netconvert",
-        f"--node-files={nodeFile}",
-        f"--edge-files={edgeFile}",
-        f"--connection-files={conFile}",
-        "-o", netFile
-    ], check=True)
+    subprocess.run(
+        [
+            "netconvert",
+            f"--node-files={nodeFile}",
+            f"--edge-files={edgeFile}",
+            f"--connection-files={conFile}",
+            "-o",
+            netFile,
+        ],
+        check=True,
+    )
 
     generateTrips(netFile, routeFile, params["Traffic Density"], params)
 
     with open(configFile, "w") as cfg:
-        cfg.write(f"""<configuration>
+        cfg.write(
+            f"""<configuration>
         <input>
             <net-file value="{netFile}"/>
             <route-files value="{routeFile}"/>
@@ -52,21 +57,32 @@ def generate(params):
             <begin value="0"/>
             <end value="3600"/>
         </time>
-    </configuration>""")
+    </configuration>"""
+        )
 
-    '''run GUI by using sumo-gui'''
+    """run GUI by using sumo-gui"""
     logfile = f"{base}_warnings.log"
     fcdOutputFile = f"{base}_fcd.xml"
 
     with open(logfile, "w") as log:
-        subprocess.run([
-            "sumo",
-            "-c", configFile,
-            "--tripinfo-output", tripinfoFile,
-            "--fcd-output", fcdOutputFile,
-            "--no-warnings", "false",
-            "--message-log", logfile
-        ], check=True, stdout=log, stderr=log)
+        subprocess.run(
+            [
+                "sumo",
+                "-c",
+                configFile,
+                "--tripinfo-output",
+                tripinfoFile,
+                "--fcd-output",
+                fcdOutputFile,
+                "--no-warnings",
+                "false",
+                "--message-log",
+                logfile,
+            ],
+            check=True,
+            stdout=log,
+            stderr=log,
+        )
 
     print("Simulation finished. Parsing results...")
 
@@ -83,7 +99,11 @@ def generate(params):
             vehicle_id = line.split("'")[1]
             emergency_brakes += 1
 
-            if i + 1 < len(lines) and vehicle_id in lines[i + 1] and "because of a red traffic light" in lines[i + 1]:
+            if (
+                i + 1 < len(lines)
+                and vehicle_id in lines[i + 1]
+                and "because of a red traffic light" in lines[i + 1]
+            ):
                 continue
             else:
                 near_collisions.append(line)
@@ -92,7 +112,11 @@ def generate(params):
             vehicle_id = line.split("'")[1]
             emergency_stops += 1
 
-            if i + 1 < len(lines) and vehicle_id in lines[i + 1] and "because of a red traffic light" in lines[i + 1]:
+            if (
+                i + 1 < len(lines)
+                and vehicle_id in lines[i + 1]
+                and "because of a red traffic light" in lines[i + 1]
+            ):
                 continue
             else:
                 near_collisions.append(line)
@@ -133,7 +157,7 @@ def generate(params):
         "Generated Vehicles": total_vehicles,
         "Emergency Brakes": emergency_brakes,
         "Emergency Stops": emergency_stops,
-        "Near collisions": len(near_collisions)
+        "Near collisions": len(near_collisions),
     }
 
     trajectories = extractTrajectories(fcdOutputFile)
@@ -143,9 +167,9 @@ def generate(params):
             "nodes": parseNodes(nodeFile),
             "edges": parseEdges(edgeFile),
             "connections": parseConnections(conFile),
-            "trafficLights": parseTrafficLights(tllFile)
+            "trafficLights": parseTrafficLights(tllFile),
         },
-        "vehicles": trajectories
+        "vehicles": trajectories,
     }
 
     with open("out/simulationOut/simulation_output.json", "w") as jf:
@@ -154,8 +178,16 @@ def generate(params):
     print("Simulation output saved to simulation_output.json")
 
     tempFiles = [
-        netFile, routeFile, configFile, tllFile, tripinfoFile,
-        nodeFile, edgeFile, conFile, fcdOutputFile, logfile
+        netFile,
+        routeFile,
+        configFile,
+        tllFile,
+        tripinfoFile,
+        nodeFile,
+        edgeFile,
+        conFile,
+        fcdOutputFile,
+        logfile,
     ]
 
     for file in tempFiles:
@@ -171,7 +203,12 @@ def parseNodes(filename):
     tree = ET.parse(filename)
     root = tree.getroot()
     return [
-        {"id": n.get("id"), "x": float(n.get("x")), "y": float(n.get("y")), "type": n.get("type")}
+        {
+            "id": n.get("id"),
+            "x": float(n.get("x")),
+            "y": float(n.get("y")),
+            "type": n.get("type"),
+        }
         for n in root.findall("node")
     ]
 
@@ -185,7 +222,7 @@ def parseEdges(filename):
             "from": e.get("from"),
             "to": e.get("to"),
             "speed": float(e.get("speed")),
-            "lanes": int(e.get("numLanes"))
+            "lanes": int(e.get("numLanes")),
         }
         for e in root.findall("edge")
     ]
@@ -200,7 +237,7 @@ def parseConnections(filename):
             "to": c.get("to"),
             "fromLane": int(c.get("fromLane")),
             "toLane": int(c.get("toLane")),
-            "tl": c.get("tl")
+            "tl": c.get("tl"),
         }
         for c in root.findall("connection")
     ]
@@ -211,17 +248,19 @@ def parseTrafficLights(filename):
     root = tree.getroot()
     result = []
     for logic in root.findall("tlLogic"):
-        result.append({
-            "id": logic.get("id"),
-            "type": logic.get("type"),
-            "phases": [
-                {
-                    "duration": int(phase.get("duration")),
-                    "state": phase.get("state")
-                }
-                for phase in logic.findall("phase")
-            ]
-        })
+        result.append(
+            {
+                "id": logic.get("id"),
+                "type": logic.get("type"),
+                "phases": [
+                    {
+                        "duration": int(phase.get("duration")),
+                        "state": phase.get("state"),
+                    }
+                    for phase in logic.findall("phase")
+                ],
+            }
+        )
     return result
 
 
@@ -239,17 +278,11 @@ def extractTrajectories(fcdOutputFile):
             speed = float(vehicle.get("speed"))
 
             if vid not in trajectories:
-                trajectories[vid] = {
-                    "id": vid,
-                    "positions": []
-                }
+                trajectories[vid] = {"id": vid, "positions": []}
 
-            trajectories[vid]["positions"].append({
-                "time": time,
-                "x": x,
-                "y": y,
-                "speed": speed
-            })
+            trajectories[vid]["positions"].append(
+                {"time": time, "x": x, "y": y, "speed": speed}
+            )
 
     return list(trajectories.values())
 
@@ -305,39 +338,41 @@ def writeConnectionFile(filename):
 
 
 def writeTrafficLightLogic(filename, greenDuration, yellowDuration, redDuration):
-    '''Phase 1: green for some lanes'''
+    """Phase 1: green for some lanes"""
     phase1_state = list("r" * 12)
     for i in [0, 1, 2, 6, 7, 8]:
         phase1_state[i] = "G"
     phase1_state = "".join(phase1_state)
 
-    '''Phase 2: yellow for same lanes (transitional)'''
+    """Phase 2: yellow for same lanes (transitional)"""
     phase2_state = list("r" * 12)
     for i in [0, 1, 2, 6, 7, 8]:
         phase2_state[i] = "y"
     phase2_state = "".join(phase2_state)
 
-    '''Phase 3: green for other lanes'''
+    """Phase 3: green for other lanes"""
     phase3_state = list("r" * 12)
     for i in [3, 4, 5, 9, 10, 11]:
         phase3_state[i] = "G"
     phase3_state = "".join(phase3_state)
 
-    '''Phase 4: yellow for other lanes'''
+    """Phase 4: yellow for other lanes"""
     phase4_state = list("r" * 12)
     for i in [3, 4, 5, 9, 10, 11]:
         phase4_state[i] = "y"
     phase4_state = "".join(phase4_state)
 
     with open(filename, "w") as tl:
-        tl.write(f"""<additional>
+        tl.write(
+            f"""<additional>
     <tlLogic id="1" type="static" programID="custom" offset="0">
         <phase duration="{greenDuration}" state="{phase1_state}"/>
         <phase duration="{yellowDuration}" state="{phase2_state}"/>
         <phase duration="{redDuration}" state="{phase3_state}"/>
         <phase duration="{yellowDuration}" state="{phase4_state}"/>
     </tlLogic>
-</additional>""")
+</additional>"""
+        )
 
 
 def generateTrips(netFile, tripFile, density, params):
@@ -348,13 +383,13 @@ def generateTrips(netFile, tripFile, density, params):
 
     if density == "low":
         period = "12"
-        '''300 vehicles p/h'''
+        """300 vehicles p/h"""
     elif density == "medium":
         period = "6"
-        '''600 vehicles p/h'''
+        """600 vehicles p/h"""
     elif density == "high":
         period = "3"
-        '''1200 vehicles p/h'''
+        """1200 vehicles p/h"""
     else:
         period = "6"
 
@@ -363,16 +398,24 @@ def generateTrips(netFile, tripFile, density, params):
         os.makedirs(tripDir, exist_ok=True)
 
     cmd = [
-        "python", os.path.join(TOOLS_PATH, "randomTrips.py"),
-        "-n", netFile,
-        "-o", tripFile,
-        "--prefix", "veh",
-        "--seed", str(params["seed"]),
-        "--min-distance", "20",
-        "--trip-attributes", 'departLane="best" departSpeed="max"',
-        "--period", period
+        "python",
+        os.path.join(TOOLS_PATH, "randomTrips.py"),
+        "-n",
+        netFile,
+        "-o",
+        tripFile,
+        "--prefix",
+        "veh",
+        "--seed",
+        str(params["seed"]),
+        "--min-distance",
+        "20",
+        "--trip-attributes",
+        'departLane="best" departSpeed="max"',
+        "--period",
+        period,
     ]
 
-    with open(os.devnull, 'w') as devnull:
+    with open(os.devnull, "w") as devnull:
         subprocess.run(cmd, check=True, stderr=devnull)
     print("Trips generated.")

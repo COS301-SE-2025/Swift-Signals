@@ -11,7 +11,7 @@ import argparse
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
-'''ENUM mappings'''
+"""ENUM mappings"""
 INTERSECTION_TYPES = {
     0: "unspecified",
     1: "trafficlight",
@@ -21,11 +21,7 @@ INTERSECTION_TYPES = {
 }
 
 
-TRAFFIC_DENSITY = {
-    0: "low",
-    1: "medium",
-    2: "high"
-}
+TRAFFIC_DENSITY = {0: "low", 1: "medium", 2: "high"}
 
 
 INTERSECTION_STATUS = {
@@ -72,7 +68,7 @@ def loadParams():
     return {
         **sim_params,
         "Traffic Density": traffic_density,
-        "Intersection Type": intersection_type
+        "Intersection Type": intersection_type,
     }
 
 
@@ -96,7 +92,9 @@ def getDefaultTimingsBySpeed(speed):
     elif speed <= 80:
         return {"Green": 30, "Yellow": 5, "Red": 35}
     else:
-        print("Speed exceeds reccomended safety for traffic lights, using default for 80km/h")
+        print(
+            "Speed exceeds reccomended safety for traffic lights, using default for 80km/h"
+        )
         return {"Green": 30, "Yellow": 5, "Red": 35}
 
 
@@ -110,8 +108,12 @@ def getParams(tL: bool):
         speed = 40
 
     if tL:
-        use_default = input("Use default light timings based on road speed? (y/n): ").strip().lower()
-        if use_default == 'y':
+        use_default = (
+            input("Use default light timings based on road speed? (y/n): ")
+            .strip()
+            .lower()
+        )
+        if use_default == "y":
             timings = getDefaultTimingsBySpeed(speed)
         else:
             try:
@@ -128,13 +130,10 @@ def getParams(tL: bool):
             "Green": timings["Green"],
             "Yellow": timings["Yellow"],
             "Red": timings["Red"],
-            "Speed": speed
+            "Speed": speed,
         }
     else:
-        return {
-            "Traffic Density": trafficDensity,
-            "Speed": speed
-        }
+        return {"Traffic Density": trafficDensity, "Speed": speed}
 
 
 def saveParams(params, intersectionType, simName):
@@ -144,9 +143,7 @@ def saveParams(params, intersectionType, simName):
     fake_oid = uuid.uuid4().hex[:24]
 
     simulationData = {
-        "_id": {
-            "$oid": fake_oid
-        },
+        "_id": {"$oid": fake_oid},
         "intersection": {
             "id": "simId",
             "name": simName,
@@ -158,9 +155,9 @@ def saveParams(params, intersectionType, simName):
             "simulation_parameters": {
                 "Intersection Type": intersectionType,
                 **params,
-                "seed": 13
-            }
-        }
+                "seed": 13,
+            },
+        },
     }
 
     with open(fileName, "w") as f:
@@ -181,7 +178,7 @@ def main():
     runCount += 1
     saveRunCount(runCount)
 
-    '''Run correct generator based on type'''
+    """Run correct generator based on type"""
     if intersection_type == "trafficlight":
         results = trafficLight.generate(params)
     elif intersection_type == "roundabout":
@@ -195,9 +192,7 @@ def main():
         return
 
     output = {
-        "_id": {
-            "$oid": uuid.uuid4().hex[:24]
-        },
+        "_id": {"$oid": uuid.uuid4().hex[:24]},
         "intersection": {
             "id": simId,
             "name": simName,
@@ -207,11 +202,11 @@ def main():
             "status": "completed",
             "run_count": runCount,
             "parameters": params,
-            "results": results
-        }
+            "results": results,
+        },
     }
 
-    '''Save the output to a file'''
+    """Save the output to a file"""
     os.makedirs("out/results", exist_ok=True)
     with open("out/results/simulation_results.json", "w") as f:
         json.dump(output, f, indent=2)

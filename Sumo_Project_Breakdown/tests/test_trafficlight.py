@@ -5,7 +5,9 @@ import sys
 import pathlib
 
 if "trafficLight" not in sys.modules:
-    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "intersections"))
+    sys.path.insert(
+        0, str(pathlib.Path(__file__).resolve().parent.parent / "intersections")
+    )
     import trafficLight
 
 
@@ -104,8 +106,17 @@ class TestTLIntersection(unittest.TestCase):
     @patch("trafficLight.generateTrips")
     @patch("trafficLight.subprocess.run")
     def test_generate_runs_full_flow(
-        self, mock_run, mock_generateTrips, mock_et_parse, mock_open_file,
-        mock_parseNodes, mock_parseEdges, mock_parseCon, mock_parseTL, mock_extractTraj, mock_remove
+        self,
+        mock_run,
+        mock_generateTrips,
+        mock_et_parse,
+        mock_open_file,
+        mock_parseNodes,
+        mock_parseEdges,
+        mock_parseCon,
+        mock_parseTL,
+        mock_extractTraj,
+        mock_remove,
     ):
         # Mock tripinfo XML
         tripinfo_xml = """
@@ -117,18 +128,29 @@ class TestTLIntersection(unittest.TestCase):
         mock_et_parse.return_value.getroot.return_value = ET.fromstring(tripinfo_xml)
 
         # Mock open for reading logs and writing outputs
-        def open_side_effect(file, mode='r', *args, **kwargs):
-            if file.endswith("_warnings.log") and 'r' in mode:
-                mock_file = mock_open(read_data="Vehicle 'v1' performs emergency braking\n").return_value
-                mock_file.__iter__.return_value = ["Vehicle 'v1' performs emergency braking\n"]
+        def open_side_effect(file, mode="r", *args, **kwargs):
+            if file.endswith("_warnings.log") and "r" in mode:
+                mock_file = mock_open(
+                    read_data="Vehicle 'v1' performs emergency braking\n"
+                ).return_value
+                mock_file.__iter__.return_value = [
+                    "Vehicle 'v1' performs emergency braking\n"
+                ]
                 return mock_file
-            if file.endswith("_tripinfo.xml") and 'r' in mode:
+            if file.endswith("_tripinfo.xml") and "r" in mode:
                 return mock_open(read_data=tripinfo_xml).return_value
             return mock_open().return_value
 
         mock_open_file.side_effect = open_side_effect
 
-        params = {"Speed": 60, "Traffic Density": "low", "seed": 1, "Green": 30, "Yellow": 5, "Red": 25}
+        params = {
+            "Speed": 60,
+            "Traffic Density": "low",
+            "seed": 1,
+            "Green": 30,
+            "Yellow": 5,
+            "Red": 25,
+        }
         result = trafficLight.generate(params)
 
         self.assertIn("Total Vehicles", result)
@@ -148,8 +170,18 @@ class TestTLIntersection(unittest.TestCase):
     @patch("trafficLight.parseNodes", return_value=[])
     @patch("trafficLight.os.remove")
     def test_generate_speed_warning_prints_message(
-        self, mock_remove, mock_parseNodes, mock_parseEdges, mock_parseCon, mock_parseTL,
-        mock_extractTraj, mock_et_parse, mock_open_file, mock_run, mock_generateTrips, mock_print
+        self,
+        mock_remove,
+        mock_parseNodes,
+        mock_parseEdges,
+        mock_parseCon,
+        mock_parseTL,
+        mock_extractTraj,
+        mock_et_parse,
+        mock_open_file,
+        mock_run,
+        mock_generateTrips,
+        mock_print,
     ):
         tripinfo_xml = """
         <root>
@@ -158,34 +190,47 @@ class TestTLIntersection(unittest.TestCase):
         """
         mock_et_parse.return_value.getroot.return_value = ET.fromstring(tripinfo_xml)
 
-        def open_side_effect(file, mode='r', *args, **kwargs):
-            if file.endswith("_warnings.log") and 'r' in mode:
+        def open_side_effect(file, mode="r", *args, **kwargs):
+            if file.endswith("_warnings.log") and "r" in mode:
                 mock_file = mock_open(read_data="").return_value
                 mock_file.__iter__.return_value = []
                 return mock_file
-            if file.endswith("_tripinfo.xml") and 'r' in mode:
+            if file.endswith("_tripinfo.xml") and "r" in mode:
                 return mock_open(read_data=tripinfo_xml).return_value
             return mock_open().return_value
 
         mock_open_file.side_effect = open_side_effect
 
-        params = {"Speed": 999, "Traffic Density": "medium", "seed": 1, "Green": 30, "Yellow": 5, "Red": 25}
+        params = {
+            "Speed": 999,
+            "Traffic Density": "medium",
+            "seed": 1,
+            "Green": 30,
+            "Yellow": 5,
+            "Red": 25,
+        }
         trafficLight.generate(params)
 
-        mock_print.assert_any_call("Warnig: Speed 999km/h not allowed. Using default 40km/h.")
+        mock_print.assert_any_call(
+            "Warnig: Speed 999km/h not allowed. Using default 40km/h."
+        )
 
     @patch("trafficLight.os.makedirs")
     @patch("trafficLight.subprocess.run")
     def test_generateTrips_builds_expected_command(self, mock_run, mock_makedirs):
         with patch.dict("trafficLight.os.environ", {"SUMO_HOME": "/fake/sumo"}):
-            trafficLight.generateTrips("net.xml", "trips/trips.rou.xml", "high", {"seed": 42})
+            trafficLight.generateTrips(
+                "net.xml", "trips/trips.rou.xml", "high", {"seed": 42}
+            )
             mock_makedirs.assert_called_with("trips", exist_ok=True)
 
             args = mock_run.call_args[0][0]
 
             trips_path = args[1]
 
-            self.assertTrue(trips_path.endswith("randomTrips.py"), f"Unexpected path: {trips_path}")
+            self.assertTrue(
+                trips_path.endswith("randomTrips.py"), f"Unexpected path: {trips_path}"
+            )
 
             self.assertIn("--period", args)
             self.assertIn("3", args)

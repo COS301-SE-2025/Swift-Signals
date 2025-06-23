@@ -7,7 +7,9 @@ import xml.etree.ElementTree as ET
 
 
 if "circle" not in sys.modules:
-    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "intersections"))
+    sys.path.insert(
+        0, str(pathlib.Path(__file__).resolve().parent.parent / "intersections")
+    )
     import circle
 
 
@@ -22,7 +24,18 @@ class TestRoundabout(unittest.TestCase):
     @patch("circle.subprocess.run")
     @patch("builtins.open", new_callable=mock_open)
     @patch("xml.etree.ElementTree.parse")
-    def test_generate_full_flow(self, mock_et_parse, mock_open_file, mock_subprocess, mock_generateTrips, mock_parseCon, mock_parseEdg, mock_parseNod, mock_extractTraj, mock_remove):
+    def test_generate_full_flow(
+        self,
+        mock_et_parse,
+        mock_open_file,
+        mock_subprocess,
+        mock_generateTrips,
+        mock_parseCon,
+        mock_parseEdg,
+        mock_parseNod,
+        mock_extractTraj,
+        mock_remove,
+    ):
         tripinfo_xml = """<root>
             <tripinfo duration="60" waitingTime="5" routeLength="500"/>
             <tripinfo duration="50" waitingTime="3" routeLength="400"/>
@@ -33,11 +46,7 @@ class TestRoundabout(unittest.TestCase):
         tree_mock.getroot.return_value = root_mock
         mock_et_parse.return_value = tree_mock
 
-        params = {
-            "Speed": 60,
-            "Traffic Density": "medium",
-            "seed": 42
-        }
+        params = {"Speed": 60, "Traffic Density": "medium", "seed": 42}
 
         results = circle.generate(params)
 
@@ -46,13 +55,17 @@ class TestRoundabout(unittest.TestCase):
         self.assertGreater(results["Average Speed"], 0)
         self.assertAlmostEqual(results["Average Waiting Time"], 4)
 
-        mock_subprocess.assert_any_call([
-            "netconvert",
-            "--node-files=roundabout.nod.xml",
-            "--edge-files=roundabout.edg.xml",
-            "--connection-files=roundabout.con.xml",
-            "-o", "roundabout.net.xml"
-        ], check=True)
+        mock_subprocess.assert_any_call(
+            [
+                "netconvert",
+                "--node-files=roundabout.nod.xml",
+                "--edge-files=roundabout.edg.xml",
+                "--connection-files=roundabout.con.xml",
+                "-o",
+                "roundabout.net.xml",
+            ],
+            check=True,
+        )
 
         mock_generateTrips.assert_called_once()
         mock_extractTraj.assert_called_once()
