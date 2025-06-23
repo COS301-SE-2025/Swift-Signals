@@ -26,17 +26,19 @@ func SendErrorResponse(w http.ResponseWriter, statusCode int, message string) {
 	errResp := model.ErrorResponse{
 		Message: message,
 	}
-	// switch statusCode {
-	// case http.StatusBadRequest:
-	// 	errResp.Code = "BAD_REQUEST"
-	// case http.StatusNotFound:
-	// 	errResp.Code = "NOT_FOUND"
-	// case http.StatusUnauthorized:
-	// 	errResp.Code = "UNAUTHORIZED"
-	// case http.StatusForbidden:
-	// 	errResp.Code = "FORBIDDEN"
-	// case http.StatusInternalServerError:
-	// 	errResp.Code = "INTERNAL_SERVER_ERROR"
-	// }
+	switch statusCode {
+	case http.StatusBadRequest:
+		errResp.Code = "BAD_REQUEST"
+	case http.StatusNotFound:
+		errResp.Code = "NOT_FOUND"
+	case http.StatusUnauthorized:
+		errResp.Code = "UNAUTHORIZED"
+	case http.StatusForbidden:
+		errResp.Code = "FORBIDDEN"
+	case http.StatusInternalServerError:
+		errResp.Code = "INTERNAL_SERVER_ERROR"
+	default:
+		errResp.Code = "UNKNOWN_ERROR"
+	}
 	SendJSONResponse(w, statusCode, errResp)
 }
