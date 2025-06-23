@@ -23,8 +23,8 @@ import (
 // @termsOfService http://example.com/terms/
 
 // @contact.name Inside Insights Team
-// @contact.url ...
-// @contact.email support@example.com
+// @contact.url https://swagger.io/
+// @contact.email insideinsights2025@gmail.com
 
 // @host localhost:9090
 // @BasePath /

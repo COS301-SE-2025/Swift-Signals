@@ -12,8 +12,8 @@ const docTemplate = `{
         "termsOfService": "http://example.com/terms/",
         "contact": {
             "name": "Inside Insights Team",
-            "url": "...",
-            "email": "support@example.com"
+            "url": "https://swagger.io/",
+            "email": "insideinsights2025@gmail.com"
         },
         "version": "{{.Version}}"
     },
