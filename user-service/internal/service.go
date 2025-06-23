@@ -118,17 +118,6 @@ func (s *Service) LogoutUser(ctx context.Context, userID string) error {
 	return nil
 }
 
-// ValidateUser validates a JWT token and returns user info
-func (s *Service) ValidateUser(ctx context.Context, token string) (*models.ValidateResponse, error) {
-	// TODO: Implement token validation
-	// - Parse and validate JWT token
-	// - Check token expiration
-	// - Extract user ID from token
-	// - Verify user still exists and is active
-	// - Return validation response
-	return nil, nil
-}
-
 // GetUserByID retrieves a user by their ID
 func (s *Service) GetUserByID(ctx context.Context, userID string) (*models.User, error) {
 	// TODO: Implement get user by ID

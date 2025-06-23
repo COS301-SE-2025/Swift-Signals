@@ -65,17 +65,6 @@ func (h *Handler) LogoutUser(ctx context.Context, req *userpb.UserIDRequest) (*e
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) ValidateUser(ctx context.Context, req *userpb.ValidateUserRequest) (*userpb.ValidateUserResponse, error) {
-	validateResponse, err := h.service.ValidateUser(ctx, req.GetToken())
-	if err != nil {
-		return nil, err
-	}
-	return &userpb.ValidateUserResponse{
-		IsValid: validateResponse.IsValid,
-		UserId:  validateResponse.UserID,
-	}, nil
-}
-
 func (h *Handler) GetUserByID(ctx context.Context, req *userpb.UserIDRequest) (*userpb.UserResponse, error) {
 	user, err := h.service.GetUserByID(ctx, req.GetUserId())
 	if err != nil {
