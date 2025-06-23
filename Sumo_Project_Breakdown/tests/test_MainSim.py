@@ -87,6 +87,7 @@ class TestSimLoad(unittest.TestCase):
 
     @patch("builtins.input", return_value="nonexistent.json")
     @patch("os.path.exists", return_value=False)
+    @patch("sys.argv", new=["scriptname"])
     def test_loadParams_file_not_found(self, mock_exists, mock_input):
         with self.assertRaises(SystemExit) as cm:
             SimLoad.loadParams()
