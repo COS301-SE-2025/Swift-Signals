@@ -41,6 +41,68 @@ func (h *Handler) validateCreateIntersectionRequest(req *intersectionpb.CreateIn
 	return nil
 }
 
+func (h *Handler) validateIntersectionIDRequest(req *intersectionpb.IntersectionIDRequest) error {
+	if req == nil {
+		return fmt.Errorf("request cannot be nil")
+	}
+
+	if req.GetId() == "" {
+		return fmt.Errorf("intersection id is required")
+	}
+
+	return nil
+}
+
+func (h *Handler) validateGetAllIntersectionsRequest(req *intersectionpb.GetAllIntersectionsRequest) error {
+	if req == nil {
+		return fmt.Errorf("request cannot be nil")
+	}
+
+	// Add future validation here when filtering parameters are added
+	// For example:
+	// if req.GetLimit() < 0 {
+	//     return fmt.Errorf("limit cannot be negative")
+	// }
+
+	return nil
+}
+
+func (h *Handler) validateUpdateIntersectionRequest(req *intersectionpb.UpdateIntersectionRequest) error {
+	if req == nil {
+		return fmt.Errorf("request cannot be nil")
+	}
+
+	if req.GetId() == "" {
+		return fmt.Errorf("intersection ID is required")
+	}
+
+	if req.GetName() == "" {
+		return fmt.Errorf("intersection name is required")
+	}
+
+	if err := h.validateIntersectionDetails(req.GetDetails()); err != nil {
+		return fmt.Errorf("invalid intersection details: %w", err)
+	}
+
+	return nil
+}
+
+func (h *Handler) validatePutOptimisationRequest(req *intersectionpb.PutOptimisationRequest) error {
+	if req == nil {
+		return fmt.Errorf("request cannot be nil")
+	}
+
+	if req.GetId() == "" {
+		return fmt.Errorf("intersection ID is required")
+	}
+
+	if req.GetParameters() == nil {
+		return fmt.Errorf("parameters are required")
+	}
+
+	return nil
+}
+
 func (h *Handler) validateIntersectionDetails(details *intersectionpb.IntersectionDetails) error {
 	if details.GetAddress() == "" {
 		return fmt.Errorf("address is required")
@@ -142,6 +204,16 @@ func (h *Handler) mapToIntersectionResponse(intersection *model.IntersectionResp
 		DefaultParameters: h.mapToProtoOptimisationParameters(intersection.DefaultParameters),
 		BestParameters:    h.mapToProtoOptimisationParameters(intersection.BestParameters),
 		CurrentParameters: h.mapToProtoOptimisationParameters(intersection.CurrentParameters),
+	}
+}
+
+func (h *Handler) mapToPutOptimisationResponse(optimisationResponse *model.PutOptimisationResponse) *intersectionpb.PutOptimisationResponse {
+	if optimisationResponse == nil {
+		return nil
+	}
+
+	return &intersectionpb.PutOptimisationResponse{
+		Improved: optimisationResponse.Improved,
 	}
 }
 
