@@ -4,6 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import '../styles/SimulationResults.css';
 import { Chart, registerables } from 'chart.js';
+import HelpMenu from "../components/HelpMenu";
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -325,6 +326,7 @@ const SimulationResults: React.FC = () => {
         </div>
       </div>
       {showFooter && <Footer />}
+      <HelpMenu />
     </div>
   );
 };
