@@ -2,30 +2,32 @@ syntax = "proto3";
 package swiftsignals.intersection;
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "protos/gen/intersection";
 
 // Service definition
 service IntersectionService {
-  rpc CreateIntersection(CreateIntersectionRequest) returns (IntersectionResponse);
+  rpc CreateIntersection(CreateIntersectionRequest)
+      returns (IntersectionResponse);
   rpc GetIntersection(IntersectionIDRequest) returns (IntersectionResponse);
-  rpc GetAllIntersections(GetAllIntersectionsRequest) returns (stream IntersectionResponse);
-  rpc UpdateIntersection(UpdateIntersectionRequest) returns (IntersectionResponse);
+  rpc GetAllIntersections(GetAllIntersectionsRequest)
+      returns (stream IntersectionResponse);
+  rpc UpdateIntersection(UpdateIntersectionRequest)
+      returns (IntersectionResponse);
   rpc DeleteIntersection(IntersectionIDRequest) returns (google.protobuf.Empty);
   rpc PutOptimisation(PutOptimisationRequest) returns (PutOptimisationResponse);
 }
 
 // Common Messages
-message IntersectionIDRequest {
-  string id = 1;
-}
+message IntersectionIDRequest { string id = 1; }
 
 message IntersectionResponse {
   string id = 1;
   string name = 2;
   IntersectionDetails details = 3;
-  string created_at = 4;
-  string last_run_at = 5;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp last_run_at = 5;
   IntersectionStatus status = 6;
   int32 run_count = 7;
   TrafficDensity traffic_density = 8;
@@ -60,9 +62,7 @@ message PutOptimisationRequest {
   OptimisationParameters parameters = 2;
 }
 
-message PutOptimisationResponse {
-  bool improved = 1;
-}
+message PutOptimisationResponse { bool improved = 1; }
 
 // Intersection details (address information)
 message IntersectionDetails {
@@ -72,7 +72,7 @@ message IntersectionDetails {
 }
 
 message OptimisationParameters {
-  OptimisationParameters optimisation_type = 1;
+  OptimisationType optimisation_type = 1;
   SimulationParameters parameters = 2;
 }
 
