@@ -7,7 +7,7 @@
 ![Intersection Service]
 ![Metric Service]
 ![Optimization Service]
-![React Frontend]
+![React Frontend](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/react.yml/badge.svg)
 ![Simulation Service](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/simulation.yml/badge.svg)
 ![User Service]
 
