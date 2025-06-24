@@ -60,9 +60,9 @@ def loadParams(param_dict=None):
             data = json.load(f)
 
     sim_params = data["intersection"]["simulation_parameters"]
-    raw_density = data["intersection"].get("Traffic Density", 1)
+    raw_density = data["intersection"].get("traffic_density", 1)
     traffic_density = TRAFFIC_DENSITY.get(raw_density, "medium")
-    raw_type = sim_params.get("Intersection Type", 0)
+    raw_type = sim_params.get("intersection_type", 0)
 
     try:
         raw_type = int(raw_type)
@@ -72,23 +72,23 @@ def loadParams(param_dict=None):
     intersection_type_str = INTERSECTION_TYPES.get(raw_type, "unspecified")
 
     mapped = {
-        "Traffic Density": traffic_density,
-        "Intersection Type": intersection_type_str,
-        "Speed": sim_params.get("Speed", 40),
+        "traffic_density": traffic_density,
+        "intersection_type": intersection_type_str,
+        "speed": sim_params.get("Speed", 40),
         "seed": sim_params.get("seed", 42),
     }
 
     if intersection_type_str == "trafficlight":
-        mapped["Green"] = sim_params.get("Green", 25)
-        mapped["Yellow"] = sim_params.get("Yellow", 3)
-        mapped["Red"] = sim_params.get("Red", 30)
+        mapped["green"] = sim_params.get("green", 25)
+        mapped["yellow"] = sim_params.get("yellow", 3)
+        mapped["red"] = sim_params.get("red", 30)
 
     return {
         "mapped": mapped,
         "raw": {
-            "Traffic Density": raw_density,
-            "Intersection Type": raw_type,
-            "Speed": sim_params.get("Speed", 40),
+            "traffic_density": raw_density,
+            "intersection_type": raw_type,
+            "speed": sim_params.get("speed", 40),
             "seed": sim_params.get("seed", 42),
         },
     }
@@ -108,16 +108,16 @@ def saveRunCount(count, counter_file="run_count.txt"):
 
 def getDefaultTimingsBySpeed(speed):
     if speed <= 40:
-        return {"Green": 25, "Yellow": 3, "Red": 30}
+        return {"green": 25, "yellow": 3, "red": 30}
     elif speed <= 60:
-        return {"Green": 25, "Yellow": 4, "Red": 30}
+        return {"green": 25, "yellow": 4, "red": 30}
     elif speed <= 80:
-        return {"Green": 30, "Yellow": 5, "Red": 35}
+        return {"green": 30, "yellow": 5, "red": 35}
     else:
         print(
             "Speed exceeds reccomended safety for traffic lights, using default for 80km/h"
         )
-        return {"Green": 30, "Yellow": 5, "Red": 35}
+        return {"green": 30, "yellow": 5, "red": 35}
 
 
 def getParams(tL: bool):
@@ -142,25 +142,25 @@ def getParams(tL: bool):
                 green = int(input("Enter green light duration in seconds: ").strip())
                 yellow = int(input("Enter yellow light duration in seconds: ").strip())
                 red = int(input("Enter red light duration in seconds: ").strip())
-                timings = {"Green": green, "Yellow": yellow, "Red": red}
+                timings = {"green": green, "yellow": yellow, "red": red}
             except ValueError:
                 print("Invalid input. Using default for 60 km/h.")
                 timings = getDefaultTimingsBySpeed(60)
 
         return {
-            "Traffic Density": trafficDensity,
-            "Green": timings["Green"],
-            "Yellow": timings["Yellow"],
-            "Red": timings["Red"],
-            "Speed": speed,
+            "traffic_density": trafficDensity,
+            "green": timings["green"],
+            "yellow": timings["yellow"],
+            "red": timings["red"],
+            "speed": speed,
         }
     else:
-        return {"Traffic Density": trafficDensity, "Speed": speed}
+        return {"traffic_density": trafficDensity, "speed": speed}
 
 
 def saveParams(params, intersection_type_str, simName):
     density_map = {"low": 0, "medium": 1, "high": 2}
-    density_num = density_map.get(params.get("Traffic Density", "medium").lower(), 1)
+    density_num = density_map.get(params.get("traffic_density", "medium").lower(), 1)
 
     reverse_intersection_types = {v: k for k, v in INTERSECTION_TYPES.items()}
     intersection_type_num = reverse_intersection_types.get(intersection_type_str, 0)
@@ -168,7 +168,7 @@ def saveParams(params, intersection_type_str, simName):
     results = {}
 
     raw = {
-        "Speed": params.get("Speed", 40),
+        "speed": params.get("speed", 40),
         "seed": params.get("seed", 42),
     }
 
@@ -184,12 +184,12 @@ def saveParams(params, intersection_type_str, simName):
             "owner": "username",
             "created_at": timestamp,
             "last_run_at": datetime.utcnow().isoformat() + "Z",
-            "Traffic Density": density_num,
+            "traffic_density": density_num,
             "status": 0,
             "run_count": 0,
             "parameters": {
-                "Intersection Type": intersection_type_num,
-                "Speed": raw["Speed"],
+                "intersection_type": intersection_type_num,
+                "speed": raw["speed"],
                 "seed": raw["seed"],
             },
             "results": results,
@@ -206,7 +206,7 @@ def main(param_dict=None):
     mapped = params["mapped"]
     raw = params["raw"]
 
-    intersection_type = mapped.get("Intersection Type", "unknown")
+    intersection_type = mapped.get("intersection_type", "unknown")
     simName = intersection_type.capitalize()
     simId = "simId"
     owner = "username"
@@ -233,11 +233,11 @@ def main(param_dict=None):
     parameters = {"Intersection Type": raw.get("Intersection Type")}
 
     if intersection_type == "trafficlight":
-        parameters["Green"] = mapped.get("Green")
-        parameters["Yellow"] = mapped.get("Yellow")
-        parameters["Red"] = mapped.get("Red")
+        parameters["green"] = mapped.get("green")
+        parameters["yellow"] = mapped.get("yellow")
+        parameters["red"] = mapped.get("red")
 
-    parameters["Seed"] = raw.get("seed")
+    parameters["seed"] = raw.get("seed")
 
     output = {
         "_id": {"$oid": uuid.uuid4().hex[:24]},
@@ -247,7 +247,7 @@ def main(param_dict=None):
             "owner": owner,
             "created_at": created,
             "last_run_at": nowIso,
-            "Traffic Density": raw.get("Traffic Density"),
+            "traffic_density": raw.get("traffic_density"),
             "status": 0,
             "run_count": runCount,
             "parameters": parameters,
