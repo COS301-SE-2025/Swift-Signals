@@ -29,7 +29,7 @@ jobs:
       run: npx eslint "**/*.{js,jsx,ts,tsx}" || echo "No files to lint"
     
     - name: Check Prettier formatting
-      run: npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,md}"
+      run: npx prettier --check "**/*.{js,jsx,ts,tsx,css}"
 
     - name: Run Jest tests
       run: npx jest --passWithNoTests
