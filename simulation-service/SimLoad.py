@@ -253,18 +253,6 @@ def main(param_dict=None):
         },
     }
 
-    """Save the output to a file"""
-    os.makedirs("out/results", exist_ok=True)
-    with open("out/results/simulation_results.json", "w") as f:
-        json.dump(output, f, indent=2)
-
-    print("Simulation saved to simulation_results.json")
-
-    with open("out/simulationOut/simulation_output.json", "w") as jf:
-        json.dump(fullOut, jf, indent=2)
-
-    print("Simulation output saved to simulation_output.json")
-
     try:
         os.remove("run_count.txt")
         print("Cleaned up run_count.txt")
@@ -272,6 +260,8 @@ def main(param_dict=None):
         pass
     except Exception as e:
         print(f"Warning: Could not delete run_count.txt - {e}")
+
+    return output, fullOut
 
 
 if __name__ == "__main__":
