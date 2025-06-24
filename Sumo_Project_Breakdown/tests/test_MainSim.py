@@ -136,22 +136,21 @@ class TestSimLoad(unittest.TestCase):
         mock_generate,
     ):
         SimLoad.main()
-        
+
         mock_generate.assert_called_once()
-        
+
         self.assertEqual(mock_json_dump.call_count, 2)
-        
+
         first_output = mock_json_dump.call_args_list[0][0][0]
         second_output = mock_json_dump.call_args_list[1][0][0]
 
         self.assertIn("intersection", first_output)
         self.assertEqual(second_output, {"simulation_log": "details_here"})
-        
+
         expected_dirs = {"out/results"}
         actual_dirs = {call_args[0][0] for call_args in mock_makedirs.call_args_list}
 
         self.assertTrue(expected_dirs.issubset(actual_dirs))
-
 
     @patch("builtins.input", return_value="nonexistent.json")
     @patch("os.path.exists", return_value=False)
