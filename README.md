@@ -5,7 +5,8 @@
 
 # Badges
 
-[Simulation Services](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/python-lint-and-test.yml/badge.svg)
+[Simulation Services](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/simulation.yml/badge.svg)
+
 
 **Team InsideInsights - Swift-Signals**  
 
