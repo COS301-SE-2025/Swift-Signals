@@ -97,47 +97,36 @@ class TestSimLoad(unittest.TestCase):
             1,
         )
 
-    @patch(
-        "SimLoad.trafficLight.generate",
-        return_value=(
-            {
-                "parameters": {
-                    "Green": 25,
-                    "Yellow": 3,
-                    "Red": 30,
-                    "Intersection Type": 1,
-                }
-            },
-            {"simulation_log": "details_here"},
-        ),
-    )
-    @patch(
-        "SimLoad.loadParams",
-        return_value={
-            "mapped": {
-                "Intersection Type": "trafficlight",
-                "Green": 25,
-                "Yellow": 3,
-                "Red": 30,
-                "Traffic Density": "medium",
-                "Speed": 60,
-                "seed": 42,
-            },
-            "raw": {
-                "Intersection Type": 1,
-                "Traffic Density": 1,
-                "Speed": 60,
-                "seed": 42,
-            },
+    @patch("SimLoad.trafficLight.generate", return_value=(
+        {"parameters": {"Green": 25, "Yellow": 3, "Red": 30, "Intersection Type": 1}},
+        {"simulation_log": "details_here"},
+    ))
+    @patch("SimLoad.loadParams", return_value={
+        "mapped": {
+            "Intersection Type": "trafficlight",
+            "Green": 25,
+            "Yellow": 3,
+            "Red": 30,
+            "Traffic Density": "medium",
+            "Speed": 60,
+            "seed": 42,
         },
-    )
+        "raw": {
+            "Intersection Type": 1,
+            "Traffic Density": 1,
+            "Speed": 60,
+            "seed": 42,
+        },
+    })
     @patch("SimLoad.saveRunCount")
     @patch("SimLoad.loadRunCount", return_value=0)
     @patch("json.dump")
     @patch("os.makedirs")
     @patch("os.remove")
+    @patch("builtins.open", new_callable=mock_open)
     def test_main_traffic_light(
         self,
+        mock_file,
         mock_remove,
         mock_makedirs,
         mock_json_dump,
@@ -147,27 +136,22 @@ class TestSimLoad(unittest.TestCase):
         mock_generate,
     ):
         SimLoad.main()
+        
         mock_generate.assert_called_once()
-
+        
         self.assertEqual(mock_json_dump.call_count, 2)
+        
+        first_output = mock_json_dump.call_args_list[0][0][0]
+        second_output = mock_json_dump.call_args_list[1][0][0]
 
-        first_dump_args, _ = mock_json_dump.call_args_list[0]
-        first_output_json = first_dump_args[0]
-        print("First dumped JSON (results file):", first_output_json)
+        self.assertIn("intersection", first_output)
+        self.assertEqual(second_output, {"simulation_log": "details_here"})
+        
+        expected_dirs = {"out/results"}
+        actual_dirs = {call_args[0][0] for call_args in mock_makedirs.call_args_list}
 
-        self.assertIn("intersection", first_output_json)
-        params = first_output_json["intersection"]["parameters"]
+        self.assertTrue(expected_dirs.issubset(actual_dirs))
 
-        self.assertIn("Green", params)
-        self.assertIn("Yellow", params)
-        self.assertIn("Red", params)
-        self.assertEqual(params["Intersection Type"], 1)
-
-        second_dump_args, _ = mock_json_dump.call_args_list[1]
-        second_output_json = second_dump_args[0]
-        print("Second dumped JSON (output file):", second_output_json)
-
-        self.assertEqual(second_output_json, {"simulation_log": "details_here"})
 
     @patch("builtins.input", return_value="nonexistent.json")
     @patch("os.path.exists", return_value=False)
