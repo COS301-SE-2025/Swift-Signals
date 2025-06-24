@@ -36,23 +36,25 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 func main() {
-	authHandler := handler.NewAuthHandler(service.NewAuthService())
-	log.Println("Initialized Auth Handler.")
 
 	mux := http.NewServeMux()
 
+	authHandler := handler.NewAuthHandler(service.NewAuthService())
 	mux.HandleFunc("POST /login", authHandler.Login)
 	mux.HandleFunc("POST /register", authHandler.Register)
 	mux.HandleFunc("POST /logout", authHandler.Logout)
 	mux.HandleFunc("POST /reset-password", authHandler.ResetPassword)
+	log.Println("Initialized Auth Handlers.")
 
-	mux.HandleFunc("GET /intersections", nil)
-	mux.HandleFunc("GET /intersections/simple", nil)
-	mux.HandleFunc("GET /intersections/{id}", nil)
-	mux.HandleFunc("POST /intersections", nil)
-	mux.HandleFunc("PATCH /intersections/{id}", nil)
-	mux.HandleFunc("DELETE /intersections/{id}", nil)
-	mux.HandleFunc("POST /intersections/{id}/optimise", nil)
+	intersectionHandler := handler.NewIntersectionHandler()
+	mux.HandleFunc("GET /intersections", intersectionHandler.GetAllIntersections)
+	// mux.HandleFunc("GET /intersections/simple", nil)
+	mux.HandleFunc("GET /intersections/{id}", intersectionHandler.GetIntersection)
+	mux.HandleFunc("POST /intersections", intersectionHandler.CreateIntersection)
+	// mux.HandleFunc("PATCH /intersections/{id}", nil)
+	// mux.HandleFunc("DELETE /intersections/{id}", nil)
+	// mux.HandleFunc("POST /intersections/{id}/optimise", nil)
+	log.Println("Initialized Intersection Handlers.")
 
 	log.Println("Registered API routes.")
 

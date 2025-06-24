@@ -20,6 +20,147 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/intersections": {
+            "get": {
+                "description": "Retrieves all the intersections associated with the user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Intersections"
+                ],
+                "summary": "Get All Intersections",
+                "responses": {
+                    "200": {
+                        "description": "Successful intersections retrieval",
+                        "schema": {
+                            "$ref": "#/definitions/model.Intersections"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new intersection with the given arguments",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Intersections"
+                ],
+                "summary": "Create Intersection",
+                "parameters": [
+                    {
+                        "description": "intersection information",
+                        "name": "createIntersectionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CreateIntersectionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User successfully registered",
+                        "schema": {
+                            "$ref": "#/definitions/model.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload or missing fields",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/intersections/{id}": {
+            "get": {
+                "description": "Retrieves a single intersection by its unique identifier.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Intersections"
+                ],
+                "summary": "Get Intersection by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful intersection retrieval",
+                        "schema": {
+                            "$ref": "#/definitions/model.Intersection"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid or missing ID parameter",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "Authenticates a user and returns an authentication token.",
@@ -213,6 +354,39 @@ const docTemplate = `{
                 }
             }
         },
+        "model.CreateIntersectionRequest": {
+            "type": "object",
+            "properties": {
+                "default_parameters": {
+                    "$ref": "#/definitions/model.simulationParameters"
+                },
+                "details": {
+                    "type": "object",
+                    "properties": {
+                        "address": {
+                            "type": "string",
+                            "example": "Corner of Foo and Bar"
+                        },
+                        "city": {
+                            "type": "string",
+                            "example": "Pretoria"
+                        },
+                        "province": {
+                            "type": "string",
+                            "example": "Gauteng"
+                        }
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "example": "My Intersection"
+                },
+                "traffic_density": {
+                    "type": "string",
+                    "example": "high"
+                }
+            }
+        },
         "model.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -223,6 +397,76 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "ERROR_MSG"
+                }
+            }
+        },
+        "model.Intersection": {
+            "type": "object",
+            "properties": {
+                "best_parameters": {
+                    "$ref": "#/definitions/model.optimisationParameters"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2025-06-24T15:04:05Z"
+                },
+                "current_parameters": {
+                    "$ref": "#/definitions/model.optimisationParameters"
+                },
+                "default_parameters": {
+                    "$ref": "#/definitions/model.optimisationParameters"
+                },
+                "details": {
+                    "type": "object",
+                    "properties": {
+                        "address": {
+                            "type": "string",
+                            "example": "Corner of Foo and Bar"
+                        },
+                        "city": {
+                            "type": "string",
+                            "example": "Pretoria"
+                        },
+                        "province": {
+                            "type": "string",
+                            "example": "Gauteng"
+                        }
+                    }
+                },
+                "id": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "last_run_at": {
+                    "type": "string",
+                    "example": "2025-06-24T15:04:05Z"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "My Intersection"
+                },
+                "run_count": {
+                    "type": "integer",
+                    "example": 7
+                },
+                "status": {
+                    "type": "string",
+                    "example": "unoptimised"
+                },
+                "traffic_density": {
+                    "type": "string",
+                    "example": "high"
+                }
+            }
+        },
+        "model.Intersections": {
+            "type": "object",
+            "properties": {
+                "intersections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Intersection"
+                    }
                 }
             }
         },
@@ -292,6 +536,47 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "Password reset instructions sent to your email."
+                }
+            }
+        },
+        "model.optimisationParameters": {
+            "type": "object",
+            "properties": {
+                "optimisation_type": {
+                    "type": "string",
+                    "example": "grid_search"
+                },
+                "simulation_parameters": {
+                    "$ref": "#/definitions/model.simulationParameters"
+                }
+            }
+        },
+        "model.simulationParameters": {
+            "type": "object",
+            "properties": {
+                "green": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "intersection_type": {
+                    "type": "string",
+                    "example": "t-junction"
+                },
+                "red": {
+                    "type": "integer",
+                    "example": 6
+                },
+                "seed": {
+                    "type": "integer",
+                    "example": 3247128304
+                },
+                "speed": {
+                    "type": "integer",
+                    "example": 60
+                },
+                "yellow": {
+                    "type": "integer",
+                    "example": 2
                 }
             }
         }
