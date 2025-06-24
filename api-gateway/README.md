@@ -7,6 +7,6 @@ This project uses Go's built-in testing framework.
 Ensure that you are in the `Swift-Signals/api-gateway` directory
 
 ```bash
-go test -v 
+go test ./... -v 
 ```
 
