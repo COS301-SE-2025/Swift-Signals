@@ -97,27 +97,40 @@ class TestSimLoad(unittest.TestCase):
             1,
         )
 
-    @patch("SimLoad.trafficLight.generate", return_value=(
-        {"parameters": {"Green": 25, "Yellow": 3, "Red": 30, "Intersection Type": 1}},
-        {"simulation_log": "details_here"},
-    ))
-    @patch("SimLoad.loadParams", return_value={
-        "mapped": {
-            "Intersection Type": "trafficlight",
-            "Green": 25,
-            "Yellow": 3,
-            "Red": 30,
-            "Traffic Density": "medium",
-            "Speed": 60,
-            "seed": 42,
+    @patch(
+        "SimLoad.trafficLight.generate",
+        return_value=(
+            {
+                "parameters": {
+                    "Green": 25,
+                    "Yellow": 3,
+                    "Red": 30,
+                    "Intersection Type": 1,
+                }
+            },
+            {"simulation_log": "details_here"},
+        ),
+    )
+    @patch(
+        "SimLoad.loadParams",
+        return_value={
+            "mapped": {
+                "Intersection Type": "trafficlight",
+                "Green": 25,
+                "Yellow": 3,
+                "Red": 30,
+                "Traffic Density": "medium",
+                "Speed": 60,
+                "seed": 42,
+            },
+            "raw": {
+                "Intersection Type": 1,
+                "Traffic Density": 1,
+                "Speed": 60,
+                "seed": 42,
+            },
         },
-        "raw": {
-            "Intersection Type": 1,
-            "Traffic Density": 1,
-            "Speed": 60,
-            "seed": 42,
-        },
-    })
+    )
     @patch("SimLoad.saveRunCount")
     @patch("SimLoad.loadRunCount", return_value=0)
     @patch("json.dump")
