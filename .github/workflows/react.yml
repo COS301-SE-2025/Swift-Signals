@@ -23,7 +23,7 @@ jobs:
       run: npm ci
 
     - name: Run ESLint
-      run: npx eslint "./src//*.{js,jsx,ts,tsx}"
+      run: npx eslint "src/**/*.{js,jsx,ts,tsx}"
 
     - name: Check Prettier formatting
       run: npx prettier --check "*.{js,jsx,ts,tsx,json,css,md}"
