@@ -18,6 +18,7 @@ class NodeType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = ()
     PRIORITY: _ClassVar[NodeType]
     TRAFFIC_LIGHT: _ClassVar[NodeType]
+
 INTERSECTION_TYPE_UNSPECIFIED: IntersectionType
 INTERSECTION_TYPE_TRAFFICLIGHT: IntersectionType
 INTERSECTION_TYPE_ROUNDABOUT: IntersectionType
@@ -31,7 +32,11 @@ class SimulationRequest(_message.Message):
     PARAMETERS_FIELD_NUMBER: _ClassVar[int]
     intersection_id: str
     parameters: SimulationParameters
-    def __init__(self, intersection_id: _Optional[str] = ..., parameters: _Optional[_Union[SimulationParameters, _Mapping]] = ...) -> None: ...
+    def __init__(
+        self,
+        intersection_id: _Optional[str] = ...,
+        parameters: _Optional[_Union[SimulationParameters, _Mapping]] = ...,
+    ) -> None: ...
 
 class SimulationParameters(_message.Message):
     __slots__ = ("intersection_type", "green", "yellow", "red", "speed", "seed")
@@ -47,10 +52,31 @@ class SimulationParameters(_message.Message):
     red: int
     speed: int
     seed: int
-    def __init__(self, intersection_type: _Optional[_Union[IntersectionType, str]] = ..., green: _Optional[int] = ..., yellow: _Optional[int] = ..., red: _Optional[int] = ..., speed: _Optional[int] = ..., seed: _Optional[int] = ...) -> None: ...
+    def __init__(
+        self,
+        intersection_type: _Optional[_Union[IntersectionType, str]] = ...,
+        green: _Optional[int] = ...,
+        yellow: _Optional[int] = ...,
+        red: _Optional[int] = ...,
+        speed: _Optional[int] = ...,
+        seed: _Optional[int] = ...,
+    ) -> None: ...
 
 class SimulationResultsResponse(_message.Message):
-    __slots__ = ("id", "total_vehicles", "avg_travel_time", "total_travel_time", "avg_speed", "avg_waiting_time", "waiting_time", "generated_vehicles", "emergency_brakes", "emergency_stops", "near_collisions", "date_run")
+    __slots__ = (
+        "id",
+        "total_vehicles",
+        "avg_travel_time",
+        "total_travel_time",
+        "avg_speed",
+        "avg_waiting_time",
+        "waiting_time",
+        "generated_vehicles",
+        "emergency_brakes",
+        "emergency_stops",
+        "near_collisions",
+        "date_run",
+    )
     ID_FIELD_NUMBER: _ClassVar[int]
     TOTAL_VEHICLES_FIELD_NUMBER: _ClassVar[int]
     AVG_TRAVEL_TIME_FIELD_NUMBER: _ClassVar[int]
@@ -75,7 +101,21 @@ class SimulationResultsResponse(_message.Message):
     emergency_stops: int
     near_collisions: int
     date_run: str
-    def __init__(self, id: _Optional[str] = ..., total_vehicles: _Optional[int] = ..., avg_travel_time: _Optional[int] = ..., total_travel_time: _Optional[int] = ..., avg_speed: _Optional[int] = ..., avg_waiting_time: _Optional[int] = ..., waiting_time: _Optional[int] = ..., generated_vehicles: _Optional[int] = ..., emergency_brakes: _Optional[int] = ..., emergency_stops: _Optional[int] = ..., near_collisions: _Optional[int] = ..., date_run: _Optional[str] = ...) -> None: ...
+    def __init__(
+        self,
+        id: _Optional[str] = ...,
+        total_vehicles: _Optional[int] = ...,
+        avg_travel_time: _Optional[int] = ...,
+        total_travel_time: _Optional[int] = ...,
+        avg_speed: _Optional[int] = ...,
+        avg_waiting_time: _Optional[int] = ...,
+        waiting_time: _Optional[int] = ...,
+        generated_vehicles: _Optional[int] = ...,
+        emergency_brakes: _Optional[int] = ...,
+        emergency_stops: _Optional[int] = ...,
+        near_collisions: _Optional[int] = ...,
+        date_run: _Optional[str] = ...,
+    ) -> None: ...
 
 class SimulationOutputResponse(_message.Message):
     __slots__ = ("intersection", "vehicles")
@@ -83,7 +123,11 @@ class SimulationOutputResponse(_message.Message):
     VEHICLES_FIELD_NUMBER: _ClassVar[int]
     intersection: Intersection
     vehicles: _containers.RepeatedCompositeFieldContainer[Vehicle]
-    def __init__(self, intersection: _Optional[_Union[Intersection, _Mapping]] = ..., vehicles: _Optional[_Iterable[_Union[Vehicle, _Mapping]]] = ...) -> None: ...
+    def __init__(
+        self,
+        intersection: _Optional[_Union[Intersection, _Mapping]] = ...,
+        vehicles: _Optional[_Iterable[_Union[Vehicle, _Mapping]]] = ...,
+    ) -> None: ...
 
 class Intersection(_message.Message):
     __slots__ = ("nodes", "edges", "connections", "traffic_lights")
@@ -95,7 +139,13 @@ class Intersection(_message.Message):
     edges: _containers.RepeatedCompositeFieldContainer[Edge]
     connections: _containers.RepeatedCompositeFieldContainer[Connection]
     traffic_lights: _containers.RepeatedCompositeFieldContainer[TrafficLight]
-    def __init__(self, nodes: _Optional[_Iterable[_Union[Node, _Mapping]]] = ..., edges: _Optional[_Iterable[_Union[Edge, _Mapping]]] = ..., connections: _Optional[_Iterable[_Union[Connection, _Mapping]]] = ..., traffic_lights: _Optional[_Iterable[_Union[TrafficLight, _Mapping]]] = ...) -> None: ...
+    def __init__(
+        self,
+        nodes: _Optional[_Iterable[_Union[Node, _Mapping]]] = ...,
+        edges: _Optional[_Iterable[_Union[Edge, _Mapping]]] = ...,
+        connections: _Optional[_Iterable[_Union[Connection, _Mapping]]] = ...,
+        traffic_lights: _Optional[_Iterable[_Union[TrafficLight, _Mapping]]] = ...,
+    ) -> None: ...
 
 class Node(_message.Message):
     __slots__ = ("id", "x", "y", "type")
@@ -107,7 +157,13 @@ class Node(_message.Message):
     x: float
     y: float
     type: NodeType
-    def __init__(self, id: _Optional[str] = ..., x: _Optional[float] = ..., y: _Optional[float] = ..., type: _Optional[_Union[NodeType, str]] = ...) -> None: ...
+    def __init__(
+        self,
+        id: _Optional[str] = ...,
+        x: _Optional[float] = ...,
+        y: _Optional[float] = ...,
+        type: _Optional[_Union[NodeType, str]] = ...,
+    ) -> None: ...
 
 class Edge(_message.Message):
     __slots__ = ("id", "to", "speed", "lanes")
@@ -120,7 +176,14 @@ class Edge(_message.Message):
     to: str
     speed: float
     lanes: int
-    def __init__(self, id: _Optional[str] = ..., to: _Optional[str] = ..., speed: _Optional[float] = ..., lanes: _Optional[int] = ..., **kwargs) -> None: ...
+    def __init__(
+        self,
+        id: _Optional[str] = ...,
+        to: _Optional[str] = ...,
+        speed: _Optional[float] = ...,
+        lanes: _Optional[int] = ...,
+        **kwargs
+    ) -> None: ...
 
 class Connection(_message.Message):
     __slots__ = ("to", "fromLane", "toLane", "tl")
@@ -133,7 +196,14 @@ class Connection(_message.Message):
     fromLane: int
     toLane: int
     tl: int
-    def __init__(self, to: _Optional[str] = ..., fromLane: _Optional[int] = ..., toLane: _Optional[int] = ..., tl: _Optional[int] = ..., **kwargs) -> None: ...
+    def __init__(
+        self,
+        to: _Optional[str] = ...,
+        fromLane: _Optional[int] = ...,
+        toLane: _Optional[int] = ...,
+        tl: _Optional[int] = ...,
+        **kwargs
+    ) -> None: ...
 
 class TrafficLight(_message.Message):
     __slots__ = ("id", "type", "phases")
@@ -143,7 +213,12 @@ class TrafficLight(_message.Message):
     id: str
     type: str
     phases: _containers.RepeatedCompositeFieldContainer[Phase]
-    def __init__(self, id: _Optional[str] = ..., type: _Optional[str] = ..., phases: _Optional[_Iterable[_Union[Phase, _Mapping]]] = ...) -> None: ...
+    def __init__(
+        self,
+        id: _Optional[str] = ...,
+        type: _Optional[str] = ...,
+        phases: _Optional[_Iterable[_Union[Phase, _Mapping]]] = ...,
+    ) -> None: ...
 
 class Phase(_message.Message):
     __slots__ = ("duration", "state")
@@ -151,7 +226,9 @@ class Phase(_message.Message):
     STATE_FIELD_NUMBER: _ClassVar[int]
     duration: int
     state: str
-    def __init__(self, duration: _Optional[int] = ..., state: _Optional[str] = ...) -> None: ...
+    def __init__(
+        self, duration: _Optional[int] = ..., state: _Optional[str] = ...
+    ) -> None: ...
 
 class Vehicle(_message.Message):
     __slots__ = ("id", "positions")
@@ -159,7 +236,11 @@ class Vehicle(_message.Message):
     POSITIONS_FIELD_NUMBER: _ClassVar[int]
     id: str
     positions: _containers.RepeatedCompositeFieldContainer[Position]
-    def __init__(self, id: _Optional[str] = ..., positions: _Optional[_Iterable[_Union[Position, _Mapping]]] = ...) -> None: ...
+    def __init__(
+        self,
+        id: _Optional[str] = ...,
+        positions: _Optional[_Iterable[_Union[Position, _Mapping]]] = ...,
+    ) -> None: ...
 
 class Position(_message.Message):
     __slots__ = ("time", "x", "y", "speed")
@@ -171,4 +252,10 @@ class Position(_message.Message):
     x: float
     y: float
     speed: float
-    def __init__(self, time: _Optional[int] = ..., x: _Optional[float] = ..., y: _Optional[float] = ..., speed: _Optional[float] = ...) -> None: ...
+    def __init__(
+        self,
+        time: _Optional[int] = ...,
+        x: _Optional[float] = ...,
+        y: _Optional[float] = ...,
+        speed: _Optional[float] = ...,
+    ) -> None: ...

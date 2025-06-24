@@ -112,7 +112,7 @@ def generate(params):
         "average_speed": avg_speed,
         "average_waiting_time": avg_waiting_time,
         "total_waiting_time": total_waiting_time,
-        "generated_vehicles": total_vehicles
+        "generated_vehicles": total_vehicles,
     }
 
     trajectories = extractTrajectories(fcdOutputFile)
