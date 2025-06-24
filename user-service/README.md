@@ -156,3 +156,17 @@ user-service/
 ```
 
 ---
+mongosh
+
+use UserService
+
+db.Users.insertOne({
+  name: "Chris",
+  email: "chris@test.com",
+  password: "abc123",
+  created_at: new Date()
+})
+
+db.Users.find().pretty()
+
+exit

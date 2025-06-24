@@ -1,8 +1,16 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
+	//Un/comment for Postgresql
+	// "database/sql"
+	// "fmt"
+
+	//Un/comment for Mongod
+	"context"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+
+	//
 	"log"
 	"net"
 	"os"
@@ -21,22 +29,32 @@ func main() {
 		log.Fatalf("Error loading .env file")
 	}
 
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbUser := os.Getenv("DB_USER")
-	dbPass := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
+	//Postgresql Connection
+	// dbHost := os.Getenv("DB_HOST")
+	// dbPort := os.Getenv("DB_PORT")
+	// dbUser := os.Getenv("DB_USER")
+	// dbPass := os.Getenv("DB_PASSWORD")
+	// dbName := os.Getenv("DB_NAME")
+	//
+	// connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
+	// 	dbUser, dbPass, dbHost, dbPort, dbName)
+	//
+	// dbConn, err := sql.Open("postgres", connStr)
+	// if err != nil {
+	// 	log.Fatalf("Failed to connect to DB: %v", err)
+	// }
+	// defer dbConn.Close()
+	//
+	// repo := db.NewPostgresUserRepo(dbConn)
 
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
-		dbUser, dbPass, dbHost, dbPort, dbName)
+	//Mongodb Connection
+	uri := os.Getenv("MONGO_URI")
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 
-	dbConn, err := sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatalf("Failed to connect to DB: %v", err)
-	}
-	defer dbConn.Close()
+	collection := client.Database("UserService").Collection("Users")
+	repo := db.NewMongoUserRepository(collection)
 
-	repo := db.NewPostgresUserRepo(dbConn)
+	//Independent of Database
 	svc := user.NewService(repo)
 	handler := user.NewHandler(svc)
 
