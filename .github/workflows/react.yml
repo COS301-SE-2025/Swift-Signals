@@ -2,9 +2,9 @@ name: React Frontend
 
 on:
   push:
-    branches: [main, dev, frontend]
+    branches: [main, dev, frontend, ChatBot]
   pull_request:
-    branches: [main, dev, frontend]
+    branches: [main, dev, frontend, ChatBot]
 
 jobs:
   lint-format-test:
