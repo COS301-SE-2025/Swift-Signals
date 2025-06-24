@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import '../styles/SignUp.css';
+import Footer from '../components/Footer';
 
 interface TrafficLightProps {
   redActive: boolean;
@@ -21,7 +22,7 @@ const TrafficLight = ({ redActive, yellowActive, greenActive }: TrafficLightProp
   const innerHighlightBase = "w-6 h-6 rounded-full absolute top-1/3 left-1/3 transform -translate-x-1/2 -translate-y-1/2 opacity-80 blur-[2px]";
 
   return (
-    <div className="bg-gradient-to-b from-neutral-800 to-neutral-900 via-neutral-900 p-4 rounded-xl shadow-2xl flex flex-col space-y-4 w-30 items-center border border-neutral-700/70">
+    <div className="traffic-light bg-gradient-to-b from-neutral-800 to-neutral-900 via-neutral-900 p-4 rounded-xl shadow-2xl flex flex-col space-y-4 w-30 items-center border border-neutral-700/70">
       <div className={`${baseLightClasses} ${redActive ? activeBorderColor : inactiveBorderColor} ${redActive ? activeRed : inactiveRed}`}>
         {redActive && <div className={`${innerHighlightBase} bg-red-300`}></div>}
       </div>
@@ -66,11 +67,11 @@ const SignUp = () => {
         style={{ minWidth: 350 }}
       >
         <img
-          src="/src/assets/LOGO.png"
+          src="/src/assets/logo.png"
           alt="Swift Signals Logo"
-          className="h-20 w-20 object-contain drop-shadow-lg"
+          className="signupLogo h-20 w-20 object-contain drop-shadow-lg"
         />
-        <span className="text-xl md:text-4xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
+        <span className="welcomeText text-xl md:text-4xl font-bold text-gray-800 dark:text-white flex items-center gap-2">
           Welcome to Swift Signals
         </span>
       </div>
@@ -150,7 +151,7 @@ const SignUp = () => {
           Already have an account?{' '}
           <button
             type="button"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/login')}
             className="font-medium text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors bg-transparent border-none p-0 m-0 cursor-pointer"
             style={{ background: 'none' }}
           >
@@ -167,6 +168,7 @@ const SignUp = () => {
           greenActive={password.length > 0}
         />
       </div>
+      <Footer />
     </div>
   );
 };
