@@ -37,22 +37,25 @@ def showMenu():
     return choice
 
 
-def loadParams():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--params", help="Path to parameter JSON file", required=False)
-    args = parser.parse_args()
-
-    if args.params and os.path.exists(args.params):
-        filePath = args.params
+def loadParams(param_dict=None):
+    if param_dict:
+        data = param_dict
     else:
-        filePath = input("Enter path to parameter JSON file: ").strip()
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--params", help="Path to parameter JSON file", required=False)
+        args = parser.parse_args()
 
-    if not os.path.exists(filePath):
-        print("File not found. Exiting.")
-        exit(1)
+        if args.params and os.path.exists(args.params):
+            filePath = args.params
+        else:
+            filePath = input("Enter path to parameter JSON file: ").strip()
 
-    with open(filePath, "r") as f:
-        data = json.load(f)
+        if not os.path.exists(filePath):
+            print("File not found. Exiting.")
+            exit(1)
+
+        with open(filePath, "r") as f:
+            data = json.load(f)
 
     sim_params = data["intersection"]["simulation_parameters"]
     raw_density = data["intersection"].get("Traffic Density", 1)
@@ -196,8 +199,8 @@ def saveParams(params, intersection_type_str, simName):
     print(f"Saved parameters to {fileName}")
 
 
-def main():
-    params = loadParams()
+def main(param_dict=None):
+    params = loadParams(param_dict)
     mapped = params["mapped"]
     raw = params["raw"]
 
