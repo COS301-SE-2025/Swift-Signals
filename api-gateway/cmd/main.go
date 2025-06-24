@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/handler"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 
 	_ "github.com/COS301-SE-2025/Swift-Signals/api-gateway/swagger"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -35,7 +36,7 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 func main() {
-	authHandler := handler.NewAuthHandler()
+	authHandler := handler.NewAuthHandler(service.NewAuthService())
 	log.Println("Initialized Auth Handler.")
 
 	mux := http.NewServeMux()
@@ -44,6 +45,15 @@ func main() {
 	mux.HandleFunc("POST /register", authHandler.Register)
 	mux.HandleFunc("POST /logout", authHandler.Logout)
 	mux.HandleFunc("POST /reset-password", authHandler.ResetPassword)
+
+	mux.HandleFunc("GET /intersections", nil)
+	mux.HandleFunc("GET /intersections/simple", nil)
+	mux.HandleFunc("GET /intersections/{id}", nil)
+	mux.HandleFunc("POST /intersections", nil)
+	mux.HandleFunc("PATCH /intersections/{id}", nil)
+	mux.HandleFunc("DELETE /intersections/{id}", nil)
+	mux.HandleFunc("POST /intersections/{id}/optimise", nil)
+
 	log.Println("Registered API routes.")
 
 	mux.Handle("/docs/", httpSwagger.WrapHandler)
