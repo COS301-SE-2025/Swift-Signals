@@ -3,7 +3,7 @@
 ![Swift Signals Logo](assets/images/SwiftLogo.png)
 
 # Badges
-![API Gateway]
+![API Gateway](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/apiGateway.yml/badge.svg)
 ![Intersection Service]
 ![Metric Service]
 ![Optimization Service]
