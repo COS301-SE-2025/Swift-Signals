@@ -2,12 +2,16 @@
 
 ![Swift Signals Logo](assets/images/SwiftLogo.png)
 
-
 # Badges
+![API Gateway]
+![Intersection Service]
+![Metric Service]
+![Optimization Service]
+![React Frontend]
+![Simulation Service](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/simulation.yml/badge.svg)
+![User Service]
 
-![Simulation Services](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/simulation.yml/badge.svg)
-
-
+# Team
 **Team InsideInsights - Swift-Signals**  
 
 Swift Signals is a data-driven, simulation-powered traffic light optimization platform designed to address traffic congestion in urban environments. Developed in collaboration with Southern Cross Solutions, the project aims to equip municipal traffic departments with advanced tools to analyse intersection performance and improve traffic signal efficiency using machine learning.
