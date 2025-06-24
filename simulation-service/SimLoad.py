@@ -230,7 +230,7 @@ def main(param_dict=None):
         print("Invalid intersection type in parameters.")
         return
 
-    parameters = {"Intersection Type": raw.get("Intersection Type")}
+    parameters = {"intersection_type": raw.get("intersection_type")}
 
     if intersection_type == "trafficlight":
         parameters["green"] = mapped.get("green")
