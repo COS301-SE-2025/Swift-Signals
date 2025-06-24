@@ -133,37 +133,23 @@ class TestSimLoad(unittest.TestCase):
     )
     @patch("SimLoad.saveRunCount")
     @patch("SimLoad.loadRunCount", return_value=0)
-    @patch("json.dump")
-    @patch("os.makedirs")
     @patch("os.remove")
-    @patch("builtins.open", new_callable=mock_open)
     def test_main_traffic_light(
         self,
-        mock_file,
         mock_remove,
-        mock_makedirs,
-        mock_json_dump,
         mock_run_count,
         mock_save_run_count,
         mock_params,
         mock_generate,
     ):
-        SimLoad.main()
+        result, fullOut = SimLoad.main()
 
         mock_generate.assert_called_once()
 
-        self.assertEqual(mock_json_dump.call_count, 2)
-
-        first_output = mock_json_dump.call_args_list[0][0][0]
-        second_output = mock_json_dump.call_args_list[1][0][0]
-
-        self.assertIn("intersection", first_output)
-        self.assertEqual(second_output, {"simulation_log": "details_here"})
-
-        expected_dirs = {"out/results"}
-        actual_dirs = {call_args[0][0] for call_args in mock_makedirs.call_args_list}
-
-        self.assertTrue(expected_dirs.issubset(actual_dirs))
+        self.assertIn("intersection", result)
+        self.assertEqual(result["intersection"]["parameters"]["Intersection Type"], 1)
+        self.assertIn("results", result["intersection"])
+        self.assertEqual(fullOut, {"simulation_log": "details_here"})
 
     @patch("builtins.input", return_value="nonexistent.json")
     @patch("os.path.exists", return_value=False)

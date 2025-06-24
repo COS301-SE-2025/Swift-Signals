@@ -8,10 +8,10 @@ param_dict = {
             "seed": 3012,
             "Green": 25,
             "Yellow": 4,
-            "Red": 35
+            "Red": 35,
         },
-        "Traffic Density": 2
+        "Traffic Density": 2,
     }
 }
 
-main(param_dict)
+results_dict, full_output = main(param_dict)

@@ -42,7 +42,9 @@ def loadParams(param_dict=None):
         data = param_dict
     else:
         parser = argparse.ArgumentParser()
-        parser.add_argument("--params", help="Path to parameter JSON file", required=False)
+        parser.add_argument(
+            "--params", help="Path to parameter JSON file", required=False
+        )
         args = parser.parse_args()
 
         if args.params and os.path.exists(args.params):
