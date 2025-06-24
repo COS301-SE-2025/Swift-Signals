@@ -151,12 +151,32 @@ class TestTLIntersection(unittest.TestCase):
             "Yellow": 5,
             "Red": 25,
         }
-        result = trafficLight.generate(params)
 
-        self.assertIn("Total Vehicles", result)
-        self.assertEqual(result["Total Vehicles"], 2)
+        # Properly unpack the return tuple
+        results, fullOutput = trafficLight.generate(params)
+
+        # Assert expected results dictionary values
+        self.assertIn("Total Vehicles", results)
+        self.assertEqual(results["Total Vehicles"], 2)
+        self.assertEqual(results["Emergency Brakes"], 1)
+        self.assertEqual(results["Emergency Stops"], 0)
+        self.assertEqual(results["Near collisions"], 1)
+        self.assertAlmostEqual(results["Average Travel Time"], 150.0)
+        self.assertAlmostEqual(results["Total Travel Time"], 300.0)
+        self.assertAlmostEqual(results["Average Waiting Time"], 15.0)
+        self.assertAlmostEqual(results["Total Waiting Time"], 30.0)
+        self.assertGreater(results["Average Speed"], 0)
+
+        # Assert generateTrips was called
         mock_generateTrips.assert_called_once()
+
+        # Assert files were cleaned up
         self.assertTrue(mock_remove.called)
+
+        # Check fullOutput structure
+        self.assertIsInstance(fullOutput, dict)
+        self.assertIn("intersection", fullOutput)
+        self.assertIn("vehicles", fullOutput)
 
     @patch("builtins.print")
     @patch("trafficLight.generateTrips")

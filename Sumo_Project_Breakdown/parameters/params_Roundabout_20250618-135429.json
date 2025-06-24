@@ -13,11 +13,11 @@
         },
         "created_at": "2025-06-18T13:52:33Z",
         "last_run_at": "2025-06-18T13:52:33Z",
-        "Traffic Density": "2",
-        "status": "0",
+        "Traffic Density": 2,
+        "status": 0,
         "run_count": 0,
         "simulation_parameters": {
-            "Intersection Type": "2",
+            "Intersection Type": 2,
             "Speed": 80,
             "seed": 13
         }, 
@@ -26,7 +26,7 @@
         },
         "optimized_parameters": {
             "optimization_type": "gridsearch",
-            "Intersection Type": "2",
+            "Intersection Type": 2,
             "Speed": 80,
             "seed": 0
         },
@@ -35,7 +35,7 @@
         },
         "best_parameters": {
             "optimization_type": "gridsearch",
-            "Intersection Type": "2",
+            "Intersection Type": 2,
             "Speed": 80,
             "seed": 0
         },

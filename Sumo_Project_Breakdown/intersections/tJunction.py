@@ -1,7 +1,6 @@
 import os
 import subprocess
 import xml.etree.ElementTree as ET
-import json
 
 
 def generate(params):
@@ -148,12 +147,6 @@ def generate(params):
         "vehicles": trajectories,
     }
 
-    os.makedirs("out/simulationOut", exist_ok=True)
-    with open("out/simulationOut/simulation_output.json", "w") as jf:
-        json.dump(fullOutput, jf, indent=2)
-
-    print("Simulation output saved to simulation_output.json")
-
     tempFiles = [
         netFile,
         routeFile,
@@ -172,7 +165,7 @@ def generate(params):
         except OSError as e:
             print(f"Warning: Could not delete {file} - {e}")
 
-    return results
+    return results, fullOutput
 
 
 def writeNodeFile(filename):

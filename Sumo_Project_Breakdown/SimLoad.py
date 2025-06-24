@@ -24,12 +24,7 @@ INTERSECTION_TYPES = {
 TRAFFIC_DENSITY = {0: "low", 1: "medium", 2: "high"}
 
 
-INTERSECTION_STATUS = {
-    0: "unoptimized",
-    1: "optimizing",
-    2: "optimized",
-    3: "failed",
-}
+INTERSECTION_STATUS = {0: "unoptimized", 1: "optimizing", 2: "optimized", 3: "failed"}
 
 
 def showMenu():
@@ -63,12 +58,34 @@ def loadParams():
     raw_density = data["intersection"].get("Traffic Density", 1)
     traffic_density = TRAFFIC_DENSITY.get(raw_density, "medium")
     raw_type = sim_params.get("Intersection Type", 0)
-    intersection_type = INTERSECTION_TYPES.get(raw_type, "unspecified")
+
+    try:
+        raw_type = int(raw_type)
+    except (ValueError, TypeError):
+        raw_type = 0
+
+    intersection_type_str = INTERSECTION_TYPES.get(raw_type, "unspecified")
+
+    mapped = {
+        "Traffic Density": traffic_density,
+        "Intersection Type": intersection_type_str,
+        "Speed": sim_params.get("Speed", 40),
+        "seed": sim_params.get("seed", 42),
+    }
+
+    if intersection_type_str == "trafficlight":
+        mapped["Green"] = sim_params.get("Green", 25)
+        mapped["Yellow"] = sim_params.get("Yellow", 3)
+        mapped["Red"] = sim_params.get("Red", 30)
 
     return {
-        **sim_params,
-        "Traffic Density": traffic_density,
-        "Intersection Type": intersection_type,
+        "mapped": mapped,
+        "raw": {
+            "Traffic Density": raw_density,
+            "Intersection Type": raw_type,
+            "Speed": sim_params.get("Speed", 40),
+            "seed": sim_params.get("seed", 42),
+        },
     }
 
 
@@ -136,38 +153,55 @@ def getParams(tL: bool):
         return {"Traffic Density": trafficDensity, "Speed": speed}
 
 
-def saveParams(params, intersectionType, simName):
+def saveParams(params, intersection_type_str, simName):
+    density_map = {"low": 0, "medium": 1, "high": 2}
+    density_num = density_map.get(params.get("Traffic Density", "medium").lower(), 1)
+
+    reverse_intersection_types = {v: k for k, v in INTERSECTION_TYPES.items()}
+    intersection_type_num = reverse_intersection_types.get(intersection_type_str, 0)
+
+    results = {}
+
+    raw = {
+        "Speed": params.get("Speed", 40),
+        "seed": params.get("seed", 42),
+    }
+
     timestamp = time.strftime("%Y-%m-%dT%H:%M:%SZ")
     time_for_file = time.strftime("%Y%m%d-%H%M%S")
     fileName = f"params_{simName}_{time_for_file}.json"
-    fake_oid = uuid.uuid4().hex[:24]
 
-    simulationData = {
-        "_id": {"$oid": fake_oid},
+    output = {
+        "_id": {"$oid": uuid.uuid4().hex[:24]},
         "intersection": {
             "id": "simId",
             "name": simName,
             "owner": "username",
             "created_at": timestamp,
-            "last_run_at": timestamp,
-            "status": "completed",
+            "last_run_at": datetime.utcnow().isoformat() + "Z",
+            "Traffic Density": density_num,
+            "status": 0,
             "run_count": 0,
-            "simulation_parameters": {
-                "Intersection Type": intersectionType,
-                **params,
-                "seed": 13,
+            "parameters": {
+                "Intersection Type": intersection_type_num,
+                "Speed": raw["Speed"],
+                "seed": raw["seed"],
             },
+            "results": results,
         },
     }
 
     with open(fileName, "w") as f:
-        json.dump(simulationData, f, indent=4)
+        json.dump(output, f, indent=4)
     print(f"Saved parameters to {fileName}")
 
 
 def main():
     params = loadParams()
-    intersection_type = params.get("Intersection Type", "unknown")
+    mapped = params["mapped"]
+    raw = params["raw"]
+
+    intersection_type = mapped.get("Intersection Type", "unknown")
     simName = intersection_type.capitalize()
     simId = "simId"
     owner = "username"
@@ -180,16 +214,25 @@ def main():
 
     """Run correct generator based on type"""
     if intersection_type == "trafficlight":
-        results = trafficLight.generate(params)
+        results, fullOut = trafficLight.generate(mapped)
     elif intersection_type == "roundabout":
-        results = circle.generate(params)
+        results, fullOut = circle.generate(mapped)
     elif intersection_type == "fourwaystop":
-        results = stopStreet.generate(params)
+        results, fullOut = stopStreet.generate(mapped)
     elif intersection_type == "tjunction":
-        results = tJunction.generate(params)
+        results, fullOut = tJunction.generate(mapped)
     else:
         print("Invalid intersection type in parameters.")
         return
+
+    parameters = {"Intersection Type": raw.get("Intersection Type")}
+
+    if intersection_type == "trafficlight":
+        parameters["Green"] = mapped.get("Green")
+        parameters["Yellow"] = mapped.get("Yellow")
+        parameters["Red"] = mapped.get("Red")
+
+    parameters["Seed"] = raw.get("seed")
 
     output = {
         "_id": {"$oid": uuid.uuid4().hex[:24]},
@@ -199,9 +242,10 @@ def main():
             "owner": owner,
             "created_at": created,
             "last_run_at": nowIso,
-            "status": "completed",
+            "Traffic Density": raw.get("Traffic Density"),
+            "status": 0,
             "run_count": runCount,
-            "parameters": params,
+            "parameters": parameters,
             "results": results,
         },
     }
@@ -212,6 +256,11 @@ def main():
         json.dump(output, f, indent=2)
 
     print("Simulation saved to simulation_results.json")
+
+    with open("out/simulationOut/simulation_output.json", "w") as jf:
+        json.dump(fullOut, jf, indent=2)
+
+    print("Simulation output saved to simulation_output.json")
 
     try:
         os.remove("run_count.txt")

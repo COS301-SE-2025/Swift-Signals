@@ -46,26 +46,27 @@ class TestStopIntersection(unittest.TestCase):
         tree_mock.getroot.return_value = root_mock
         mock_et_parse.return_value = tree_mock
 
-        # Set distinct mocks for different files
-        mock_cfg_file = MagicMock()
-        mock_log_file = MagicMock()
-        mock_output_file = MagicMock()
-        mock_default_file = MagicMock()
+        mock_cfg_file = mock_open().return_value
+        mock_cfg_file.__enter__.return_value = mock_cfg_file
+
+        mock_log_file = mock_open().return_value
+        mock_log_file.__enter__.return_value = mock_log_file
+
+        mock_default_file = mock_open().return_value
+        mock_default_file.__enter__.return_value = mock_default_file
 
         def open_side_effect(file, mode="r", *args, **kwargs):
-            if file == "stop_intersection.sumocfg":
+            if file.endswith("stop_intersection.sumocfg"):
                 return mock_cfg_file
-            elif file == "stop_intersection_warnings.log":
+            elif file.endswith("stop_intersection_warnings.log"):
                 return mock_log_file
-            elif file == "out/simulationOut/simulation_output.json":
-                return mock_output_file
             else:
                 return mock_default_file
 
         mock_open_file.side_effect = open_side_effect
 
         params = {"Speed": 60, "Traffic Density": "medium", "seed": 42}
-        results = stopStreet.generate(params)
+        results, fullOutput = stopStreet.generate(params)
 
         self.assertIn("Total Vehicles", results)
         self.assertEqual(results["Total Vehicles"], 2)
@@ -104,7 +105,6 @@ class TestStopIntersection(unittest.TestCase):
         mock_generateTrips.assert_called_once()
         mock_extractTraj.assert_called_once()
         mock_remove.assert_any_call("stop_intersection.net.xml")
-        mock_open_file.assert_any_call("out/simulationOut/simulation_output.json", "w")
 
     def test_writeNodeFile(self):
         with patch("builtins.open", mock_open()) as m:

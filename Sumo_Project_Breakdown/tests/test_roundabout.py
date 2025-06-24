@@ -48,7 +48,7 @@ class TestRoundabout(unittest.TestCase):
 
         params = {"Speed": 60, "Traffic Density": "medium", "seed": 42}
 
-        results = circle.generate(params)
+        results, fullOutput = circle.generate(params)
 
         self.assertIn("Total Vehicles", results)
         self.assertEqual(results["Total Vehicles"], 2)
@@ -70,7 +70,6 @@ class TestRoundabout(unittest.TestCase):
         mock_generateTrips.assert_called_once()
         mock_extractTraj.assert_called_once()
         mock_remove.assert_any_call("roundabout.net.xml")
-        mock_open_file.assert_any_call("out/simulationOut/simulation_output.json", "w")
 
     @patch("builtins.open", new_callable=mock_open)
     def test_writeNodeFile(self, mock_file):

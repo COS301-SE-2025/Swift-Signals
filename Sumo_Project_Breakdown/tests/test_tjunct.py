@@ -40,7 +40,6 @@ class TestTJunction(unittest.TestCase):
         mock_writeEdge,
         mock_writeNode,
     ):
-        # Setup mocks for reading logfile and tripinfo XML
         logfile_content = [
             "Vehicle 'veh1' performs emergency braking\n",
             "Vehicle 'veh2' performs emergency stop\n",
@@ -51,7 +50,6 @@ class TestTJunction(unittest.TestCase):
             <tripinfo duration="200" waitingTime="20" routeLength="1000"/>
         </root>"""
 
-        # Mock open() for logfile, tripinfoFile, and simulation_output.json
         def open_side_effect(file, mode="r", *args, **kwargs):
             if file == "tjunction_warnings.log" and "r" in mode:
                 mock_file = mock_open(read_data="".join(logfile_content)).return_value
@@ -68,24 +66,22 @@ class TestTJunction(unittest.TestCase):
         mock_open_file.side_effect = open_side_effect
 
         params = {"Speed": 60, "Traffic Density": "medium", "seed": 42}
-        results = tJunction.generate(params)
 
-        # Check speed conversion and warnings
+        results, fullOutput = tJunction.generate(params)
+
         self.assertIn("Total Vehicles", results)
         self.assertEqual(results["Total Vehicles"], 2)
         self.assertEqual(results["Emergency Brakes"], 1)
         self.assertEqual(results["Emergency Stops"], 1)
         self.assertEqual(results["Near collisions"], 2)
 
-        # Check write files called with correct filenames
         mock_writeNode.assert_called_once_with("tjInt.nod.xml")
         mock_writeEdge.assert_called_once()
         args, _ = mock_writeEdge.call_args
-        self.assertAlmostEqual(args[1], 60 * 1000 / 3600)  # speed conversion
+        self.assertAlmostEqual(args[1], 60 * 1000 / 3600)
 
         mock_writeCon.assert_called_once_with("tjInt.con.xml")
 
-        # Check subprocess calls for netconvert and sumo run
         calls = [call_args[0][0] for call_args in mock_subprocess_run.call_args_list]
         self.assertIn(
             [
@@ -98,7 +94,6 @@ class TestTJunction(unittest.TestCase):
             ],
             calls,
         )
-
         self.assertIn(
             [
                 "sumo",
@@ -120,13 +115,6 @@ class TestTJunction(unittest.TestCase):
             "tjunction.net.xml", "tjunction.rou.xml", "medium", params
         )
 
-        # Check JSON output file creation
-        mock_open_file.assert_any_call("out/simulationOut/simulation_output.json", "w")
-
-        # Check directories created
-        mock_makedirs.assert_any_call("out/simulationOut", exist_ok=True)
-
-        # Check temp files removal
         expected_files = [
             "tjunction.net.xml",
             "tjunction.rou.xml",
@@ -168,7 +156,7 @@ class TestTJunction(unittest.TestCase):
     @patch("builtins.open", new_callable=mock_open)
     def test_generateTrips_runs_command(self, mock_open_file, mock_run, mock_makedirs):
         netFile = "net.xml"
-        tripFile = "some_dir/trips.rou.xml"  # <-- add directory here
+        tripFile = "some_dir/trips.rou.xml"
         params = {"seed": 123}
         tJunction.generateTrips(netFile, tripFile, "high", params)
         mock_makedirs.assert_called_with("some_dir", exist_ok=True)
