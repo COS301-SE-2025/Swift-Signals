@@ -26,7 +26,8 @@ jobs:
       run: npm install --save-dev eslint
       
     - name: Run ESLint
-      run: npx eslint "frontend/**/*.{js,jsx,ts,tsx}"
+      working-directory: frontend
+      run: npx eslint "src/**/*.{js,jsx,ts,tsx}"
     
     - name: Check Prettier formatting
       run: npx prettier --check "frontend/**/*.{js,jsx,ts,tsx,json,css,md}"
