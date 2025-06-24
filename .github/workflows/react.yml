@@ -26,10 +26,11 @@ jobs:
       run: npm install --save-dev eslint
       
     - name: Run ESLint
-      run: npx eslint "**/*.{js,jsx,ts,tsx}" || echo "No files to lint"
+      run: npx eslint "frontend/**/*.{js,jsx,ts,tsx}"
     
     - name: Check Prettier formatting
-      run: npx prettier --check "**/*.{js,jsx,ts,tsx,css}"
+      run: npx prettier --check "frontend/**/*.{js,jsx,ts,tsx,json,css,md}"
+
 
     - name: Run Jest tests
       run: npx jest --passWithNoTests
