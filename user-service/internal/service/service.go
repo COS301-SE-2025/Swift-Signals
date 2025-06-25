@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -154,11 +155,20 @@ func (s *Service) LogoutUser(ctx context.Context, userID string) error {
 
 // GetUserByID retrieves a user by their ID
 func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.UserResponse, error) {
-	// TODO: Implement get user by ID
-	// - Validate user ID
-	// - Query database for user
-	// - Return user model or not found error
-	return nil, nil
+	// Validate user ID
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Query database for user
+	user, err := s.repo.GetUserByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return user model or not found error
+	return user, nil
 }
 
 // GetUserByEmail retrieves a user by their email address
@@ -203,22 +213,72 @@ func (s *Service) DeleteUser(ctx context.Context, userID string) error {
 
 // GetUserIntersectionIDs retrieves all intersection IDs for a user
 func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]int32, error) {
-	// TODO: Implement get user intersection IDs
-	// - Validate user ID
-	// - Check if user exists
-	// - Query database for user's intersection IDs
+	// Validate user ID
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if user exists
+	user, err := s.repo.GetUserByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, errors.New("user not found")
+	}
+
+	// Query database for user's intersection IDs
+	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert to []int32 slice
+	int32IDs := make([]int32, len(intIDs))
+	for i, v := range intIDs {
+		int32IDs[i] = int32(v)
+	}
+
 	// - Return slice of intersection IDs
-	return nil, nil
+	return int32IDs, nil
 }
 
 // AddIntersectionID adds an intersection ID to a user's list
 func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersectionID int32) error {
-	// TODO: Implement add intersection ID
-	// - Validate user ID and intersection ID
-	// - Check if user exists
-	// - Check if intersection ID already exists for user
-	// - Add intersection ID to user's list
-	// - Update database
+	// Validate user ID and intersection ID
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+		return err
+	}
+
+	// Check if user exists
+	user, err := s.repo.GetUserByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return errors.New("user not found")
+	}
+
+	// Check if intersection ID already exists for user
+	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, id)
+	if err != nil {
+		return err
+	}
+	newIntID := int(intersectionID)
+	for _, intID := range intIDs {
+		if intID == newIntID {
+			return errors.New("intersection already exists")
+		}
+	}
+
+	// Add intersection ID to user's list
+	err = s.repo.AddIntersectionID(ctx, id, newIntID)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
