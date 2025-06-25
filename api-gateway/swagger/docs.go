@@ -79,9 +79,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "User successfully registered",
+                        "description": "Intersection successfully created",
                         "schema": {
-                            "$ref": "#/definitions/model.AuthResponse"
+                            "$ref": "#/definitions/model.CreateIntersectionResponse"
                         }
                     },
                     "400": {
@@ -384,6 +384,15 @@ const docTemplate = `{
                 "traffic_density": {
                     "type": "string",
                     "example": "high"
+                }
+            }
+        },
+        "model.CreateIntersectionResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "2"
                 }
             }
         },

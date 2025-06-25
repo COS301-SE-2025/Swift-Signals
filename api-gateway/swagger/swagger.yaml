@@ -32,6 +32,12 @@ definitions:
         example: high
         type: string
     type: object
+  model.CreateIntersectionResponse:
+    properties:
+      id:
+        example: "2"
+        type: string
+    type: object
   model.ErrorResponse:
     properties:
       code:
@@ -218,9 +224,9 @@ paths:
       - application/json
       responses:
         "201":
-          description: User successfully registered
+          description: Intersection successfully created
           schema:
-            $ref: '#/definitions/model.AuthResponse'
+            $ref: '#/definitions/model.CreateIntersectionResponse'
         "400":
           description: Invalid request payload or missing fields
           schema:

@@ -5,13 +5,18 @@ import (
 	"net/http"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 )
 
-type IntersectionHandler struct{}
+type IntersectionHandler struct {
+	service *service.IntersectionService
+}
 
-func NewIntersectionHandler() *IntersectionHandler {
-	return &IntersectionHandler{}
+func NewIntersectionHandler(s *service.IntersectionService) *IntersectionHandler {
+	return &IntersectionHandler{
+		service: s,
+	}
 }
 
 // @Summary Get All Intersections
@@ -65,7 +70,7 @@ func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Req
 // @Accept json
 // @Produce json
 // @Param createIntersectionRequest body model.CreateIntersectionRequest true "intersection information"
-// @Success 201 {object} model.AuthResponse "User successfully registered"
+// @Success 201 {object} model.CreateIntersectionResponse "Intersection successfully created"
 // @Failure 400 {object} model.ErrorResponse "Invalid request payload or missing fields"
 // @Failure 401 {object} model.ErrorResponse "Unauthorized: Token missing or invalid"
 // @Failure 500 {object} model.ErrorResponse "Internal server error"

@@ -35,6 +35,10 @@ type CreateIntersectionRequest struct {
 	DefaultParameters simulationParameters `json:"default_parameters"`
 }
 
+type CreateIntersectionResponse struct {
+	Id string `json:"id" example:"2"`
+}
+
 type optimisationParameters struct {
 	OptimisationType     string               `json:"optimisation_type" example:"grid_search"`
 	SimulationParameters simulationParameters `json:"simulation_parameters"`

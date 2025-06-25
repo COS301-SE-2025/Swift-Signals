@@ -46,7 +46,7 @@ func main() {
 	mux.HandleFunc("POST /reset-password", authHandler.ResetPassword)
 	log.Println("Initialized Auth Handlers.")
 
-	intersectionHandler := handler.NewIntersectionHandler()
+	intersectionHandler := handler.NewIntersectionHandler(service.NewIntersectionService())
 	mux.HandleFunc("GET /intersections", intersectionHandler.GetAllIntersections)
 	// mux.HandleFunc("GET /intersections/simple", nil)
 	mux.HandleFunc("GET /intersections/{id}", intersectionHandler.GetIntersection)
