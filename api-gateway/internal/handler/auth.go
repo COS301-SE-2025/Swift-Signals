@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
@@ -37,19 +36,17 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Basic validation
+	// Basic validation  NOTE: might be moved to middleware later on
 	if req.Username == "" || req.Email == "" || req.Password == "" {
 		util.SendErrorResponse(w, http.StatusBadRequest, "Username, email, and password are required")
 		return
 	}
 
-	// TODO: Implement Service Logic
-	log.Println("Attempting to register user...")
-
-	resp := &model.AuthResponse{
-		Message: "Registration Example Successful",
-		Token:   "example.token",
+	resp, err := h.service.RegisterUser(r.Context(), req)
+	if err != nil {
+		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
 	}
+
 	util.SendJSONResponse(w, http.StatusCreated, resp)
 }
 
@@ -70,13 +67,11 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: Implement Service Logic
-	log.Println("Attempting to log in user...")
-
-	resp := &model.AuthResponse{
-		Message: "Login Example Successful",
-		Token:   "example.token",
+	resp, err := h.service.LoginUser(r.Context(), req)
+	if err != nil {
+		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
 	}
+
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }
 
@@ -91,18 +86,17 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /logout [post]
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
+	token, err := util.GetToken(r)
+	if err != nil {
 		util.SendErrorResponse(w, http.StatusUnauthorized, "Authorization token is missing")
 		return
 	}
 
-	// TODO: Implement Service Logic
-	log.Println("Attempting to logout user...")
-
-	resp := &model.LogoutResponse{
-		Message: "Logout Successful",
+	resp, err := h.service.LogoutUser(r.Context(), token)
+	if err != nil {
+		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
 	}
+
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }
 
