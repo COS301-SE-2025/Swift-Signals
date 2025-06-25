@@ -136,7 +136,7 @@ func (uc *UserClient) RemoveIntersectionIDs(ctx context.Context, userID string, 
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	return uc.client.RemoveIntersectionID(ctx, req)
+	return uc.client.RemoveIntersectionIDs(ctx, req)
 }
 
 func (uc *UserClient) ChangePassword(ctx context.Context, user_id, current_password, new_password string) (*emptypb.Empty, error) {
@@ -162,7 +162,7 @@ func (uc *UserClient) ResetPassword(ctx context.Context, email string) (*emptypb
 }
 
 func (uc *UserClient) MakeAdmin(ctx context.Context, user_id, admin_user_id string) (*emptypb.Empty, error) {
-	req := &userpb.MakeAdminRequest{
+	req := &userpb.AdminRequest{
 		UserId:      user_id,
 		AdminUserId: admin_user_id,
 	}
@@ -173,7 +173,7 @@ func (uc *UserClient) MakeAdmin(ctx context.Context, user_id, admin_user_id stri
 }
 
 func (uc *UserClient) RemoveAdmin(ctx context.Context, user_id, admin_user_id string) (*emptypb.Empty, error) {
-	req := &userpb.RemoveAdminRequest{
+	req := &userpb.AdminRequest{
 		UserId:      user_id,
 		AdminUserId: admin_user_id,
 	}
