@@ -32,35 +32,40 @@ export interface CarouselProps {
 const DEFAULT_ITEMS: CarouselItem[] = [
   {
     title: "Overview",
-    description: "Swift Signals is a smart traffic light optimization platform built to reduce congestion in cities.",
+    description:
+      "Swift Signals is a smart traffic light optimization platform built to reduce congestion in cities.",
     id: 1,
     icon: <FiInfo className="carousel-icon" />,
     backgroundColor: "rgba(11, 80, 33, 0.3)",
   },
   {
     title: "Purpose & Impact",
-    description: "Addresses one of South Africa’s biggest infrastructure challenges—R1 billion lost annually due to traffic.",
+    description:
+      "Addresses one of South Africa’s biggest infrastructure challenges—R1 billion lost annually due to traffic.",
     id: 2,
     icon: <FiTarget className="carousel-icon" />,
     backgroundColor: "rgba(62, 228, 12, 0.3)",
   },
   {
     title: "Intelligent Optimization",
-    description: "Uses machine learning and historical traffic data to improve traffic signal timing.",
+    description:
+      "Uses machine learning and historical traffic data to improve traffic signal timing.",
     id: 3,
     icon: <FiBarChart2 className="carousel-icon" />,
     backgroundColor: "rgba(56, 78, 107, 0.3)",
   },
   {
     title: "Realistic Simulation",
-    description: "Simulates real-world intersection behaviour to support dynamic signal phase adjustments.",
+    description:
+      "Simulates real-world intersection behaviour to support dynamic signal phase adjustments.",
     id: 4,
     icon: <FiTrendingUp className="carousel-icon" />,
     backgroundColor: "rgba(58, 143, 240, 0.3)",
   },
   {
     title: "Strategic Partnership",
-    description: "Developed in collaboration with Southern Cross Solutions for real-world municipal deployment.",
+    description:
+      "Developed in collaboration with Southern Cross Solutions for real-world municipal deployment.",
     id: 5,
     icon: <FiUsers className="carousel-icon" />,
     backgroundColor: "rgba(226, 250, 8, 0.3)",
@@ -144,7 +149,7 @@ export default function Carousel({
 
   const handleDragEnd = (
     _: MouseEvent | TouchEvent | PointerEvent,
-    info: PanInfo
+    info: PanInfo,
   ): void => {
     const offset = info.offset.x;
     const velocity = info.velocity.x;

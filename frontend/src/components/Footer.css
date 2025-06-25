@@ -1,5 +1,5 @@
 .footer {
-  background-color: #F0F0F0;
+  background-color: #f0f0f0;
   color: #000000;
   z-index: 2000;
   text-align: center;
@@ -48,5 +48,4 @@
     font-size: 0.6rem;
     font-weight: bold;
   }
-  
 }

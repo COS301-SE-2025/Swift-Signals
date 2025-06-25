@@ -1,154 +1,155 @@
 .tutorial-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 10000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10000;
 }
 
 .tutorial-highlight {
-    position: absolute;
-    border-radius: 8px;
-    /* This box-shadow creates the "cutout" effect over the entire screen */
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 0, 0, 0.3);
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    pointer-events: none; /* Allows clicks to go through to the popover */
+  position: absolute;
+  border-radius: 8px;
+  /* This box-shadow creates the "cutout" effect over the entire screen */
+  box-shadow:
+    0 0 0 9999px rgba(0, 0, 0, 0.6),
+    0 0 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  pointer-events: none; /* Allows clicks to go through to the popover */
 }
 
 .tutorial-popover {
-    position: absolute;
-    width: 320px;
-    max-width: calc(100vw - 40px);
-    background-color: white;
-    color: #333;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-    z-index: 10001;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    border: 1px solid #ddd;
+  position: absolute;
+  width: 320px;
+  max-width: calc(100vw - 40px);
+  background-color: white;
+  color: #333;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  z-index: 10001;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border: 1px solid #ddd;
 }
 
 .dark .tutorial-popover {
-    background-color: #2a2a2a;
-    color: #f9fafb;
-    border-color: #444;
+  background-color: #2a2a2a;
+  color: #f9fafb;
+  border-color: #444;
 }
 
-
 .tutorial-popover h4 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #991915;
-    margin: 0 0 0.75rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #991915;
+  margin: 0 0 0.75rem 0;
 }
 
 .tutorial-popover p {
-    line-height: 1.6;
-    margin: 0 0 1.5rem 0;
-    font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+  font-size: 0.95rem;
 }
 
 /* Style for the error message code block */
 .tutorial-popover p code {
-    background-color: #f0f0f0;
-    color: #c7254e;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: monospace;
+  background-color: #f0f0f0;
+  color: #c7254e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
 }
 
 .dark .tutorial-popover p code {
-    background-color: #444;
-    color: #ff8b8b;
+  background-color: #444;
+  color: #ff8b8b;
 }
 
 .tutorial-navigation {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid #eee;
-    padding-top: 1rem;
-    margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+  margin-top: 1rem;
 }
 
 .dark .tutorial-navigation {
-    border-color: #3a3a3a;
+  border-color: #3a3a3a;
 }
 
-
 .tutorial-step-count {
-    font-size: 0.9rem;
-    color: #666;
+  font-size: 0.9rem;
+  color: #666;
 }
 
 .dark .tutorial-step-count {
-    color: #bbb;
+  color: #bbb;
 }
 
-
 .tutorial-navigation .nav-buttons {
-    display: flex;
-    gap: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
 }
 
 .tutorial-navigation button {
-    background-color: #991915;
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
+  background-color: #991915;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
 }
 
 .tutorial-navigation button:hover {
-    background-color: #7a1410;
+  background-color: #7a1410;
 }
 
 .tutorial-navigation button:first-of-type {
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ccc;
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ccc;
 }
 .dark .tutorial-navigation button:first-of-type {
-    background-color: #444;
-    color: #fff;
-    border-color: #666;
+  background-color: #444;
+  color: #fff;
+  border-color: #666;
 }
 
 .tutorial-navigation button:first-of-type:hover {
-    background-color: #e0e0e0;
+  background-color: #e0e0e0;
 }
 .dark .tutorial-navigation button:first-of-type:hover {
-    background-color: #555;
+  background-color: #555;
 }
 
 .tutorial-close-button {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    color: #999;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 50%;
-    transition: background-color 0.2s, color 0.2s;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #999;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .tutorial-close-button:hover {
-    background-color: #f0f0f0;
-    color: #333;
+  background-color: #f0f0f0;
+  color: #333;
 }
 
 .dark .tutorial-close-button {
-    color: #ccc;
+  color: #ccc;
 }
 .dark .tutorial-close-button:hover {
-    background-color: #3a3a3a;
-    color: white;
+  background-color: #3a3a3a;
+  color: white;
 }

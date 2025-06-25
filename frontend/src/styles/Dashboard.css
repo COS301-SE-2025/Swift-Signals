@@ -119,7 +119,8 @@ body {
   }
 }
 
-.main-column, .side-column {
+.main-column,
+.side-column {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -162,11 +163,13 @@ body {
   color: #ffffff;
 }
 
-.recent-simulations-tab th, .recent-simulations-tab td {
+.recent-simulations-tab th,
+.recent-simulations-tab td {
   border-color: #e5e7eb;
 }
 
-.dark .recent-simulations-tab th, .dark .recent-simulations-tab td {
+.dark .recent-simulations-tab th,
+.dark .recent-simulations-tab td {
   border-color: #374151;
 }
 
@@ -187,7 +190,8 @@ body {
 }
 
 /* Base Card Structure */
-.graph-card, .inter-card {
+.graph-card,
+.inter-card {
   background-color: #ffffff;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -197,7 +201,8 @@ body {
   flex-direction: column;
   padding: 1.25rem;
 }
-.dark .graph-card, .dark .inter-card {
+.dark .graph-card,
+.dark .inter-card {
   background-color: #2a2a2a;
 }
 
