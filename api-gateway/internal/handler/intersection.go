@@ -69,7 +69,7 @@ func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Req
 // @Tags Intersections
 // @Accept json
 // @Produce json
-// @Param createIntersectionRequest body model.CreateIntersectionRequest true "intersection information"
+// @Param createIntersectionRequest body model.CreateIntersectionRequest true "Intersection information"
 // @Success 201 {object} model.CreateIntersectionResponse "Intersection successfully created"
 // @Failure 400 {object} model.ErrorResponse "Invalid request payload or missing fields"
 // @Failure 401 {object} model.ErrorResponse "Unauthorized: Token missing or invalid"
@@ -83,4 +83,27 @@ func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.
 	}
 
 	util.SendJSONResponse(w, http.StatusOK, model.CreateIntersectionRequest{})
+}
+
+// @Summary Update Intersection
+// @Description Partially updates fields of an existing intersection by ID.
+// @Tags Intersections
+// @Accept json
+// @Produce json
+// @Param id path string true "Intersection ID"
+// @Param body body model.UpdateIntersectionRequest true "Fields to update"
+// @Success 200 {object} model.Intersection "Successful update"
+// @Failure 400 {object} model.ErrorResponse "Bad Request: Invalid input"
+// @Failure 401 {object} model.ErrorResponse "Unauthorized: Token missing or invalid"
+// @Failure 404 {object} model.ErrorResponse "Not Found: Intersection does not exist"
+// @Failure 500 {object} model.ErrorResponse "Internal server error"
+// @Router /intersections/{id} [patch]
+func (h *IntersectionHandler) UpdateIntersection(w http.ResponseWriter, r *http.Request) {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		util.SendErrorResponse(w, http.StatusUnauthorized, "Authorization token is missing")
+		return
+	}
+
+	util.SendJSONResponse(w, http.StatusOK, model.Intersection{})
 }

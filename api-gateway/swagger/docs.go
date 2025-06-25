@@ -68,7 +68,7 @@ const docTemplate = `{
                 "summary": "Create Intersection",
                 "parameters": [
                     {
-                        "description": "intersection information",
+                        "description": "Intersection information",
                         "name": "createIntersectionRequest",
                         "in": "body",
                         "required": true,
@@ -136,6 +136,69 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request: Invalid or missing ID parameter",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Partially updates fields of an existing intersection by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Intersections"
+                ],
+                "summary": "Update Intersection",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UpdateIntersectionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful update",
+                        "schema": {
+                            "$ref": "#/definitions/model.Intersection"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input",
                         "schema": {
                             "$ref": "#/definitions/model.ErrorResponse"
                         }
@@ -545,6 +608,32 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "Password reset instructions sent to your email."
+                }
+            }
+        },
+        "model.UpdateIntersectionRequest": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "object",
+                    "properties": {
+                        "address": {
+                            "type": "string",
+                            "example": "Corner of Foo and Bar"
+                        },
+                        "city": {
+                            "type": "string",
+                            "example": "Pretoria"
+                        },
+                        "province": {
+                            "type": "string",
+                            "example": "Gauteng"
+                        }
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "example": "My Updated Intersection"
                 }
             }
         },

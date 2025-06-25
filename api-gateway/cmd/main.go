@@ -51,7 +51,7 @@ func main() {
 	// mux.HandleFunc("GET /intersections/simple", nil)
 	mux.HandleFunc("GET /intersections/{id}", intersectionHandler.GetIntersection)
 	mux.HandleFunc("POST /intersections", intersectionHandler.CreateIntersection)
-	// mux.HandleFunc("PATCH /intersections/{id}", nil)
+	mux.HandleFunc("PATCH /intersections/{id}", intersectionHandler.UpdateIntersection)
 	// mux.HandleFunc("DELETE /intersections/{id}", nil)
 	// mux.HandleFunc("POST /intersections/{id}/optimise", nil)
 	log.Println("Initialized Intersection Handlers.")

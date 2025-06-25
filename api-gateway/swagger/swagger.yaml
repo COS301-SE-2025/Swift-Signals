@@ -144,6 +144,24 @@ definitions:
         example: Password reset instructions sent to your email.
         type: string
     type: object
+  model.UpdateIntersectionRequest:
+    properties:
+      details:
+        properties:
+          address:
+            example: Corner of Foo and Bar
+            type: string
+          city:
+            example: Pretoria
+            type: string
+          province:
+            example: Gauteng
+            type: string
+        type: object
+      name:
+        example: My Updated Intersection
+        type: string
+    type: object
   model.optimisationParameters:
     properties:
       optimisation_type:
@@ -214,7 +232,7 @@ paths:
       - application/json
       description: Creates a new intersection with the given arguments
       parameters:
-      - description: intersection information
+      - description: Intersection information
         in: body
         name: createIntersectionRequest
         required: true
@@ -277,6 +295,48 @@ paths:
           schema:
             $ref: '#/definitions/model.ErrorResponse'
       summary: Get Intersection by ID
+      tags:
+      - Intersections
+    patch:
+      consumes:
+      - application/json
+      description: Partially updates fields of an existing intersection by ID.
+      parameters:
+      - description: Intersection ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Fields to update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateIntersectionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful update
+          schema:
+            $ref: '#/definitions/model.Intersection'
+        "400":
+          description: 'Bad Request: Invalid input'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: 'Not Found: Intersection does not exist'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Update Intersection
       tags:
       - Intersections
   /login:
