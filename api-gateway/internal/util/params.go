@@ -3,6 +3,7 @@ package util
 import (
 	"errors"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -23,4 +24,9 @@ func GetToken(r *http.Request) (string, error) {
 	}
 
 	return token, nil
+}
+
+func GetID(r *http.Request) (int, error) {
+	idStr := r.PathValue("id")
+	return strconv.Atoi(idStr)
 }

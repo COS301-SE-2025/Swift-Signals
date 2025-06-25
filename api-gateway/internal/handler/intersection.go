@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"log"
+	"encoding/json"
 	"net/http"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
@@ -29,15 +29,20 @@ func NewIntersectionHandler(s *service.IntersectionService) *IntersectionHandler
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections [get]
 func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http.Request) {
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
+	_, err := util.GetToken(r)
+	if err != nil {
 		util.SendErrorResponse(w, http.StatusUnauthorized, "Authorization token is missing")
 		return
 	}
 
-	// TODO: Implement Service Logic
-	log.Println("Getting all intersections...")
-	resp := model.Intersections{}
+	// TODO: Implement User Verification
+	// ...
+
+	resp, err := h.service.GetAllIntersections(r.Context())
+	if err != nil {
+		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }
@@ -55,11 +60,22 @@ func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections/{id} [get]
 func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Request) {
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
+	_, err := util.GetToken(r)
+	if err != nil {
 		util.SendErrorResponse(w, http.StatusUnauthorized, "Authorization token is missing")
 		return
 	}
+
+	id, err := util.GetID(r)
+	if err != nil {
+		util.SendErrorResponse(w, http.StatusBadRequest, "Invalid ID specified in path; must be an integer")
+		return
+	}
+
+	// TODO: Implement User Verification
+	// ...
+
+	resp, err := h.service.GetIntersectionByID(r.Context(), id)
 
 	util.SendJSONResponse(w, http.StatusOK, model.Intersection{})
 }
@@ -76,13 +92,28 @@ func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Req
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections [post]
 func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.Request) {
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
+	var req model.CreateIntersectionRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		util.SendErrorResponse(w, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	_, err := util.GetToken(r)
+	if err != nil {
 		util.SendErrorResponse(w, http.StatusUnauthorized, "Authorization token is missing")
 		return
 	}
 
-	util.SendJSONResponse(w, http.StatusOK, model.CreateIntersectionRequest{})
+	// TODO: Implement User Verification
+	// ...
+
+	resp, err := h.service.CreateIntersection(r.Context(), req)
+	if err != nil {
+		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	util.SendJSONResponse(w, http.StatusOK, resp)
 }
 
 // @Summary Update Intersection
