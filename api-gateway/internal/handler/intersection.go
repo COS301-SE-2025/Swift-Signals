@@ -69,6 +69,7 @@ func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Req
 	id, err := util.GetID(r)
 	if err != nil {
 		util.SendErrorResponse(w, http.StatusBadRequest, "Invalid ID specified in path; must be an integer")
+		return
 	}
 
 	// TODO: Implement User Verification
