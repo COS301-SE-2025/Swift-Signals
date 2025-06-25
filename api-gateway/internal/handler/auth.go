@@ -25,7 +25,7 @@ func NewAuthHandler(s *service.AuthService) *AuthHandler {
 // @Accept json
 // @Produce json
 // @Param registerRequest body model.RegisterRequest true "User registration details"
-// @Success 201 {object} model.AuthResponse "User successfully registered"
+// @Success 201 {object} model.RegisterResponse "User successfully registered"
 // @Failure 400 {object} model.ErrorResponse "Invalid request payload or missing fields"
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /register [post]
@@ -56,7 +56,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 // @Accept json
 // @Produce json
 // @Param loginRequest body model.LoginRequest true "Login credentials"
-// @Success 200 {object} model.AuthResponse "Successful login"
+// @Success 200 {object} model.LoginResponse "Successful login"
 // @Failure 400 {object} model.ErrorResponse "Invalid request payload or credentials"
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /login [post]
