@@ -3,13 +3,18 @@ package service
 import (
 	"context"
 
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 )
 
-type AuthService struct{}
+type AuthService struct {
+	userClient *client.UserClient
+}
 
-func NewAuthService() *AuthService {
-	return &AuthService{}
+func NewAuthService(uc *client.UserClient) *AuthService {
+	return &AuthService{
+		userClient: uc,
+	}
 }
 
 func (s *AuthService) RegisterUser(ctx context.Context, req model.RegisterRequest) (resp model.AuthResponse, err error) {
