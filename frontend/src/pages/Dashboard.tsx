@@ -20,16 +20,16 @@ Chart.register(...registerables);
 
 // Data remains the same
 const simulations = [
-  { id: "#1234", intersection: "Main St & 5th Ave", status: "Complete", statusColor: "bg-statusGreen", textColor: "text-statusTextGreen" },
-  { id: "#1233", intersection: "Broadway & 7th St", status: "Running", statusColor: "bg-statusYellow", textColor: "text-statusTextYellow" },
-  { id: "#1232", intersection: "Park Ave & 3rd St", status: "Failed", statusColor: "bg-statusRed", textColor: "text-statusTextRed" },
-  { id: "#1231", intersection: "Broadway & 7th St", status: "Running", statusColor: "bg-statusYellow", textColor: "text-statusTextYellow" },
+    { id: "#1234", intersection: "Main St & 5th Ave", status: "Complete", statusColor: "bg-statusGreen", textColor: "text-statusTextGreen" },
+    { id: "#1233", intersection: "Broadway & 7th St", status: "Running", statusColor: "bg-statusYellow", textColor: "text-statusTextYellow" },
+    { id: "#1232", intersection: "Park Ave & 3rd St", status: "Failed", statusColor: "bg-statusRed", textColor: "text-statusTextRed" },
+    { id: "#1231", intersection: "Broadway & 7th St", status: "Running", statusColor: "bg-statusYellow", textColor: "text-statusTextYellow" },
 ];
 
 const topIntersections = [
-  { name: "Main St & 5th Ave", volume: 15000, volumeText: "15,000 vehicles" },
-  { name: "Broadway & 7th St", volume: 13500, volumeText: "13,500 vehicles" },
-  { name: "Park Ave & 3rd St", volume: 12000, volumeText: "12,000 vehicles" },
+    { name: "Main St & 5th Ave", volume: 15000, volumeText: "15,000 vehicles" },
+    { name: "Broadway & 7th St", volume: 13500, volumeText: "13,500 vehicles" },
+    { name: "Park Ave & 3rd St", volume: 12000, volumeText: "12,000 vehicles" },
 ];
 
 const Dashboard: React.FC = () => {
@@ -37,81 +37,81 @@ const Dashboard: React.FC = () => {
   const chartInstanceRef = useRef<Chart | null>(null);
 
   useEffect(() => {
-    if (chartRef.current) {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-      const ctx = chartRef.current.getContext("2d");
-      if (!ctx) return;
-      const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-      gradient.addColorStop(0, "rgba(153, 25, 21, 0.4)");
-      gradient.addColorStop(1, "rgba(153, 25, 21, 0)");
-      chartInstanceRef.current = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels: ["6 AM", "7 AM", "8 AM", "9 AM", "10 AM"],
-          datasets: [{
-            label: "Traffic Volume",
-            data: [5000, 10000, 8000, 12000, 9000],
-            fill: true,
-            backgroundColor: gradient,
-            borderColor: "#991915",
-            borderWidth: 2.5,
-            pointRadius: 0,
-            pointHoverRadius: 8,
-            pointHoverBackgroundColor: "#991915",
-            pointHoverBorderColor: "#fff",
-            tension: 0.4,
-          }],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: { color: "#6B7280", font: { size: 12, family: "'Inter', sans-serif" } },
-              border: { display: false },
-            },
-            y: {
-              grid: { color: "#E5E7EB", drawTicks: false },
-              ticks: {
-                color: "#6B7280",
-                stepSize: 2500,
-                font: { size: 12, family: "'Inter', sans-serif" },
-                padding: 10,
-              },
-              border: { display: false },
-            },
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              enabled: true,
-              backgroundColor: "#111827",
-              titleColor: "#F9FAFB",
-              bodyColor: "#E5E7EB",
-              cornerRadius: 8,
-              padding: 12,
-              titleFont: { weight: "bold", size: 14, family: "'Inter', sans-serif" },
-              bodyFont: { size: 12, family: "'Inter', sans-serif" },
-              displayColors: false,
-              caretPadding: 10,
-            },
-          },
-        },
-      });
-    }
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-        chartInstanceRef.current = null;
-      }
-    };
-  }, []);
+    if (chartRef.current) {
+        if (chartInstanceRef.current) {
+            chartInstanceRef.current.destroy();
+        }
+        const ctx = chartRef.current.getContext("2d");
+        if (!ctx) return;
+        const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+        gradient.addColorStop(0, "rgba(153, 25, 21, 0.4)");
+        gradient.addColorStop(1, "rgba(153, 25, 21, 0)");
+        chartInstanceRef.current = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: ["6 AM", "7 AM", "8 AM", "9 AM", "10 AM"],
+                datasets: [{
+                    label: "Traffic Volume",
+                    data: [5000, 10000, 8000, 12000, 9000],
+                    fill: true,
+                    backgroundColor: gradient,
+                    borderColor: "#991915",
+                    borderWidth: 2.5,
+                    pointRadius: 0,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: "#991915",
+                    pointHoverBorderColor: "#fff",
+                    tension: 0.4,
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: "#6B7280", font: { size: 12, family: "'Inter', sans-serif" } },
+                        border: { display: false },
+                    },
+                    y: {
+                        grid: { color: "#E5E7EB", drawTicks: false },
+                        ticks: {
+                            color: "#6B7280",
+                            stepSize: 2500,
+                            font: { size: 12, family: "'Inter', sans-serif" },
+                            padding: 10,
+                        },
+                        border: { display: false },
+                    },
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: "#111827",
+                        titleColor: "#F9FAFB",
+                        bodyColor: "#E5E7EB",
+                        cornerRadius: 8,
+                        padding: 12,
+                        titleFont: { weight: "bold", size: 14, family: "'Inter', sans-serif" },
+                        bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                        displayColors: false,
+                        caretPadding: 10,
+                    },
+                },
+            },
+        });
+    }
+    return () => {
+        if (chartInstanceRef.current) {
+            chartInstanceRef.current.destroy();
+            chartInstanceRef.current = null;
+        }
+    };
+}, []);
 
-  const maxVolume = Math.max(...topIntersections.map(i => i.volume), 0);
+    const maxVolume = Math.max(...topIntersections.map(i => i.volume), 0);
 
   return (
     <div className="dashboard-screen min-h-screen bg-gray-100 dark:bg-gray-900">
