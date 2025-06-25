@@ -63,8 +63,16 @@ func (s *Service) CreateIntersection(
 }
 
 func (s *Service) GetIntersection(ctx context.Context, id string) (*model.IntersectionResponse, error) {
-	// TODO: Implement GetIntersection
-	return nil, nil
+	// Validate ID
+	if strings.TrimSpace(id) == "" {
+		return nil, fmt.Errorf("id cannot be empty")
+	}
+	// Check if intersection exists
+	intersection, err := s.repo.GetIntersectionByID(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find existing intersection: %w", err)
+	}
+	return intersection, nil
 }
 
 func (s *Service) GetAllIntersections(ctx context.Context) ([]*model.IntersectionResponse, error) {

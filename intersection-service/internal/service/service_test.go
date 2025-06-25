@@ -454,3 +454,82 @@ func TestValidateCreateIntersectionInput(t *testing.T) {
 		})
 	}
 }
+
+func TestService_GetIntersection(t *testing.T) {
+	tests := []struct {
+		name           string
+		inputID        string
+		setupMock      func(*db.MockRepository)
+		expectedError  string
+		expectedResult *model.IntersectionResponse
+	}{
+		{
+			name:    "successful fetch",
+			inputID: "abc123",
+			setupMock: func(mockRepo *db.MockRepository) {
+				mockRepo.On("GetIntersectionByID", mock.Anything, "abc123").
+					Return(&model.IntersectionResponse{
+						ID:   "abc123",
+						Name: "Main & 1st",
+					}, nil)
+			},
+			expectedError: "",
+			expectedResult: &model.IntersectionResponse{
+				ID:   "abc123",
+				Name: "Main & 1st",
+			},
+		},
+		{
+			name:    "empty id",
+			inputID: "",
+			setupMock: func(mockRepo *db.MockRepository) {
+				// No mock needed since it returns early
+			},
+			expectedError:  "id cannot be empty",
+			expectedResult: nil,
+		},
+		{
+			name:    "intersection not found",
+			inputID: "notfound123",
+			setupMock: func(mockRepo *db.MockRepository) {
+				mockRepo.On("GetIntersectionByID", mock.Anything, "notfound123").
+					Return(nil, model.ErrIntersectionNotFound)
+			},
+			expectedError:  "intersection not found",
+			expectedResult: nil,
+		},
+		{
+			name:    "repository error",
+			inputID: "fail123",
+			setupMock: func(mockRepo *db.MockRepository) {
+				mockRepo.On("GetIntersectionByID", mock.Anything, "fail123").
+					Return(nil, errors.New("db failure"))
+			},
+			expectedError:  "failed to find existing intersection",
+			expectedResult: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := new(db.MockRepository)
+			if tt.setupMock != nil {
+				tt.setupMock(mockRepo)
+			}
+
+			service := &Service{repo: mockRepo}
+			result, err := service.GetIntersection(context.Background(), tt.inputID)
+
+			if tt.expectedError != "" {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tt.expectedError)
+				assert.Nil(t, result)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedResult, result)
+			}
+
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
