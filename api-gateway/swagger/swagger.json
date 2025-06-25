@@ -1,0 +1,687 @@
+{
+    "schemes": [
+        "http"
+    ],
+    "swagger": "2.0",
+    "info": {
+        "description": "This is the API Gateway for the Swift-Signals project,\nforwarding requests to backend gRPC microservices.",
+        "title": "Authentication API Gateway",
+        "termsOfService": "http://example.com/terms/",
+        "contact": {
+            "name": "Inside Insights Team",
+            "url": "https://swagger.io/",
+            "email": "insideinsights2025@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "host": "localhost:9090",
+    "basePath": "/",
+    "paths": {
+        "/intersections": {
+            "get": {
+                "description": "Retrieves all the intersections associated with the user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Intersections"
+                ],
+                "summary": "Get All Intersections",
+                "responses": {
+                    "200": {
+                        "description": "Successful intersections retrieval",
+                        "schema": {
+                            "$ref": "#/definitions/model.Intersections"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new intersection with the given arguments",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Intersections"
+                ],
+                "summary": "Create Intersection",
+                "parameters": [
+                    {
+                        "description": "Intersection information",
+                        "name": "createIntersectionRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CreateIntersectionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Intersection successfully created",
+                        "schema": {
+                            "$ref": "#/definitions/model.CreateIntersectionResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload or missing fields",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/intersections/{id}": {
+            "get": {
+                "description": "Retrieves a single intersection by its unique identifier.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Intersections"
+                ],
+                "summary": "Get Intersection by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful intersection retrieval",
+                        "schema": {
+                            "$ref": "#/definitions/model.Intersection"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid or missing ID parameter",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Partially updates fields of an existing intersection by ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Intersections"
+                ],
+                "summary": "Update Intersection",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Fields to update",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UpdateIntersectionRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful update",
+                        "schema": {
+                            "$ref": "#/definitions/model.Intersection"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "description": "Authenticates a user and returns an authentication token.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User Login",
+                "parameters": [
+                    {
+                        "description": "Login credentials",
+                        "name": "loginRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful login",
+                        "schema": {
+                            "$ref": "#/definitions/model.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload or credentials",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Invalidates the user's session or token on the server-side.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User Logout",
+                "responses": {
+                    "200": {
+                        "description": "Successful logout",
+                        "schema": {
+                            "$ref": "#/definitions/model.LogoutResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "description": "Registers a new user and returns an authentication token.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User Registration",
+                "parameters": [
+                    {
+                        "description": "User registration details",
+                        "name": "registerRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.RegisterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "User successfully registered",
+                        "schema": {
+                            "$ref": "#/definitions/model.AuthResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload or missing fields",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/reset-password": {
+            "post": {
+                "description": "Reset's a user's password in case they forgot it.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Reset Password",
+                "parameters": [
+                    {
+                        "description": "User Email",
+                        "name": "resetPasswordRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ResetPasswordRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful password reset",
+                        "schema": {
+                            "$ref": "#/definitions/model.ResetPasswordResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request payload or email",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.AuthResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Login successful"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                }
+            }
+        },
+        "model.CreateIntersectionRequest": {
+            "type": "object",
+            "properties": {
+                "default_parameters": {
+                    "$ref": "#/definitions/model.simulationParameters"
+                },
+                "details": {
+                    "type": "object",
+                    "properties": {
+                        "address": {
+                            "type": "string",
+                            "example": "Corner of Foo and Bar"
+                        },
+                        "city": {
+                            "type": "string",
+                            "example": "Pretoria"
+                        },
+                        "province": {
+                            "type": "string",
+                            "example": "Gauteng"
+                        }
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "example": "My Intersection"
+                },
+                "traffic_density": {
+                    "type": "string",
+                    "example": "high"
+                }
+            }
+        },
+        "model.CreateIntersectionResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "2"
+                }
+            }
+        },
+        "model.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "example": "BAD_REQUEST"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "ERROR_MSG"
+                }
+            }
+        },
+        "model.Intersection": {
+            "type": "object",
+            "properties": {
+                "best_parameters": {
+                    "$ref": "#/definitions/model.optimisationParameters"
+                },
+                "created_at": {
+                    "type": "string",
+                    "example": "2025-06-24T15:04:05Z"
+                },
+                "current_parameters": {
+                    "$ref": "#/definitions/model.optimisationParameters"
+                },
+                "default_parameters": {
+                    "$ref": "#/definitions/model.optimisationParameters"
+                },
+                "details": {
+                    "type": "object",
+                    "properties": {
+                        "address": {
+                            "type": "string",
+                            "example": "Corner of Foo and Bar"
+                        },
+                        "city": {
+                            "type": "string",
+                            "example": "Pretoria"
+                        },
+                        "province": {
+                            "type": "string",
+                            "example": "Gauteng"
+                        }
+                    }
+                },
+                "id": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "last_run_at": {
+                    "type": "string",
+                    "example": "2025-06-24T15:04:05Z"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "My Intersection"
+                },
+                "run_count": {
+                    "type": "integer",
+                    "example": 7
+                },
+                "status": {
+                    "type": "string",
+                    "example": "unoptimised"
+                },
+                "traffic_density": {
+                    "type": "string",
+                    "example": "high"
+                }
+            }
+        },
+        "model.Intersections": {
+            "type": "object",
+            "properties": {
+                "intersections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Intersection"
+                    }
+                }
+            }
+        },
+        "model.LoginRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "StrongPassword123"
+                }
+            }
+        },
+        "model.LogoutResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Logout successful"
+                }
+            }
+        },
+        "model.RegisterRequest": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "newuser@example.com"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "VeryStrongPassword456"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "johndoe"
+                }
+            }
+        },
+        "model.ResetPasswordRequest": {
+            "type": "object",
+            "required": [
+                "email"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                }
+            }
+        },
+        "model.ResetPasswordResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Password reset instructions sent to your email."
+                }
+            }
+        },
+        "model.UpdateIntersectionRequest": {
+            "type": "object",
+            "properties": {
+                "details": {
+                    "type": "object",
+                    "properties": {
+                        "address": {
+                            "type": "string",
+                            "example": "Corner of Foo and Bar"
+                        },
+                        "city": {
+                            "type": "string",
+                            "example": "Pretoria"
+                        },
+                        "province": {
+                            "type": "string",
+                            "example": "Gauteng"
+                        }
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "example": "My Updated Intersection"
+                }
+            }
+        },
+        "model.optimisationParameters": {
+            "type": "object",
+            "properties": {
+                "optimisation_type": {
+                    "type": "string",
+                    "example": "grid_search"
+                },
+                "simulation_parameters": {
+                    "$ref": "#/definitions/model.simulationParameters"
+                }
+            }
+        },
+        "model.simulationParameters": {
+            "type": "object",
+            "properties": {
+                "green": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "intersection_type": {
+                    "type": "string",
+                    "example": "t-junction"
+                },
+                "red": {
+                    "type": "integer",
+                    "example": 6
+                },
+                "seed": {
+                    "type": "integer",
+                    "example": 3247128304
+                },
+                "speed": {
+                    "type": "integer",
+                    "example": 60
+                },
+                "yellow": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
