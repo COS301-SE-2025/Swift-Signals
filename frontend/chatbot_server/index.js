@@ -26,11 +26,9 @@ app.post("/api/chatbot", async (req, res) => {
   const projectId = process.env.DIALOGFLOW_PROJECT_ID;
 
   if (!sessionId || (!message && !event)) {
-    return res
-      .status(400)
-      .send({
-        error: "SessionId and either a message or an event are required",
-      });
+    return res.status(400).send({
+      error: "SessionId and either a message or an event are required",
+    });
   }
 
   const sessionPath = sessionClient.projectAgentSessionPath(
