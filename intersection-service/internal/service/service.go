@@ -76,8 +76,11 @@ func (s *Service) GetIntersection(ctx context.Context, id string) (*model.Inters
 }
 
 func (s *Service) GetAllIntersections(ctx context.Context) ([]*model.IntersectionResponse, error) {
-	//TODO: Implement GetAllIntersections
-	return nil, nil
+	intersections, err := s.repo.GetAllIntersections(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch intersections: %w", err)
+	}
+	return intersections, nil
 }
 
 func (s *Service) UpdateIntersection(
