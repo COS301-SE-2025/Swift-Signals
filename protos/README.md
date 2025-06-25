@@ -5,7 +5,9 @@ This folder is dedicated for specifying the protocols that the gRPC servers in o
 To generate code, you will first need to install the `protoc` tool.
 Run all of the following commands from inside the protos directory.
 
-To generate code for python, use the following commands:
+
+### To update simulation.proto generated code
+
 ```bash
 python -m grpc_tools.protoc -I . \
        --python_out=./gen/simulation/ \
@@ -14,7 +16,6 @@ python -m grpc_tools.protoc -I . \
        simulation.proto
 ```
 
-To generate code for go, use the following commands:
 
 ### To update user.proto generated code
 ```bash
@@ -22,6 +23,7 @@ protoc --go_out=./gen/user/ --go_opt=paths=source_relative \
        --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative \
        user.proto
 ```
+
 
 ### To update intersection.proto generated code
 ```bash
