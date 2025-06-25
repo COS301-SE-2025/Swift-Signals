@@ -6,13 +6,18 @@ import (
 	"net/http"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 )
 
-type AuthHandler struct{}
+type AuthHandler struct {
+	service *service.AuthService
+}
 
-func NewAuthHandler() *AuthHandler {
-	return &AuthHandler{}
+func NewAuthHandler(s *service.AuthService) *AuthHandler {
+	return &AuthHandler{
+		service: s,
+	}
 }
 
 // @Summary User Registration

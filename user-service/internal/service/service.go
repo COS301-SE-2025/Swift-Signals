@@ -189,7 +189,7 @@ func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersec
 }
 
 // RemoveIntersectionID removes an intersection ID from a user's list
-func (s *Service) RemoveIntersectionID(ctx context.Context, userID string, intersectionID []int32) error {
+func (s *Service) RemoveIntersectionIDs(ctx context.Context, userID string, intersectionID []int32) error {
 	// TODO: Implement remove intersection ID
 	// - Validate user ID and intersection ID
 	// - Check if user exists
