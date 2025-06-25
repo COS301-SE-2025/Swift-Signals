@@ -1,16 +1,16 @@
 module.exports = {
   root: true,
-  parser: '@typescript-eslint/parser',
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 2020,
-    sourceType: 'module',
+    sourceType: "module",
     ecmaFeatures: {
       jsx: true,
     },
   },
   settings: {
     react: {
-      version: 'detect',
+      version: "detect",
     },
   },
   env: {
@@ -18,20 +18,20 @@ module.exports = {
     es2021: true,
     node: true,
   },
-  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'import'],
+  plugins: ["@typescript-eslint", "react", "react-hooks", "import"],
   extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:react/recommended',
-    'plugin:react-hooks/recommended',
-    'plugin:import/errors',
-    'plugin:import/warnings',
-    'plugin:import/typescript',
-    'prettier', // Disables rules that conflict with Prettier
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "prettier", // Disables rules that conflict with Prettier
   ],
   rules: {
-    'react/react-in-jsx-scope': 'off', // Not needed for React 17+
-    'import/order': ['warn', { 'newlines-between': 'always' }],
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    "react/react-in-jsx-scope": "off", // Not needed for React 17+
+    "import/order": ["warn", { "newlines-between": "always" }],
+    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
   },
 };
