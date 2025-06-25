@@ -48,7 +48,7 @@ func (s *IntersectionService) GetAllIntersections(ctx context.Context) (model.In
 func (s *IntersectionService) GetIntersectionByID(ctx context.Context, id int) (model.Intersection, error) {
 	pbResp, err := s.intrClient.GetIntersection(ctx, strconv.Itoa(id))
 	if err != nil {
-		return model.Intersection{}, errors.New("Unable to get all intersections")
+		return model.Intersection{}, errors.New("Unable to get intersection by ID")
 	}
 
 	resp := util.RPCIntersectionToIntersection(pbResp)
