@@ -41,6 +41,7 @@ func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http
 	resp, err := h.service.GetAllIntersections(r.Context())
 	if err != nil {
 		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	util.SendJSONResponse(w, http.StatusOK, resp)
