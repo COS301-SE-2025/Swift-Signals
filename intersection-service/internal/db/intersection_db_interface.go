@@ -10,5 +10,5 @@ import (
 type IntersectionRepository interface {
 	CreateIntersection(ctx context.Context, intersection *model.IntersectionResponse) (*model.IntersectionResponse, error)
 	GetIntersectionByID(ctx context.Context, id string) (*model.IntersectionResponse, error)
-	GetAllIntersections(ctx context.Context, user_id string) ([]*model.IntersectionResponse, error)
+	GetAllIntersections(ctx context.Context) ([]*model.IntersectionResponse, error)
 }

@@ -533,3 +533,60 @@ func TestService_GetIntersection(t *testing.T) {
 		})
 	}
 }
+
+func TestService_GetAllIntersections(t *testing.T) {
+	tests := []struct {
+		name           string
+		setupMock      func(*db.MockRepository)
+		expectedError  string
+		expectedResult []*model.IntersectionResponse
+	}{
+		{
+			name: "successful fetch",
+			setupMock: func(mockRepo *db.MockRepository) {
+				mockRepo.On("GetAllIntersections", mock.Anything).
+					Return([]*model.IntersectionResponse{
+						{ID: "1", Name: "Main & 1st"},
+						{ID: "2", Name: "Broadway & 5th"},
+					}, nil)
+			},
+			expectedError: "",
+			expectedResult: []*model.IntersectionResponse{
+				{ID: "1", Name: "Main & 1st"},
+				{ID: "2", Name: "Broadway & 5th"},
+			},
+		},
+		{
+			name: "repository error",
+			setupMock: func(mockRepo *db.MockRepository) {
+				mockRepo.On("GetAllIntersections", mock.Anything).
+					Return(nil, errors.New("db failure"))
+			},
+			expectedError:  "failed to fetch intersections",
+			expectedResult: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockRepo := new(db.MockRepository)
+			if tt.setupMock != nil {
+				tt.setupMock(mockRepo)
+			}
+			service := &Service{repo: mockRepo}
+
+			result, err := service.GetAllIntersections(context.Background())
+
+			if tt.expectedError != "" {
+				assert.Error(t, err)
+				assert.Contains(t, err.Error(), tt.expectedError)
+				assert.Nil(t, result)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expectedResult, result)
+			}
+
+			mockRepo.AssertExpectations(t)
+		})
+	}
+}
