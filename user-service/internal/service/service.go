@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -154,11 +155,20 @@ func (s *Service) LogoutUser(ctx context.Context, userID string) error {
 
 // GetUserByID retrieves a user by their ID
 func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.UserResponse, error) {
-	// TODO: Implement get user by ID
-	// - Validate user ID
-	// - Query database for user
-	// - Return user model or not found error
-	return nil, nil
+	// Validate user ID
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Query database for user
+	user, err := s.repo.GetUserByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return user model or not found error
+	return user, nil
 }
 
 // GetUserByEmail retrieves a user by their email address
