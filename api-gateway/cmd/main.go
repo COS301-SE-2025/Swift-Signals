@@ -44,6 +44,12 @@ func main() {
 	}
 	userClient := client.NewUserClient(userConn)
 
+	intrConn, err := grpc.Dial("localhost:50052", grpc.WithInsecure()) // NOTE: Will change to use TLS later on
+	if err != nil {
+		log.Fatalf("failed to connect to Intersection gRPC server: %v", err)
+	}
+	intrClient := client.NewIntersectionClient(intrConn)
+
 	mux := http.NewServeMux()
 
 	authService := service.NewAuthService(userClient)
@@ -54,7 +60,8 @@ func main() {
 	mux.HandleFunc("POST /reset-password", authHandler.ResetPassword)
 	log.Println("Initialized Auth Handlers.")
 
-	intersectionHandler := handler.NewIntersectionHandler(service.NewIntersectionService())
+	intersectionService := service.NewIntersectionService(intrClient)
+	intersectionHandler := handler.NewIntersectionHandler(intersectionService)
 	mux.HandleFunc("GET /intersections", intersectionHandler.GetAllIntersections)
 	// mux.HandleFunc("GET /intersections/simple", nil)
 	mux.HandleFunc("GET /intersections/{id}", intersectionHandler.GetIntersection)

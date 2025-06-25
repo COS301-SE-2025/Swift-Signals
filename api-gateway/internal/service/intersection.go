@@ -1,25 +1,34 @@
 package service
 
-import "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+import (
+	"context"
 
-type IntersectionService struct{}
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+)
 
-func NewIntersectionService() *IntersectionService {
-	return &IntersectionService{}
+type IntersectionService struct {
+	intrClient *client.IntersectionClient
 }
 
-func (s *IntersectionService) GetAllIntersections() (resp model.Intersections, err error) {
+func NewIntersectionService(ic *client.IntersectionClient) *IntersectionService {
+	return &IntersectionService{
+		intrClient: ic,
+	}
+}
+
+func (s *IntersectionService) GetAllIntersections(ctx context.Context) (resp model.Intersections, err error) {
 	return model.Intersections{}, nil
 }
 
-func (s *IntersectionService) GetIntersectionByID(id int) (resp model.Intersection, err error) {
+func (s *IntersectionService) GetIntersectionByID(ctx context.Context, id int) (resp model.Intersection, err error) {
 	return model.Intersection{}, nil
 }
 
-func (s *IntersectionService) CreateIntersection(req model.CreateIntersectionRequest) (resp model.CreateIntersectionResponse, err error) {
+func (s *IntersectionService) CreateIntersection(ctx context.Context, req model.CreateIntersectionRequest) (resp model.CreateIntersectionResponse, err error) {
 	return model.CreateIntersectionResponse{}, nil
 }
 
-func (s *IntersectionService) UpdateIntersectionByID(id int, req model.UpdateIntersectionRequest) (resp model.Intersection, err error) {
+func (s *IntersectionService) UpdateIntersectionByID(ctx context.Context, id int, req model.UpdateIntersectionRequest) (resp model.Intersection, err error) {
 	return model.Intersection{}, nil
 }
