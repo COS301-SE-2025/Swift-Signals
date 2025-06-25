@@ -213,12 +213,35 @@ func (s *Service) DeleteUser(ctx context.Context, userID string) error {
 
 // GetUserIntersectionIDs retrieves all intersection IDs for a user
 func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]int32, error) {
-	// TODO: Implement get user intersection IDs
-	// - Validate user ID
-	// - Check if user exists
-	// - Query database for user's intersection IDs
+	// Validate user ID
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Check if user exists
+	user, err := s.repo.GetUserByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, errors.New("user not found")
+	}
+
+	// Query database for user's intersection IDs
+	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert to []int32 slice
+	int32IDs := make([]int32, len(intIDs))
+	for i, v := range intIDs {
+		int32IDs[i] = int32(v)
+	}
+
 	// - Return slice of intersection IDs
-	return nil, nil
+	return int32IDs, nil
 }
 
 // AddIntersectionID adds an intersection ID to a user's list
