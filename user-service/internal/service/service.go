@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
+	"github.com/COS301-SE-2025/Swift-Signals/shared/jwt"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/google/uuid"
@@ -98,15 +100,47 @@ func (s *Service) validateUserInput(name, email, password string) error {
 	return nil
 }
 
+func checkPassword(inputPassword, storedHashedPassword string) error {
+	return bcrypt.CompareHashAndPassword([]byte(storedHashedPassword), []byte(inputPassword))
+}
+
 // LoginUser authenticates a user and returns auth token
 func (s *Service) LoginUser(ctx context.Context, email, password string) (*model.LoginUserResponse, error) {
 	// TODO: Implement user login
 	// - Validate input parameters
-	// - Find user by email
-	// - Verify password
-	// - Generate JWT token
-	// - Return auth response with token and user info
-	return nil, nil
+
+	// Find user by email
+	user, err := s.repo.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, errors.New("user does not exist")
+	}
+
+	// Verify password
+	err = checkPassword(password, user.Password)
+	if err != nil {
+		return nil, errors.New("invalid credentials")
+	}
+
+	// Generate JWT token
+	role := "regular"
+	if user.IsAdmin {
+		role = "admin"
+	}
+	expiryDate := time.Now().Add(time.Hour * 72)
+	token, err := jwt.GenerateToken(user.ID, role, time.Hour*72)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return auth response with token and user info
+	resp := &model.LoginUserResponse{
+		Token:     token,
+		ExpiresAt: expiryDate,
+	}
+	return resp, nil
 }
 
 // LogoutUser invalidates the user's session/token
