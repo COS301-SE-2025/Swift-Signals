@@ -110,6 +110,7 @@ func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.
 	resp, err := h.service.CreateIntersection(r.Context(), req)
 	if err != nil {
 		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	util.SendJSONResponse(w, http.StatusOK, resp)
