@@ -86,7 +86,7 @@ func (ic *IntersectionClient) PutOptimisation(ctx context.Context, id string, pa
 type IntersectionClientInterface interface {
 	CreateIntersection(ctx context.Context, intersection model.Intersection) (*intersectionpb.IntersectionResponse, error)
 	GetIntersection(ctx context.Context, id string) (*intersectionpb.IntersectionResponse, error)
-	GetAllIntersections(ctx context.Context, page, page_size int32, filter string) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error)
+	GetAllIntersections(ctx context.Context) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error)
 	UpdateIntersection(ctx context.Context, id, name string, details model.Details) (*intersectionpb.IntersectionResponse, error)
 	DeleteIntersection(ctx context.Context, id string) (*emptypb.Empty, error)
 	PutOptimisation(ctx context.Context, id string, parameters model.OptimisationParameters) (*intersectionpb.PutOptimisationResponse, error)
