@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"google.golang.org/grpc"
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 
@@ -36,10 +38,16 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 func main() {
+	userConn, err := grpc.Dial("localhost:50051", grpc.WithInsecure()) // NOTE: Will change to use TLS later on
+	if err != nil {
+		log.Fatalf("failed to connect to User gRPC server: %v", err)
+	}
+	userClient := client.NewUserClient(userConn)
 
 	mux := http.NewServeMux()
 
-	authHandler := handler.NewAuthHandler(service.NewAuthService())
+	authService := service.NewAuthService(userClient)
+	authHandler := handler.NewAuthHandler(authService)
 	mux.HandleFunc("POST /login", authHandler.Login)
 	mux.HandleFunc("POST /register", authHandler.Register)
 	mux.HandleFunc("POST /logout", authHandler.Logout)
