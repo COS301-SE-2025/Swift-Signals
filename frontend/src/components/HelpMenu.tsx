@@ -12,6 +12,41 @@ import { IoSend } from "react-icons/io5";
 type QuickReply = { text: string; payload: string; };
 type ChatMessage = { text: string; sender: "user" | "bot"; quickReplies?: QuickReply[]; };
 type TutorialType = 'dashboard' | 'navigation' | 'intersections' | 'simulations' | 'users';
+// Add these new types
+type DialogflowMessage = {
+    payload?: {
+        fields?: {
+            richContent: {
+                listValue: {
+                    values: {
+                        listValue: {
+                            values: {
+                                structValue: {
+                                    fields: {
+                                        options: {
+                                            listValue: {
+                                                values: DialogflowQuickReplyOption[];
+                                            };
+                                        };
+                                    };
+                                };
+                            }[];
+                        };
+                    }[];
+                };
+            };
+        };
+    };
+};
+
+type DialogflowQuickReplyOption = {
+    structValue: {
+        fields: {
+            text: { stringValue: string };
+            link?: { stringValue: string };
+        };
+    };
+};
 
 // --- TUTORIAL STEP DEFINITIONS ---
 const dashboardTutorialSteps: TutorialStep[] = [
@@ -157,77 +192,79 @@ const HelpMenu: React.FC = () => {
     useEffect(() => { if (chatBodyRef.current) { chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight; } }, [messages, isBotTyping]);
     
     // This single, unified function handles all communication with the bot
-    const sendQueryToBot = async (query: { text?: string; event?: string }) => {
-        const { text, event } = query;
+const sendQueryToBot = async (query: { text?: string; event?: string }) => {
+    const { text, event } = query;
 
-        // Exit if the user tries to send an empty text message
-        if (text && text.trim() === "") return;
+    // Exit if the user tries to send an empty text message
+    if (text && text.trim() === "") return;
 
-        // Add the user's message to the chat window UI only if it's a text message
-        if (text) {
-            const newUserMessage: ChatMessage = { text, sender: "user" };
-            setMessages(prev => [...prev, newUserMessage]);
-            setUserInput("");
+    // Add the user's message to the chat window UI only if it's a text message
+    if (text) {
+        const newUserMessage: ChatMessage = { text, sender: "user" };
+        setMessages(prev => [...prev, newUserMessage]);
+        setUserInput("");
+    }
+
+    setIsBotTyping(true);
+
+    try {
+        const response = await fetch('http://localhost:3001/api/chatbot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text, event: event, sessionId: sessionId }),
+        });
+
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        
+        let quickReplies: QuickReply[] = [];
+        if (data.fulfillmentMessages) {
+            // FIXED: Replaced 'any' with 'DialogflowMessage'
+            const payload = data.fulfillmentMessages.find((msg: DialogflowMessage) => msg.payload);
+            if (payload?.payload?.fields?.richContent) {
+                const options = payload.payload.fields.richContent.listValue.values[0].listValue.values[0].structValue.fields.options.listValue.values;
+                // FIXED: Replaced 'any' with 'DialogflowQuickReplyOption'
+                quickReplies = options.map((option: DialogflowQuickReplyOption) => ({
+                    text: option.structValue.fields.text.stringValue,
+                    payload: option.structValue.fields.link?.stringValue || option.structValue.fields.text.stringValue,
+                }));
+            }
         }
 
-        setIsBotTyping(true);
+        const botResponse: ChatMessage = {
+            text: data.fulfillmentText,
+            sender: "bot",
+            quickReplies: quickReplies.length > 0 ? quickReplies : undefined,
+        };
 
-        try {
-            const response = await fetch('http://localhost:3001/api/chatbot', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text, event: event, sessionId: sessionId }),
-            });
+        setMessages(prev => [...prev, botResponse]);
 
-            if (!response.ok) throw new Error('Network response was not ok');
+        // --- THE CORRECTED AND FINAL ACTION HANDLER ---
+        // It now looks inside the 'fields' object for the lowercase 'tutorialtopic'
+        if (data.action === 'start.tutorial' && data.parameters?.fields?.tutorialtopic) {
+            // Get the actual value from inside the object structure
+            const tutorialType = data.parameters.fields.tutorialtopic.stringValue as TutorialType;
             
-            const data = await response.json();
-            
-            let quickReplies: QuickReply[] = [];
-            if (data.fulfillmentMessages) {
-                const payload = data.fulfillmentMessages.find((msg: any) => msg.payload);
-                if (payload?.payload?.fields?.richContent) {
-                    const options = payload.payload.fields.richContent.listValue.values[0].listValue.values[0].structValue.fields.options.listValue.values;
-                    quickReplies = options.map((option: any) => ({
-                        text: option.structValue.fields.text.stringValue,
-                        payload: option.structValue.fields.link.stringValue || option.structValue.fields.text.stringValue,
-                    }));
-                }
+            if (tutorialType) {
+                console.log(`%c✅ ACTION HANDLER PASSED: Starting tutorial for [${tutorialType}]`, 'color: green; font-weight: bold;');
+                setTimeout(() => {
+                    startTutorial(tutorialType);
+                }, 500); 
             }
-
-            const botResponse: ChatMessage = {
-                text: data.fulfillmentText,
-                sender: "bot",
-                quickReplies: quickReplies.length > 0 ? quickReplies : undefined,
-            };
-
-            setMessages(prev => [...prev, botResponse]);
-
-            // --- THE CORRECTED AND FINAL ACTION HANDLER ---
-            // It now looks inside the 'fields' object for the lowercase 'tutorialtopic'
-            if (data.action === 'start.tutorial' && data.parameters?.fields?.tutorialtopic) {
-                // Get the actual value from inside the object structure
-                const tutorialType = data.parameters.fields.tutorialtopic.stringValue as TutorialType;
-                
-                if (tutorialType) {
-                    console.log(`%c✅ ACTION HANDLER PASSED: Starting tutorial for [${tutorialType}]`, 'color: green; font-weight: bold;');
-                    setTimeout(() => {
-                        startTutorial(tutorialType);
-                    }, 500); 
-                }
-            }
-
-        } catch (error) {
-            console.error("Error communicating with chatbot backend:", error);
-            const errorResponse: ChatMessage = {
-                text: "Sorry, I'm having trouble connecting to my brain right now. Please try again later.",
-                sender: "bot",
-            };
-            setMessages(prev => [...prev, errorResponse]);
-        } finally {
-            setIsBotTyping(false);
         }
-    };
+
+    } catch (error) {
+        console.error("Error communicating with chatbot backend:", error);
+        const errorResponse: ChatMessage = {
+            text: "Sorry, I'm having trouble connecting to my brain right now. Please try again later.",
+            sender: "bot",
+        };
+        setMessages(prev => [...prev, errorResponse]);
+    } finally {
+        setIsBotTyping(false);
+    }
+};
     
     // This useEffect hook correctly calls our unified function for the welcome message
     useEffect(() => {
