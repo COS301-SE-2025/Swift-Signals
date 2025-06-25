@@ -9,6 +9,7 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type IntersectionClient struct {
@@ -23,26 +24,80 @@ func NewIntersectionClient(conn *grpc.ClientConn) *IntersectionClient {
 
 func (ic *IntersectionClient) CreateIntersection(ctx context.Context, intersection model.Intersection) (*intersectionpb.IntersectionResponse, error) {
 	req := &intersectionpb.CreateIntersectionRequest{
-		Name:           intersection.Name,
-		Details:        convertDetailsToProto(intersection.Details),
-		TrafficDensity: StringToTrafficDensity(intersection.TrafficDensity),
-		DefaultParameters: &intersectionpb.OptimisationParameters{
-			OptimisationType: StringToOptimisationType(intersection.DefaultParameters.OptimisationType),
-			Parameters: &intersectionpb.SimulationParameters{
-				IntersectionType: StringToIntersectionType(intersection.DefaultParameters.SimulationParameters.IntersectionType),
-				Green:            int32(intersection.DefaultParameters.SimulationParameters.Green),
-				Yellow:           int32(intersection.DefaultParameters.SimulationParameters.Yellow),
-				Red:              int32(intersection.DefaultParameters.SimulationParameters.Red),
-				Speed:            int32(intersection.DefaultParameters.SimulationParameters.Speed),
-				Seed:             int32(intersection.DefaultParameters.SimulationParameters.Seed),
-			},
-		},
+		Name:              intersection.Name,
+		Details:           convertDetailsToProto(intersection.Details),
+		TrafficDensity:    StringToTrafficDensity(intersection.TrafficDensity),
+		DefaultParameters: convertParametersToProto(intersection.DefaultParameters),
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	return ic.client.CreateIntersection(ctx, req)
 }
+
+func (ic *IntersectionClient) GetIntersection(ctx context.Context, id string) (*intersectionpb.IntersectionResponse, error) {
+	req := &intersectionpb.IntersectionIDRequest{
+		Id: id,
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	return ic.client.GetIntersection(ctx, req)
+}
+
+func (ic *IntersectionClient) GetAllIntersections(ctx context.Context, page, page_size int32, filter string) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error) {
+	req := &intersectionpb.GetAllIntersectionsRequest{}
+
+	return ic.client.GetAllIntersections(ctx, req)
+}
+
+func (ic *IntersectionClient) UpdateIntersection(ctx context.Context, id, name string, details model.Details) (*intersectionpb.IntersectionResponse, error) {
+	req := &intersectionpb.UpdateIntersectionRequest{
+		Id:      id,
+		Name:    name,
+		Details: convertDetailsToProto(details),
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	return ic.client.UpdateIntersection(ctx, req)
+}
+
+func (ic *IntersectionClient) DeleteIntersection(ctx context.Context, id string) (*emptypb.Empty, error) {
+	req := &intersectionpb.IntersectionIDRequest{
+		Id: id,
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	return ic.client.DeleteIntersection(ctx, req)
+}
+
+func (ic *IntersectionClient) PutOptimisation(ctx context.Context, id string, parameters model.OptimisationParameters) (*intersectionpb.PutOptimisationResponse, error) {
+	req := &intersectionpb.PutOptimisationRequest{
+		Id:         id,
+		Parameters: convertParametersToProto(parameters),
+	}
+
+	return ic.client.PutOptimisation(ctx, req)
+}
+
+// NOTE: Creates stub for testing
+type IntersectionClientInterface interface {
+	CreateIntersection(ctx context.Context, intersection model.Intersection) (*intersectionpb.IntersectionResponse, error)
+	GetIntersection(ctx context.Context, id string) (*intersectionpb.IntersectionResponse, error)
+	GetAllIntersections(ctx context.Context, page, page_size int32, filter string) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error)
+	UpdateIntersection(ctx context.Context, id, name string, details model.Details) (*intersectionpb.IntersectionResponse, error)
+	DeleteIntersection(ctx context.Context, id string) (*emptypb.Empty, error)
+	PutOptimisation(ctx context.Context, id string, parameters model.OptimisationParameters) (*intersectionpb.PutOptimisationResponse, error)
+}
+
+// NOTE: Asserts Interface Implementation
+var _ IntersectionClientInterface = (*IntersectionClient)(nil)
+
+//////////////////////
+// Helper functions //
+//////////////////////
 
 func convertDetailsToProto(details model.Details) *intersectionpb.IntersectionDetails {
 	return &intersectionpb.IntersectionDetails{
@@ -52,7 +107,20 @@ func convertDetailsToProto(details model.Details) *intersectionpb.IntersectionDe
 	}
 }
 
-// StringToOptimisationType converts a string to protobuf OptimisationType enum
+func convertParametersToProto(parameters model.OptimisationParameters) *intersectionpb.OptimisationParameters {
+	return &intersectionpb.OptimisationParameters{
+		OptimisationType: StringToOptimisationType(parameters.OptimisationType),
+		Parameters: &intersectionpb.SimulationParameters{
+			IntersectionType: StringToIntersectionType(parameters.SimulationParameters.IntersectionType),
+			Green:            int32(parameters.SimulationParameters.Green),
+			Yellow:           int32(parameters.SimulationParameters.Yellow),
+			Red:              int32(parameters.SimulationParameters.Red),
+			Speed:            int32(parameters.SimulationParameters.Speed),
+			Seed:             int32(parameters.SimulationParameters.Seed),
+		},
+	}
+}
+
 func StringToOptimisationType(s string) intersectionpb.OptimisationType {
 	switch strings.ToLower(s) {
 	case "grid_search", "gridsearch":
@@ -62,13 +130,11 @@ func StringToOptimisationType(s string) intersectionpb.OptimisationType {
 	case "none", "":
 		return intersectionpb.OptimisationType_OPTIMISATION_TYPE_NONE
 	default:
-		// Log warning or handle error as needed
 		fmt.Printf("Warning: unknown optimisation type '%s', defaulting to GRIDSEARCH\n", s)
 		return intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH
 	}
 }
 
-// StringToIntersectionType converts a string to protobuf IntersectionType enum
 func StringToIntersectionType(s string) intersectionpb.IntersectionType {
 	switch strings.ToLower(strings.ReplaceAll(s, "-", "")) {
 	case "trafficlight", "traffic_light":
@@ -82,13 +148,11 @@ func StringToIntersectionType(s string) intersectionpb.IntersectionType {
 	case "unspecified", "":
 		return intersectionpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED
 	default:
-		// Log warning or handle error as needed
 		fmt.Printf("Warning: unknown intersection type '%s', defaulting to UNSPECIFIED\n", s)
 		return intersectionpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED
 	}
 }
 
-// StringToTrafficDensity converts a string to protobuf TrafficDensity enum
 func StringToTrafficDensity(s string) intersectionpb.TrafficDensity {
 	switch strings.ToLower(s) {
 	case "high":
@@ -98,13 +162,11 @@ func StringToTrafficDensity(s string) intersectionpb.TrafficDensity {
 	case "low":
 		return intersectionpb.TrafficDensity_TRAFFIC_DENSITY_LOW
 	default:
-		// Log warning or handle error as needed
 		fmt.Printf("Warning: unknown traffic density '%s', defaulting to MEDIUM\n", s)
 		return intersectionpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM
 	}
 }
 
-// StringToIntersectionStatus converts a string to protobuf IntersectionStatus enum
 func StringToIntersectionStatus(s string) intersectionpb.IntersectionStatus {
 	switch strings.ToLower(s) {
 	case "unoptimised", "unoptimized":
@@ -116,7 +178,6 @@ func StringToIntersectionStatus(s string) intersectionpb.IntersectionStatus {
 	case "failed":
 		return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_FAILED
 	default:
-		// Log warning or handle error as needed
 		fmt.Printf("Warning: unknown intersection status '%s', defaulting to UNOPTIMISED\n", s)
 		return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED
 	}
