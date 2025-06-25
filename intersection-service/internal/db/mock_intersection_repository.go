@@ -33,8 +33,8 @@ func (m *MockRepository) GetIntersectionByID(ctx context.Context, id string) (*m
 	return args.Get(0).(*model.IntersectionResponse), args.Error(1)
 }
 
-func (m *MockRepository) GetAllIntersections(ctx context.Context, user_id string) ([]*model.IntersectionResponse, error) {
-	args := m.Called(ctx, user_id)
+func (m *MockRepository) GetAllIntersections(ctx context.Context) ([]*model.IntersectionResponse, error) {
+	args := m.Called(ctx)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
