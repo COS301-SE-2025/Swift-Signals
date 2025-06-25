@@ -4,13 +4,7 @@ import type { PanInfo } from "framer-motion";
 // replace icons with your own if needed
 import {
   FiBarChart2,
-  FiCircle,
-  FiCode,
-  FiFileText,
-  FiGlobe,
   FiInfo,
-  FiLayers,
-  FiLayout,
   FiTarget,
   FiTrendingUp,
   FiUsers,

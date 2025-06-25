@@ -7,12 +7,12 @@ import { Chart, registerables } from "chart.js";
 
 // Icons used in this component
 import {
-  FaRoad,
-  FaPlay,
-  FaChartLine,
-  FaPlus,
-  FaMap,
-  FaArrowRight,
+    FaRoad,
+    FaPlay,
+    FaChartLine,
+    FaPlus,
+    FaMap,
+    FaArrowRight,
 } from "react-icons/fa";
 
 // Register Chart.js components
