@@ -3,13 +3,9 @@ package model
 import "time"
 
 type Intersection struct {
-	ID      string `json:"id" example:"1"`
-	Name    string `json:"name" example:"My Intersection"`
-	Details struct {
-		Address  string `json:"address"  example:"Corner of Foo and Bar"`
-		City     string `json:"city"     example:"Pretoria"`
-		Province string `json:"province" example:"Gauteng"`
-	} `json:"details"`
+	ID                string                 `json:"id" example:"1"`
+	Name              string                 `json:"name" example:"My Intersection"`
+	Details           Details                `json:"details"`
 	CreatedAt         time.Time              `json:"created_at"      example:"2025-06-24T15:04:05Z"`
 	LastRunAt         time.Time              `json:"last_run_at"     example:"2025-06-24T15:04:05Z"`
 	Status            string                 `json:"status"          example:"unoptimised"`
@@ -22,6 +18,12 @@ type Intersection struct {
 
 type Intersections struct {
 	Intersections []Intersection `json:"intersections"`
+}
+
+type Details struct {
+	Address  string `json:"address"  example:"Corner of Foo and Bar"`
+	City     string `json:"city"     example:"Pretoria"`
+	Province string `json:"province" example:"Gauteng"`
 }
 
 type OptimisationParameters struct {
