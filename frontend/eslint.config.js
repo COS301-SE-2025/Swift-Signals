@@ -28,4 +28,7 @@ export default defineConfig([
       "react/react-in-jsx-scope": "off", // ✅ Required for React 17+
     },
   },
+  {
+    ignores: ["node_modules/", "build/", "dist/"],
+  }
 ]);
