@@ -13,4 +13,6 @@ type UserRepository interface {
 	UpdateUser(ctx context.Context, user *model.UserResponse) (*model.UserResponse, error)
 	DeleteUser(ctx context.Context, id string) error
 	ListUsers(ctx context.Context, limit, offset int) ([]*model.UserResponse, error)
+	AddIntersectionID(ctx context.Context, userID int, intID int) error
+	GetIntersectionsByUserID(ctx context.Context, userID int) ([]int, error)
 }

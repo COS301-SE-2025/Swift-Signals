@@ -68,5 +68,23 @@ func (m *MockRepository) ListUsers(ctx context.Context, limit, offset int) ([]*m
 	return args.Get(0).([]*model.UserResponse), args.Error(1)
 }
 
+// AddIntersectionID mocks the AddIntersectionID method
+func (m *MockRepository) AddIntersectionID(ctx context.Context, userID, intID int) error {
+	args := m.Called(ctx, userID, intID)
+	if args.Get(0) == nil {
+		return args.Error(1)
+	}
+	return args.Error(1)
+}
+
+// GetIntersectionsByUserID mocks the GetIntersectionsByUserID method
+func (m *MockRepository) GetIntersectionsByUserID(ctx context.Context, userID int) ([]int, error) {
+	args := m.Called(ctx, userID)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).([]int), args.Error(1)
+}
+
 // Verify MockRepository implements UserRepository interface at compile time
 var _ UserRepository = (*MockRepository)(nil)
