@@ -246,12 +246,39 @@ func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]
 
 // AddIntersectionID adds an intersection ID to a user's list
 func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersectionID int32) error {
-	// TODO: Implement add intersection ID
-	// - Validate user ID and intersection ID
-	// - Check if user exists
-	// - Check if intersection ID already exists for user
-	// - Add intersection ID to user's list
-	// - Update database
+	// Validate user ID and intersection ID
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+		return err
+	}
+
+	// Check if user exists
+	user, err := s.repo.GetUserByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return errors.New("user not found")
+	}
+
+	// Check if intersection ID already exists for user
+	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, id)
+	if err != nil {
+		return err
+	}
+	newIntID := int(intersectionID)
+	for intID := range intIDs {
+		if intID == newIntID {
+			return errors.New("intersection already exists")
+		}
+	}
+
+	// Add intersection ID to user's list
+	err = s.repo.AddIntersectionID(ctx, id, newIntID)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
