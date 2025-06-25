@@ -67,7 +67,7 @@ func (s *IntersectionService) CreateIntersection(ctx context.Context, req model.
 	}
 	pbResp, err := s.intrClient.CreateIntersection(ctx, intersection)
 	if err != nil {
-		return model.CreateIntersectionResponse{}, errors.New("Unable to get all intersections")
+		return model.CreateIntersectionResponse{}, errors.New("Unable to create intersection")
 	}
 
 	resp := model.CreateIntersectionResponse{
