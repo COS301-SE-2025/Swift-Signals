@@ -267,7 +267,7 @@ func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersec
 		return err
 	}
 	newIntID := int(intersectionID)
-	for intID := range intIDs {
+	for _, intID := range intIDs {
 		if intID == newIntID {
 			return errors.New("intersection already exists")
 		}
