@@ -33,83 +33,83 @@ const topIntersections = [
 ];
 
 const Dashboard: React.FC = () => {
-  const chartRef = useRef<HTMLCanvasElement | null>(null);
-  const chartInstanceRef = useRef<Chart | null>(null);
+    const chartRef = useRef<HTMLCanvasElement | null>(null);
+    const chartInstanceRef = useRef<Chart | null>(null);
 
-  useEffect(() => {
-    if (chartRef.current) {
-        if (chartInstanceRef.current) {
-            chartInstanceRef.current.destroy();
-        }
-        const ctx = chartRef.current.getContext("2d");
-        if (!ctx) return;
-        const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-        gradient.addColorStop(0, "rgba(153, 25, 21, 0.4)");
-        gradient.addColorStop(1, "rgba(153, 25, 21, 0)");
-        chartInstanceRef.current = new Chart(ctx, {
-            type: "line",
-            data: {
-                labels: ["6 AM", "7 AM", "8 AM", "9 AM", "10 AM"],
-                datasets: [{
-                    label: "Traffic Volume",
-                    data: [5000, 10000, 8000, 12000, 9000],
-                    fill: true,
-                    backgroundColor: gradient,
-                    borderColor: "#991915",
-                    borderWidth: 2.5,
-                    pointRadius: 0,
-                    pointHoverRadius: 8,
-                    pointHoverBackgroundColor: "#991915",
-                    pointHoverBorderColor: "#fff",
-                    tension: 0.4,
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { mode: 'index', intersect: false },
-                scales: {
-                    x: {
-                        grid: { display: false },
-                        ticks: { color: "#6B7280", font: { size: 12, family: "'Inter', sans-serif" } },
-                        border: { display: false },
-                    },
-                    y: {
-                        grid: { color: "#E5E7EB", drawTicks: false },
-                        ticks: {
-                            color: "#6B7280",
-                            stepSize: 2500,
-                            font: { size: 12, family: "'Inter', sans-serif" },
-                            padding: 10,
+    useEffect(() => {
+        if (chartRef.current) {
+            if (chartInstanceRef.current) {
+                chartInstanceRef.current.destroy();
+            }
+            const ctx = chartRef.current.getContext("2d");
+            if (!ctx) return;
+            const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+            gradient.addColorStop(0, "rgba(153, 25, 21, 0.4)");
+            gradient.addColorStop(1, "rgba(153, 25, 21, 0)");
+            chartInstanceRef.current = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: ["6 AM", "7 AM", "8 AM", "9 AM", "10 AM"],
+                    datasets: [{
+                        label: "Traffic Volume",
+                        data: [5000, 10000, 8000, 12000, 9000],
+                        fill: true,
+                        backgroundColor: gradient,
+                        borderColor: "#991915",
+                        borderWidth: 2.5,
+                        pointRadius: 0,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: "#991915",
+                        pointHoverBorderColor: "#fff",
+                        tension: 0.4,
+                    }],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: "#6B7280", font: { size: 12, family: "'Inter', sans-serif" } },
+                            border: { display: false },
                         },
-                        border: { display: false },
+                        y: {
+                            grid: { color: "#E5E7EB", drawTicks: false },
+                            ticks: {
+                                color: "#6B7280",
+                                stepSize: 2500,
+                                font: { size: 12, family: "'Inter', sans-serif" },
+                                padding: 10,
+                            },
+                            border: { display: false },
+                        },
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: "#111827",
+                            titleColor: "#F9FAFB",
+                            bodyColor: "#E5E7EB",
+                            cornerRadius: 8,
+                            padding: 12,
+                            titleFont: { weight: "bold", size: 14, family: "'Inter', sans-serif" },
+                            bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                            displayColors: false,
+                            caretPadding: 10,
+                        },
                     },
                 },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        enabled: true,
-                        backgroundColor: "#111827",
-                        titleColor: "#F9FAFB",
-                        bodyColor: "#E5E7EB",
-                        cornerRadius: 8,
-                        padding: 12,
-                        titleFont: { weight: "bold", size: 14, family: "'Inter', sans-serif" },
-                        bodyFont: { size: 12, family: "'Inter', sans-serif" },
-                        displayColors: false,
-                        caretPadding: 10,
-                    },
-                },
-            },
-        });
-    }
-    return () => {
-        if (chartInstanceRef.current) {
-            chartInstanceRef.current.destroy();
-            chartInstanceRef.current = null;
+            });
         }
-    };
-}, []);
+        return () => {
+            if (chartInstanceRef.current) {
+                chartInstanceRef.current.destroy();
+                chartInstanceRef.current = null;
+            }
+        };
+    }, []);
 
     const maxVolume = Math.max(...topIntersections.map(i => i.volume), 0);
 
