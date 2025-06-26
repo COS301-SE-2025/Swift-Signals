@@ -10,7 +10,7 @@ service SimulationService {
 
 message SimulationRequest {
   string intersection_id = 1; // ID of the intersection to simulate
-  SimulationParameters parameters = 2; // Parameters for the simulation
+  SimulationParameters simulation_parameters = 2; // Parameters for the simulation
 }
 
 message SimulationParameters {
