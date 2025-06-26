@@ -4,12 +4,8 @@
 
 # Badges
 ![API Gateway](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/apiGateway.yml/badge.svg)
-![Intersection Service]
-![Metric Service]
-![Optimization Service]
 ![React Frontend](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/react.yml/badge.svg)
 ![Simulation Service](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/simulation.yml/badge.svg)
-![User Service]
 
 # Team
 **Team InsideInsights - Swift-Signals**  
@@ -19,9 +15,18 @@ Traffic congestion remains one of South Africa’s most costly infrastructure ch
 
 ## Key Links
 
-- [Functional Requirements (SRS)](docs/SRS_Swift_Signals.pdf)
+### Demo 2
+- [Functional Requirements (SRS)]
+- [User Manual]
+- [Architectural Requirements Document]
+- [Coding Standards and Practices]
 - [GitHub Project Board](https://github.com/orgs/COS301-SE-2025/projects/116)
 - [Team Wiki](https://github.com/COS301-SE-2025/Swift-Signals/wiki)
+- [Demo 1 Video]
+
+### Demo 1
+
+- [Functional Requirements (SRS)](docs/SRS_Swift_Signals.pdf)
 - [Demo 1 Video](https://drive.google.com/drive/folders/1atNvpmhXaGXENKEQayBK2XgDB_K1cdJR?usp=sharing)
 
 ## Team Members
