@@ -27,7 +27,7 @@ func (m *MockRepository) CreateUser(ctx context.Context, user *model.UserRespons
 }
 
 // GetUserByID mocks the GetUserByID method
-func (m *MockRepository) GetUserByID(ctx context.Context, id string) (*model.UserResponse, error) {
+func (m *MockRepository) GetUserByID(ctx context.Context, id int) (*model.UserResponse, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -54,7 +54,7 @@ func (m *MockRepository) UpdateUser(ctx context.Context, user *model.UserRespons
 }
 
 // DeleteUser mocks the DeleteUser method
-func (m *MockRepository) DeleteUser(ctx context.Context, id string) error {
+func (m *MockRepository) DeleteUser(ctx context.Context, id int) error {
 	args := m.Called(ctx, id)
 	return args.Error(0)
 }
