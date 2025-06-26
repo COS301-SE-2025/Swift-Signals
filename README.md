@@ -19,7 +19,7 @@ Traffic congestion remains one of South Africa’s most costly infrastructure ch
 - [Functional Requirements (SRS)]
 - [User Manual]
 - [Architectural Requirements Document]
-- [Coding Standards and Practices]
+- [Coding Standards and Practices](/docs/Demo2/CodingStandardsPractices.pdf)
 - [GitHub Project Board](https://github.com/orgs/COS301-SE-2025/projects/116)
 - [Team Wiki](https://github.com/COS301-SE-2025/Swift-Signals/wiki)
 - [Demo 1 Video]
@@ -85,8 +85,8 @@ design.
 - **api-gateway**: API Gateway for routing requests  
 - **user-service**: User management and authentication  
 - **simulation-service**: Simulation engine  
-- **ai-service**: Machine learning and AI capabilities  
-- **control-service**: System control and management  
+- **optimization-service**: Machine learning and AI capabilities  
+- **intersection-service**: Intersection control and management  
 - **metrics-service**: Monitoring and metrics collection  
 - **frontend**: Web dashboard for visualization and control
 
