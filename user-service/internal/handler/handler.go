@@ -160,8 +160,8 @@ func (h *Handler) AddIntersectionID(ctx context.Context, req *userpb.AddIntersec
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) RemoveIntersectionID(ctx context.Context, req *userpb.RemoveIntersectionIDRequest) (*emptypb.Empty, error) {
-	err := h.service.RemoveIntersectionID(ctx, req.GetUserId(), req.GetIntersectionId())
+func (h *Handler) RemoveIntersectionIDs(ctx context.Context, req *userpb.RemoveIntersectionIDRequest) (*emptypb.Empty, error) {
+	err := h.service.RemoveIntersectionIDs(ctx, req.GetUserId(), req.GetIntersectionId())
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +184,7 @@ func (h *Handler) ResetPassword(ctx context.Context, req *userpb.ResetPasswordRe
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) MakeAdmin(ctx context.Context, req *userpb.MakeAdminRequest) (*emptypb.Empty, error) {
+func (h *Handler) MakeAdmin(ctx context.Context, req *userpb.AdminRequest) (*emptypb.Empty, error) {
 	err := h.service.MakeAdmin(ctx, req.GetUserId(), req.GetAdminUserId())
 	if err != nil {
 		return nil, err
@@ -192,7 +192,7 @@ func (h *Handler) MakeAdmin(ctx context.Context, req *userpb.MakeAdminRequest) (
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) RemoveAdmin(ctx context.Context, req *userpb.RemoveAdminRequest) (*emptypb.Empty, error) {
+func (h *Handler) RemoveAdmin(ctx context.Context, req *userpb.AdminRequest) (*emptypb.Empty, error) {
 	err := h.service.RemoveAdmin(ctx, req.GetUserId(), req.GetAdminUserId())
 	if err != nil {
 		return nil, err

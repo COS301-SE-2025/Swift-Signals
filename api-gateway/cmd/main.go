@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"google.golang.org/grpc"
 	"log"
 	"net/http"
 	"os"
@@ -10,7 +11,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/handler"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 
 	_ "github.com/COS301-SE-2025/Swift-Signals/api-gateway/swagger"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -35,15 +38,41 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 func main() {
-	authHandler := handler.NewAuthHandler()
-	log.Println("Initialized Auth Handler.")
+	userConn, err := grpc.Dial("localhost:50051", grpc.WithInsecure()) // NOTE: Will change to use TLS later on
+	if err != nil {
+		log.Fatalf("failed to connect to User gRPC server: %v", err)
+	}
+	userClient := client.NewUserClient(userConn)
+	log.Println("Connected to User-Service")
+
+	intrConn, err := grpc.Dial("localhost:50052", grpc.WithInsecure()) // NOTE: Will change to use TLS later on
+	if err != nil {
+		log.Fatalf("failed to connect to Intersection gRPC server: %v", err)
+	}
+	intrClient := client.NewIntersectionClient(intrConn)
+	log.Println("Connected to Intersection-Service")
 
 	mux := http.NewServeMux()
 
+	authService := service.NewAuthService(userClient)
+	authHandler := handler.NewAuthHandler(authService)
 	mux.HandleFunc("POST /login", authHandler.Login)
 	mux.HandleFunc("POST /register", authHandler.Register)
 	mux.HandleFunc("POST /logout", authHandler.Logout)
 	mux.HandleFunc("POST /reset-password", authHandler.ResetPassword)
+	log.Println("Initialized Auth Handlers.")
+
+	intersectionService := service.NewIntersectionService(intrClient)
+	intersectionHandler := handler.NewIntersectionHandler(intersectionService)
+	mux.HandleFunc("GET /intersections", intersectionHandler.GetAllIntersections)
+	// mux.HandleFunc("GET /intersections/simple", nil)
+	mux.HandleFunc("GET /intersections/{id}", intersectionHandler.GetIntersection)
+	mux.HandleFunc("POST /intersections", intersectionHandler.CreateIntersection)
+	mux.HandleFunc("PATCH /intersections/{id}", intersectionHandler.UpdateIntersection)
+	// mux.HandleFunc("DELETE /intersections/{id}", nil)
+	// mux.HandleFunc("POST /intersections/{id}/optimise", nil)
+	log.Println("Initialized Intersection Handlers.")
+
 	log.Println("Registered API routes.")
 
 	mux.Handle("/docs/", httpSwagger.WrapHandler)
