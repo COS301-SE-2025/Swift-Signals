@@ -2,9 +2,9 @@ name: React Frontend
 
 on:
   push:
-    branches: [main, dev, frontend, ChatBot]
+    branches: [main, dev, frontend, feature/ChatBot]
   pull_request:
-    branches: [main, dev, frontend, ChatBot]
+    branches: [main, dev, frontend, feature/ChatBot]
 
 jobs:
   lint-format-test:
@@ -20,13 +20,15 @@ jobs:
         node-version: '18'
 
     - name: Install dependencies
+      working-directory: frontend
       run: npm ci
-
+      
     - name: Run ESLint
-      run: npx eslint "./src//*.{js,jsx,ts,tsx}"
-
+      working-directory: frontend
+      run: npx eslint "src/**/*.{js,jsx,ts,tsx}"
+    
     - name: Check Prettier formatting
-      run: npx prettier --check "*.{js,jsx,ts,tsx,json,css,md}"
+      run: npx prettier --check "frontend/**/*.{js,jsx,ts,tsx,json,css,md}"
 
 
     - name: Run Jest tests
