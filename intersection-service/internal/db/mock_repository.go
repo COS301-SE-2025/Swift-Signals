@@ -1,3 +1,6 @@
+//go:build mockonly
+// +build mockonly
+
 package db
 
 import (
