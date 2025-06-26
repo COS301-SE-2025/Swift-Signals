@@ -5,10 +5,28 @@ import IntersectionCard from "../components/IntersectionCard";
 import "../styles/Intersections.css";
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
+
+export interface IntersectionFormData {
+  name: string;
+  traffic_density: "low" | "medium" | "high";
+  details: {
+    address: string;
+    city: string;
+    province: string;
+  };
+  default_parameters: {
+    green: number;
+    yellow: number;
+    red: number;
+    speed: number;
+    seed: number;
+    intersection_type: string;
+  };
+}
 interface CreateIntersectionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: IntersectionFormData) => void;
   isLoading: boolean;
   error: string | null;
 }
@@ -20,7 +38,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   isLoading,
   error,
 }) => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IntersectionFormData>({
     name: "",
     traffic_density: "low",
     details: {
@@ -45,17 +63,21 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
     const keys = name.split('.');
 
     if (keys.length > 1) {
-      setFormData(prev => {
-        const newState = { ...prev };
-        let current: any = newState;
-        for (let i = 0; i < keys.length - 1; i++) {
-          current = current[keys[i]];
-        }
-        current[keys[keys.length - 1]] = e.target.type === 'number' ? parseInt(value, 10) : value;
-        return newState;
-      });
+      const [parentKey, childKey] = keys as [keyof IntersectionFormData, string];
+      if (parentKey === 'details' || parentKey === 'default_parameters') {
+        setFormData(prev => ({
+          ...prev,
+          [parentKey]: {
+            ...prev[parentKey],
+            [childKey]: e.target.type === 'number' ? parseInt(value, 10) : value,
+          },
+        }));
+      }
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
     }
   };
 
@@ -154,8 +176,12 @@ const Intersections = () => {
       if (!response.ok) throw new Error(`Failed to fetch intersections: ${response.statusText}`);
       const data = await response.json();
       setIntersections(data.intersections || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+          setError(err.message);
+      } else {
+          setError("An unexpected error occurred.");
+      }
       setIntersections([]);
     } finally {
       setIsLoading(false);
@@ -175,14 +201,18 @@ const Intersections = () => {
       if (!response.ok) throw new Error(`Failed to find intersection with ID ${id}: ${response.statusText}`);
       const data = await response.json();
       setIntersections(data ? [data] : []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            setError(err.message);
+        } else {
+            setError("An unexpected error occurred while searching.");
+        }
       setIntersections([]);
     } finally {
       setIsLoading(false);
     }
   };
-  const handleCreateIntersection = async (formData: any) => {
+  const handleCreateIntersection = async (formData: IntersectionFormData) => {
     setIsCreating(true);
     setCreateError(null);
     try {
@@ -200,8 +230,12 @@ const Intersections = () => {
       }
       setIsModalOpen(false);
       fetchIntersections();
-    } catch (err: any) {
+    } catch (err: unknown) {
+      if (err instanceof Error) {
         setCreateError(err.message);
+      } else {
+        setCreateError("An unexpected error occurred during creation.");
+      }
     } finally {
         setIsCreating(false);
     }

@@ -110,9 +110,13 @@ const Login = () => {
       } else {
         throw new Error("Login failed: No authentication token received.");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Login error:", err);
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected login error occurred.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -150,9 +154,13 @@ const Login = () => {
         setResetEmail("");
         setResetSuccessMessage(null);
       }, 3000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Password reset error:", err);
-      setResetError(err.message);
+      if (err instanceof Error) {
+        setResetError(err.message);
+      } else {
+        setResetError("An unexpected password reset error occurred.");
+      }
     } finally {
       setIsLoading(false);
     }

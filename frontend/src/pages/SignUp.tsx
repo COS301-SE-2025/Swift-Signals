@@ -109,9 +109,13 @@ const SignUp = () => {
       setTimeout(() => {
         navigate("/login");
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Sign-up error:", err);
-      setError(err.message);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unexpected sign-up error occurred.");
+      }
     } finally {
       setIsLoading(false);
     }
