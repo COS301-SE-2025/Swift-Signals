@@ -1,0 +1,115 @@
+syntax = "proto3";
+package swiftsignals.intersection;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "protos/gen/intersection";
+
+// Service definition
+service IntersectionService {
+  rpc CreateIntersection(CreateIntersectionRequest)
+      returns (IntersectionResponse);
+  rpc GetIntersection(IntersectionIDRequest) returns (IntersectionResponse);
+  rpc GetAllIntersections(GetAllIntersectionsRequest)
+      returns (stream IntersectionResponse);
+  rpc UpdateIntersection(UpdateIntersectionRequest)
+      returns (IntersectionResponse);
+  rpc DeleteIntersection(IntersectionIDRequest) returns (google.protobuf.Empty);
+  rpc PutOptimisation(PutOptimisationRequest) returns (PutOptimisationResponse);
+}
+
+// Common Messages
+message IntersectionIDRequest { string id = 1; }
+
+message IntersectionResponse {
+  string id = 1;
+  string name = 2;
+  IntersectionDetails details = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp last_run_at = 5;
+  IntersectionStatus status = 6;
+  int32 run_count = 7;
+  TrafficDensity traffic_density = 8;
+  OptimisationParameters default_parameters = 9;
+  OptimisationParameters best_parameters = 10;
+  OptimisationParameters current_parameters = 11;
+}
+
+// Create Intersection messages
+message CreateIntersectionRequest {
+  string name = 1;
+  IntersectionDetails details = 2;
+  TrafficDensity traffic_density = 3;
+  OptimisationParameters default_parameters = 4;
+}
+
+// Get All Intersections messages
+message GetAllIntersectionsRequest {
+  // Empty for now, but could add filtering parameters later
+}
+
+// Update Intersection messages
+message UpdateIntersectionRequest {
+  string id = 1;
+  string name = 2;
+  IntersectionDetails details = 3;
+}
+
+// Put Optimisation messages
+message PutOptimisationRequest {
+  string id = 1;
+  OptimisationParameters parameters = 2;
+}
+
+message PutOptimisationResponse { bool improved = 1; }
+
+// Intersection details (address information)
+message IntersectionDetails {
+  string address = 1;
+  string city = 2;
+  string province = 3;
+}
+
+message OptimisationParameters {
+  OptimisationType optimisation_type = 1;
+  SimulationParameters parameters = 2;
+}
+
+// Traffic light timing parameters
+message SimulationParameters {
+  IntersectionType intersection_type = 2;
+  int32 green = 3;
+  int32 yellow = 4;
+  int32 red = 5;
+  int32 speed = 6;
+  int32 seed = 7;
+}
+
+// Enums for different types and statuses
+enum IntersectionStatus {
+  INTERSECTION_STATUS_UNOPTIMISED = 0;
+  INTERSECTION_STATUS_OPTIMISING = 1;
+  INTERSECTION_STATUS_OPTIMISED = 2;
+  INTERSECTION_STATUS_FAILED = 3;
+}
+
+enum TrafficDensity {
+  TRAFFIC_DENSITY_LOW = 0;
+  TRAFFIC_DENSITY_MEDIUM = 1;
+  TRAFFIC_DENSITY_HIGH = 2;
+}
+
+enum OptimisationType {
+  OPTIMISATION_TYPE_NONE = 0;
+  OPTIMISATION_TYPE_GRIDSEARCH = 1;
+  OPTIMISATION_TYPE_GENETIC_EVALUATION = 2;
+}
+
+enum IntersectionType {
+  INTERSECTION_TYPE_UNSPECIFIED = 0;
+  INTERSECTION_TYPE_TRAFFICLIGHT = 1;
+  INTERSECTION_TYPE_TJUNCTION = 2;
+  INTERSECTION_TYPE_ROUNDABOUT = 3;
+  INTERSECTION_TYPE_STOP_SIGN = 4;
+}
