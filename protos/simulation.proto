@@ -31,12 +31,12 @@ enum IntersectionType {
 
 message SimulationResultsResponse {
   int64 total_vehicles = 1;
-  int64 average_travel_time = 2;
-  int64 total_travel_time = 3;
-  int64 average_speed = 4;
-  int64 average_waiting_time = 5;
-  int64 total_waiting_time = 6;
-  int64 generated_vehicles = 7; 
+  float average_travel_time = 2;
+  float total_travel_time = 3;
+  float average_speed = 4;
+  float average_waiting_time = 5;
+  float total_waiting_time = 6;
+  int64 generated_vehicles = 7;
   int64 emergency_brakes = 8; // Number of emergency brakes applied
   int64 emergency_stops = 9; // Number of emergency stops
   int64 near_collisions = 10; // Number of near collisions
@@ -48,7 +48,7 @@ message SimulationOutputResponse {
 }
 
 message Intersection {
-  repeated Node nodes= 1;
+  repeated Node nodes = 1;
   repeated Edge edges = 2;
   repeated Connection connections = 3;
   repeated TrafficLight traffic_lights = 4;

@@ -62,16 +62,16 @@ class SimulationResultsResponse(_message.Message):
     EMERGENCY_STOPS_FIELD_NUMBER: _ClassVar[int]
     NEAR_COLLISIONS_FIELD_NUMBER: _ClassVar[int]
     total_vehicles: int
-    average_travel_time: int
-    total_travel_time: int
-    average_speed: int
-    average_waiting_time: int
-    total_waiting_time: int
+    average_travel_time: float
+    total_travel_time: float
+    average_speed: float
+    average_waiting_time: float
+    total_waiting_time: float
     generated_vehicles: int
     emergency_brakes: int
     emergency_stops: int
     near_collisions: int
-    def __init__(self, total_vehicles: _Optional[int] = ..., average_travel_time: _Optional[int] = ..., total_travel_time: _Optional[int] = ..., average_speed: _Optional[int] = ..., average_waiting_time: _Optional[int] = ..., total_waiting_time: _Optional[int] = ..., generated_vehicles: _Optional[int] = ..., emergency_brakes: _Optional[int] = ..., emergency_stops: _Optional[int] = ..., near_collisions: _Optional[int] = ...) -> None: ...
+    def __init__(self, total_vehicles: _Optional[int] = ..., average_travel_time: _Optional[float] = ..., total_travel_time: _Optional[float] = ..., average_speed: _Optional[float] = ..., average_waiting_time: _Optional[float] = ..., total_waiting_time: _Optional[float] = ..., generated_vehicles: _Optional[int] = ..., emergency_brakes: _Optional[int] = ..., emergency_stops: _Optional[int] = ..., near_collisions: _Optional[int] = ...) -> None: ...
 
 class SimulationOutputResponse(_message.Message):
     __slots__ = ("intersection", "vehicles")
