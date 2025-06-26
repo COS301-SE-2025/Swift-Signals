@@ -1,20 +1,24 @@
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
   min-height: 100vh;
   min-width: 100vw;
-  background: #F0F0F0;
+  background: #f0f0f0;
   overflow: hidden;
 }
 
-.dark body, .dark #root, .dark #root > div {
+.dark body,
+.dark #root,
+.dark #root > div {
   background: #000000;
 }
 
 .dark .loginContainer {
-  background: #2A2A2A;
+  background: #2a2a2a;
 }
 
 .dark .loginTitle {
@@ -22,7 +26,7 @@ html, body, #root {
 }
 
 .dark input {
-  background: #2A2A2A;
+  background: #2a2a2a;
   color: #fff;
 }
 
@@ -50,7 +54,7 @@ html, body, #root {
     margin-top: 0;
     display: flex;
     flex-direction: row;
-    font-size: 2.0rem;
+    font-size: 2rem;
     width: 100%;
     justify-content: center;
     margin-bottom: 20px;
@@ -62,7 +66,7 @@ html, body, #root {
     display: none;
   }
 
-  .welcomeMessage .welcomeText{
+  .welcomeMessage .welcomeText {
     font-size: 1.8rem;
     margin-bottom: 20px;
   }
