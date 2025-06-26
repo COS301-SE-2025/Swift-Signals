@@ -14,13 +14,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.24.3'
-
-      - name: Display Go version
-        run: go version
 
       - name: Install Protobuf Compiler
         run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
@@ -32,6 +32,10 @@ jobs:
 
       - name: Add Go bin to PATH
         run: echo "${HOME}/go/bin" >> $GITHUB_PATH
+
+      - name: Generate Proto Files
+        working-directory: ./protos
+        run: protoc --go_out=gen --go-grpc_out=gen *.proto
 
       - name: Run unit tests in api-gateway
         working-directory: ./api-gateway
