@@ -46,14 +46,14 @@ class TestRoundabout(unittest.TestCase):
         tree_mock.getroot.return_value = root_mock
         mock_et_parse.return_value = tree_mock
 
-        params = {"Speed": 60, "Traffic Density": "medium", "seed": 42}
+        params = {"speed": 60, "traffic_density": "medium", "seed": 42}
 
         results, fullOutput = circle.generate(params)
 
-        self.assertIn("Total Vehicles", results)
-        self.assertEqual(results["Total Vehicles"], 2)
-        self.assertGreater(results["Average Speed"], 0)
-        self.assertAlmostEqual(results["Average Waiting Time"], 4)
+        self.assertIn("total_vehicles", results)
+        self.assertEqual(results["total_vehicles"], 2)
+        self.assertGreater(results["average_speed"], 0)
+        self.assertAlmostEqual(results["average_waiting_time"], 4)
 
         mock_subprocess.assert_any_call(
             [

@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 def generate(params):
     allowedSpeeds = [40, 60, 80, 100, 120]
-    speedKm = params.get("Speed", 40)
+    speedKm = params.get("speed", 40)
     if speedKm not in allowedSpeeds:
         print(f"Warning: Speed {speedKm}km/h not allowed. Using default 40km/h.")
         speedKm = 40
@@ -39,7 +39,7 @@ def generate(params):
         check=True,
     )
 
-    generateTrips(netFile, routeFile, params["Traffic Density"], params)
+    generateTrips(netFile, routeFile, params["traffic_density"], params)
 
     with open(configFile, "w") as cfg:
         cfg.write(
@@ -124,16 +124,16 @@ def generate(params):
     avg_travel_time = total_travel_time / total_vehicles if total_vehicles > 0 else 0
 
     results = {
-        "Total Vehicles": total_vehicles,
-        "Average Travel Time": avg_travel_time,
-        "Total Travel Time": total_travel_time,
-        "Average Speed": avg_speed,
-        "Average Waiting Time": avg_waiting_time,
-        "Total Waiting Time": total_waiting_time,
-        "Generated Vehicles": total_vehicles,
-        "Emergency Brakes": emergency_brakes,
-        "Emergency Stops": emergency_stops,
-        "Near collisions": len(near_collisions),
+        "total_vehicles": total_vehicles,
+        "average_travel_time": avg_travel_time,
+        "total_travel_time": total_travel_time,
+        "average_speed": avg_speed,
+        "average_waiting_time": avg_waiting_time,
+        "total_waiting_time": total_waiting_time,
+        "generated_vehicles": total_vehicles,
+        "emergency_brakes": emergency_brakes,
+        "emergency_stops": emergency_stops,
+        "near_collisions": len(near_collisions),
     }
 
     trajectories = extractTrajectories(fcdOutputFile)

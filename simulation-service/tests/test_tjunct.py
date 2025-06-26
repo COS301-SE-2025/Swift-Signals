@@ -65,15 +65,15 @@ class TestTJunction(unittest.TestCase):
 
         mock_open_file.side_effect = open_side_effect
 
-        params = {"Speed": 60, "Traffic Density": "medium", "seed": 42}
+        params = {"speed": 60, "traffic_density": "medium", "seed": 42}
 
         results, fullOutput = tJunction.generate(params)
 
-        self.assertIn("Total Vehicles", results)
-        self.assertEqual(results["Total Vehicles"], 2)
-        self.assertEqual(results["Emergency Brakes"], 1)
-        self.assertEqual(results["Emergency Stops"], 1)
-        self.assertEqual(results["Near collisions"], 2)
+        self.assertIn("total_vehicles", results)
+        self.assertEqual(results["total_vehicles"], 2)
+        self.assertEqual(results["emergency_brakes"], 1)
+        self.assertEqual(results["emergency_stops"], 1)
+        self.assertEqual(results["near_collisions"], 2)
 
         mock_writeNode.assert_called_once_with("tjInt.nod.xml")
         mock_writeEdge.assert_called_once()
@@ -255,7 +255,7 @@ class TestTJunction(unittest.TestCase):
         </root>"""
         mock_et_parse.return_value = ET.ElementTree(ET.fromstring(tripinfo_xml))
 
-        params = {"Speed": 999, "Traffic Density": "low", "seed": 1}
+        params = {"speed": 999, "traffic_density": "low", "seed": 1}
         tJunction.generate(params)
 
         mock_print.assert_any_call(

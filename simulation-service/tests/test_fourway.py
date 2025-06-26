@@ -65,11 +65,11 @@ class TestStopIntersection(unittest.TestCase):
 
         mock_open_file.side_effect = open_side_effect
 
-        params = {"Speed": 60, "Traffic Density": "medium", "seed": 42}
+        params = {"speed": 60, "traffic_density": "medium", "seed": 42}
         results, fullOutput = stopStreet.generate(params)
 
-        self.assertIn("Total Vehicles", results)
-        self.assertEqual(results["Total Vehicles"], 2)
+        self.assertIn("total_vehicles", results)
+        self.assertEqual(results["total_vehicles"], 2)
 
         calls = [call[0][0] for call in mock_subprocess.call_args_list]
 

@@ -127,7 +127,6 @@ class TestTLIntersection(unittest.TestCase):
         """
         mock_et_parse.return_value.getroot.return_value = ET.fromstring(tripinfo_xml)
 
-        # Mock open for reading logs and writing outputs
         def open_side_effect(file, mode="r", *args, **kwargs):
             if file.endswith("_warnings.log") and "r" in mode:
                 mock_file = mock_open(
@@ -144,28 +143,28 @@ class TestTLIntersection(unittest.TestCase):
         mock_open_file.side_effect = open_side_effect
 
         params = {
-            "Speed": 60,
-            "Traffic Density": "low",
+            "speed": 60,
+            "traffic_density": "low",
             "seed": 1,
-            "Green": 30,
-            "Yellow": 5,
-            "Red": 25,
+            "green": 30,
+            "yellow": 5,
+            "red": 25,
         }
 
         # Properly unpack the return tuple
         results, fullOutput = trafficLight.generate(params)
 
         # Assert expected results dictionary values
-        self.assertIn("Total Vehicles", results)
-        self.assertEqual(results["Total Vehicles"], 2)
-        self.assertEqual(results["Emergency Brakes"], 1)
-        self.assertEqual(results["Emergency Stops"], 0)
-        self.assertEqual(results["Near collisions"], 1)
-        self.assertAlmostEqual(results["Average Travel Time"], 150.0)
-        self.assertAlmostEqual(results["Total Travel Time"], 300.0)
-        self.assertAlmostEqual(results["Average Waiting Time"], 15.0)
-        self.assertAlmostEqual(results["Total Waiting Time"], 30.0)
-        self.assertGreater(results["Average Speed"], 0)
+        self.assertIn("total_vehicles", results)
+        self.assertEqual(results["total_vehicles"], 2)
+        self.assertEqual(results["emergency_brakes"], 1)
+        self.assertEqual(results["emergency_stops"], 0)
+        self.assertEqual(results["near_collisions"], 1)
+        self.assertAlmostEqual(results["average_travel_time"], 150.0)
+        self.assertAlmostEqual(results["total_travel_time"], 300.0)
+        self.assertAlmostEqual(results["average_waiting_time"], 15.0)
+        self.assertAlmostEqual(results["total_waiting_time"], 30.0)
+        self.assertGreater(results["average_speed"], 0)
 
         # Assert generateTrips was called
         mock_generateTrips.assert_called_once()
@@ -222,17 +221,17 @@ class TestTLIntersection(unittest.TestCase):
         mock_open_file.side_effect = open_side_effect
 
         params = {
-            "Speed": 999,
-            "Traffic Density": "medium",
+            "speed": 999,
+            "traffic_density": "medium",
             "seed": 1,
-            "Green": 30,
-            "Yellow": 5,
-            "Red": 25,
+            "green": 30,
+            "yellow": 5,
+            "red": 25,
         }
         trafficLight.generate(params)
 
         mock_print.assert_any_call(
-            "Warnig: Speed 999km/h not allowed. Using default 40km/h."
+            "Warning: Speed 999km/h not allowed. Using default 40km/h."
         )
 
     @patch("trafficLight.os.makedirs")
