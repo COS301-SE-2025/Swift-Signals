@@ -39,7 +39,7 @@
 }
 
 .dark .logo {
-  color: #DADADA;
+  color: #dadada;
 }
 
 .navbar-center {
@@ -62,7 +62,7 @@
 }
 
 .dark .navbar-center .nav-links li a {
-  color: #DADADA;
+  color: #dadada;
 }
 
 .navbar-center .nav-links li a:hover {
@@ -70,7 +70,7 @@
 }
 
 .dark .navbar-center .nav-links li a:hover {
-  color: #4B6FFF;
+  color: #4b6fff;
 }
 
 .navbar-right {
@@ -88,7 +88,7 @@
 }
 
 .dark .user-profile {
-  color: #DADADA;
+  color: #dadada;
 }
 
 .logout-icon {
@@ -101,7 +101,7 @@
 }
 
 .dark .logout-icon {
-  color: #DADADA;
+  color: #dadada;
 }
 
 .mobile-menu-toggle {
@@ -113,7 +113,7 @@
 }
 
 .dark .mobile-menu-toggle {
-  color: #DADADA;
+  color: #dadada;
 }
 
 .mobile-user-profile {
@@ -124,7 +124,7 @@
 @media (max-width: 768px) {
   .navbar {
     flex-wrap: wrap;
-    height: 5.0rem; /* Reduced height for mobile */
+    height: 5rem; /* Reduced height for mobile */
     padding: 0.5rem;
   }
 
@@ -188,7 +188,7 @@
   }
 
   .dark .mobile-user-profile {
-    color: #DADADA;
+    color: #dadada;
   }
 
   .mobile-user-profile .logout-icon {

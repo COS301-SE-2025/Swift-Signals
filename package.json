@@ -1,7 +1,15 @@
 {
   "dependencies": {
     "@types/react-router-dom": "^5.3.3",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "google-auth-library": "^10.1.0",
     "lucide-react": "^0.511.0",
-    "react-router-dom": "^7.6.0"
+    "react-router-dom": "^7.6.0",
+    "three-stdlib": "^2.36.0"
+  },
+  "devDependencies": {
+    "@types/three": "^0.177.0",
+    "three": "^0.168.0"
   }
 }
