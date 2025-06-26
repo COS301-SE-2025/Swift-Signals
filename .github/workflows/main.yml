@@ -1,4 +1,4 @@
-name: CI Lint, Format, and Test Workflow
+name: Combined CI Workflow
 
 on:
   push:
@@ -7,47 +7,71 @@ on:
     branches: [main, dev, quality-assurance]
 
 jobs:
-  # ====== Linting ======
-
-  lint-go:
+  go-standard-check:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
 
-      - name: Setup Go
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.24.3'
 
-      - name: Run Go lint (go vet + go fmt check)
+      - name: Display Go version
+        run: go version
+
+      - name: Run unit tests in api-gateway
         working-directory: ./api-gateway
         run: |
           go mod tidy
-          go vet ./...
-          gofmt -l .
+          go test -v ./...
 
-  lint-python:
+  python-standard-check:
+    needs: go-standard-check
     runs-on: ubuntu-latest
-    needs: lint-go
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
       - name: Setup Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
-      - name: Install linting dependencies
-        run: pip install flake8
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install sumolib traci
+          pip install flake8 pytest pytest-mock pytest-cov black
 
-      - name: Run Python linting with flake8
+      - name: Install SUMO
+        run: sudo apt-get update && sudo apt-get install -y sumo sumo-tools sumo-doc
+
+      - name: Set SUMO_HOME
+        run: echo "SUMO_HOME=/path/to/sumo/home" >> $GITHUB_ENV
+
+      - name: Run Linting with Flake8
         run: flake8 simulation-service --ignore=E501,W503
 
-  lint-react:
+      - name: Check Python formatting with Black
+        run: black --check --exclude "/protos/" .
+
+      - name: Create results directory
+        run: mkdir -p out/results
+
+      - name: Run Tests with coverage using Pytest
+        run: pytest --cov=SimLoad --cov-report=term-missing simulation-service/tests/
+
+  peact-standard-check:
+    needs: python-standard-check
     runs-on: ubuntu-latest
-    needs: lint-python
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -62,118 +86,9 @@ jobs:
         working-directory: frontend
         run: npx eslint "src/**/*.{js,jsx,ts,tsx}"
 
-
-  # ====== Formatting ======
-
-  format-go:
-    runs-on: ubuntu-latest
-    needs: lint-react
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.24.3'
-
-      - name: Check Go formatting
-        working-directory: ./api-gateway
-        run: gofmt -l .
-
-  format-python:
-    runs-on: ubuntu-latest
-    needs: format-go
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-
-      - name: Install black
-        run: pip install black
-
-      - name: Check Python formatting with Black
-        run: black --check --exclude "/protos/" .
-
-  format-react:
-    runs-on: ubuntu-latest
-    needs: format-python
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        working-directory: frontend
-        run: npm ci
-
       - name: Check Prettier formatting
         working-directory: frontend
         run: npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,md}"
-
-
-  # ====== Testing ======
-
-  test-go:
-    runs-on: ubuntu-latest
-    needs: format-react
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.24.3'
-
-      - name: Run Go tests
-        working-directory: ./api-gateway
-        run: |
-          go mod tidy
-          go test -v ./...
-
-  test-python:
-    runs-on: ubuntu-latest
-    needs: test-go
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-
-      - name: Install test dependencies
-        run: |
-          pip install sumolib traci pytest pytest-mock pytest-cov
-
-      - name: Install SUMO
-        run: sudo apt-get update && sudo apt-get install -y sumo sumo-tools sumo-doc
-
-      - name: Set SUMO_HOME
-        run: echo "SUMO_HOME=/path/to/sumo/home" >> $GITHUB_ENV
-
-      - name: Run Python tests with coverage
-        run: pytest --cov=SimLoad --cov-report=term-missing simulation-service/tests/
-
-  test-react:
-    runs-on: ubuntu-latest
-    needs: test-python
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        working-directory: frontend
-        run: npm ci
 
       - name: Run Jest tests
         working-directory: frontend
