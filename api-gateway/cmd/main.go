@@ -43,12 +43,14 @@ func main() {
 		log.Fatalf("failed to connect to User gRPC server: %v", err)
 	}
 	userClient := client.NewUserClient(userConn)
+	log.Println("Connected to User-Service")
 
 	intrConn, err := grpc.Dial("localhost:50052", grpc.WithInsecure()) // NOTE: Will change to use TLS later on
 	if err != nil {
 		log.Fatalf("failed to connect to Intersection gRPC server: %v", err)
 	}
 	intrClient := client.NewIntersectionClient(intrConn)
+	log.Println("Connected to Intersection-Service")
 
 	mux := http.NewServeMux()
 

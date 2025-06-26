@@ -4,12 +4,10 @@ import (
 	"context"
 	"errors"
 	"io"
-	"strconv"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
-	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
 )
 
 type IntersectionService struct {
@@ -45,8 +43,8 @@ func (s *IntersectionService) GetAllIntersections(ctx context.Context) (model.In
 	return resp, nil
 }
 
-func (s *IntersectionService) GetIntersectionByID(ctx context.Context, id int) (model.Intersection, error) {
-	pbResp, err := s.intrClient.GetIntersection(ctx, strconv.Itoa(id))
+func (s *IntersectionService) GetIntersectionByID(ctx context.Context, id string) (model.Intersection, error) {
+	pbResp, err := s.intrClient.GetIntersection(ctx, id)
 	if err != nil {
 		return model.Intersection{}, errors.New("Unable to get intersection by ID")
 	}
@@ -77,6 +75,6 @@ func (s *IntersectionService) CreateIntersection(ctx context.Context, req model.
 	return resp, nil
 }
 
-func (s *IntersectionService) UpdateIntersectionByID(ctx context.Context, id int, req model.UpdateIntersectionRequest) (resp model.Intersection, err error) {
+func (s *IntersectionService) UpdateIntersectionByID(ctx context.Context, id string, req model.UpdateIntersectionRequest) (model.Intersection, error) {
 	return model.Intersection{}, nil
 }
