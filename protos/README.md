@@ -31,3 +31,10 @@ protoc --go_out=./gen/intersection/ --go_opt=paths=source_relative \
        --go-grpc_out=./gen/intersection/ --go-grpc_opt=paths=source_relative \
        intersection.proto
 ```
+
+### To update simulation.proto generated code
+```bash
+protoc --go_out=./gen/simulation/ --go_opt=paths=source_relative \
+       --go-grpc_out=./gen/simulation/ --go-grpc_opt=paths=source_relative \
+       simulation.proto
+```
