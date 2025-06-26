@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10simulation.proto\x12\x17swiftsignals.simulation\"o\n\x11SimulationRequest\x12\x17\n\x0fintersection_id\x18\x01 \x01(\t\x12\x41\n\nparameters\x18\x02 \x01(\x0b\x32-.swiftsignals.simulation.SimulationParameters\"\xa5\x01\n\x14SimulationParameters\x12\x44\n\x11intersection_type\x18\x01 \x01(\x0e\x32).swiftsignals.simulation.IntersectionType\x12\r\n\x05green\x18\x02 \x01(\x05\x12\x0e\n\x06yellow\x18\x03 \x01(\x05\x12\x0b\n\x03red\x18\x04 \x01(\x05\x12\r\n\x05speed\x18\x05 \x01(\x05\x12\x0c\n\x04seed\x18\x06 \x01(\x05\"\xb0\x02\n\x19SimulationResultsResponse\x12\n\n\x02id\x18\x01 \x01(\t\x12\x16\n\x0etotal_vehicles\x18\x02 \x01(\x03\x12\x17\n\x0f\x61vg_travel_time\x18\x03 \x01(\x03\x12\x19\n\x11total_travel_time\x18\x04 \x01(\x03\x12\x11\n\tavg_speed\x18\x05 \x01(\x03\x12\x18\n\x10\x61vg_waiting_time\x18\x06 \x01(\x03\x12\x14\n\x0cwaiting_time\x18\x07 \x01(\x03\x12\x1a\n\x12generated_vehicles\x18\x08 \x01(\x03\x12\x18\n\x10\x65mergency_brakes\x18\t \x01(\x03\x12\x17\n\x0f\x65mergency_stops\x18\n \x01(\x03\x12\x17\n\x0fnear_collisions\x18\x0b \x01(\x03\x12\x10\n\x08\x64\x61te_run\x18\x0c \x01(\t\"\x8b\x01\n\x18SimulationOutputResponse\x12;\n\x0cintersection\x18\x01 \x01(\x0b\x32%.swiftsignals.simulation.Intersection\x12\x32\n\x08vehicles\x18\x02 \x03(\x0b\x32 .swiftsignals.simulation.Vehicle\"\xe3\x01\n\x0cIntersection\x12,\n\x05nodes\x18\x01 \x03(\x0b\x32\x1d.swiftsignals.simulation.Node\x12,\n\x05\x65\x64ges\x18\x02 \x03(\x0b\x32\x1d.swiftsignals.simulation.Edge\x12\x38\n\x0b\x63onnections\x18\x03 \x03(\x0b\x32#.swiftsignals.simulation.Connection\x12=\n\x0etraffic_lights\x18\x04 \x03(\x0b\x32%.swiftsignals.simulation.TrafficLight\"Y\n\x04Node\x12\n\n\x02id\x18\x01 \x01(\t\x12\t\n\x01x\x18\x02 \x01(\x02\x12\t\n\x01y\x18\x03 \x01(\x02\x12/\n\x04type\x18\x04 \x01(\x0e\x32!.swiftsignals.simulation.NodeType\"J\n\x04\x45\x64ge\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04\x66rom\x18\x02 \x01(\t\x12\n\n\x02to\x18\x03 \x01(\t\x12\r\n\x05speed\x18\x04 \x01(\x02\x12\r\n\x05lanes\x18\x05 \x01(\x05\"T\n\nConnection\x12\x0c\n\x04\x66rom\x18\x01 \x01(\t\x12\n\n\x02to\x18\x02 \x01(\t\x12\x10\n\x08\x66romLane\x18\x03 \x01(\x05\x12\x0e\n\x06toLane\x18\x04 \x01(\x05\x12\n\n\x02tl\x18\x05 \x01(\x05\"X\n\x0cTrafficLight\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12.\n\x06phases\x18\x03 \x03(\x0b\x32\x1e.swiftsignals.simulation.Phase\"(\n\x05Phase\x12\x10\n\x08\x64uration\x18\x01 \x01(\x05\x12\r\n\x05state\x18\x02 \x01(\t\"K\n\x07Vehicle\x12\n\n\x02id\x18\x01 \x01(\t\x12\x34\n\tpositions\x18\x02 \x03(\x0b\x32!.swiftsignals.simulation.Position\"=\n\x08Position\x12\x0c\n\x04time\x18\x01 \x01(\x05\x12\t\n\x01x\x18\x02 \x01(\x02\x12\t\n\x01y\x18\x03 \x01(\x02\x12\r\n\x05speed\x18\x04 \x01(\x02*\x9c\x01\n\x10IntersectionType\x12!\n\x1dINTERSECTION_TYPE_UNSPECIFIED\x10\x00\x12\"\n\x1eINTERSECTION_TYPE_TRAFFICLIGHT\x10\x01\x12 \n\x1cINTERSECTION_TYPE_ROUNDABOUT\x10\x02\x12\x1f\n\x1bINTERSECTION_TYPE_STOP_SIGN\x10\x03*+\n\x08NodeType\x12\x0c\n\x08PRIORITY\x10\x00\x12\x11\n\rTRAFFIC_LIGHT\x10\x01\x32\x81\x02\n\x11SimulationService\x12v\n\x14GetSimulationResults\x12*.swiftsignals.simulation.SimulationRequest\x1a\x32.swiftsignals.simulation.SimulationResultsResponse\x12t\n\x13GetSimulationOutput\x12*.swiftsignals.simulation.SimulationRequest\x1a\x31.swiftsignals.simulation.SimulationOutputResponseB\x17Z\x15protos/gen/simulationb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10simulation.proto\x12\x17swiftsignals.simulation\"z\n\x11SimulationRequest\x12\x17\n\x0fintersection_id\x18\x01 \x01(\t\x12L\n\x15simulation_parameters\x18\x02 \x01(\x0b\x32-.swiftsignals.simulation.SimulationParameters\"\xa5\x01\n\x14SimulationParameters\x12\x44\n\x11intersection_type\x18\x01 \x01(\x0e\x32).swiftsignals.simulation.IntersectionType\x12\r\n\x05green\x18\x02 \x01(\x05\x12\x0e\n\x06yellow\x18\x03 \x01(\x05\x12\x0b\n\x03red\x18\x04 \x01(\x05\x12\r\n\x05speed\x18\x05 \x01(\x05\x12\x0c\n\x04seed\x18\x06 \x01(\x05\"\xa4\x02\n\x19SimulationResultsResponse\x12\x16\n\x0etotal_vehicles\x18\x01 \x01(\x03\x12\x1b\n\x13\x61verage_travel_time\x18\x02 \x01(\x03\x12\x19\n\x11total_travel_time\x18\x03 \x01(\x03\x12\x15\n\raverage_speed\x18\x04 \x01(\x03\x12\x1c\n\x14\x61verage_waiting_time\x18\x05 \x01(\x03\x12\x1a\n\x12total_waiting_time\x18\x06 \x01(\x03\x12\x1a\n\x12generated_vehicles\x18\x07 \x01(\x03\x12\x18\n\x10\x65mergency_brakes\x18\x08 \x01(\x03\x12\x17\n\x0f\x65mergency_stops\x18\t \x01(\x03\x12\x17\n\x0fnear_collisions\x18\n \x01(\x03\"\x8b\x01\n\x18SimulationOutputResponse\x12;\n\x0cintersection\x18\x01 \x01(\x0b\x32%.swiftsignals.simulation.Intersection\x12\x32\n\x08vehicles\x18\x02 \x03(\x0b\x32 .swiftsignals.simulation.Vehicle\"\xe3\x01\n\x0cIntersection\x12,\n\x05nodes\x18\x01 \x03(\x0b\x32\x1d.swiftsignals.simulation.Node\x12,\n\x05\x65\x64ges\x18\x02 \x03(\x0b\x32\x1d.swiftsignals.simulation.Edge\x12\x38\n\x0b\x63onnections\x18\x03 \x03(\x0b\x32#.swiftsignals.simulation.Connection\x12=\n\x0etraffic_lights\x18\x04 \x03(\x0b\x32%.swiftsignals.simulation.TrafficLight\"Y\n\x04Node\x12\n\n\x02id\x18\x01 \x01(\t\x12\t\n\x01x\x18\x02 \x01(\x02\x12\t\n\x01y\x18\x03 \x01(\x02\x12/\n\x04type\x18\x04 \x01(\x0e\x32!.swiftsignals.simulation.NodeType\"J\n\x04\x45\x64ge\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04\x66rom\x18\x02 \x01(\t\x12\n\n\x02to\x18\x03 \x01(\t\x12\r\n\x05speed\x18\x04 \x01(\x02\x12\r\n\x05lanes\x18\x05 \x01(\x05\"T\n\nConnection\x12\x0c\n\x04\x66rom\x18\x01 \x01(\t\x12\n\n\x02to\x18\x02 \x01(\t\x12\x10\n\x08\x66romLane\x18\x03 \x01(\x05\x12\x0e\n\x06toLane\x18\x04 \x01(\x05\x12\n\n\x02tl\x18\x05 \x01(\x05\"X\n\x0cTrafficLight\x12\n\n\x02id\x18\x01 \x01(\t\x12\x0c\n\x04type\x18\x02 \x01(\t\x12.\n\x06phases\x18\x03 \x03(\x0b\x32\x1e.swiftsignals.simulation.Phase\"(\n\x05Phase\x12\x10\n\x08\x64uration\x18\x01 \x01(\x05\x12\r\n\x05state\x18\x02 \x01(\t\"K\n\x07Vehicle\x12\n\n\x02id\x18\x01 \x01(\t\x12\x34\n\tpositions\x18\x02 \x03(\x0b\x32!.swiftsignals.simulation.Position\"=\n\x08Position\x12\x0c\n\x04time\x18\x01 \x01(\x05\x12\t\n\x01x\x18\x02 \x01(\x02\x12\t\n\x01y\x18\x03 \x01(\x02\x12\r\n\x05speed\x18\x04 \x01(\x02*\x9c\x01\n\x10IntersectionType\x12!\n\x1dINTERSECTION_TYPE_UNSPECIFIED\x10\x00\x12\"\n\x1eINTERSECTION_TYPE_TRAFFICLIGHT\x10\x01\x12 \n\x1cINTERSECTION_TYPE_ROUNDABOUT\x10\x02\x12\x1f\n\x1bINTERSECTION_TYPE_STOP_SIGN\x10\x03*+\n\x08NodeType\x12\x0c\n\x08PRIORITY\x10\x00\x12\x11\n\rTRAFFIC_LIGHT\x10\x01\x32\x81\x02\n\x11SimulationService\x12v\n\x14GetSimulationResults\x12*.swiftsignals.simulation.SimulationRequest\x1a\x32.swiftsignals.simulation.SimulationResultsResponse\x12t\n\x13GetSimulationOutput\x12*.swiftsignals.simulation.SimulationRequest\x1a\x31.swiftsignals.simulation.SimulationOutputResponseB\x17Z\x15protos/gen/simulationb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,34 +32,34 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'simulation_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z\025protos/gen/simulation'
-  _globals['_INTERSECTIONTYPE']._serialized_start=1531
-  _globals['_INTERSECTIONTYPE']._serialized_end=1687
-  _globals['_NODETYPE']._serialized_start=1689
-  _globals['_NODETYPE']._serialized_end=1732
+  _globals['_INTERSECTIONTYPE']._serialized_start=1530
+  _globals['_INTERSECTIONTYPE']._serialized_end=1686
+  _globals['_NODETYPE']._serialized_start=1688
+  _globals['_NODETYPE']._serialized_end=1731
   _globals['_SIMULATIONREQUEST']._serialized_start=45
-  _globals['_SIMULATIONREQUEST']._serialized_end=156
-  _globals['_SIMULATIONPARAMETERS']._serialized_start=159
-  _globals['_SIMULATIONPARAMETERS']._serialized_end=324
-  _globals['_SIMULATIONRESULTSRESPONSE']._serialized_start=327
-  _globals['_SIMULATIONRESULTSRESPONSE']._serialized_end=631
-  _globals['_SIMULATIONOUTPUTRESPONSE']._serialized_start=634
-  _globals['_SIMULATIONOUTPUTRESPONSE']._serialized_end=773
-  _globals['_INTERSECTION']._serialized_start=776
-  _globals['_INTERSECTION']._serialized_end=1003
-  _globals['_NODE']._serialized_start=1005
-  _globals['_NODE']._serialized_end=1094
-  _globals['_EDGE']._serialized_start=1096
-  _globals['_EDGE']._serialized_end=1170
-  _globals['_CONNECTION']._serialized_start=1172
-  _globals['_CONNECTION']._serialized_end=1256
-  _globals['_TRAFFICLIGHT']._serialized_start=1258
-  _globals['_TRAFFICLIGHT']._serialized_end=1346
-  _globals['_PHASE']._serialized_start=1348
-  _globals['_PHASE']._serialized_end=1388
-  _globals['_VEHICLE']._serialized_start=1390
-  _globals['_VEHICLE']._serialized_end=1465
-  _globals['_POSITION']._serialized_start=1467
-  _globals['_POSITION']._serialized_end=1528
-  _globals['_SIMULATIONSERVICE']._serialized_start=1735
-  _globals['_SIMULATIONSERVICE']._serialized_end=1992
+  _globals['_SIMULATIONREQUEST']._serialized_end=167
+  _globals['_SIMULATIONPARAMETERS']._serialized_start=170
+  _globals['_SIMULATIONPARAMETERS']._serialized_end=335
+  _globals['_SIMULATIONRESULTSRESPONSE']._serialized_start=338
+  _globals['_SIMULATIONRESULTSRESPONSE']._serialized_end=630
+  _globals['_SIMULATIONOUTPUTRESPONSE']._serialized_start=633
+  _globals['_SIMULATIONOUTPUTRESPONSE']._serialized_end=772
+  _globals['_INTERSECTION']._serialized_start=775
+  _globals['_INTERSECTION']._serialized_end=1002
+  _globals['_NODE']._serialized_start=1004
+  _globals['_NODE']._serialized_end=1093
+  _globals['_EDGE']._serialized_start=1095
+  _globals['_EDGE']._serialized_end=1169
+  _globals['_CONNECTION']._serialized_start=1171
+  _globals['_CONNECTION']._serialized_end=1255
+  _globals['_TRAFFICLIGHT']._serialized_start=1257
+  _globals['_TRAFFICLIGHT']._serialized_end=1345
+  _globals['_PHASE']._serialized_start=1347
+  _globals['_PHASE']._serialized_end=1387
+  _globals['_VEHICLE']._serialized_start=1389
+  _globals['_VEHICLE']._serialized_end=1464
+  _globals['_POSITION']._serialized_start=1466
+  _globals['_POSITION']._serialized_end=1527
+  _globals['_SIMULATIONSERVICE']._serialized_start=1734
+  _globals['_SIMULATIONSERVICE']._serialized_end=1991
 # @@protoc_insertion_point(module_scope)
