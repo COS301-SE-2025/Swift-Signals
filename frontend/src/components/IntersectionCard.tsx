@@ -1,10 +1,14 @@
+// src/components/IntersectionCard.tsx
+
+import React from "react";
 import "../styles/IntersectionCard.css";
 
+// The props interface has been updated to include `location` and `lanes`
 interface IntersectionCardProps {
   id: number;
   name: string;
-  location: string;
-  lanes: string;
+  location: string; // <-- ADDED
+  lanes: string; // <-- ADDED
   image?: string;
   onSimulate: (id: number) => void;
   onEdit: (id: number) => void;
@@ -14,8 +18,8 @@ interface IntersectionCardProps {
 const IntersectionCard: React.FC<IntersectionCardProps> = ({
   id,
   name,
-  location,
-  lanes,
+  location, // <-- Now correctly received as a prop
+  lanes,      // <-- Now correctly received as a prop
   image,
   onSimulate,
   onEdit,
@@ -53,11 +57,12 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
             {name}
           </h3>
           <p className="intersectionID text-xl text-gray-700">ID: {id}</p>
+          {/* These fields now use the new props */}
           <p className="intersectionLocation text-xl text-gray-700">
             Location: {location}
           </p>
           <p className="intersectionLanes text-xl text-gray-700">
-            Lanes: {lanes}
+            Type: {lanes} 
           </p>
         </div>
       </div>
@@ -98,10 +103,9 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
         >
           ✏️
         </button>
-
         <button
           onClick={() => onDelete(id)}
-          className="intersectionBtn bg-red-600 hover:bg-red-700 text-white text-lg font-semibold py-2 px-2 rounded-full"
+          className="intersectionBtn bg-red-600 hover:bg-red-700 text-white text-lg font-semibold py-1 px-2 rounded-full"
         >
           🗑️
         </button>
