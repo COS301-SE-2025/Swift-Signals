@@ -12,7 +12,7 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/shared/jwt"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
-	"github.com/google/uuid"
+	// "github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -64,9 +64,9 @@ func (s *Service) RegisterUser(ctx context.Context, name, email, password string
 	}
 
 	// Create user
-	id := uuid.New().String()
+	// id := uuid.New().String()
 	user := &model.UserResponse{
-		ID:       id,
+		// ID:       id,
 		Name:     strings.TrimSpace(name),
 		Email:    strings.ToLower(strings.TrimSpace(email)),
 		Password: string(hashedPassword),
@@ -111,7 +111,7 @@ func (s *Service) LoginUser(ctx context.Context, email, password string) (*model
 	// - Validate input parameters
 
 	// Find user by email
-	user, err := s.repo.GetUserByEmail(ctx, email)
+	user, err := s.repo.GetUserByEmail(ctx, normalizeEmail(email))
 	if err != nil {
 		return nil, err
 	}

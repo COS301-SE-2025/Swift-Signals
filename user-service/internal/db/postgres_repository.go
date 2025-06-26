@@ -18,9 +18,9 @@ func NewPostgresUserRepo(db *sql.DB) UserRepository {
 }
 
 func (r *PostgresUserRepo) CreateUser(ctx context.Context, u *model.UserResponse) (*model.UserResponse, error) {
-	query := `INSERT INTO users (id, name, email, password, is_admin, created_at, updated_at) 
-	          VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`
-	_, err := r.db.ExecContext(ctx, query, u.ID, u.Name, u.Email, u.Password, u.IsAdmin)
+	query := `INSERT INTO users (name, email, password, is_admin, created_at, updated_at) 
+	          VALUES ($1, $2, $3, $4, NOW(), NOW())`
+	_, err := r.db.ExecContext(ctx, query, u.Name, u.Email, u.Password, u.IsAdmin)
 	return u, err
 }
 
@@ -62,6 +62,10 @@ func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*m
 	var id int
 	err := row.Scan(&id, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			// No user found with that email
+			return nil, nil
+		}
 		return nil, err
 	}
 	user.ID = strconv.Itoa(id)
