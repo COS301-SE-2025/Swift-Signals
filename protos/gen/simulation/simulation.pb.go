@@ -256,21 +256,19 @@ func (x *SimulationParameters) GetSeed() int32 {
 }
 
 type SimulationResultsResponse struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	TotalVehicles     int64                  `protobuf:"varint,2,opt,name=total_vehicles,json=totalVehicles,proto3" json:"total_vehicles,omitempty"` // Total number of vehicles in the simulation
-	AvgTravelTime     int64                  `protobuf:"varint,3,opt,name=avg_travel_time,json=avgTravelTime,proto3" json:"avg_travel_time,omitempty"`
-	TotalTravelTime   int64                  `protobuf:"varint,4,opt,name=total_travel_time,json=totalTravelTime,proto3" json:"total_travel_time,omitempty"`
-	AvgSpeed          int64                  `protobuf:"varint,5,opt,name=avg_speed,json=avgSpeed,proto3" json:"avg_speed,omitempty"`
-	AvgWaitingTime    int64                  `protobuf:"varint,6,opt,name=avg_waiting_time,json=avgWaitingTime,proto3" json:"avg_waiting_time,omitempty"`
-	WaitingTime       int64                  `protobuf:"varint,7,opt,name=waiting_time,json=waitingTime,proto3" json:"waiting_time,omitempty"`
-	GeneratedVehicles int64                  `protobuf:"varint,8,opt,name=generated_vehicles,json=generatedVehicles,proto3" json:"generated_vehicles,omitempty"`
-	EmergencyBrakes   int64                  `protobuf:"varint,9,opt,name=emergency_brakes,json=emergencyBrakes,proto3" json:"emergency_brakes,omitempty"` // Number of emergency brakes applied
-	EmergencyStops    int64                  `protobuf:"varint,10,opt,name=emergency_stops,json=emergencyStops,proto3" json:"emergency_stops,omitempty"`   // Number of emergency stops
-	NearCollisions    int64                  `protobuf:"varint,11,opt,name=near_collisions,json=nearCollisions,proto3" json:"near_collisions,omitempty"`   // Number of near collisions
-	DateRun           string                 `protobuf:"bytes,12,opt,name=date_run,json=dateRun,proto3" json:"date_run,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	TotalVehicles      int64                  `protobuf:"varint,1,opt,name=total_vehicles,json=totalVehicles,proto3" json:"total_vehicles,omitempty"`
+	AverageTravelTime  int64                  `protobuf:"varint,2,opt,name=average_travel_time,json=averageTravelTime,proto3" json:"average_travel_time,omitempty"`
+	TotalTravelTime    int64                  `protobuf:"varint,3,opt,name=total_travel_time,json=totalTravelTime,proto3" json:"total_travel_time,omitempty"`
+	AverageSpeed       int64                  `protobuf:"varint,4,opt,name=average_speed,json=averageSpeed,proto3" json:"average_speed,omitempty"`
+	AverageWaitingTime int64                  `protobuf:"varint,5,opt,name=average_waiting_time,json=averageWaitingTime,proto3" json:"average_waiting_time,omitempty"`
+	TotalWaitingTime   int64                  `protobuf:"varint,6,opt,name=total_waiting_time,json=totalWaitingTime,proto3" json:"total_waiting_time,omitempty"`
+	GeneratedVehicles  int64                  `protobuf:"varint,7,opt,name=generated_vehicles,json=generatedVehicles,proto3" json:"generated_vehicles,omitempty"`
+	EmergencyBrakes    int64                  `protobuf:"varint,8,opt,name=emergency_brakes,json=emergencyBrakes,proto3" json:"emergency_brakes,omitempty"` // Number of emergency brakes applied
+	EmergencyStops     int64                  `protobuf:"varint,9,opt,name=emergency_stops,json=emergencyStops,proto3" json:"emergency_stops,omitempty"`    // Number of emergency stops
+	NearCollisions     int64                  `protobuf:"varint,10,opt,name=near_collisions,json=nearCollisions,proto3" json:"near_collisions,omitempty"`   // Number of near collisions
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *SimulationResultsResponse) Reset() {
@@ -303,13 +301,6 @@ func (*SimulationResultsResponse) Descriptor() ([]byte, []int) {
 	return file_simulation_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *SimulationResultsResponse) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
 func (x *SimulationResultsResponse) GetTotalVehicles() int64 {
 	if x != nil {
 		return x.TotalVehicles
@@ -317,9 +308,9 @@ func (x *SimulationResultsResponse) GetTotalVehicles() int64 {
 	return 0
 }
 
-func (x *SimulationResultsResponse) GetAvgTravelTime() int64 {
+func (x *SimulationResultsResponse) GetAverageTravelTime() int64 {
 	if x != nil {
-		return x.AvgTravelTime
+		return x.AverageTravelTime
 	}
 	return 0
 }
@@ -331,23 +322,23 @@ func (x *SimulationResultsResponse) GetTotalTravelTime() int64 {
 	return 0
 }
 
-func (x *SimulationResultsResponse) GetAvgSpeed() int64 {
+func (x *SimulationResultsResponse) GetAverageSpeed() int64 {
 	if x != nil {
-		return x.AvgSpeed
+		return x.AverageSpeed
 	}
 	return 0
 }
 
-func (x *SimulationResultsResponse) GetAvgWaitingTime() int64 {
+func (x *SimulationResultsResponse) GetAverageWaitingTime() int64 {
 	if x != nil {
-		return x.AvgWaitingTime
+		return x.AverageWaitingTime
 	}
 	return 0
 }
 
-func (x *SimulationResultsResponse) GetWaitingTime() int64 {
+func (x *SimulationResultsResponse) GetTotalWaitingTime() int64 {
 	if x != nil {
-		return x.WaitingTime
+		return x.TotalWaitingTime
 	}
 	return 0
 }
@@ -378,13 +369,6 @@ func (x *SimulationResultsResponse) GetNearCollisions() int64 {
 		return x.NearCollisions
 	}
 	return 0
-}
-
-func (x *SimulationResultsResponse) GetDateRun() string {
-	if x != nil {
-		return x.DateRun
-	}
-	return ""
 }
 
 type SimulationOutputResponse struct {
@@ -973,21 +957,19 @@ const file_simulation_proto_rawDesc = "" +
 	"\x06yellow\x18\x03 \x01(\x05R\x06yellow\x12\x10\n" +
 	"\x03red\x18\x04 \x01(\x05R\x03red\x12\x14\n" +
 	"\x05speed\x18\x05 \x01(\x05R\x05speed\x12\x12\n" +
-	"\x04seed\x18\x06 \x01(\x05R\x04seed\"\xd7\x03\n" +
-	"\x19SimulationResultsResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12%\n" +
-	"\x0etotal_vehicles\x18\x02 \x01(\x03R\rtotalVehicles\x12&\n" +
-	"\x0favg_travel_time\x18\x03 \x01(\x03R\ravgTravelTime\x12*\n" +
-	"\x11total_travel_time\x18\x04 \x01(\x03R\x0ftotalTravelTime\x12\x1b\n" +
-	"\tavg_speed\x18\x05 \x01(\x03R\bavgSpeed\x12(\n" +
-	"\x10avg_waiting_time\x18\x06 \x01(\x03R\x0eavgWaitingTime\x12!\n" +
-	"\fwaiting_time\x18\a \x01(\x03R\vwaitingTime\x12-\n" +
-	"\x12generated_vehicles\x18\b \x01(\x03R\x11generatedVehicles\x12)\n" +
-	"\x10emergency_brakes\x18\t \x01(\x03R\x0femergencyBrakes\x12'\n" +
-	"\x0femergency_stops\x18\n" +
-	" \x01(\x03R\x0eemergencyStops\x12'\n" +
-	"\x0fnear_collisions\x18\v \x01(\x03R\x0enearCollisions\x12\x19\n" +
-	"\bdate_run\x18\f \x01(\tR\adateRun\"\xa3\x01\n" +
+	"\x04seed\x18\x06 \x01(\x05R\x04seed\"\xcf\x03\n" +
+	"\x19SimulationResultsResponse\x12%\n" +
+	"\x0etotal_vehicles\x18\x01 \x01(\x03R\rtotalVehicles\x12.\n" +
+	"\x13average_travel_time\x18\x02 \x01(\x03R\x11averageTravelTime\x12*\n" +
+	"\x11total_travel_time\x18\x03 \x01(\x03R\x0ftotalTravelTime\x12#\n" +
+	"\raverage_speed\x18\x04 \x01(\x03R\faverageSpeed\x120\n" +
+	"\x14average_waiting_time\x18\x05 \x01(\x03R\x12averageWaitingTime\x12,\n" +
+	"\x12total_waiting_time\x18\x06 \x01(\x03R\x10totalWaitingTime\x12-\n" +
+	"\x12generated_vehicles\x18\a \x01(\x03R\x11generatedVehicles\x12)\n" +
+	"\x10emergency_brakes\x18\b \x01(\x03R\x0femergencyBrakes\x12'\n" +
+	"\x0femergency_stops\x18\t \x01(\x03R\x0eemergencyStops\x12'\n" +
+	"\x0fnear_collisions\x18\n" +
+	" \x01(\x03R\x0enearCollisions\"\xa3\x01\n" +
 	"\x18SimulationOutputResponse\x12I\n" +
 	"\fintersection\x18\x01 \x01(\v2%.swiftsignals.simulation.IntersectionR\fintersection\x12<\n" +
 	"\bvehicles\x18\x02 \x03(\v2 .swiftsignals.simulation.VehicleR\bvehicles\"\x8d\x02\n" +
