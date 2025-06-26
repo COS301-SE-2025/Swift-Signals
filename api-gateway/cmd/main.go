@@ -56,19 +56,31 @@ func main() {
 
 	authService := service.NewAuthService(userClient)
 	authHandler := handler.NewAuthHandler(authService)
-	mux.HandleFunc("POST /login", authHandler.Login)
-	mux.HandleFunc("POST /register", authHandler.Register)
-	mux.HandleFunc("POST /logout", authHandler.Logout)
-	mux.HandleFunc("POST /reset-password", authHandler.ResetPassword)
+	mux.HandleFunc("POST /login", CORS(authHandler.Login))
+	//Suggested fix
+	mux.HandleFunc("/login", CORS(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+		}
+	}))
+	mux.HandleFunc("POST /register", CORS(authHandler.Register))
+	//Suggested fix
+	mux.HandleFunc("/{register}", CORS(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusNoContent)
+		}
+	}))
+	mux.HandleFunc("POST /logout", CORS(authHandler.Logout))
+	mux.HandleFunc("POST /reset-password", CORS(authHandler.ResetPassword))
 	log.Println("Initialized Auth Handlers.")
 
 	intersectionService := service.NewIntersectionService(intrClient)
 	intersectionHandler := handler.NewIntersectionHandler(intersectionService)
-	mux.HandleFunc("GET /intersections", intersectionHandler.GetAllIntersections)
+	mux.HandleFunc("GET /intersections", CORS(intersectionHandler.GetAllIntersections))
 	// mux.HandleFunc("GET /intersections/simple", nil)
-	mux.HandleFunc("GET /intersections/{id}", intersectionHandler.GetIntersection)
-	mux.HandleFunc("POST /intersections", intersectionHandler.CreateIntersection)
-	mux.HandleFunc("PATCH /intersections/{id}", intersectionHandler.UpdateIntersection)
+	mux.HandleFunc("GET /intersections/{id}", CORS(intersectionHandler.GetIntersection))
+	mux.HandleFunc("POST /intersections", CORS(intersectionHandler.CreateIntersection))
+	mux.HandleFunc("PATCH /intersections/{id}", CORS(intersectionHandler.UpdateIntersection))
 	// mux.HandleFunc("DELETE /intersections/{id}", nil)
 	// mux.HandleFunc("POST /intersections/{id}/optimise", nil)
 	log.Println("Initialized Intersection Handlers.")
@@ -108,4 +120,20 @@ func main() {
 	}
 
 	log.Println("Server exited gracefully.")
+}
+
+func CORS(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		next(w, r)
+	}
 }
