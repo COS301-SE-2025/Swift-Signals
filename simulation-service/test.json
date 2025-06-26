@@ -1,0 +1,12 @@
+{
+    "intersection": {
+        "simulation_parameters": {
+            "intersection_type": 1,
+            "green": 30,
+            "yellow": 5,
+            "red": 35,
+            "speed": 80,
+            "seed": 13
+        }
+    }
+}
