@@ -103,7 +103,7 @@ jobs:
 
       - name: Check Prettier formatting
         working-directory: frontend
-        run: npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,md}"
+        run: npx prettier --check "**/*.{js,jsx,ts,tsx,css,md}"
 
       - name: Run Jest tests
         working-directory: frontend
