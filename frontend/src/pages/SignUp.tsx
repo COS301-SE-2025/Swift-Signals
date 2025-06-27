@@ -95,12 +95,22 @@ const SignUp = () => {
         body: JSON.stringify({ username, email, password }),
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+
+      let data;
+      if (responseText) {
+          try {
+              data = JSON.parse(responseText);
+        console.log("JSON RESPONSE:", data);
+          } catch (e) {
+              console.error("Failed to parse JSON:", responseText);
+              throw new Error(`An unexpected response was received from the server.`);
+          }
+      }
 
       if (!response.ok) {
-        throw new Error(
-          data.message || "An unexpected error occurred. Please try again.",
-        );
+        const errorMessage = data?.message || "An unexpected error occurred. Please try again.";
+        throw new Error(errorMessage);
       }
 
       console.log("Registration successful:", data);

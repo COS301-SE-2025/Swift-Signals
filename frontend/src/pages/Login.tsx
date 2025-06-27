@@ -80,30 +80,34 @@ const Login = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
-
     if (!username || !password) {
       setError("Please fill in all fields.");
       return;
     }
-
     setIsLoading(true);
 
     try {
       const response = await fetch(`${API_BASE_URL}/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: username, password: password }),
       });
-
-      const data = await response.json();
-
+      
+      const responseText = await response.text();
       if (!response.ok) {
-        throw new Error(data.message || "Invalid credentials or server error.");
+        let serverMessage = `Status: ${response.status}`;
+        try {
+          const errorData = JSON.parse(responseText);
+          serverMessage = errorData?.message || serverMessage;
+        } catch (e) {
+          console.error("Could not parse error response as JSON:", responseText);
+        }
+        throw new Error(`Login failed. Server says: "${serverMessage}"`);
       }
+      
+      const data = JSON.parse(responseText);
 
-      if (data.token) {
+      if (data?.token) {
         localStorage.setItem("authToken", data.token);
         console.log("Login successful:", data.message);
         navigate("/dashboard");
@@ -111,7 +115,6 @@ const Login = () => {
         throw new Error("Login failed: No authentication token received.");
       }
     } catch (err: unknown) {
-      console.error("Login error:", err);
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -122,9 +125,7 @@ const Login = () => {
     }
   };
 
-  const handleForgotPasswordSubmit = async (
-    event: React.FormEvent<HTMLFormElement>,
-  ) => {
+  const handleForgotPasswordSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setResetError(null);
     setResetSuccessMessage(null);
@@ -133,21 +134,26 @@ const Login = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/reset-password`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: resetEmail }),
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to send reset link.");
+      const responseText = await response.text();
+      let data;
+      if (responseText) {
+        try {
+          data = JSON.parse(responseText);
+        } catch (e) {
+          console.error("Failed to parse JSON from reset-password:", responseText);
+          throw new Error("An unexpected response was received from the server.");
+        }
       }
 
-      setResetSuccessMessage(
-        data.message || "Password reset instructions sent to your email.",
-      );
+      if (!response.ok) {
+        throw new Error(data?.message || "Failed to send reset link.");
+      }
+
+      setResetSuccessMessage(data?.message || "Password reset instructions sent to your email.");
 
       setTimeout(() => {
         setIsModalOpen(false);
