@@ -22,7 +22,7 @@ Traffic congestion remains one of South Africa’s most costly infrastructure ch
 - [Coding Standards and Practices](/docs/Demo2/CodingStandardsPractices.pdf)
 - [GitHub Project Board](https://github.com/orgs/COS301-SE-2025/projects/116)
 - [Team Wiki](https://github.com/COS301-SE-2025/Swift-Signals/wiki)
-- [Demo 2 Video]
+- [Demo 2 Video](https://drive.google.com/file/d/1aziHGN7oFnAVXir01R-gUUyE7hT6cnv7/view?usp=sharing)
 
 ### Demo 1
 
