@@ -1,5 +1,5 @@
 .footer {
-  background-color: #F0F0F0;
+  background-color: #f0f0f0;
   color: #000000;
   z-index: 2000;
   text-align: center;
@@ -41,4 +41,11 @@
   justify-content: center;
   align-items: center;
   gap: 0;
+}
+
+@media screen and (max-width: 500px) {
+  .footerText {
+    font-size: 0.6rem;
+    font-weight: bold;
+  }
 }
