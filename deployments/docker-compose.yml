@@ -30,6 +30,30 @@ services:
     ports:
       - "5432:5432"
 
+  intersection-service:
+    build:
+      context: ../intersection-service
+      dockerfile: ../build/package/Dockerfile.intersection
+    image: Swift-Signals/intersection-service:dev
+    container_name: intersection-service
+    environment:
+      APP_PORT: 50052
+      MONGO_URI: mongodb://intersection-mongo:27017
+    depends_on:
+      - intersection-mongo
+    ports:
+      - "50052:50052"
+
+  intersection-mongo:
+    image: mongo:6.0
+    container_name: IntersectionServiceMongo
+    environment:
+      MONGO_INITDB_DATABASE: IntersectionService
+    volumes:
+      - intersection_mongodata:/data/db
+    ports:
+      - "27017:27017"
+
   # metric-postgres:
   #    image: postgres:16
   #    container_name: MetricServicePostgres
@@ -44,5 +68,6 @@ services:
 
 volumes:
   user_pgdata:
+  intersection_mongodata:
   # metric_pgdata:
 
