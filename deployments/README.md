@@ -61,6 +61,34 @@ grpcurl -plaintext -d '{
 }' localhost:50052 swiftsignals.intersection.IntersectionService/CreateIntersection
 ```
 
+Testing intersection-service:
+```bash
+grpcurl -plaintext -d '{
+  "name": "Main Street & 1st Avenue",
+  "details": {
+    "address": "123 Main Street",
+    "city": "Johannesburg",
+    "province": "Gauteng"
+  },
+  "trafficDensity": "TRAFFIC_DENSITY_LOW",
+  "defaultParameters": {
+    "optimisationType": "OPTIMISATION_TYPE_GRIDSEARCH",
+    "parameters": {
+      "intersectionType": "INTERSECTION_TYPE_TRAFFICLIGHT",
+      "green": 30,
+      "yellow": 3,
+      "red": 25,
+      "speed": 50,
+      "seed": 12345
+    }
+  }
+}' localhost:50052 swiftsignals.intersection.IntersectionService/CreateIntersection
+```
+
+```bash
+grpcurl -plaintext -d '{}' localhost:50052 swiftsignals.intersection.IntersectionService/GetAllIntersections
+```
+
 ```bash
 grpcurl -plaintext -d '{}' localhost:50052 swiftsignals.intersection.IntersectionService/GetAllIntersections
 ```
