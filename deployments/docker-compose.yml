@@ -1,0 +1,48 @@
+services:
+  user-service:
+    build:
+      context: ../user-service
+      dockerfile: ../build/package/Dockerfile.user
+    image: Swift-Signals/user-service:dev
+    container_name: user-service
+    environment:
+      DB_HOST: user-postgres
+      DB_PORT: 5432
+      DB_USER: user_service
+      DB_PASSWORD: password
+      DB_NAME: user_service_db
+      APP_PORT: 50051
+    depends_on:
+      - user-postgres
+    ports:
+      - "50051:50051"
+
+  user-postgres:
+    image: postgres:16
+    container_name: UserServicePostgres
+    environment:
+      POSTGRES_USER: user_service
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: user_service_db
+    volumes:
+      - user_pgdata:/var/lib/postgresql/data
+      - ../user-service/internal/db/postgres_schema.sql:/docker-entrypoint-initdb.d/postgres_schema.sql:ro
+    ports:
+      - "5432:5432"
+
+  # metric-postgres:
+  #    image: postgres:16
+  #    container_name: MetricServicePostgres
+  #    environment:
+  #      POSTGRES_USER: metric_service
+  #      POSTGRES_PASSWORD: password
+  #      POSTGRES_DB: metric_service_db
+  #    volumes:
+  #      - metric_pgdata:/var/lib/postgresql/data
+  #    ports:
+  #      - "5433:5432"
+
+volumes:
+  user_pgdata:
+  # metric_pgdata:
+
