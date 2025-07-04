@@ -3,7 +3,7 @@ services:
     build:
       context: ../user-service
       dockerfile: ../build/package/Dockerfile.user
-    image: Swift-Signals/user-service:dev
+    image: swift-signals/user-service:dev
     container_name: user-service
     environment:
       DB_HOST: user-postgres
@@ -19,7 +19,7 @@ services:
 
   user-postgres:
     image: postgres:16
-    container_name: UserServicePostgres
+    container_name: user-postgres
     environment:
       POSTGRES_USER: user_service
       POSTGRES_PASSWORD: password
@@ -34,7 +34,7 @@ services:
     build:
       context: ../intersection-service
       dockerfile: ../build/package/Dockerfile.intersection
-    image: Swift-Signals/intersection-service:dev
+    image: swift-signals/intersection-service:dev
     container_name: intersection-service
     environment:
       APP_PORT: 50052
@@ -46,7 +46,7 @@ services:
 
   intersection-mongo:
     image: mongo:6.0
-    container_name: IntersectionServiceMongo
+    container_name: intersection-mongo
     environment:
       MONGO_INITDB_DATABASE: IntersectionService
     volumes:
@@ -54,9 +54,26 @@ services:
     ports:
       - "27017:27017"
 
+  api-gateway:
+    build:
+      context: ../api-gateway
+      dockerfile: ../build/package/Dockerfile.api-gateway
+    image: swift-signals/api-gateway:dev
+    container_name: api-gateway
+    depends_on:
+      - user-service
+      - intersection-service
+    environment:
+      APP_PORT: 9090
+      USER_GRPC_ADDR: user-service:50051
+      INTR_GRPC_ADDR: intersection-service:50052
+    ports:
+      - "9090:9090"
+
+
   # metric-postgres:
   #    image: postgres:16
-  #    container_name: MetricServicePostgres
+  #    container_name: metric-postgres
   #    environment:
   #      POSTGRES_USER: metric_service
   #      POSTGRES_PASSWORD: password

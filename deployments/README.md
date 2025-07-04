@@ -3,7 +3,7 @@
 Run the services:
 ```bash
 cd deployments
-docker compose up -d
+docker compose up -d --build
 ```
 
 Stop the services:
@@ -65,3 +65,35 @@ grpcurl -plaintext -d '{
 grpcurl -plaintext -d '{}' localhost:50052 swiftsignals.intersection.IntersectionService/GetAllIntersections
 ```
 
+Testing api-gateway:
+```bash
+curl localhost:9090/register -d '{"email": "ham@ferrari.com", "password": "1234abcd", "username":"lh44"}'
+```
+
+```bash
+curl localhost:9090/login -d '{"email": "ham@ferrari.com", "password": "1234abcd"}'                                           
+```
+
+```bash
+curl localhost:9090/intersections -H "Authorization: Bearer fjaskdf;a" -d '{                                           
+  "default_parameters": {
+    "green": 10,
+    "intersection_type": "t-junction",
+    "red": 6,
+    "seed": 3247128304,
+    "speed": 60,
+    "yellow": 2
+  },
+  "details": {
+    "address": "Corner of Foo and Bar",
+    "city": "Pretoria",
+    "province": "Gauteng"
+  },
+  "name": "My Intersection",
+  "traffic_density": "high"
+}'
+```
+
+```bash
+curl localhost:9090/intersections -H "Authorization: Bearer fjaskdf;a" 
+```
