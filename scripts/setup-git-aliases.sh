@@ -90,6 +90,7 @@ git config --local alias.microservice-sync-dev '!f() { \
   ms=${1:?Microservice name required}; \
   git fetch origin && \
   git checkout "$ms" && \
+  git pull origin "$ms" && \
   git merge "origin/dev" && \
   git push origin "$ms" && \
   echo "✅ Synced $ms with dev branch"; \
@@ -132,6 +133,7 @@ git config --local alias.hotfix-sync '!f() { \
   fi; \
   git checkout "$branch_name" && \
   git fetch origin && \
+  git pull origin "$branch_name" && \
   git merge "origin/main" && \
   git push origin "$branch_name" && \
   echo "✅ Synced hotfix branch with main"; \
