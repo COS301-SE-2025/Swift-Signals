@@ -112,7 +112,7 @@ func (uc *UserClient) GetUserIntersectionIDs(ctx context.Context, userID string)
 	return uc.client.GetUserIntersectionIDs(ctx, req)
 }
 
-func (uc *UserClient) AddIntersectionID(ctx context.Context, userID string, intersection_id int32) (*emptypb.Empty, error) {
+func (uc *UserClient) AddIntersectionID(ctx context.Context, userID string, intersection_id string) (*emptypb.Empty, error) {
 	req := &userpb.AddIntersectionIDRequest{
 		UserId:         userID,
 		IntersectionId: intersection_id,
@@ -124,12 +124,12 @@ func (uc *UserClient) AddIntersectionID(ctx context.Context, userID string, inte
 }
 
 // Remove a single intersection ID
-func (uc *UserClient) RemoveIntersectionID(ctx context.Context, userID string, intersectionID int32) (*emptypb.Empty, error) {
-	return uc.RemoveIntersectionIDs(ctx, userID, []int32{intersectionID})
+func (uc *UserClient) RemoveIntersectionID(ctx context.Context, userID string, intersectionID string) (*emptypb.Empty, error) {
+	return uc.RemoveIntersectionIDs(ctx, userID, []string{intersectionID})
 }
 
 // Remove multiple intersection IDs
-func (uc *UserClient) RemoveIntersectionIDs(ctx context.Context, userID string, intersectionIDs []int32) (*emptypb.Empty, error) {
+func (uc *UserClient) RemoveIntersectionIDs(ctx context.Context, userID string, intersectionIDs []string) (*emptypb.Empty, error) {
 	req := &userpb.RemoveIntersectionIDRequest{
 		UserId:         userID,
 		IntersectionId: intersectionIDs,
@@ -194,8 +194,8 @@ type UserClientInterface interface {
 	UpdateUser(ctx context.Context, user_id, name, email string) (*userpb.UserResponse, error)
 	DeleteUser(ctx context.Context, userID string) (*emptypb.Empty, error)
 	GetUserIntersectionIDs(ctx context.Context, userID string) (userpb.UserService_GetUserIntersectionIDsClient, error)
-	RemoveIntersectionID(ctx context.Context, userID string, intersectionID int32) (*emptypb.Empty, error)
-	RemoveIntersectionIDs(ctx context.Context, userID string, intersectionIDs []int32) (*emptypb.Empty, error)
+	RemoveIntersectionID(ctx context.Context, userID string, intersectionID string) (*emptypb.Empty, error)
+	RemoveIntersectionIDs(ctx context.Context, userID string, intersectionIDs []string) (*emptypb.Empty, error)
 	ChangePassword(ctx context.Context, userID, current_password, new_password string) (*emptypb.Empty, error)
 	ResetPassword(ctx context.Context, email string) (*emptypb.Empty, error)
 	MakeAdmin(ctx context.Context, user_id, admin_user_id string) (*emptypb.Empty, error)
