@@ -13,8 +13,8 @@ var (
 	ErrInvalidUserData = errors.New("invalid user data")
 )
 
-// UserResponse represents a user in the system
-type UserResponse struct {
+// User represents a user in the system
+type User struct {
 	ID              string    `json:"id" db:"id"`
 	Name            string    `json:"name" db:"name"`
 	Email           string    `json:"email" db:"email"`
@@ -26,8 +26,8 @@ type UserResponse struct {
 }
 
 // PublicUser returns a user struct without sensitive information
-func (u *UserResponse) PublicUser() *UserResponse {
-	return &UserResponse{
+func (u *User) PublicUser() *User {
+	return &User{
 		ID:              u.ID,
 		Name:            u.Name,
 		Email:           u.Email,
@@ -37,9 +37,4 @@ func (u *UserResponse) PublicUser() *UserResponse {
 		UpdatedAt:       u.UpdatedAt,
 		// Password is intentionally omitted
 	}
-}
-
-type LoginUserResponse struct {
-	Token     string    `json:"token"`
-	ExpiresAt time.Time `json:"expires_at"`
 }

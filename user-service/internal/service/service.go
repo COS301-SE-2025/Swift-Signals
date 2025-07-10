@@ -39,7 +39,7 @@ func normalizeEmail(email string) string {
 }
 
 // RegisterUser creates a new user with proper validation and password hashing
-func (s *Service) RegisterUser(ctx context.Context, name, email, password string) (*model.UserResponse, error) {
+func (s *Service) RegisterUser(ctx context.Context, name, email, password string) (*model.User, error) {
 
 	email = normalizeEmail(email)
 
@@ -65,7 +65,7 @@ func (s *Service) RegisterUser(ctx context.Context, name, email, password string
 
 	// Create user
 	// id := uuid.New().String()
-	user := &model.UserResponse{
+	user := &model.User{
 		// ID:       id,
 		Name:     strings.TrimSpace(name),
 		Email:    strings.ToLower(strings.TrimSpace(email)),
@@ -106,23 +106,23 @@ func checkPassword(inputPassword, storedHashedPassword string) error {
 }
 
 // LoginUser authenticates a user and returns auth token
-func (s *Service) LoginUser(ctx context.Context, email, password string) (*model.LoginUserResponse, error) {
+func (s *Service) LoginUser(ctx context.Context, email, password string) (string, time.Time, error) {
 	// TODO: Implement user login
 	// - Validate input parameters
 
 	// Find user by email
 	user, err := s.repo.GetUserByEmail(ctx, normalizeEmail(email))
 	if err != nil {
-		return nil, err
+		return "", time.Time{}, err
 	}
 	if user == nil {
-		return nil, errors.New("user does not exist")
+		return "", time.Time{}, errors.New("user does not exist")
 	}
 
 	// Verify password
 	err = checkPassword(password, user.Password)
 	if err != nil {
-		return nil, errors.New("invalid credentials")
+		return "", time.Time{}, errors.New("invalid credentials")
 	}
 
 	// Generate JWT token
@@ -133,15 +133,10 @@ func (s *Service) LoginUser(ctx context.Context, email, password string) (*model
 	expiryDate := time.Now().Add(time.Hour * 72)
 	token, err := jwt.GenerateToken(user.ID, role, time.Hour*72)
 	if err != nil {
-		return nil, err
+		return "", time.Time{}, err
 	}
 
-	// Return auth response with token and user info
-	resp := &model.LoginUserResponse{
-		Token:     token,
-		ExpiresAt: expiryDate,
-	}
-	return resp, nil
+	return token, expiryDate, nil
 }
 
 // LogoutUser invalidates the user's session/token
@@ -154,7 +149,7 @@ func (s *Service) LogoutUser(ctx context.Context, userID string) error {
 }
 
 // GetUserByID retrieves a user by their ID
-func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.UserResponse, error) {
+func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.User, error) {
 	// Validate user ID
 	id, err := strconv.Atoi(userID)
 	if err != nil {
@@ -172,7 +167,7 @@ func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.UserRe
 }
 
 // GetUserByEmail retrieves a user by their email address
-func (s *Service) GetUserByEmail(ctx context.Context, email string) (*model.UserResponse, error) {
+func (s *Service) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
 	// TODO: Implement get user by email
 	// - Validate email format
 	// - Query database for user by email
@@ -181,7 +176,7 @@ func (s *Service) GetUserByEmail(ctx context.Context, email string) (*model.User
 }
 
 // GetAllUsers retrieves all users with pagination and filtering
-func (s *Service) GetAllUsers(ctx context.Context, page, pageSize int32, filter string) ([]*model.UserResponse, error) {
+func (s *Service) GetAllUsers(ctx context.Context, page, pageSize int32, filter string) ([]*model.User, error) {
 	// TODO: Implement get all users
 	// - Validate pagination parameters
 	// - Apply filters if provided
@@ -191,7 +186,7 @@ func (s *Service) GetAllUsers(ctx context.Context, page, pageSize int32, filter 
 }
 
 // UpdateUser updates user information
-func (s *Service) UpdateUser(ctx context.Context, userID, name, email string) (*model.UserResponse, error) {
+func (s *Service) UpdateUser(ctx context.Context, userID, name, email string) (*model.User, error) {
 	// TODO: Implement user update
 	// - Validate input parameters
 	// - Check if user exists

@@ -35,14 +35,14 @@ func (h *Handler) RegisterUser(ctx context.Context, req *userpb.RegisterUserRequ
 }
 
 func (h *Handler) LoginUser(ctx context.Context, req *userpb.LoginUserRequest) (*userpb.LoginUserResponse, error) {
-	loginResponse, err := h.service.LoginUser(ctx, req.GetEmail(), req.GetPassword())
+	token, expiryTime, err := h.service.LoginUser(ctx, req.GetEmail(), req.GetPassword())
 	if err != nil {
 		return nil, err
 	}
 
 	return &userpb.LoginUserResponse{
-		Token:     loginResponse.Token,
-		ExpiresAt: timestamppb.New(loginResponse.ExpiresAt),
+		Token:     token,
+		ExpiresAt: timestamppb.New(expiryTime),
 	}, nil
 }
 

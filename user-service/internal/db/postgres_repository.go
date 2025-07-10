@@ -17,20 +17,20 @@ func NewPostgresUserRepo(db *sql.DB) UserRepository {
 	return &PostgresUserRepo{db: db}
 }
 
-func (r *PostgresUserRepo) CreateUser(ctx context.Context, u *model.UserResponse) (*model.UserResponse, error) {
+func (r *PostgresUserRepo) CreateUser(ctx context.Context, u *model.User) (*model.User, error) {
 	query := `INSERT INTO users (name, email, password, is_admin, created_at, updated_at) 
 	          VALUES ($1, $2, $3, $4, NOW(), NOW())`
 	_, err := r.db.ExecContext(ctx, query, u.Name, u.Email, u.Password, u.IsAdmin)
 	return u, err
 }
 
-func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id int) (*model.UserResponse, error) {
+func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id int) (*model.User, error) {
 	query := `SELECT id, name, email, password, is_admin, created_at, updated_at 
 	          FROM users 
 	          WHERE id = $1`
 	row := r.db.QueryRowContext(ctx, query, id)
 
-	user := &model.UserResponse{}
+	user := &model.User{}
 	err := row.Scan(&id, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, err
@@ -52,13 +52,13 @@ func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id int) (*model.User
 	return user, nil
 }
 
-func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*model.UserResponse, error) {
+func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
 	query := `SELECT id, name, email, password, is_admin, created_at, updated_at 
 	          FROM users 
 	          WHERE email = $1`
 	row := r.db.QueryRowContext(ctx, query, email)
 
-	user := &model.UserResponse{}
+	user := &model.User{}
 	var id int
 	err := row.Scan(&id, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
@@ -85,7 +85,7 @@ func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*m
 	return user, nil
 }
 
-func (r *PostgresUserRepo) UpdateUser(ctx context.Context, u *model.UserResponse) (*model.UserResponse, error) {
+func (r *PostgresUserRepo) UpdateUser(ctx context.Context, u *model.User) (*model.User, error) {
 	query := `UPDATE users
 	          SET name = $1, email = $2, password = $3, is_admin = $4, updated_at = NOW()
 	          WHERE id = $5`
@@ -103,7 +103,7 @@ func (r *PostgresUserRepo) DeleteUser(ctx context.Context, id int) error {
 	return err
 }
 
-func (r *PostgresUserRepo) ListUsers(ctx context.Context, limit, offset int) ([]*model.UserResponse, error) {
+func (r *PostgresUserRepo) ListUsers(ctx context.Context, limit, offset int) ([]*model.User, error) {
 	query := `SELECT id, name, email, password, is_admin, created_at, updated_at 
 	          FROM users 
 	          ORDER BY id LIMIT $1 OFFSET $2`
@@ -113,9 +113,9 @@ func (r *PostgresUserRepo) ListUsers(ctx context.Context, limit, offset int) ([]
 	}
 	defer rows.Close()
 
-	var users []*model.UserResponse
+	var users []*model.User
 	for rows.Next() {
-		user := &model.UserResponse{}
+		user := &model.User{}
 		var id int
 		err := rows.Scan(&id, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
 		if err != nil {
