@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -150,14 +149,10 @@ func (s *Service) LogoutUser(ctx context.Context, userID string) error {
 
 // GetUserByID retrieves a user by their ID
 func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.User, error) {
-	// Validate user ID
-	id, err := strconv.Atoi(userID)
-	if err != nil {
-		return nil, err
-	}
+	// TODO: Validate user ID
 
 	// Query database for user
-	user, err := s.repo.GetUserByID(ctx, id)
+	user, err := s.repo.GetUserByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -207,15 +202,11 @@ func (s *Service) DeleteUser(ctx context.Context, userID string) error {
 }
 
 // GetUserIntersectionIDs retrieves all intersection IDs for a user
-func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]int32, error) {
-	// Validate user ID
-	id, err := strconv.Atoi(userID)
-	if err != nil {
-		return nil, err
-	}
+func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]string, error) {
+	// TODO: Validate user ID
 
 	// Check if user exists
-	user, err := s.repo.GetUserByID(ctx, id)
+	user, err := s.repo.GetUserByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -224,31 +215,21 @@ func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]
 	}
 
 	// Query database for user's intersection IDs
-	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, id)
+	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Convert to []int32 slice
-	int32IDs := make([]int32, len(intIDs))
-	for i, v := range intIDs {
-		int32IDs[i] = int32(v)
-	}
-
 	// - Return slice of intersection IDs
-	return int32IDs, nil
+	return intIDs, nil
 }
 
 // AddIntersectionID adds an intersection ID to a user's list
-func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersectionID int32) error {
-	// Validate user ID and intersection ID
-	id, err := strconv.Atoi(userID)
-	if err != nil {
-		return err
-	}
+func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersectionID string) error {
+	// TODO: Validate user ID and intersection ID
 
 	// Check if user exists
-	user, err := s.repo.GetUserByID(ctx, id)
+	user, err := s.repo.GetUserByID(ctx, userID)
 	if err != nil {
 		return err
 	}
@@ -257,19 +238,18 @@ func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersec
 	}
 
 	// Check if intersection ID already exists for user
-	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, id)
+	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, userID)
 	if err != nil {
 		return err
 	}
-	newIntID := int(intersectionID)
 	for _, intID := range intIDs {
-		if intID == newIntID {
+		if intID == intersectionID {
 			return errors.New("intersection already exists")
 		}
 	}
 
 	// Add intersection ID to user's list
-	err = s.repo.AddIntersectionID(ctx, id, newIntID)
+	err = s.repo.AddIntersectionID(ctx, userID, intersectionID)
 	if err != nil {
 		return err
 	}
@@ -278,7 +258,7 @@ func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersec
 }
 
 // RemoveIntersectionID removes an intersection ID from a user's list
-func (s *Service) RemoveIntersectionIDs(ctx context.Context, userID string, intersectionID []int32) error {
+func (s *Service) RemoveIntersectionIDs(ctx context.Context, userID string, intersectionID []string) error {
 	// TODO: Implement remove intersection ID
 	// - Validate user ID and intersection ID
 	// - Check if user exists

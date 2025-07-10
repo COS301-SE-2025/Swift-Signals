@@ -27,7 +27,7 @@ func (m *MockRepository) CreateUser(ctx context.Context, user *model.User) (*mod
 }
 
 // GetUserByID mocks the GetUserByID method
-func (m *MockRepository) GetUserByID(ctx context.Context, id int) (*model.User, error) {
+func (m *MockRepository) GetUserByID(ctx context.Context, id string) (*model.User, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -54,7 +54,7 @@ func (m *MockRepository) UpdateUser(ctx context.Context, user *model.User) (*mod
 }
 
 // DeleteUser mocks the DeleteUser method
-func (m *MockRepository) DeleteUser(ctx context.Context, id int) error {
+func (m *MockRepository) DeleteUser(ctx context.Context, id string) error {
 	args := m.Called(ctx, id)
 	return args.Error(0)
 }
@@ -69,7 +69,7 @@ func (m *MockRepository) ListUsers(ctx context.Context, limit, offset int) ([]*m
 }
 
 // AddIntersectionID mocks the AddIntersectionID method
-func (m *MockRepository) AddIntersectionID(ctx context.Context, userID, intID int) error {
+func (m *MockRepository) AddIntersectionID(ctx context.Context, userID, intID string) error {
 	args := m.Called(ctx, userID, intID)
 	if args.Get(0) == nil {
 		return args.Error(1)
@@ -78,12 +78,12 @@ func (m *MockRepository) AddIntersectionID(ctx context.Context, userID, intID in
 }
 
 // GetIntersectionsByUserID mocks the GetIntersectionsByUserID method
-func (m *MockRepository) GetIntersectionsByUserID(ctx context.Context, userID int) ([]int, error) {
+func (m *MockRepository) GetIntersectionsByUserID(ctx context.Context, userID string) ([]string, error) {
 	args := m.Called(ctx, userID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}
-	return args.Get(0).([]int), args.Error(1)
+	return args.Get(0).([]string), args.Error(1)
 }
 
 // Verify MockRepository implements UserRepository interface at compile time

@@ -20,7 +20,7 @@ type User struct {
 	Email           string    `json:"email" db:"email"`
 	Password        string    `json:"-" db:"password"` // "-" ensures password is never serialized to JSON
 	IsAdmin         bool      `json:"is_admin" db:"is_admin"`
-	IntersectionIDs []int32   `json:"intersection_ids" db:"intersection_ids"`
+	IntersectionIDs []string  `json:"intersection_ids" db:"intersection_ids"`
 	CreatedAt       time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt       time.Time `json:"updated_at" db:"updated_at"`
 }

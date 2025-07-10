@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"strconv"
 
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	_ "github.com/lib/pq"
@@ -24,18 +23,17 @@ func (r *PostgresUserRepo) CreateUser(ctx context.Context, u *model.User) (*mode
 	return u, err
 }
 
-func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id int) (*model.User, error) {
+func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id string) (*model.User, error) {
 	query := `SELECT id, name, email, password, is_admin, created_at, updated_at 
 	          FROM users 
 	          WHERE id = $1`
 	row := r.db.QueryRowContext(ctx, query, id)
 
 	user := &model.User{}
-	err := row.Scan(&id, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		return nil, err
 	}
-	user.ID = strconv.Itoa(id)
 
 	// Get intersection IDs
 	intIDs, err := r.GetIntersectionsByUserID(ctx, id)
@@ -44,10 +42,7 @@ func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id int) (*model.User
 	}
 
 	// Populate User IDs
-	user.IntersectionIDs = make([]int32, len(intIDs))
-	for i, v := range intIDs {
-		user.IntersectionIDs[i] = int32(v)
-	}
+	user.IntersectionIDs = intIDs
 
 	return user, nil
 }
@@ -59,8 +54,7 @@ func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*m
 	row := r.db.QueryRowContext(ctx, query, email)
 
 	user := &model.User{}
-	var id int
-	err := row.Scan(&id, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No user found with that email
@@ -68,19 +62,15 @@ func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*m
 		}
 		return nil, err
 	}
-	user.ID = strconv.Itoa(id)
 
 	// Get intersection IDs
-	intIDs, err := r.GetIntersectionsByUserID(ctx, id)
+	intIDs, err := r.GetIntersectionsByUserID(ctx, user.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	// Populate User IDs
-	user.IntersectionIDs = make([]int32, len(intIDs))
-	for i, v := range intIDs {
-		user.IntersectionIDs[i] = int32(v)
-	}
+	user.IntersectionIDs = intIDs
 
 	return user, nil
 }
@@ -96,7 +86,7 @@ func (r *PostgresUserRepo) UpdateUser(ctx context.Context, u *model.User) (*mode
 	return u, nil
 }
 
-func (r *PostgresUserRepo) DeleteUser(ctx context.Context, id int) error {
+func (r *PostgresUserRepo) DeleteUser(ctx context.Context, id string) error {
 	query := `DELETE FROM users 
 	          WHERE id = $1`
 	_, err := r.db.ExecContext(ctx, query, id)
@@ -116,31 +106,26 @@ func (r *PostgresUserRepo) ListUsers(ctx context.Context, limit, offset int) ([]
 	var users []*model.User
 	for rows.Next() {
 		user := &model.User{}
-		var id int
-		err := rows.Scan(&id, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
+		err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
 		if err != nil {
 			return nil, err
 		}
-		user.ID = strconv.Itoa(id)
 
 		// Get intersection IDs
-		intIDs, err := r.GetIntersectionsByUserID(ctx, id)
+		intIDs, err := r.GetIntersectionsByUserID(ctx, user.ID)
 		if err != nil {
 			return nil, err
 		}
 
 		// Populate User IDs
-		user.IntersectionIDs = make([]int32, len(intIDs))
-		for i, v := range intIDs {
-			user.IntersectionIDs[i] = int32(v)
-		}
+		user.IntersectionIDs = intIDs
 
 		users = append(users, user)
 	}
 	return users, nil
 }
 
-func (r *PostgresUserRepo) AddIntersectionID(ctx context.Context, userID int, intID int) error {
+func (r *PostgresUserRepo) AddIntersectionID(ctx context.Context, userID string, intID string) error {
 	query := `INSERT INTO user_intersections (user_id, intersection_id) 
 	          VALUES ($1, $2) 
 	          ON CONFLICT DO NOTHING`
@@ -148,7 +133,7 @@ func (r *PostgresUserRepo) AddIntersectionID(ctx context.Context, userID int, in
 	return err
 }
 
-func (r *PostgresUserRepo) GetIntersectionsByUserID(ctx context.Context, userID int) ([]int, error) {
+func (r *PostgresUserRepo) GetIntersectionsByUserID(ctx context.Context, userID string) ([]string, error) {
 	query := `SELECT intersection_id 
 	          FROM user_intersections 
 	          WHERE user_id = $1`
@@ -158,9 +143,9 @@ func (r *PostgresUserRepo) GetIntersectionsByUserID(ctx context.Context, userID 
 	}
 	defer rows.Close()
 
-	var ids []int
+	var ids []string
 	for rows.Next() {
-		var id int
+		var id string
 		if err := rows.Scan(&id); err != nil {
 			return nil, err
 		}

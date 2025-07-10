@@ -4,7 +4,7 @@ DROP TABLE IF EXISTS users;
 
 -- Create users table with integer primary key
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,                    -- Auto-incrementing integer ID
+    uuid SERIAL PRIMARY KEY,                    -- Auto-incrementing integer ID
     name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
