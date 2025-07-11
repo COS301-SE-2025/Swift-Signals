@@ -80,7 +80,7 @@ jobs:
       - name: Run Tests with coverage using Pytest
         run: pytest --cov=SimLoad --cov-report=term-missing simulation-service/tests/
 
-  peact-standard-check:
+  react-standard-check:
     needs: python-standard-check
     runs-on: ubuntu-latest
 
