@@ -19,7 +19,7 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
   id,
   name,
   location, // <-- Now correctly received as a prop
-  lanes,      // <-- Now correctly received as a prop
+  lanes, // <-- Now correctly received as a prop
   image,
   onSimulate,
   onEdit,
@@ -62,7 +62,7 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
             Location: {location}
           </p>
           <p className="intersectionLanes text-xl text-gray-700">
-            Type: {lanes} 
+            Type: {lanes}
           </p>
         </div>
       </div>
