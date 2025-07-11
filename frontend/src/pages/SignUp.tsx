@@ -99,17 +99,20 @@ const SignUp = () => {
 
       let data;
       if (responseText) {
-          try {
-              data = JSON.parse(responseText);
-        console.log("JSON RESPONSE:", data);
-          } catch (e) {
-              console.error("Failed to parse JSON:", responseText);
-              throw new Error(`An unexpected response was received from the server.`);
-          }
+        try {
+          data = JSON.parse(responseText);
+          console.log("JSON RESPONSE:", data);
+        } catch (e) {
+          console.error("Failed to parse JSON:", responseText);
+          throw new Error(
+            `An unexpected response was received from the server.`,
+          );
+        }
       }
 
       if (!response.ok) {
-        const errorMessage = data?.message || "An unexpected error occurred. Please try again.";
+        const errorMessage =
+          data?.message || "An unexpected error occurred. Please try again.";
         throw new Error(errorMessage);
       }
 

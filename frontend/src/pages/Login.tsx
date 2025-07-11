@@ -92,7 +92,7 @@ const Login = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: username, password: password }),
       });
-      
+
       const responseText = await response.text();
       if (!response.ok) {
         let serverMessage = `Status: ${response.status}`;
@@ -100,11 +100,14 @@ const Login = () => {
           const errorData = JSON.parse(responseText);
           serverMessage = errorData?.message || serverMessage;
         } catch (e) {
-          console.error("Could not parse error response as JSON:", responseText);
+          console.error(
+            "Could not parse error response as JSON:",
+            responseText,
+          );
         }
         throw new Error(`Login failed. Server says: "${serverMessage}"`);
       }
-      
+
       const data = JSON.parse(responseText);
 
       if (data?.token) {
@@ -125,7 +128,9 @@ const Login = () => {
     }
   };
 
-  const handleForgotPasswordSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleForgotPasswordSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
     setResetError(null);
     setResetSuccessMessage(null);
@@ -144,8 +149,13 @@ const Login = () => {
         try {
           data = JSON.parse(responseText);
         } catch (e) {
-          console.error("Failed to parse JSON from reset-password:", responseText);
-          throw new Error("An unexpected response was received from the server.");
+          console.error(
+            "Failed to parse JSON from reset-password:",
+            responseText,
+          );
+          throw new Error(
+            "An unexpected response was received from the server.",
+          );
         }
       }
 
@@ -153,7 +163,9 @@ const Login = () => {
         throw new Error(data?.message || "Failed to send reset link.");
       }
 
-      setResetSuccessMessage(data?.message || "Password reset instructions sent to your email.");
+      setResetSuccessMessage(
+        data?.message || "Password reset instructions sent to your email.",
+      );
 
       setTimeout(() => {
         setIsModalOpen(false);
