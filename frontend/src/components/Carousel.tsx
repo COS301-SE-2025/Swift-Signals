@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import type { PanInfo } from "framer-motion";
-// replace icons with your own if needed
+
 import {
   FiBarChart2,
   FiInfo,
