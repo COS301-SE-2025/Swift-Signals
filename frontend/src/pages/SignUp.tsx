@@ -102,7 +102,7 @@ const SignUp = () => {
         try {
           data = JSON.parse(responseText);
           console.log("JSON RESPONSE:", data);
-        } catch (_e) {
+        } catch (e) {
           console.error("Failed to parse JSON:", responseText);
           throw new Error(
             `An unexpected response was received from the server.`,
@@ -185,7 +185,10 @@ const SignUp = () => {
               id="username"
               name="username"
               value={username}
-              onChange={(_e) => setUsername(_e.target.value)}
+              onChange={(e) => {
+                e.preventDefault();
+                setUsername(e.target.value);
+              }}
               placeholder="Username"
               className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
@@ -201,7 +204,10 @@ const SignUp = () => {
               id="email"
               name="email"
               value={email}
-              onChange={(_e) => setEmail(_e.target.value)}
+              onChange={(e) => {
+                e.preventDefault();
+                setEmail(e.target.value);
+              }}
               placeholder="Email"
               className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
@@ -217,7 +223,10 @@ const SignUp = () => {
               id="password"
               name="password"
               value={password}
-              onChange={(_e) => setPassword(_e.target.value)}
+              onChange={(e) => {
+                e.preventDefault();
+                setPassword(e.target.value);
+              }}
               placeholder="Password"
               className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
