@@ -227,7 +227,7 @@ const Login = () => {
               id="username"
               name="username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(_e) => setUsername(_e.target.value)}
               placeholder="Username or Email"
               className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
@@ -243,7 +243,7 @@ const Login = () => {
               id="password"
               name="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(_e) => setPassword(_e.target.value)}
               placeholder="Password"
               className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
@@ -253,8 +253,8 @@ const Login = () => {
           <div className="text-right">
             <a
               href="#"
-              onClick={(e) => {
-                e.preventDefault();
+              onClick={(_e) => {
+                _e.preventDefault();
                 setIsModalOpen(true);
               }}
               className="text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors"
@@ -332,7 +332,7 @@ const Login = () => {
                   id="resetEmail"
                   name="resetEmail"
                   value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
+                  onChange={(_e) => setResetEmail(_e.target.value)}
                   placeholder="Enter your email"
                   className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
                   required
