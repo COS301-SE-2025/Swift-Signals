@@ -103,6 +103,7 @@ const SignUp = () => {
           data = JSON.parse(responseText);
           console.log("JSON RESPONSE:", data);
         } catch (e) {
+          console.error(e);
           console.error("Failed to parse JSON:", responseText);
           throw new Error(
             `An unexpected response was received from the server.`,

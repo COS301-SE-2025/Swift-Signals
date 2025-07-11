@@ -100,6 +100,7 @@ const Login = () => {
           const errorData = JSON.parse(responseText);
           serverMessage = errorData?.message || serverMessage;
         } catch (e) {
+          console.error(e);
           console.error(
             "Could not parse error response as JSON:",
             responseText,
@@ -149,6 +150,7 @@ const Login = () => {
         try {
           data = JSON.parse(responseText);
         } catch (e) {
+          console.error(e);
           console.error(
             "Failed to parse JSON from reset-password:",
             responseText,
