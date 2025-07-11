@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import HelpMenu from "../components/HelpMenu"; // MODIFICATION: Import the new component
+import HelpMenu from "../components/HelpMenu";
 import "../styles/Dashboard.css";
 import { Chart, registerables } from "chart.js";
 

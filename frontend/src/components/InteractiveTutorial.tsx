@@ -107,7 +107,7 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
         popoverTop = rect.top + rect.height / 2 - popoverRect.height / 2;
         popoverLeft = rect.right + 20;
         break;
-      default: // bottom
+      default:
         popoverTop = rect.bottom + 20;
         popoverLeft = rect.left + rect.width / 2 - popoverRect.width / 2;
         break;

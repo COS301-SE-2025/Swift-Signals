@@ -26,12 +26,12 @@ PRIORITY: NodeType
 TRAFFIC_LIGHT: NodeType
 
 class SimulationRequest(_message.Message):
-    __slots__ = ("intersection_id", "parameters")
+    __slots__ = ("intersection_id", "simulation_parameters")
     INTERSECTION_ID_FIELD_NUMBER: _ClassVar[int]
-    PARAMETERS_FIELD_NUMBER: _ClassVar[int]
+    SIMULATION_PARAMETERS_FIELD_NUMBER: _ClassVar[int]
     intersection_id: str
-    parameters: SimulationParameters
-    def __init__(self, intersection_id: _Optional[str] = ..., parameters: _Optional[_Union[SimulationParameters, _Mapping]] = ...) -> None: ...
+    simulation_parameters: SimulationParameters
+    def __init__(self, intersection_id: _Optional[str] = ..., simulation_parameters: _Optional[_Union[SimulationParameters, _Mapping]] = ...) -> None: ...
 
 class SimulationParameters(_message.Message):
     __slots__ = ("intersection_type", "green", "yellow", "red", "speed", "seed")
