@@ -80,10 +80,15 @@ func main() {
 	mux.Handle("/docs/", httpSwagger.WrapHandler)
 	log.Println("Swagger UI available at http://localhost:9090/docs/index.html")
 
+	middlewares := middleware.CreateStack(
+		middleware.Logging,
+		middleware.CORS,
+	)
+
 	serverAddr := fmt.Sprintf(":%d", 9090)
 	srv := &http.Server{
 		Addr:         serverAddr,
-		Handler:      middleware.Logging(middleware.CORS(mux)),
+		Handler:      middlewares(mux),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
