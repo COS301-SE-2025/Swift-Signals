@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"google.golang.org/grpc"
 	"log"
 	"net/http"
 	"os"
@@ -11,8 +10,11 @@ import (
 	"syscall"
 	"time"
 
+	"google.golang.org/grpc"
+
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/handler"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 
 	_ "github.com/COS301-SE-2025/Swift-Signals/api-gateway/swagger"
@@ -81,7 +83,7 @@ func main() {
 	serverAddr := fmt.Sprintf(":%d", 9090)
 	srv := &http.Server{
 		Addr:         serverAddr,
-		Handler:      mux,
+		Handler:      middleware.CORS(mux),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
