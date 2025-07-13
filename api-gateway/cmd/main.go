@@ -83,7 +83,7 @@ func main() {
 	serverAddr := fmt.Sprintf(":%d", 9090)
 	srv := &http.Server{
 		Addr:         serverAddr,
-		Handler:      middleware.CORS(mux),
+		Handler:      middleware.Logging(middleware.CORS(mux)),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
