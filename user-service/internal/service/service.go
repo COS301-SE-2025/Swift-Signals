@@ -3,15 +3,16 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"regexp"
 	"strings"
 	"time"
 
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/shared/jwt"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
-	// "github.com/google/uuid"
+	"github.com/google/uuid"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -22,13 +23,6 @@ type Service struct {
 func NewService(r db.UserRepository) *Service {
 	return &Service{repo: r}
 }
-
-var (
-	ErrInvalidEmail    = errors.New("invalid email format")
-	ErrInvalidPassword = errors.New("password must be at least 8 characters long")
-	ErrInvalidName     = errors.New("name cannot be empty")
-	ErrUserExists      = errors.New("user with this email already exists")
-)
 
 // emailRegex is a simple regex for basic email validation
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
@@ -42,30 +36,37 @@ func (s *Service) RegisterUser(ctx context.Context, name, email, password string
 
 	email = normalizeEmail(email)
 
-	// Validate input
+	// Validate input before using db resources
 	if err := s.validateUserInput(name, email, password); err != nil {
 		return nil, err
 	}
 
 	// Check if user already exists
 	existingUser, err := s.repo.GetUserByEmail(ctx, email)
-	if err != nil && !errors.Is(err, model.ErrUserNotFound) {
-		return nil, fmt.Errorf("failed to check existing user: %w", err)
+
+	// NOTE: Logic is dependent on GetUserByEmail returning nil if user does not exist
+	//       If this returns an error instead, we need to handle it differently
+	//       This is a limitation of the current implementation
+	//       Perhaps we should define EmailExists repository method instead
+
+	if err != nil {
+		return nil, errs.NewInternalError("failed to check existing user", err, map[string]any{"user": existingUser, "email": email})
+		// NOTE: Make sure to return publicUser in GetUserByEmail to ensure confidentail data is not leaked
 	}
 	if existingUser != nil {
-		return nil, ErrUserExists
+		return nil, errs.NewAlreadyExistsError("email already exists", map[string]any{"user": existingUser, "email": email})
 	}
 
 	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash password: %w", err)
+		return nil, errs.NewInternalError("failed to hash password", err, nil)
 	}
 
 	// Create user
-	// id := uuid.New().String()
+	id := uuid.New().String()
 	user := &model.User{
-		// ID:       id,
+		ID:       id,
 		Name:     strings.TrimSpace(name),
 		Email:    strings.ToLower(strings.TrimSpace(email)),
 		Password: string(hashedPassword),
@@ -73,30 +74,33 @@ func (s *Service) RegisterUser(ctx context.Context, name, email, password string
 
 	createdUser, err := s.repo.CreateUser(ctx, user)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create user: %w", err)
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError("failed to create user", err, map[string]any{})
 	}
-
 	return createdUser, nil
 }
 
 // validateUserInput validates the input parameters for user registration
 func (s *Service) validateUserInput(name, email, password string) error {
-	// Validate name
+	var validationErrors []string
+
 	if strings.TrimSpace(name) == "" {
-		return ErrInvalidName
+		validationErrors = append(validationErrors, "name is required")
 	}
-
-	// Validate email
-	email = strings.TrimSpace(email)
 	if email == "" || !emailRegex.MatchString(email) {
-		return ErrInvalidEmail
+		validationErrors = append(validationErrors, "email is invalid")
 	}
-
-	// Validate password
 	if len(password) < 8 {
-		return ErrInvalidPassword
+		validationErrors = append(validationErrors, "password is too short")
 	}
 
+	if len(validationErrors) > 0 {
+		combinedErrors := strings.Join(validationErrors, "; ")
+		return errs.NewValidationError(combinedErrors, map[string]any{"email": email})
+	}
 	return nil
 }
 
