@@ -4,10 +4,8 @@ import (
 	"context"
 	"database/sql"
 
-	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
-	"github.com/lib/pq"
 )
 
 type PostgresUserRepo struct {
@@ -23,31 +21,14 @@ func (r *PostgresUserRepo) CreateUser(ctx context.Context, u *model.User) (*mode
 	          VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`
 
 	_, err := r.db.ExecContext(ctx, query, u.ID, u.Name, u.Email, u.Password, u.IsAdmin)
-
 	if err != nil {
-		if pqErr, ok := err.(*pq.Error); ok {
-			switch pqErr.Code {
-			case "23505":
-				// Unique constraint violation
-				return nil, errs.NewAlreadyExistsError("email already exists", map[string]any{"email": u.Email})
-
-			case "23503":
-				// Foreign key violation (e.g. non-existent user_id in user_intersections)
-				return nil, errs.NewDatabaseError("invalid reference to related resource", err, nil)
-
-			case "23502":
-				// Not-null constraint violation
-				return nil, errs.NewDatabaseError("missing required field", err, nil)
-
-			default:
-				return nil, errs.NewInternalError("postgres error", err, map[string]any{"postgresErrCode": pqErr.Code, "postgresErrMessage": pqErr.Message})
-			}
-		}
-
-		return nil, errs.NewInternalError("query execution failed", err, nil)
+		return nil, HandleDatabaseError(err, ErrorContext{
+			Operation: OpCreate,
+			Table:     "users",
+		})
 	}
 
-	return u, err
+	return u, nil
 }
 
 func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id string) (*model.User, error) {
