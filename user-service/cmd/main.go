@@ -10,7 +10,7 @@ import (
 	"os"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
-	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db/postgres"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/service"
 	"github.com/joho/godotenv"
@@ -40,7 +40,7 @@ func main() {
 	}
 	defer dbConn.Close()
 
-	repo := db.NewPostgresUserRepo(dbConn)
+	repo := postgres.NewPostgresUserRepo(dbConn)
 
 	svc := service.NewService(repo)
 	handler := handler.NewHandler(svc)

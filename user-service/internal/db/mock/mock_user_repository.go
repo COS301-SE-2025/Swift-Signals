@@ -1,7 +1,9 @@
-package db
+package mock
 
 import (
 	"context"
+
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/stretchr/testify/mock"
 )
@@ -11,7 +13,7 @@ type MockRepository struct {
 	mock.Mock
 }
 
-func NewUserRepository() UserRepository {
+func NewUserRepository() db.UserRepository {
 	return &MockRepository{
 		Mock: mock.Mock{},
 	}
@@ -87,4 +89,4 @@ func (m *MockRepository) GetIntersectionsByUserID(ctx context.Context, userID st
 }
 
 // Verify MockRepository implements UserRepository interface at compile time
-var _ UserRepository = (*MockRepository)(nil)
+var _ db.UserRepository = (*MockRepository)(nil)
