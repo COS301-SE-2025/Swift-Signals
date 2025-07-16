@@ -1,26 +1,34 @@
-package db
+package postgres
 
 import (
 	"context"
 	"database/sql"
 
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
-	_ "github.com/lib/pq"
 )
 
 type PostgresUserRepo struct {
 	db *sql.DB
 }
 
-func NewPostgresUserRepo(db *sql.DB) UserRepository {
+func NewPostgresUserRepo(db *sql.DB) db.UserRepository {
 	return &PostgresUserRepo{db: db}
 }
 
 func (r *PostgresUserRepo) CreateUser(ctx context.Context, u *model.User) (*model.User, error) {
-	query := `INSERT INTO users (name, email, password, is_admin, created_at, updated_at) 
-	          VALUES ($1, $2, $3, $4, NOW(), NOW())`
-	_, err := r.db.ExecContext(ctx, query, u.Name, u.Email, u.Password, u.IsAdmin)
-	return u, err
+	query := `INSERT INTO users (uuid, name, email, password, is_admin, created_at, updated_at) 
+	          VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`
+
+	_, err := r.db.ExecContext(ctx, query, u.ID, u.Name, u.Email, u.Password, u.IsAdmin)
+	if err != nil {
+		return nil, HandleDatabaseError(err, ErrorContext{
+			Operation: OpCreate,
+			Table:     "users",
+		})
+	}
+
+	return u, nil
 }
 
 func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id string) (*model.User, error) {
