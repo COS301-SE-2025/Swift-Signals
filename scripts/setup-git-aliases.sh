@@ -31,9 +31,9 @@ git config --local alias.new-feature '!f() { \
     exit 1; \
   fi; \
   git fetch origin && \
-  git checkout "$ms" && \
+  git switch "$ms" && \
   git pull origin "$ms" && \
-  git checkout -b "$branch_name" && \
+  git switch -c "$branch_name" && \
   git push -u origin "$branch_name" && \
   echo "✅ Created and pushed feature branch: $branch_name"; \
 }; f'
@@ -47,7 +47,7 @@ git config --local alias.feature-sync '!f() { \
     echo "❌ Branch $branch_name does not exist locally"; \
     exit 1; \
   fi; \
-  git checkout "$branch_name" && \
+  git switch "$branch_name" && \
   git fetch origin && \
   git rebase "origin/$ms" && \
   git push --force-with-lease && \
@@ -89,7 +89,7 @@ git config --local alias.delete-feature '!f() { \
 git config --local alias.microservice-sync-dev '!f() { \
   ms=${1:?Microservice name required}; \
   git fetch origin && \
-  git checkout "$ms" && \
+  git switch "$ms" && \
   git pull origin "$ms" && \
   git merge "origin/dev" && \
   git push origin "$ms" && \
@@ -116,9 +116,9 @@ git config --local alias.new-hotfix '!f() { \
     exit 1; \
   fi; \
   git fetch origin && \
-  git checkout main && \
+  git switch main && \
   git pull origin main && \
-  git checkout -b "$branch_name" && \
+  git switch -c "$branch_name" && \
   git push -u origin "$branch_name" && \
   echo "✅ Created and pushed hotfix branch: $branch_name"; \
 }; f'
@@ -131,7 +131,7 @@ git config --local alias.hotfix-sync '!f() { \
     echo "❌ Branch $branch_name does not exist locally"; \
     exit 1; \
   fi; \
-  git checkout "$branch_name" && \
+  git switch "$branch_name" && \
   git fetch origin && \
   git pull origin "$branch_name" && \
   git merge "origin/main" && \
@@ -170,7 +170,7 @@ git config --local alias.delete-hotfix '!f() { \
 
 # Enhanced git graph visualization
 git config --local alias.graph \
-"log --oneline --graph --decorate --all"
+"log --oneline --graph --decorate -n 10"
 
 echo "✅ Git aliases configured locally:"
 git config --local --get-regexp alias
