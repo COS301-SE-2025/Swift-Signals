@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -40,22 +39,37 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 func main() {
-	userConn, err := grpc.Dial("localhost:50051", grpc.WithInsecure()) // NOTE: Will change to use TLS later on
+	userClient := mustConnectUserService()
+	intrClient := mustConnectIntersectionService()
+
+	mux := setupRoutes(userClient, intrClient)
+
+	server := createServer(":9090", mux)
+	runServer(server)
+}
+
+func mustConnectUserService() *client.UserClient {
+	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("failed to connect to User gRPC server: %v", err)
 	}
-	userClient := client.NewUserClient(userConn)
 	log.Println("Connected to User-Service")
+	return client.NewUserClient(conn)
+}
 
-	intrConn, err := grpc.Dial("localhost:50052", grpc.WithInsecure()) // NOTE: Will change to use TLS later on
+func mustConnectIntersectionService() *client.IntersectionClient {
+	conn, err := grpc.Dial("localhost:50052", grpc.WithInsecure()) // NOTE: Will change to use TLS later on
 	if err != nil {
 		log.Fatalf("failed to connect to Intersection gRPC server: %v", err)
 	}
-	intrClient := client.NewIntersectionClient(intrConn)
 	log.Println("Connected to Intersection-Service")
+	return client.NewIntersectionClient(conn)
+}
 
+func setupRoutes(userClient *client.UserClient, intrClient *client.IntersectionClient) http.Handler {
 	mux := http.NewServeMux()
 
+	// Auth routes
 	authService := service.NewAuthService(userClient)
 	authHandler := handler.NewAuthHandler(authService)
 	mux.HandleFunc("POST /login", authHandler.Login)
@@ -64,55 +78,65 @@ func main() {
 	mux.HandleFunc("POST /reset-password", authHandler.ResetPassword)
 	log.Println("Initialized Auth Handlers.")
 
+	// Intersection routes
 	intersectionService := service.NewIntersectionService(intrClient)
 	intersectionHandler := handler.NewIntersectionHandler(intersectionService)
 	mux.HandleFunc("GET /intersections", intersectionHandler.GetAllIntersections)
-	// mux.HandleFunc("GET /intersections/simple", nil)
 	mux.HandleFunc("GET /intersections/{id}", intersectionHandler.GetIntersection)
 	mux.HandleFunc("POST /intersections", intersectionHandler.CreateIntersection)
 	mux.HandleFunc("PATCH /intersections/{id}", intersectionHandler.UpdateIntersection)
-	// mux.HandleFunc("DELETE /intersections/{id}", nil)
-	// mux.HandleFunc("POST /intersections/{id}/optimise", nil)
+	mux.HandleFunc("DELETE /intersections/{id}", NotImplemented)
+	mux.HandleFunc("POST /intersections/{id}/optimise", NotImplemented)
+	mux.HandleFunc("GET /intersections/simple", NotImplemented)
 	log.Println("Initialized Intersection Handlers.")
 
-	log.Println("Registered API routes.")
-
+	// Swagger
 	mux.Handle("/docs/", httpSwagger.WrapHandler)
 	log.Println("Swagger UI available at http://localhost:9090/docs/index.html")
 
-	middlewares := middleware.CreateStack(
+	// Middleware stack
+	return middleware.CreateStack(
 		middleware.Logging,
 		middleware.CORS,
-	)
+	)(mux)
+}
 
-	serverAddr := fmt.Sprintf(":%d", 9090)
-	srv := &http.Server{
-		Addr:         serverAddr,
-		Handler:      middlewares(mux),
+func createServer(addr string, handler http.Handler) *http.Server {
+	return &http.Server{
+		Addr:         addr,
+		Handler:      handler,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
 	}
+}
 
+func runServer(server *http.Server) {
+	// Start server in goroutine
 	go func() {
-		log.Printf("Server starting on %s", serverAddr)
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Printf("Server starting on %s", server.Addr)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)
 		}
 	}()
 
+	// Wait for interrupt
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-
 	<-quit // Block until a signal is received
-	log.Println("Shutting down server...")
 
+	// Gracefully shutdown
+	log.Println("Shutting down server...")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	if err := srv.Shutdown(ctx); err != nil {
+	if err := server.Shutdown(ctx); err != nil {
 		log.Fatalf("Server forced to shutdown: %v", err)
 	}
 
 	log.Println("Server exited gracefully.")
+}
+
+func NotImplemented(w http.ResponseWriter, r *http.Request) {
+	http.Error(w, "NotImplemented", http.StatusNotImplemented)
 }
