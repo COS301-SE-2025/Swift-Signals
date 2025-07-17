@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -12,6 +13,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/config"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
@@ -39,17 +41,19 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 func main() {
-	userClient := mustConnectUserService()
-	intrClient := mustConnectIntersectionService()
+	cfg := config.Load()
+
+	userClient := mustConnectUserService(cfg.UserServiceAddr)
+	intrClient := mustConnectIntersectionService(cfg.IntersectionAddr)
 
 	mux := setupRoutes(userClient, intrClient)
 
-	server := createServer(":9090", mux)
+	server := createServer(cfg.Port, mux)
 	runServer(server)
 }
 
-func mustConnectUserService() *client.UserClient {
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+func mustConnectUserService(address string) *client.UserClient {
+	conn, err := grpc.Dial(address, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("failed to connect to User gRPC server: %v", err)
 	}
@@ -57,8 +61,8 @@ func mustConnectUserService() *client.UserClient {
 	return client.NewUserClient(conn)
 }
 
-func mustConnectIntersectionService() *client.IntersectionClient {
-	conn, err := grpc.Dial("localhost:50052", grpc.WithInsecure()) // NOTE: Will change to use TLS later on
+func mustConnectIntersectionService(address string) *client.IntersectionClient {
+	conn, err := grpc.Dial(address, grpc.WithInsecure()) // NOTE: Will change to use TLS later on
 	if err != nil {
 		log.Fatalf("failed to connect to Intersection gRPC server: %v", err)
 	}
@@ -101,7 +105,8 @@ func setupRoutes(userClient *client.UserClient, intrClient *client.IntersectionC
 	)(mux)
 }
 
-func createServer(addr string, handler http.Handler) *http.Server {
+func createServer(port int, handler http.Handler) *http.Server {
+	addr := fmt.Sprintf(":%d", port)
 	return &http.Server{
 		Addr:         addr,
 		Handler:      handler,
