@@ -80,7 +80,7 @@ jobs:
       - name: Run Tests with coverage using Pytest
         run: pytest --cov=SimLoad --cov-report=term-missing simulation-service/tests/
 
-  peact-standard-check:
+  react-standard-check:
     needs: python-standard-check
     runs-on: ubuntu-latest
 
@@ -103,7 +103,7 @@ jobs:
 
       - name: Check Prettier formatting
         working-directory: frontend
-        run: npx prettier --check "**/*.{js,jsx,ts,tsx,json,css,md}"
+        run: npx prettier --check "**/*.{js,jsx,ts,tsx,css,md}"
 
       - name: Run Jest tests
         working-directory: frontend

@@ -2,6 +2,12 @@
 
 ![Swift Signals Logo](assets/images/SwiftLogo.png)
 
+# Badges
+![API Gateway](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/apiGateway.yml/badge.svg)
+![React Frontend](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/react.yml/badge.svg)
+![Simulation Service](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/simulation.yml/badge.svg)
+
+# Team
 **Team InsideInsights - Swift-Signals**  
 
 Swift Signals is a data-driven, simulation-powered traffic light optimization platform designed to address traffic congestion in urban environments. Developed in collaboration with Southern Cross Solutions, the project aims to equip municipal traffic departments with advanced tools to analyse intersection performance and improve traffic signal efficiency using machine learning.
@@ -9,9 +15,18 @@ Traffic congestion remains one of South Africa’s most costly infrastructure ch
 
 ## Key Links
 
-- [Functional Requirements (SRS)](docs/SRS_Swift_Signals.pdf)
+### Demo 2
+- [Functional Requirements (SRS)](docs/Demo2/SRSV2.pdf)
+- [User Manual](docs/Demo2/UserManual.pdf)
+- [Architectural Requirements Document](docs/Demo2/ArchitecturalRequirements.pdf)
+- [Coding Standards and Practices](/docs/Demo2/CodingStandardsPractices.pdf)
 - [GitHub Project Board](https://github.com/orgs/COS301-SE-2025/projects/116)
 - [Team Wiki](https://github.com/COS301-SE-2025/Swift-Signals/wiki)
+- [Demo 2 Video](https://drive.google.com/file/d/1aziHGN7oFnAVXir01R-gUUyE7hT6cnv7/view?usp=sharing)
+
+### Demo 1
+
+- [Functional Requirements (SRS)](docs/Demo1/SRS_Swift_Signals.pdf)
 - [Demo 1 Video](https://drive.google.com/drive/folders/1atNvpmhXaGXENKEQayBK2XgDB_K1cdJR?usp=sharing)
 
 ## Team Members
@@ -70,8 +85,8 @@ design.
 - **api-gateway**: API Gateway for routing requests  
 - **user-service**: User management and authentication  
 - **simulation-service**: Simulation engine  
-- **ai-service**: Machine learning and AI capabilities  
-- **control-service**: System control and management  
+- **optimization-service**: Machine learning and AI capabilities  
+- **intersection-service**: Intersection control and management  
 - **metrics-service**: Monitoring and metrics collection  
 - **frontend**: Web dashboard for visualization and control
 

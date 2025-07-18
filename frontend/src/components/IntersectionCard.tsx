@@ -1,14 +1,11 @@
-// src/components/IntersectionCard.tsx
-
 import React from "react";
 import "../styles/IntersectionCard.css";
 
-// The props interface has been updated to include `location` and `lanes`
 interface IntersectionCardProps {
-  id: number;
+  id: string;
   name: string;
-  location: string; // <-- ADDED
-  lanes: string; // <-- ADDED
+  location: string;
+  lanes: string;
   image?: string;
   onSimulate: (id: number) => void;
   onEdit: (id: number) => void;
@@ -18,8 +15,8 @@ interface IntersectionCardProps {
 const IntersectionCard: React.FC<IntersectionCardProps> = ({
   id,
   name,
-  location, // <-- Now correctly received as a prop
-  lanes,      // <-- Now correctly received as a prop
+  location,
+  lanes,
   image,
   onSimulate,
   onEdit,
@@ -57,33 +54,32 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
             {name}
           </h3>
           <p className="intersectionID text-xl text-gray-700">ID: {id}</p>
-          {/* These fields now use the new props */}
           <p className="intersectionLocation text-xl text-gray-700">
             Location: {location}
           </p>
           <p className="intersectionLanes text-xl text-gray-700">
-            Type: {lanes} 
+            Type: {lanes}
           </p>
         </div>
       </div>
 
       <div className="intBtns flex flex-col space-y-3">
         <button
-          onClick={() => onSimulate(id)}
+          onClick={() => onSimulate(Number(id))}
           className="intersectionBtn bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-2 px-8 rounded-full"
         >
           ▶ Simulate
         </button>
 
         <button
-          onClick={() => onEdit(id)}
+          onClick={() => onEdit(Number(id))}
           className="intersectionBtn bg-green-600 hover:bg-green-700 text-white text-lg font-semibold py-2 px-8 rounded-full"
         >
           ✏️ Edit
         </button>
 
         <button
-          onClick={() => onDelete(id)}
+          onClick={() => onDelete(Number(id))}
           className="intersectionBtn bg-red-600 hover:bg-red-700 text-white text-lg font-semibold py-2 px-8 rounded-full"
         >
           🗑️ Delete
@@ -91,20 +87,20 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
       </div>
       <div className="mobileIntBtns flex flex-col space-y-3">
         <button
-          onClick={() => onSimulate(id)}
+          onClick={() => onSimulate(Number(id))}
           className="intersectionBtn bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-1 px-2 rounded-full"
         >
           ▶
         </button>
 
         <button
-          onClick={() => onEdit(id)}
+          onClick={() => onEdit(Number(id))}
           className="intersectionBtn bg-green-600 hover:bg-green-700 text-white text-lg font-semibold py-1 px-2 rounded-full"
         >
           ✏️
         </button>
         <button
-          onClick={() => onDelete(id)}
+          onClick={() => onDelete(Number(id))}
           className="intersectionBtn bg-red-600 hover:bg-red-700 text-white text-lg font-semibold py-1 px-2 rounded-full"
         >
           🗑️
