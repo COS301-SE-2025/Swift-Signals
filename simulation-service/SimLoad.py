@@ -251,13 +251,17 @@ def main():
     }
 
     """Save the output to a file"""
-    os.makedirs("out/results", exist_ok=True)
-    with open("out/results/simulation_results.json", "w") as f:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    results_path = os.path.join(base_dir, "out/results/simulation_results.json")
+    os.makedirs(os.path.dirname(results_path), exist_ok=True)
+    with open(results_path, "w") as f:
         json.dump(output, f, indent=2)
 
     print("Simulation saved to simulation_results.json")
 
-    with open("out/simulationOut/simulation_output.json", "w") as jf:
+    output_path = os.path.join(base_dir, "out/simulationOut/simulation_output.json")
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w") as jf:
         json.dump(fullOut, jf, indent=2)
 
     print("Simulation output saved to simulation_output.json")
