@@ -2,7 +2,13 @@ module github.com/COS301-SE-2025/Swift-Signals/user-service
 
 go 1.24.4
 
+toolchain go1.24.5
+
 require (
+	github.com/COS301-SE-2025/Swift-Signals/protos/gen v0.1.0
+	github.com/COS301-SE-2025/Swift-Signals/shared v0.1.0
+	github.com/joho/godotenv v1.5.1
+	github.com/lib/pq v1.10.9
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/crypto v0.36.0
 	google.golang.org/grpc v1.73.0
