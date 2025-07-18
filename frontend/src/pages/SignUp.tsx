@@ -99,17 +99,21 @@ const SignUp = () => {
 
       let data;
       if (responseText) {
-          try {
-              data = JSON.parse(responseText);
-        console.log("JSON RESPONSE:", data);
-          } catch (e) {
-              console.error("Failed to parse JSON:", responseText);
-              throw new Error(`An unexpected response was received from the server.`);
-          }
+        try {
+          data = JSON.parse(responseText);
+          console.log("JSON RESPONSE:", data);
+        } catch (e) {
+          console.error(e);
+          console.error("Failed to parse JSON:", responseText);
+          throw new Error(
+            `An unexpected response was received from the server.`,
+          );
+        }
       }
 
       if (!response.ok) {
-        const errorMessage = data?.message || "An unexpected error occurred. Please try again.";
+        const errorMessage =
+          data?.message || "An unexpected error occurred. Please try again.";
         throw new Error(errorMessage);
       }
 
@@ -182,7 +186,10 @@ const SignUp = () => {
               id="username"
               name="username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) => {
+                e.preventDefault();
+                setUsername(e.target.value);
+              }}
               placeholder="Username"
               className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
@@ -198,7 +205,10 @@ const SignUp = () => {
               id="email"
               name="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                e.preventDefault();
+                setEmail(e.target.value);
+              }}
               placeholder="Email"
               className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
@@ -214,7 +224,10 @@ const SignUp = () => {
               id="password"
               name="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                e.preventDefault();
+                setPassword(e.target.value);
+              }}
               placeholder="Password"
               className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
