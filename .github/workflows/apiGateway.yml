@@ -6,6 +6,7 @@ on:
     branches: [api-gateway]
   pull_request:
     branches: [api-gateway]
+  workflow_dispatch:
 
 jobs:
   run-tests:
@@ -22,6 +23,13 @@ jobs:
 
       - name: Display Go version
         run: go version
+        
+      - name: Set up Go workspace
+        run: |
+          go work init ./api-gateway ./shared
+          go work sync
+          echo "---- go.work ----"
+          cat go.work
 
       - name: Run unit tests in api-gateway
         working-directory: ./api-gateway  #Change to ./test if need be
