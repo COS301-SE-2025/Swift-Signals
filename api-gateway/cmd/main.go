@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,14 +14,20 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
-	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/config"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
+	"github.com/COS301-SE-2025/Swift-Signals/shared/config"
 
 	_ "github.com/COS301-SE-2025/Swift-Signals/api-gateway/swagger"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
+
+type Config struct {
+	Port             int    `env:"PORT"           envDefault:"9090"`
+	UserServiceAddr  string `env:"USER_GRPC_ADDR" envDefault:"localhost:50051"` // TODO: Change to proper address
+	IntersectionAddr string `env:"INTR_GRPC_ADDR" envDefault:"localhost:50052"` // TODO: Change to proper address
+}
 
 // @title Authentication API Gateway
 // @version 1.0
@@ -41,15 +48,21 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 func main() {
-	cfg := config.Load()
+	var cfg Config
+	if err := config.Load(&cfg); err != nil {
+		log.Fatalf("failed to load config: %v", err)
+	}
 
-	userClient := mustConnectUserService(cfg.UserServiceAddr)
-	intrClient := mustConnectIntersectionService(cfg.IntersectionAddr)
+	s, _ := json.MarshalIndent(cfg, "", "\t")
+	fmt.Print(string(s))
 
-	mux := setupRoutes(userClient, intrClient)
-
-	server := createServer(cfg.Port, mux)
-	runServer(server)
+	// userClient := mustConnectUserService(cfg.UserServiceAddr)
+	// intrClient := mustConnectIntersectionService(cfg.IntersectionAddr)
+	//
+	// mux := setupRoutes(userClient, intrClient)
+	//
+	// server := createServer(cfg.Port, mux)
+	// runServer(server)
 }
 
 func mustConnectUserService(address string) *client.UserClient {

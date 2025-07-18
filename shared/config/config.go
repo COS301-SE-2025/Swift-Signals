@@ -1,22 +1,21 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"reflect"
 	"strconv"
 )
 
-type Config struct {
-	Port             int    `env:"PORT"                      envDefault:"9090"`
-	UserServiceAddr  string `env:"USER_SERVICE_ADDR"         envDefault:"localhost:50051"` // TODO: Change to proper address
-	IntersectionAddr string `env:"INTERSECTION_SERVICE_ADDR" envDefault:"localhost:50052"` // TODO: Change to proper address
-}
+func Load(cfg any) error {
+	p := reflect.ValueOf(cfg)
+	if p.Kind() != reflect.Ptr || p.Elem().Kind() != reflect.Struct {
+		return fmt.Errorf("Load expects a pointer to a struct")
+	}
 
-func Load() *Config {
-	cfg := &Config{}
-	t := reflect.TypeOf(*cfg)
-	v := reflect.ValueOf(cfg).Elem()
+	v := p.Elem()
+	t := v.Type()
 
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
@@ -47,9 +46,9 @@ func Load() *Config {
 			}
 			v.Field(i).SetBool(parsed)
 		default:
-			log.Fatalf("unsupported field type: %s", field.Type)
+			return fmt.Errorf("unsupported field type: %s", field.Type)
 		}
 	}
 
-	return cfg
+	return nil
 }
