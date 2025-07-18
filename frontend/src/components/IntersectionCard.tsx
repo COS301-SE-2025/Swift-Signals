@@ -58,7 +58,7 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
             Location: {location}
           </p>
           <p className="intersectionLanes text-xl text-gray-700">
-            Type: {lanes} 
+            Type: {lanes}
           </p>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/WelcomePage.css"; // Make sure this path is correct
+import "../styles/WelcomePage.css";
 import Carousel from "../components/Carousel";
 
 const WelcomePage: React.FC = () => {
