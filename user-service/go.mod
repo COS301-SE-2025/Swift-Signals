@@ -26,3 +26,9 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+require (
+	github.com/COS301-SE-2025/Swift-Signals/protos/gen v0.1.0
+	github.com/COS301-SE-2025/Swift-Signals/shared v0.1.0
+	github.com/lib/pq v1.10.9
+)

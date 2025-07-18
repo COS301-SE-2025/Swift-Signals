@@ -13,17 +13,11 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db/postgres"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/service"
-	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection" //for development using grpcurl
 )
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
-
 	// Postgresql Connection
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
