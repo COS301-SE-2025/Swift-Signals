@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -53,16 +52,13 @@ func main() {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	s, _ := json.MarshalIndent(cfg, "", "\t")
-	fmt.Print(string(s))
+	userClient := mustConnectUserService(cfg.UserServiceAddr)
+	intrClient := mustConnectIntersectionService(cfg.IntersectionAddr)
 
-	// userClient := mustConnectUserService(cfg.UserServiceAddr)
-	// intrClient := mustConnectIntersectionService(cfg.IntersectionAddr)
-	//
-	// mux := setupRoutes(userClient, intrClient)
-	//
-	// server := createServer(cfg.Port, mux)
-	// runServer(server)
+	mux := setupRoutes(userClient, intrClient)
+
+	server := createServer(cfg.Port, mux)
+	runServer(server)
 }
 
 func mustConnectUserService(address string) *client.UserClient {
