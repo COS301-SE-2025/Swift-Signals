@@ -22,6 +22,11 @@ jobs:
 
       - name: Display Go version
         run: go version
+        
+      - name: Set up Go workspace
+        run: |
+          go work init ./api-gateway ./shared
+          go work sync
 
       - name: Run unit tests in api-gateway
         working-directory: ./api-gateway  #Change to ./test if need be
