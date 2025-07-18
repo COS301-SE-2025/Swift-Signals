@@ -9,13 +9,11 @@
   "author": "",
   "license": "ISC",
   "description": "",
-  "devDependencies": {
+  "dependencies": {
     "@google-cloud/dialogflow": "^7.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "express": "^5.1.0"
-  },
-  "dependencies": {
+    "express": "^5.1.0",
     "google-auth-library": "^10.1.0"
   }
 }

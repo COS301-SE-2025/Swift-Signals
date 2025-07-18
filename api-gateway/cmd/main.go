@@ -38,14 +38,16 @@ import (
 // @name Authorization
 // @description Type "Bearer" followed by a space and JWT token.
 func main() {
-	userConn, err := grpc.Dial("localhost:50051", grpc.WithInsecure()) // NOTE: Will change to use TLS later on
+	userGRPCAddr := os.Getenv("USER_GRPC_ADDR")
+	userConn, err := grpc.Dial(userGRPCAddr, grpc.WithInsecure()) // NOTE: Will change to use TLS later on
 	if err != nil {
 		log.Fatalf("failed to connect to User gRPC server: %v", err)
 	}
 	userClient := client.NewUserClient(userConn)
 	log.Println("Connected to User-Service")
 
-	intrConn, err := grpc.Dial("localhost:50052", grpc.WithInsecure()) // NOTE: Will change to use TLS later on
+	intrGRPCAddr := os.Getenv("INTR_GRPC_ADDR")
+	intrConn, err := grpc.Dial(intrGRPCAddr, grpc.WithInsecure()) // NOTE: Will change to use TLS later on
 	if err != nil {
 		log.Fatalf("failed to connect to Intersection gRPC server: %v", err)
 	}

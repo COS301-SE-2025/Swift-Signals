@@ -5,7 +5,6 @@ go 1.24.4
 require (
 	github.com/COS301-SE-2025/Swift-Signals/protos/gen v0.1.0
 	github.com/google/uuid v1.6.0
-	github.com/joho/godotenv v1.5.1
 	github.com/stretchr/testify v1.10.0
 	go.mongodb.org/mongo-driver v1.17.4
 	google.golang.org/grpc v1.73.0
