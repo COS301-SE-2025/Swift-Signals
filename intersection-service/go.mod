@@ -2,6 +2,11 @@ module github.com/COS301-SE-2025/Swift-Signals/intersection-service
 
 go 1.24.4
 
+replace (
+	github.com/COS301-SE-2025/Swift-Signals/protos/gen => ../protos/gen
+	github.com/COS301-SE-2025/Swift-Signals/shared => ../shared
+)
+
 require (
 	github.com/COS301-SE-2025/Swift-Signals/protos/gen v0.1.0
 	github.com/google/uuid v1.6.0

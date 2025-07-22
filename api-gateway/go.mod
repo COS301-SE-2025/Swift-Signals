@@ -2,8 +2,14 @@ module github.com/COS301-SE-2025/Swift-Signals/api-gateway
 
 go 1.24.4
 
+replace (
+	github.com/COS301-SE-2025/Swift-Signals/protos/gen => ../protos/gen
+	github.com/COS301-SE-2025/Swift-Signals/shared => ../shared
+)
+
 require (
 	github.com/COS301-SE-2025/Swift-Signals/protos/gen v0.1.0
+	github.com/COS301-SE-2025/Swift-Signals/shared v0.0.0-00010101000000-000000000000
 	github.com/swaggo/http-swagger v1.3.4
 	github.com/swaggo/swag v1.16.4
 	google.golang.org/grpc v1.73.0
