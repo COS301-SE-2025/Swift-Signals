@@ -65,18 +65,18 @@ body {
 }
 
 .card-icon-1 {
-  color: #3700ff;
-  background-color: #d0d3ff;
+  color: #0F5BA7;
+  background-color: #d4e9f9;
 }
 
 .card-icon-2 {
-  color: #008b25;
-  background-color: #87ff95;
+  color: #0F5BA7;
+  background-color: #d4e9f9;
 }
 
 .card-icon-3 {
-  color: #8600b3;
-  background-color: #ed96ff;
+  color: #0F5BA7;
+  background-color: #d4e9f9;
 }
 
 .card-text {
@@ -139,7 +139,7 @@ body {
 }
 
 .quick-action-button {
-  border: none;
+  /* border: none; */
   border-radius: 12px;
   padding: 0.75rem 1.5rem;
   font-size: 1em;
@@ -218,7 +218,7 @@ body {
 .view-report-button {
   background: none;
   border: none;
-  color: #991915;
+  color: #0F5BA7;
   font-weight: 500;
   font-size: 0.9em;
   cursor: pointer;
@@ -300,7 +300,7 @@ body {
 .progress-bar {
   height: 100%;
   border-radius: 4px;
-  background: linear-gradient(90deg, #d84a45, #991915);
+  background: linear-gradient(90deg, #3DAEF0, #0F5BA7);
   transition: width 0.5s ease-in-out;
 }
 

@@ -68,8 +68,8 @@ const Dashboard: React.FC = () => {
       const ctx = chartRef.current.getContext("2d");
       if (!ctx) return;
       const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-      gradient.addColorStop(0, "rgba(153, 25, 21, 0.4)");
-      gradient.addColorStop(1, "rgba(153, 25, 21, 0)");
+      gradient.addColorStop(0, "rgba(15, 91, 167, 0.4)");
+      gradient.addColorStop(1, "rgba(15, 91, 167, 0)");
       chartInstanceRef.current = new Chart(ctx, {
         type: "line",
         data: {
@@ -80,12 +80,12 @@ const Dashboard: React.FC = () => {
               data: [5000, 10000, 8000, 12000, 9000],
               fill: true,
               backgroundColor: gradient,
-              borderColor: "#991915",
+              borderColor: "#0F5BA7",
               borderWidth: 2.5,
               pointRadius: 0,
               pointHoverRadius: 8,
-              pointHoverBackgroundColor: "#991915",
-              pointHoverBorderColor: "#fff",
+              pointHoverBackgroundColor: "#0F5BA7",
+              pointHoverBorderColor: "#0066CC",
               tension: 0.4,
             },
           ],
@@ -153,7 +153,7 @@ const Dashboard: React.FC = () => {
         <div className="card-grid">
           <div className="card">
             <div className="card-icon-1">
-              <span className="text-blue-600">
+              <span className="text-[#0F5BA7]">
                 <FaRoad />
               </span>
             </div>
@@ -164,7 +164,7 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="card">
             <div className="card-icon-2">
-              <span className="text-green-600">
+              <span className="text-[#0F5BA7]">
                 <FaPlay />
               </span>
             </div>
@@ -175,7 +175,7 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="card">
             <div className="card-icon-3">
-              <span className="text-purple-600">
+              <span className="text-[#0F5BA7]">
                 <FaChartLine />
               </span>
             </div>
@@ -187,21 +187,17 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="dashboard-main-grid">
           <div className="main-column">
-            {/* --- MODIFICATION START --- */}
-            {/* Replaced 'flex flex-wrap' with a responsive grid layout */}
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-              <button className="quick-action-button bg-customIndigo text-white flex items-center justify-center gap-2">
+              <button className="quick-action-button bg-[#0F5BA7] text-white flex items-center justify-center gap-2">
                 <FaPlus /> New Intersection
               </button>
-              <button className="quick-action-button bg-customGreen text-white flex items-center justify-center gap-2">
+              <button className="quick-action-button bg-[#2B9348] text-white flex items-center justify-center gap-2">
                 <FaPlay /> Run Simulation
               </button>
-              {/* This button now spans 2 columns on smaller screens and 1 on extra-large screens */}
-              <button className="quick-action-button bg-customPurple text-white flex items-center justify-center gap-2 col-span-2 xl:col-span-1">
+              <button className="quick-action-button border-2 border-[#0F5BA7] text-[#0F5BA7] bg-white hover:bg-[#e6f1fa] transition flex items-center justify-center gap-2 col-span-2 xl:col-span-1">
                 <FaMap /> View Map
               </button>
             </div>
-            {/* --- MODIFICATION END --- */}
             <div className="recent-simulations-tab bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
                 Recent Simulations
@@ -236,7 +232,7 @@ const Dashboard: React.FC = () => {
                           </span>
                         </td>
                         <td className="p-2">
-                          <button className="view-details-button text-blue-600 hover:underline">
+                          <button className="view-details-button text-[#0F5BA7] hover:underline border-none">
                             View Details
                           </button>
                         </td>
