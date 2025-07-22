@@ -11,7 +11,10 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.7.2",
+    "@react-three/drei": "^10.5.1",
+    "@react-three/fiber": "^9.2.0",
     "@types/react-router-dom": "^5.3.3",
+    "@types/three": "^0.178.1",
     "chart.js": "^4.4.9",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.523.0",

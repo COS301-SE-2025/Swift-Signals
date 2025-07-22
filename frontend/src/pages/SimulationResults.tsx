@@ -1,439 +1,434 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/SimulationResults.css";
-import { Chart, registerables } from "chart.js";
 import HelpMenu from "../components/HelpMenu";
+import { Chart, registerables } from "chart.js";
+import { useLocation } from "react-router-dom";
 
-// Register Chart.js components
 Chart.register(...registerables);
 
-const SimulationResults: React.FC = () => {
-  const location = useLocation();
-  const [simulationData, setSimulationData] = useState<{
-    name: string;
-    description: string;
-    intersections: string[];
-  } | null>(null);
-  const [params, setParams] = useState<{ speed: number; density: number }>({
-    speed: 50,
-    density: 30,
-  });
-  const [optimizedParams, setOptimizedParams] = useState<{
-    speed: number;
-    density: number;
-  }>({ speed: 70, density: 20 });
-  const [isRunningSim, setIsRunningSim] = useState(false);
-  const [isRunningOpt, setIsRunningOpt] = useState(false);
-  const [showFooter, setShowFooter] = useState(false);
-  const [fullScreenChart, setFullScreenChart] = useState<
-    "simulation" | "optimized" | null
-  >(null);
-  const simCanvasRef = useRef<HTMLCanvasElement | null>(null);
-  const optCanvasRef = useRef<HTMLCanvasElement | null>(null);
+// Helper functions for stats and chart data
+type Position = { time: number; x: number; y: number; speed: number };
+type Vehicle = { id: string; positions: Position[] };
 
-  useEffect(() => {
-    if (location.state) {
-      setSimulationData(location.state);
-    }
-
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      setShowFooter(scrollPosition >= documentHeight - 10);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [location.state]);
-
-  const handleParamChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setParams((prev) => ({ ...prev, [name]: Number(value) }));
-  };
-
-  const handleOptimizedParamChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const { name, value } = e.target;
-    setOptimizedParams((prev) => ({ ...prev, [name]: Number(value) }));
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: "rgba(0, 0, 0, 0.9)",
-        cornerRadius: 10,
-        padding: 12,
-        bodyFont: { size: 14, weight: "bold" as const },
-      },
-    },
-    scales: {
-      x: {
-        display: true,
-        title: {
-          display: true,
-          text: "Parameter",
-          font: { size: 14, weight: "bold" as const },
-        },
-        grid: { color: "rgba(255, 255, 255, 0.1)" },
-      },
-      y: {
-        beginAtZero: true,
-        max: 100,
-        title: {
-          display: true,
-          text: "Value",
-          font: { size: 14, weight: "bold" as const },
-        },
-        grid: { color: "rgba(255, 255, 255, 0.1)" },
-      },
-    },
-    animation: {
-      duration: 1200,
-      easing: "easeOutQuart" as const,
-    },
-  };
-
-  const simulationChartData = {
-    labels: ["Speed", "Density"],
-    datasets: [
-      {
-        label: "Simulation",
-        data: [params.speed, params.density],
-        backgroundColor: ["#34D399", "#10B981"],
-        borderColor: ["#34D399", "#10B981"],
-        borderWidth: 2,
-        barThickness: 20,
-      },
-    ],
-  };
-
-  const optimizedChartData = {
-    labels: ["Speed", "Density"],
-    datasets: [
-      {
-        label: "Optimized",
-        data: [optimizedParams.speed, optimizedParams.density],
-        backgroundColor: ["#3B82F6", "#2563EB"],
-        borderColor: ["#3B82F6", "#2563EB"],
-        borderWidth: 2,
-        barThickness: 20,
-      },
-    ],
-  };
-
-  useEffect(() => {
-    let simChart: Chart | undefined;
-    if (simCanvasRef.current) {
-      simChart = new Chart(simCanvasRef.current, {
-        type: "bar",
-        data: simulationChartData,
-        options: chartOptions,
-      });
-    }
-    return () => simChart?.destroy();
-  }, [params, isRunningSim]);
-
-  useEffect(() => {
-    let optChart: Chart | undefined;
-    if (optCanvasRef.current) {
-      optChart = new Chart(optCanvasRef.current, {
-        type: "bar",
-        data: optimizedChartData,
-        options: chartOptions,
-      });
-    }
-    return () => optChart?.destroy();
-  }, [optimizedParams, isRunningOpt]);
-
-  useEffect(() => {
-    let fullScreenChartInstance: Chart | undefined;
-    const canvas = document.getElementById(
-      "fullScreenChart",
-    ) as HTMLCanvasElement | null;
-    if (canvas && fullScreenChart) {
-      const data =
-        fullScreenChart === "simulation"
-          ? simulationChartData
-          : optimizedChartData;
-      fullScreenChartInstance = new Chart(canvas, {
-        type: "bar",
-        data,
-        options: {
-          ...chartOptions,
-          plugins: {
-            ...chartOptions.plugins,
-            title: {
-              display: true,
-              text:
-                fullScreenChart === "simulation"
-                  ? "Simulation Visualization"
-                  : "Optimized Visualization",
-              font: { size: 18, weight: "bold" as const },
-              color: "#fff",
-            },
-          },
-        },
-      });
-    }
-    return () => fullScreenChartInstance?.destroy();
-  }, [fullScreenChart]);
-
-  const handleRunSimulation = () => {
-    setIsRunningSim(true);
-    setTimeout(() => setIsRunningSim(false), 2000);
-  };
-
-  const handleRunOptimized = () => {
-    setIsRunningOpt(true);
-    setTimeout(() => setIsRunningOpt(false), 2000);
-  };
-
-  const handleOptimize = () => {
-    setOptimizedParams({
-      speed: Math.min(params.speed + 20, 100),
-      density: Math.max(params.density - 10, 0),
+function computeStats(vehicles: Vehicle[]) {
+  let totalSpeed = 0, maxSpeed = -Infinity, minSpeed = Infinity, speedCount = 0;
+  let totalDistance = 0;
+  let vehicleCount = vehicles.length;
+  const finalSpeeds: number[] = [];
+  vehicles.forEach((veh: Vehicle) => {
+    let prev: Position | null = null;
+    veh.positions.forEach((pos: Position, idx: number) => {
+      totalSpeed += pos.speed;
+      speedCount++;
+      if (pos.speed > maxSpeed) maxSpeed = pos.speed;
+      if (pos.speed < minSpeed) minSpeed = pos.speed;
+      if (prev) {
+        const dx = pos.x - prev.x;
+        const dy = pos.y - prev.y;
+        totalDistance += Math.sqrt(dx * dx + dy * dy);
+      }
+      prev = pos;
     });
+    if (veh.positions.length > 0) {
+      finalSpeeds.push(veh.positions[veh.positions.length - 1].speed);
+    }
+  });
+  return {
+    avgSpeed: speedCount ? totalSpeed / speedCount : 0,
+    maxSpeed: maxSpeed === -Infinity ? 0 : maxSpeed,
+    minSpeed: minSpeed === Infinity ? 0 : minSpeed,
+    totalDistance,
+    vehicleCount,
+    finalSpeeds,
+  };
+}
+
+function getAllTimes(vehicles: Vehicle[]): number[] {
+  // Get all unique time points across all vehicles
+  const timeSet = new Set<number>();
+  vehicles.forEach((veh: Vehicle) => {
+    veh.positions.forEach((pos: Position) => timeSet.add(pos.time));
+  });
+  return Array.from(timeSet).sort((a, b) => a - b);
+}
+
+function getAverageSpeedOverTime(vehicles: Vehicle[], allTimes: number[]): number[] {
+  // For each time, compute average speed of all vehicles present at that time
+  return allTimes.map((t: number) => {
+    let sum = 0, count = 0;
+    vehicles.forEach((veh: Vehicle) => {
+      const pos = veh.positions.find((p: Position) => p.time === t);
+      if (pos) {
+        sum += pos.speed;
+        count++;
+      }
+    });
+    return count ? sum / count : 0;
+  });
+}
+
+function getVehicleCountOverTime(vehicles: Vehicle[], allTimes: number[]): number[] {
+  // For each time, count how many vehicles have a position at that time
+  return allTimes.map((t: number) => {
+    let count = 0;
+    vehicles.forEach((veh: Vehicle) => {
+      if (veh.positions.find((p: Position) => p.time === t)) count++;
+    });
+    return count;
+  });
+}
+
+function getTotalDistancePerVehicle(vehicles: Vehicle[]): number[] {
+  return vehicles.map((veh: Vehicle) => {
+    let dist = 0;
+    let prev: Position | null = null;
+    veh.positions.forEach((pos: Position) => {
+      if (prev) {
+        const dx = pos.x - prev.x;
+        const dy = pos.y - prev.y;
+        dist += Math.sqrt(dx * dx + dy * dy);
+      }
+      prev = pos;
+    });
+    return dist;
+  });
+}
+
+function getVehicleIds(vehicles: Vehicle[]): string[] {
+  return vehicles.map((veh: Vehicle) => veh.id);
+}
+
+function getHistogramData(data: number[], binSize = 2, maxVal = 40): number[] {
+  // Simple histogram for speeds
+  const bins = Math.ceil(maxVal / binSize);
+  const counts: number[] = Array(bins).fill(0);
+  data.forEach((v: number) => {
+    const idx = Math.min(Math.floor(v / binSize), bins - 1);
+    counts[idx]++;
+  });
+  return counts;
+}
+
+const SimulationResults: React.FC = () => {
+  const [simData, setSimData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const location = useLocation();
+
+  // Extract simulation info from location.state if available
+  const simInfo = location.state || {};
+  const simName = simInfo.name || simData?.name || "Simulation";
+  const simDesc = simInfo.description || simData?.description || "";
+  const simIntersections = simInfo.intersections || simData?.intersections || [];
+
+  // Extract traffic light stats from simData
+  let numPhases = 0;
+  let totalCycle = 0;
+  if (simData && simData.intersection && simData.intersection.trafficLights && simData.intersection.trafficLights.length > 0) {
+    const tl = simData.intersection.trafficLights[0];
+    numPhases = tl.phases.length;
+    totalCycle = tl.phases.reduce((sum: number, p: any) => sum + (p.duration || 0), 0);
+  }
+
+  // Chart refs
+  const simAvgSpeedRef = useRef<HTMLCanvasElement | null>(null);
+  const simVehCountRef = useRef<HTMLCanvasElement | null>(null);
+  const simFinalSpeedHistRef = useRef<HTMLCanvasElement | null>(null);
+  const simTotalDistRef = useRef<HTMLCanvasElement | null>(null);
+
+  const optAvgSpeedRef = useRef<HTMLCanvasElement | null>(null);
+  const optVehCountRef = useRef<HTMLCanvasElement | null>(null);
+  const optFinalSpeedHistRef = useRef<HTMLCanvasElement | null>(null);
+  const optTotalDistRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Chart instances for cleanup
+  const chartInstances = useRef<any[]>([]);
+
+  useEffect(() => {
+    fetch("/simulation_output (1).json")
+      .then((res) => res.json())
+      .then((data) => {
+        setSimData(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError("Failed to load simulation data");
+        setLoading(false);
+      });
+  }, []);
+
+  // Compute stats and chart data
+  let stats = null;
+  let allTimes: number[] = [];
+  let avgSpeedOverTime: number[] = [];
+  let vehCountOverTime: number[] = [];
+  let totalDistPerVeh: number[] = [];
+  let vehIds: string[] = [];
+  let finalSpeedHist: number[] = [];
+  let histLabels: string[] = [];
+
+  if (simData && simData.vehicles) {
+    stats = computeStats(simData.vehicles);
+    allTimes = getAllTimes(simData.vehicles);
+    avgSpeedOverTime = getAverageSpeedOverTime(simData.vehicles, allTimes);
+    vehCountOverTime = getVehicleCountOverTime(simData.vehicles, allTimes);
+    totalDistPerVeh = getTotalDistancePerVehicle(simData.vehicles);
+    vehIds = getVehicleIds(simData.vehicles);
+    finalSpeedHist = getHistogramData(stats.finalSpeeds, 2, 40);
+    histLabels = finalSpeedHist.map((_, i) => `${i * 2}-${i * 2 + 2}`);
+  }
+
+  // Handler for opening the rendering page
+  const handleViewRendering = () => {
+    window.open('/traffic-simulation', '_blank');
   };
 
-  const openFullScreen = (chartType: "simulation" | "optimized") => {
-    setFullScreenChart(chartType);
-  };
+  // Chart rendering
+  useEffect(() => {
+    // Cleanup previous charts
+    chartInstances.current.forEach((c) => c && c.destroy());
+    chartInstances.current = [];
+    if (!simData || !simData.vehicles) return;
+    // Chart options
+    const baseOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: "rgba(0,0,0,0.9)", cornerRadius: 10, padding: 12, bodyFont: { size: 14, weight: 'bold' as const } },
+      },
+      scales: {
+        x: { grid: { color: "rgba(255,255,255,0.1)" }, ticks: { color: "#ccc" }, title: { color: "#fff" } },
+        y: { grid: { color: "rgba(255,255,255,0.1)" }, ticks: { color: "#ccc" }, title: { color: "#fff" } },
+      },
+    };
+    // Simulation Results
+    if (simAvgSpeedRef.current) {
+      chartInstances.current.push(new Chart(simAvgSpeedRef.current, {
+        type: "line",
+        data: {
+          labels: allTimes,
+          datasets: [{ label: "Avg Speed", data: avgSpeedOverTime, borderColor: "#34D399", backgroundColor: "#34D39933", fill: true }],
+        },
+        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Average Speed Over Time", color: "#fff" } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { display: true, text: "Time (s)", color: "#fff" } }, y: { ...baseOptions.scales.y, title: { display: true, text: "Speed (m/s)", color: "#fff" } } } },
+      }));
+    }
+    if (simVehCountRef.current) {
+      chartInstances.current.push(new Chart(simVehCountRef.current, {
+        type: "line",
+        data: {
+          labels: allTimes,
+          datasets: [{ label: "Vehicle Count", data: vehCountOverTime, borderColor: "#60A5FA", backgroundColor: "#60A5FA33", fill: true }],
+        },
+        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Vehicle Count Over Time", color: "#fff" } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { display: true, text: "Time (s)", color: "#fff" } }, y: { ...baseOptions.scales.y, title: { display: true, text: "Count", color: "#fff" } } } },
+      }));
+    }
+    if (simFinalSpeedHistRef.current) {
+      chartInstances.current.push(new Chart(simFinalSpeedHistRef.current, {
+        type: "bar",
+        data: {
+          labels: histLabels,
+          datasets: [{ label: "Final Speeds", data: finalSpeedHist, backgroundColor: "#F59E42" }],
+        },
+        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Histogram of Final Speeds", color: "#fff" } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { display: true, text: "Speed (m/s)", color: "#fff" } }, y: { ...baseOptions.scales.y, title: { display: true, text: "Count", color: "#fff" } } } },
+      }));
+    }
+    if (simTotalDistRef.current) {
+      chartInstances.current.push(new Chart(simTotalDistRef.current, {
+        type: "bar",
+        data: {
+          labels: vehIds,
+          datasets: [{ label: "Total Distance", data: totalDistPerVeh, backgroundColor: "#8B5CF6" }],
+        },
+        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Total Distance per Vehicle", color: "#fff" } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { display: true, text: "Vehicle ID", color: "#fff" } }, y: { ...baseOptions.scales.y, title: { display: true, text: "Distance (m)", color: "#fff" } } } },
+      }));
+    }
+    // Optimized Results (same data for now)
+    if (optAvgSpeedRef.current) {
+      chartInstances.current.push(new Chart(optAvgSpeedRef.current, {
+        type: "line",
+        data: {
+          labels: allTimes,
+          datasets: [{ label: "Avg Speed", data: avgSpeedOverTime, borderColor: "#3B82F6", backgroundColor: "#3B82F633", fill: true }],
+        },
+        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Average Speed Over Time (Optimized)", color: "#fff" } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { display: true, text: "Time (s)", color: "#fff" } }, y: { ...baseOptions.scales.y, title: { display: true, text: "Speed (m/s)", color: "#fff" } } } },
+      }));
+    }
+    if (optVehCountRef.current) {
+      chartInstances.current.push(new Chart(optVehCountRef.current, {
+        type: "line",
+        data: {
+          labels: allTimes,
+          datasets: [{ label: "Vehicle Count", data: vehCountOverTime, borderColor: "#818CF8", backgroundColor: "#818CF833", fill: true }],
+        },
+        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Vehicle Count Over Time (Optimized)", color: "#fff" } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { display: true, text: "Time (s)", color: "#fff" } }, y: { ...baseOptions.scales.y, title: { display: true, text: "Count", color: "#fff" } } } },
+      }));
+    }
+    if (optFinalSpeedHistRef.current) {
+      chartInstances.current.push(new Chart(optFinalSpeedHistRef.current, {
+        type: "bar",
+        data: {
+          labels: histLabels,
+          datasets: [{ label: "Final Speeds", data: finalSpeedHist, backgroundColor: "#F472B6" }],
+        },
+        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Histogram of Final Speeds (Optimized)", color: "#fff" } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { display: true, text: "Speed (m/s)", color: "#fff" } }, y: { ...baseOptions.scales.y, title: { display: true, text: "Count", color: "#fff" } } } },
+      }));
+    }
+    if (optTotalDistRef.current) {
+      chartInstances.current.push(new Chart(optTotalDistRef.current, {
+        type: "bar",
+        data: {
+          labels: vehIds,
+          datasets: [{ label: "Total Distance", data: totalDistPerVeh, backgroundColor: "#06B6D4" }],
+        },
+        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Total Distance per Vehicle (Optimized)", color: "#fff" } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { display: true, text: "Vehicle ID", color: "#fff" } }, y: { ...baseOptions.scales.y, title: { display: true, text: "Distance (m)", color: "#fff" } } } },
+      }));
+    }
+    return () => {
+      chartInstances.current.forEach((c) => c && c.destroy());
+      chartInstances.current = [];
+    };
+  }, [simData]);
 
-  const closeFullScreen = () => {
-    setFullScreenChart(null);
-  };
-
-  if (!simulationData)
-    return (
-      <div className="text-center text-gray-700 dark:text-gray-300 py-10">
-        Loading...
-      </div>
-    );
+  if (loading) {
+    return <div className="text-center text-gray-700 dark:text-gray-300 py-10">Loading simulation data...</div>;
+  }
+  if (error) {
+    return <div className="text-center text-red-500 py-10">{error}</div>;
+  }
+  if (!simData) {
+    return <div className="text-center text-gray-700 dark:text-gray-300 py-10">No simulation data found.</div>;
+  }
 
   return (
-    <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100">
+    <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
       <Navbar />
       <div className="simRes-main-content py-8 px-6 overflow-y-auto">
         <div className="results max-w-7xl mx-auto">
-          <h1 className="simName text-4xl font-extrabold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-4">
-            {simulationData.name}
-          </h1>
-          <p className="simDesc text-lg text-gray-400 mb-6 leading-relaxed">
-            {simulationData.description}
-          </p>
-          <div className="flex flex-wrap gap-3 mb-8">
-            {simulationData.intersections.map((intersection, index) => (
-              <span
-                key={index}
-                className="simInt inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-medium text-teal-300 border border-teal-500/30 hover:bg-white/20 transition-all duration-300"
-              >
-                {intersection}
-              </span>
-            ))}
+          {/* Simulation meta info */}
+          <div className="mb-10">
+            <h1 className="simName text-4xl font-extrabold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-2">
+              {simName}
+            </h1>
+            {simDesc && (
+              <p className="simDesc text-lg text-gray-400 mb-4 leading-relaxed">{simDesc}</p>
+            )}
+            {simIntersections && simIntersections.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-2">
+                {simIntersections.map((intersection: string, idx: number) => (
+                  <span key={idx} className="px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-medium text-teal-300 border border-teal-500/30 hover:bg-white/20 transition-all duration-300">
+                    {intersection}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-60">
-            {/* Simulation Visualization Section */}
-            <div className="visSection bg-white/5 backdrop-blur-md p-6 rounded-xl shadow-lg border border-gray-800/50 hover:shadow-xl transition-all duration-300">
-              <h2 className="text-2xl font-semibold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-4">
-                Simulation Visualization
-              </h2>
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="flex-2 visualization-box h-96 relative bg-gray-900/50 border border-gray-700 rounded-lg overflow-hidden">
-                  <div
-                    onClick={() => openFullScreen("simulation")}
-                    className="chart-container cursor-pointer"
-                  >
-                    <canvas
-                      id="simulationChart"
-                      ref={simCanvasRef}
-                      className="w-full h-full"
-                    />
+          <div className="flex flex-col space-y-24">
+            {/* Simulation Results Section */}
+            <section className="visSection bg-white/5 backdrop-blur-md p-6 px-8 md:px-12 rounded-xl shadow-lg border border-gray-800/50 w-full max-w-full mx-auto text-center">
+              <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent">Simulation Results</h2>
+              <div className="flex flex-col md:flex-row gap-8">
+                {/* Stats column */}
+                <div className="flex flex-row md:flex-col gap-4 md:gap-6 mb-2 md:mb-0 md:min-w-[180px] md:max-w-[220px]">
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1">Average Speed</div>
+                    <div className="text-2xl font-bold text-teal-300">{stats ? stats.avgSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
                   </div>
-                  <div className="absolute bottom-6 right-6 flex space-x-4">
-                    <button
-                      onClick={handleRunSimulation}
-                      disabled={isRunningSim}
-                      className={`px-6 py-3 rounded-lg text-sm font-semibold ${isRunningSim ? "bg-gray-600 cursor-not-allowed" : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"} text-white shadow-md hover:shadow-lg transition-all duration-300`}
-                    >
-                      {isRunningSim ? "Running..." : "Run"}
-                    </button>
-                    <button
-                      onClick={handleOptimize}
-                      className="px-6 py-3 rounded-lg text-sm font-semibold bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-300"
-                    >
-                      Optimize
-                    </button>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1">Max Speed</div>
+                    <div className="text-2xl font-bold text-teal-300">{stats ? stats.maxSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
+                  </div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1">Min Speed</div>
+                    <div className="text-2xl font-bold text-teal-300">{stats ? stats.minSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
+                  </div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1">Total Distance</div>
+                    <div className="text-2xl font-bold text-teal-300">{stats ? stats.totalDistance.toFixed(2) : "..."} <span className="text-base font-normal">m</span></div>
+                  </div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1"># Vehicles</div>
+                    <div className="text-2xl font-bold text-teal-300">{stats ? stats.vehicleCount : "..."}</div>
+                  </div>
+                  {/* Traffic Light Stat Cards */}
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1"># TL Phases</div>
+                    <div className="text-2xl font-bold text-yellow-400">{numPhases}</div>
+                  </div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1">TL Cycle Duration</div>
+                    <div className="text-2xl font-bold text-yellow-400">{totalCycle} <span className="text-base font-normal">s</span></div>
                   </div>
                 </div>
-                <div className="parameters md:w-1/3 bg-gray-800/70 p-6 rounded-xl border border-gray-700">
-                  <h3 className="text-xl font-medium bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-4">
-                    Parameters
-                  </h3>
-                  <div className="space-y-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500 dark:text-gray-300 mb-2">
-                        Speed
-                      </label>
-                      <input
-                        type="number"
-                        name="speed"
-                        value={params.speed}
-                        onChange={handleParamChange}
-                        className="paramInput w-full p-3 rounded-lg bg-gray-700/50 border border-gray-600 text-gray-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300"
-                        min="0"
-                        max="100"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500 dark:text-gray-300 mb-2">
-                        Density
-                      </label>
-                      <input
-                        type="number"
-                        name="density"
-                        value={params.density}
-                        onChange={handleParamChange}
-                        className="paramInput w-full p-3 rounded-lg bg-gray-700/50 border border-gray-600 text-gray-100 focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300"
-                        min="0"
-                        max="100"
-                      />
-                    </div>
-                  </div>
+                {/* Graphs grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={simAvgSpeedRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={simVehCountRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={simFinalSpeedHistRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={simTotalDistRef} className="w-full h-full" /></div>
                 </div>
               </div>
-            </div>
-
-            {/* Optimized Visualization Section */}
-            <div className="visSection bg-white/5 backdrop-blur-md p-6 rounded-xl shadow-lg border border-gray-800/50 hover:shadow-xl transition-all duration-300">
-              <h2 className="text-2xl font-semibold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent mb-4">
-                Optimized Visualization
-              </h2>
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="flex-2 visualization-box h-96 relative bg-gray-900/50 border border-gray-700 rounded-lg overflow-hidden">
-                  <div
-                    onClick={() => openFullScreen("optimized")}
-                    className="chart-container cursor-pointer"
-                  >
-                    <canvas
-                      id="optimizedChart"
-                      ref={optCanvasRef}
-                      className="w-full h-full"
-                    />
+              {/* Action buttons */}
+              <div className="flex flex-row gap-4 justify-center mt-8">
+                <button className="px-6 py-3 rounded-lg text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white shadow-md transition-all duration-300">Optimize</button>
+                <button onClick={handleViewRendering} className="px-6 py-3 rounded-lg text-sm font-semibold bg-gray-200 hover:bg-gray-300 text-gray-800 shadow-md transition-all duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">View Rendering</button>
+              </div>
+            </section>
+            {/* Optimized Results Section */}
+            <section className="visSection bg-white/5 backdrop-blur-md p-6 px-8 md:px-12 rounded-xl shadow-lg border border-gray-800/50 w-full max-w-full mx-auto mt-12 text-center">
+              <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">Optimized Results</h2>
+              <div className="flex flex-col md:flex-row gap-8">
+                {/* Stats column */}
+                <div className="flex flex-row md:flex-col gap-4 md:gap-6 mb-2 md:mb-0 md:min-w-[180px] md:max-w-[220px]">
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1">Average Speed</div>
+                    <div className="text-2xl font-bold text-blue-300">{stats ? stats.avgSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
                   </div>
-                  <div className="absolute bottom-6 right-6">
-                    <button
-                      onClick={handleRunOptimized}
-                      disabled={isRunningOpt}
-                      className={`px-6 py-3 rounded-lg text-sm font-semibold ${isRunningOpt ? "bg-gray-600 cursor-not-allowed" : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"} text-white shadow-md hover:shadow-lg transition-all duration-300`}
-                    >
-                      {isRunningOpt ? "Running..." : "Run"}
-                    </button>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1">Max Speed</div>
+                    <div className="text-2xl font-bold text-blue-300">{stats ? stats.maxSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
+                  </div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1">Min Speed</div>
+                    <div className="text-2xl font-bold text-blue-300">{stats ? stats.minSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
+                  </div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1">Total Distance</div>
+                    <div className="text-2xl font-bold text-blue-300">{stats ? stats.totalDistance.toFixed(2) : "..."} <span className="text-base font-normal">m</span></div>
+                  </div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1"># Vehicles</div>
+                    <div className="text-2xl font-bold text-blue-300">{stats ? stats.vehicleCount : "..."}</div>
+                  </div>
+                  {/* Traffic Light Stat Cards */}
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1"># TL Phases</div>
+                    <div className="text-2xl font-bold text-yellow-400">{numPhases}</div>
+                  </div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm text-gray-400 mb-1">TL Cycle Duration</div>
+                    <div className="text-2xl font-bold text-yellow-400">{totalCycle} <span className="text-base font-normal">s</span></div>
                   </div>
                 </div>
-                <div className="parameters md:w-1/3 bg-gray-800/70 p-6 rounded-xl border border-gray-700">
-                  <h3 className="text-xl font-medium bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent mb-4">
-                    Optimized Parameters
-                  </h3>
-                  <div className="space-y-5">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500 dark:text-gray-300 mb-2">
-                        Speed
-                      </label>
-                      <input
-                        type="number"
-                        name="speed"
-                        value={optimizedParams.speed}
-                        onChange={handleOptimizedParamChange}
-                        className="paramInput w-full p-3 rounded-lg bg-gray-700/50 border border-gray-600 text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                        min="0"
-                        max="100"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-500 dark:text-gray-300 mb-2">
-                        Density
-                      </label>
-                      <input
-                        type="number"
-                        name="density"
-                        value={optimizedParams.density}
-                        onChange={handleOptimizedParamChange}
-                        className="paramInput w-full p-3 rounded-lg bg-gray-700/50 border border-gray-600 text-gray-100 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-300"
-                        min="0"
-                        max="100"
-                      />
-                    </div>
-                  </div>
+                {/* Graphs grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
+                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={optAvgSpeedRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={optVehCountRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={optFinalSpeedHistRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={optTotalDistRef} className="w-full h-full" /></div>
                 </div>
               </div>
-            </div>
-          </div>
-
-          {/* Full-Screen Modal */}
-          {fullScreenChart && (
-            <div className="fullscreen-modal fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-              <div className="relative w-full h-full max-w-7xl max-h-[90vh] p-4">
-                <button
-                  onClick={closeFullScreen}
-                  className="absolute top-4 right-4 text-white bg-gray-800/70 rounded-full p-2 hover:bg-gray-700 transition-all duration-300"
-                >
-                  ✕
-                </button>
-                <canvas id="fullScreenChart" className="w-full h-full" />
+              {/* Action button */}
+              <div className="flex flex-row gap-4 justify-center mt-8">
+                <button onClick={handleViewRendering} className="px-6 py-3 rounded-lg text-sm font-semibold bg-gray-200 hover:bg-gray-300 text-gray-800 shadow-md transition-all duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">View Rendering</button>
               </div>
-            </div>
-          )}
-
-          {/* Additional Content to Ensure Scrolling */}
-          <div className="mt-12">
-            <h2 className="statTitle text-2xl font-semibold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-4">
-              Statistics
-            </h2>
-            <p className="text-gray-400 mb-6 leading-relaxed">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </p>
-            <p className="text-gray-400 mb-6 leading-relaxed">
-              Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-              accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-              quae ab illo inventore veritatis et quasi architecto beatae vitae
-              dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-              aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-              eos qui ratione voluptatem sequi nesciunt.
-            </p>
-            <p className="text-gray-400 mb-6 leading-relaxed">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-              reprehenderit in voluptate velit esse cillum dolore eu fugiat
-              nulla pariatur. Excepteur sint occaecat cupidatat non proident,
-              sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </p>
-            <p className="text-gray-400 mb-6 leading-relaxed">
-              Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-              accusantium doloremque laudantium, totam rem aperiam, eaque ipsa
-              quae ab illo inventore veritatis et quasi architecto beatae vitae
-              dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit
-              aspernatur aut odit aut fugit, sed quia consequuntur magni dolores
-              eos qui ratione voluptatem sequi nesciunt.
-            </p>
+            </section>
           </div>
         </div>
       </div>
-      {showFooter && <Footer />}
+      <Footer />
       <HelpMenu />
     </div>
   );

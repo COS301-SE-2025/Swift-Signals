@@ -2,7 +2,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   margin-top: 50px;
   margin-bottom: 100px;
 }
@@ -68,7 +68,7 @@
 }
 
 .simulation-results-page .visSection {
-  width: 700px;
+  width: 80vw;
   background-color: #fff;
 }
 

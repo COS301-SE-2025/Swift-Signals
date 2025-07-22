@@ -12,6 +12,7 @@ import Users from "./pages/Users";
 import SimulationResults from "./pages/SimulationResults";
 import ErrorBoundary from "./components/ErrorBoundary";
 import WelcomePage from "./pages/WelcomePage";
+import TrafficSimulation from "./pages/TrafficSimulation";
 //import reactLogo from './assets/react.svg';
 //import viteLogo from '/vite.svg';
 import "./App.css";
@@ -31,6 +32,10 @@ function App() {
           <Route path="/intersections" element={<Intersections />} />
           <Route path="/Users" element={<Users />} />
           <Route path="/simulation-results" element={<SimulationResults />} />
+          <Route path="/traffic-simulation" element={<TrafficSimulation />} />
+          {/* Add more routes as needed */}
+          {/* <Route path="/about" element={<About />} /> */}
+          {/* <Route path="/contact" element={<Contact />} /> */}
           {/* Add more routes as needed */}
         </Routes>
       </ErrorBoundary>

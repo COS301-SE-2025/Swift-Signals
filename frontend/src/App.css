@@ -5,6 +5,25 @@
   text-align: center;
 }
 
+#root:has(.traffic-simulation-root) {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.traffic-simulation-root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+  background: #3d3d3d;
+  z-index: 10;
+}
+
 .logo {
   height: 6em;
   padding-top: 1.3em;
@@ -40,4 +59,9 @@
 
 .read-the-docs {
   color: #888;
+}
+
+canvas, div {
+  border: none !important;
+  box-shadow: none !important;
 }
