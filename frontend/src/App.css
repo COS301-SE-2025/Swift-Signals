@@ -5,6 +5,15 @@
   text-align: center;
 }
 
+#root:has(.dashboard-screen) {
+  max-width: none;
+  padding-top: 2rem;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  margin: 0;
+}
+
 #root:has(.traffic-simulation-root) {
   max-width: none !important;
   margin: 0 !important;

@@ -7,12 +7,12 @@ body {
   width: 100%;
   min-height: 100vh;
   background-color: #f0f0f0;
-  padding: 2rem;
+  padding: 4rem;
   padding-top: 6rem;
 }
 
 .dark .main-content {
-  background-color: #000000;
+  background-color: #0D1117;
 }
 
 .Dashboard-h1 {
@@ -26,7 +26,6 @@ body {
   color: #fff;
 }
 
-/* Summary Cards Grid */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -34,7 +33,6 @@ body {
   margin-bottom: 2rem;
 }
 
-/* Updated Card Layout */
 .card {
   background-color: #ffffff;
   border-radius: 16px;
@@ -49,8 +47,8 @@ body {
 }
 
 .dark .card {
-  background-color: #2a2a2a;
-  color: #f9fafb;
+  background-color: #161B22;
+  /* color: #E6EDF3; */
 }
 
 .card-icon-1,
@@ -69,14 +67,27 @@ body {
   background-color: #d4e9f9;
 }
 
+.dark .card-icon-1 {
+  color: #388BFD;
+  background-color: rgba(44, 89, 156, 0.192);
+}
+
 .card-icon-2 {
   color: #0F5BA7;
   background-color: #d4e9f9;
+}
+.dark .card-icon-2 {
+  color: #388BFD;
+  background-color: rgba(44, 89, 156, 0.192);
 }
 
 .card-icon-3 {
   color: #0F5BA7;
   background-color: #d4e9f9;
+}
+.dark .card-icon-3 {
+  color: #388BFD;
+  background-color: rgba(44, 89, 156, 0.192);
 }
 
 .card-text {
@@ -92,7 +103,7 @@ body {
 }
 
 .dark .card-h3 {
-  color: #dadada;
+  color: #8B949E;
 }
 
 .card-p {
@@ -103,10 +114,9 @@ body {
 }
 
 .dark .card-p {
-  color: #ffffff;
+  color: #E6EDF3;
 }
 
-/* Two-Column Main Layout */
 .dashboard-main-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -132,7 +142,6 @@ body {
   }
 }
 
-/* Recent Simulations Table */
 .recent-simulations-tab {
   border-radius: 16px;
   overflow: hidden;
@@ -151,7 +160,7 @@ body {
 }
 
 .dark .recent-simulations-tab {
-  background-color: #2a2a2a;
+  background-color: #161B22;
 }
 
 .recent-simulations-tab h2 {
@@ -189,7 +198,6 @@ body {
   text-decoration: underline;
 }
 
-/* Base Card Structure */
 .graph-card,
 .inter-card {
   background-color: #ffffff;
@@ -203,10 +211,9 @@ body {
 }
 .dark .graph-card,
 .dark .inter-card {
-  background-color: #2a2a2a;
+  background-color: #161B22;
 }
 
-/* Graph Card Header */
 .graph-card-header {
   display: flex;
   justify-content: space-between;
@@ -229,15 +236,15 @@ body {
 }
 
 .view-report-button:hover {
-  color: #7a1410;
+  color: #0F5BA7;
 }
 
 .dark .view-report-button {
-  color: #e5e7eb;
+  color: #388BFD;
 }
 
 .dark .view-report-button:hover {
-  color: #fff;
+  color: #388BFD;
 }
 
 .traffic-chart-container {
@@ -294,7 +301,7 @@ body {
   overflow: hidden;
 }
 .dark .progress-bar-container {
-  background-color: #374151;
+  background-color: #0D1117;
 }
 
 .progress-bar {
@@ -311,11 +318,11 @@ body {
   display: flex;
   justify-content: space-between;
   color: #4b5563;
-  font-size: 0.9em;
+  font-size: 1.0em;
 }
 .dark .inter-card-footer {
   border-top-color: #374151;
-  color: #d1d5db;
+  color: #E6EDF3;
 }
 
 canvas {

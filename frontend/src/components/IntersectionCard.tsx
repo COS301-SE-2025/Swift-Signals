@@ -53,15 +53,15 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
         </div>
 
         <div>
-          <h3 className="intersectionName text-3xl font-extrabold text-black mb-2">
+          <h3 className="intersectionName text-3xl font-extrabold text-black dark:text-[#E6EDF3] mb-2">
             {name}
           </h3>
-          <p className="intersectionID text-xl text-gray-700">ID: {id}</p>
+          <p className="intersectionID text-xl text-gray-700 dark:text-[#8B949E]">ID: {id}</p>
           {/* These fields now use the new props */}
-          <p className="intersectionLocation text-xl text-gray-700">
+          <p className="intersectionLocation text-xl text-gray-700 dark:text-[#8B949E]">
             Location: {location}
           </p>
-          <p className="intersectionLanes text-xl text-gray-700">
+          <p className="intersectionLanes text-xl text-gray-700 dark:text-[#8B949E]">
             Type: {lanes}
           </p>
         </div>
@@ -105,7 +105,7 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
         </button>
         <button
           onClick={() => onDelete(id)}
-          className="intersectionBtn bg-red-600 hover:bg-red-700 text-white text-lg font-semibold py-1 px-2 rounded-full flex items-center justify-center"
+          className="intersectionBtn bg-red-600 dark:bg-[#DA3633] hover:bg-red-700 text-white text-lg font-semibold py-1 px-2 rounded-full flex items-center justify-center"
         >
           <Trash2 size={18} strokeWidth={2} />
         </button>

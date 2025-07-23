@@ -229,24 +229,24 @@ const Dashboard: React.FC = () => {
         <div className="dashboard-main-grid">
           <div className="main-column">
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-              <button className="quick-action-button bg-[#0F5BA7] text-white flex items-center justify-center gap-2">
+              <button className="quick-action-button bg-[#0F5BA7] dark:bg-[#388BFD] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2">
                 <FaPlus /> New Intersection
               </button>
-              <button className="quick-action-button bg-[#2B9348] text-white flex items-center justify-center gap-2">
+              <button className="quick-action-button bg-[#2B9348] dark:bg-[#2DA44E] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2">
                 <FaPlay /> Run Simulation
               </button>
-              <button className="quick-action-button border-2 border-[#0F5BA7] text-[#0F5BA7] bg-white hover:bg-[#e6f1fa] transition flex items-center justify-center gap-2 col-span-2 xl:col-span-1" onClick={handleOpenMapModal}>
+              <button className="quick-action-button border-2 border-[#0F5BA7] dark:border-[#388BFD] text-[#0F5BA7] dark:text-[#388BFD] bg-white dark:bg-[#0D1117] hover:bg-[#e6f1fa] transition flex items-center justify-center gap-2 col-span-2 xl:col-span-1" onClick={handleOpenMapModal}>
                 <FaMap /> View Map
               </button>
             </div>
             <div className="recent-simulations-tab bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] mb-4">
                 Recent Simulations
               </h2>
               <div className="overflow-x-auto">
                 <table className="table-auto w-full text-left">
                   <thead>
-                    <tr className="text-gray-600 dark:text-gray-400">
+                    <tr className="text-gray-600 dark:text-[#8B949E]">
                       <th className="p-2">ID</th>
                       <th className="p-2">Intersection</th>
                       <th className="p-2">Status</th>
@@ -257,12 +257,12 @@ const Dashboard: React.FC = () => {
                     {simulations.map((sim) => (
                       <tr
                         key={sim.id}
-                        className="border-t dark:border-gray-700"
+                        className="border-t dark:border-[#30363D]"
                       >
-                        <td className="p-2 text-gray-700 dark:text-gray-200">
+                        <td className="p-2 text-gray-700 dark:text-[#E6EDF3]">
                           {sim.id}
                         </td>
-                        <td className="p-2 text-gray-700 dark:text-gray-200">
+                        <td className="p-2 text-gray-700 dark:text-[#E6EDF3]">
                           {sim.intersection}
                         </td>
                         <td className="p-2">
@@ -273,7 +273,7 @@ const Dashboard: React.FC = () => {
                           </span>
                         </td>
                         <td className="p-2">
-                          <button className="view-details-button text-[#0F5BA7] hover:underline border-none">
+                          <button className="view-details-button text-[#0F5BA7] dark:text-[#388BFD] hover:underline border-none">
                             View Details
                           </button>
                         </td>
@@ -288,7 +288,7 @@ const Dashboard: React.FC = () => {
           <div className="side-column">
             <div className="graph-card bg-white dark:bg-gray-800 rounded-lg shadow-md">
               <div className="graph-card-header">
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-[#E6EDF3]">
                   Traffic Volume
                 </h2>
                 <button className="view-report-button">
@@ -302,7 +302,7 @@ const Dashboard: React.FC = () => {
 
             <div className="inter-card bg-white dark:bg-gray-800 rounded-lg shadow-md">
               <div className="inter-card-header">
-                <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-[#E6EDF3]">
                   Top Intersections
                 </h3>
               </div>
