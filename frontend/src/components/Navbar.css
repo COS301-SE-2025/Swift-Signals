@@ -11,10 +11,12 @@
   height: 5rem;
   box-sizing: border-box;
   z-index: 1000;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .dark .navbar {
   background-color: #000000;
+  border-bottom: 1px solid #2a2a2a;
 }
 
 .navbar-left {
@@ -45,6 +47,7 @@
 .navbar-center {
   display: flex;
   align-items: center;
+  height: 100%;
 }
 
 .navbar-center .nav-links {
@@ -53,12 +56,23 @@
   gap: 1.5rem;
   margin: 0;
   padding: 0;
+  height: 100%;
+}
+
+.navbar-center .nav-links li {
+  height: 100%;
 }
 
 .navbar-center .nav-links li a {
+  display: flex;
+  align-items: center;
+  height: 100%;
   text-decoration: none;
   color: #333;
   font-size: clamp(0.9rem, 2vw, 1.1rem);
+  font-weight: 500;
+  border-bottom: 4px solid transparent;
+  transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .dark .navbar-center .nav-links li a {
@@ -66,11 +80,22 @@
 }
 
 .navbar-center .nav-links li a:hover {
-  color: #a33;
+  color: #0F5BA7;
 }
 
 .dark .navbar-center .nav-links li a:hover {
   color: #4b6fff;
+}
+
+.navbar-center .nav-links li a.active {
+  color: #0F5BA7;
+  font-weight: 700;
+  border-bottom: 4px solid #0F5BA7;
+}
+
+.dark .navbar-center .nav-links li a.active {
+  color: #0F5BA7;
+  border-bottom-color: #0F5BA7;
 }
 
 .navbar-right {
@@ -120,11 +145,10 @@
   display: none;
 }
 
-/* Media Queries for Responsiveness */
 @media (max-width: 768px) {
   .navbar {
     flex-wrap: wrap;
-    height: 5rem; /* Reduced height for mobile */
+    height: 5rem;
     padding: 0.5rem;
   }
 
@@ -133,7 +157,7 @@
   }
 
   .logo {
-    display: none; /* Hide Swift Signals text on mobile */
+    display: none;
   }
 
   .logo-image {
@@ -150,13 +174,14 @@
     display: none;
     width: 100%;
     position: absolute;
-    top: 4.5rem; /* Match reduced navbar height */
+    top: 4.5rem;
     left: 0;
     background-color: #fff;
     padding: 1rem;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     flex-direction: column;
     align-items: center;
+    height: auto;
   }
 
   .dark .navbar-center {
@@ -172,6 +197,20 @@
     align-items: center;
     gap: 1rem;
     width: 100%;
+    height: auto;
+  }
+
+  .navbar-center .nav-links li {
+    height: auto;
+    width: 100%;
+  }
+  
+  .navbar-center .nav-links li a {
+    height: auto;
+    width: 100%;
+    justify-content: center;
+    padding: 0.5rem 0;
+    border-bottom-width: 2px;
   }
 
   .navbar-right {
