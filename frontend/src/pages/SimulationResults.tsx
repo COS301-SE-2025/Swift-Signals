@@ -265,22 +265,22 @@ const SimulationResults: React.FC = () => {
     // Optimized Charts (using same data for demonstration)
     createChart(chartRefs.optAvgSpeedRef, {
         type: "line",
-        data: { labels: timeLabels, datasets: [{ label: "Average Speed (Optimized)", data: downsampledAvgSpeed, borderColor: "#3B82F6", backgroundColor: "#3B82F633", fill: true, tension: 0.3 }] },
+        data: { labels: timeLabels, datasets: [{ label: "Average Speed (Optimized)", data: downsampledAvgSpeed, borderColor: "#2B9348", backgroundColor: "#48ac4d33", fill: true, tension: 0.3 }] },
         options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Average Speed (Optimized)", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Time (s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Speed (m/s)" } } } },
     });
     createChart(chartRefs.optVehCountRef, {
         type: "line",
-        data: { labels: timeLabels, datasets: [{ label: "Vehicle Count (Optimized)", data: downsampledVehCount, borderColor: "#818CF8", backgroundColor: "#818CF833", fill: true, tension: 0.3 }] },
+        data: { labels: timeLabels, datasets: [{ label: "Vehicle Count (Optimized)", data: downsampledVehCount, borderColor: "#0F5BA7", backgroundColor: "#60A5FA33", fill: true, tension: 0.3 }] },
         options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Vehicle Count (Optimized)", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Time (s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Count" } } } },
     });
     createChart(chartRefs.optFinalSpeedHistRef, {
         type: "bar",
-        data: { labels: finalSpeedHistLabels, datasets: [{ label: "Final Speed Distribution (Optimized)", data: finalSpeedHist, backgroundColor: "#F472B6" }] },
+        data: { labels: finalSpeedHistLabels, datasets: [{ label: "Final Speed Distribution (Optimized)", data: finalSpeedHist, backgroundColor: "#0F5BA7" }] },
         options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Final Speeds Hist. (Optimized)", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Speed (m/s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Number of Vehicles" } } } },
     });
     createChart(chartRefs.optTotalDistHistRef, {
         type: "bar",
-        data: { labels: totalDistHistLabels, datasets: [{ label: "Total Distance Distribution (Optimized)", data: totalDistHist, backgroundColor: "#06B6D4" }] },
+        data: { labels: totalDistHistLabels, datasets: [{ label: "Total Distance Distribution (Optimized)", data: totalDistHist, backgroundColor: "#2B9348" }] },
         options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Total Distance Hist. (Optimized)", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Distance (m)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Number of Vehicles" } } } },
     });
 
@@ -331,39 +331,39 @@ const SimulationResults: React.FC = () => {
           </div>
           <div className="flex flex-col space-y-24">
             {/* Simulation Results Section */}
-            <section className="visSection bg-white/5 backdrop-blur-md p-6 px-8 md:px-12 rounded-xl shadow-lg border border-gray-800/50 w-full max-w-full mx-auto text-center">
+            <section className="visSection simulation-section bg-white/5 backdrop-blur-md p-6 px-8 md:px-12 rounded-xl shadow-lg border border-gray-800/50 w-full max-w-full mx-auto text-center">
               <h2 className="text-2xl font-semibold mb-4 bg-[#0F5BA7] bg-clip-text text-transparent">Simulation Results</h2>
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Stats column */}
                 <div className="flex flex-row md:flex-col gap-4 md:gap-6 mb-2 md:mb-0 md:min-w-[180px] md:max-w-[220px]">
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1">Average Speed</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.avgSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1">Average Speed</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.avgSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1">Max Speed</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.maxSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1">Max Speed</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.maxSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1">Min Speed</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.minSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1">Min Speed</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.minSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1">Total Distance</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.totalDistance.toFixed(2) : "..."} <span className="text-base font-normal">m</span></div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1">Total Distance</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.totalDistance.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1"># Vehicles</div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1"># Vehicles</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.vehicleCount : "..."}</div>
                   </div>
                   {/* Traffic Light Stat Cards */}
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1"># TL Phases</div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1"># TL Phases</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{numPhases}</div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1">TL Cycle Duration</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{totalCycle} <span className="text-base font-normal">s</span></div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1">TL Cycle Duration</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{totalCycle} <span className="text-base text-[#0F5BA7] font-normal">s</span></div>
                   </div>
                 </div>
                 {/* Graphs grid */}
@@ -375,45 +375,52 @@ const SimulationResults: React.FC = () => {
                 </div>
               </div>
               {/* Action buttons */}
-              <div className="flex flex-row gap-4 justify-center mt-8">
-                <button className="px-6 py-3 rounded-lg text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white shadow-md transition-all duration-300">Optimize</button>
-                <button onClick={handleViewRendering} className="px-6 py-3 rounded-lg text-sm font-semibold bg-gray-200 hover:bg-gray-300 text-gray-800 shadow-md transition-all duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">View Rendering</button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
+                <button className="px-8 py-3 text-base font-bold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/50 transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-blue-500/60 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                  Optimize
+                </button>
+                <button 
+                  onClick={handleViewRendering} 
+                  className="px-8 py-3 text-base font-bold text-[#0F5BA7] bg-transparent border-2 border-[#0F5BA7] rounded-xl transform transition-all duration-300 ease-in-out hover:bg-[#0F5BA7] hover:text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-600"
+                >
+                  View Rendering
+                </button>
               </div>
             </section>
             {/* Optimized Results Section */}
-            <section className="visSection bg-white/5 backdrop-blur-md p-6 px-8 md:px-12 rounded-xl shadow-lg border border-gray-800/50 w-full max-w-full mx-auto mt-12 text-center">
-              <h2 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">Optimized Results</h2>
+            <section className="visSection optimized-section bg-white/5 backdrop-blur-md p-6 px-8 md:px-12 rounded-xl shadow-lg border border-gray-800/50 w-full max-w-full mx-auto mt-12 text-center">
+              <h2 className="text-2xl font-semibold mb-4 bg-[#0F5BA7] bg-clip-text text-transparent">Optimized Results</h2>
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Stats column */}
                 <div className="flex flex-row md:flex-col gap-4 md:gap-6 mb-2 md:mb-0 md:min-w-[180px] md:max-w-[220px]">
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1">Average Speed</div>
-                    <div className="text-2xl font-bold text-blue-300">{stats ? stats.avgSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1">Average Speed</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.avgSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1">Max Speed</div>
-                    <div className="text-2xl font-bold text-blue-300">{stats ? stats.maxSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1">Max Speed</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.maxSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1">Min Speed</div>
-                    <div className="text-2xl font-bold text-blue-300">{stats ? stats.minSpeed.toFixed(2) : "..."} <span className="text-base font-normal">m/s</span></div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1">Min Speed</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.minSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1">Total Distance</div>
-                    <div className="text-2xl font-bold text-blue-300">{stats ? stats.totalDistance.toFixed(2) : "..."} <span className="text-base font-normal">m</span></div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1">Total Distance</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.totalDistance.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1"># Vehicles</div>
-                    <div className="text-2xl font-bold text-blue-300">{stats ? stats.vehicleCount : "..."}</div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1"># Vehicles</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.vehicleCount : "..."}</div>
                   </div>
                   {/* Traffic Light Stat Cards */}
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1"># TL Phases</div>
-                    <div className="text-2xl font-bold text-yellow-400">{numPhases}</div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1"># TL Phases</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{numPhases}</div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm text-gray-400 mb-1">TL Cycle Duration</div>
-                    <div className="text-2xl font-bold text-yellow-400">{totalCycle} <span className="text-base font-normal">s</span></div>
+                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                    <div className="text-sm font-bold text-gray-600 mb-1">TL Cycle Duration</div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">{totalCycle} <span className="text-base text-[#0F5BA7] font-normal">s</span></div>
                   </div>
                 </div>
                 {/* Graphs grid */}
@@ -425,8 +432,13 @@ const SimulationResults: React.FC = () => {
                 </div>
               </div>
               {/* Action button */}
-              <div className="flex flex-row gap-4 justify-center mt-8">
-                <button onClick={handleViewRendering} className="px-6 py-3 rounded-lg text-sm font-semibold bg-gray-200 hover:bg-gray-300 text-gray-800 shadow-md transition-all duration-300 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100">View Rendering</button>
+              <div className="flex flex-row gap-4 justify-center mt-12">
+                <button 
+                  onClick={handleViewRendering} 
+                  className="px-8 py-3 text-base font-bold text-[#0F5BA7] bg-transparent border-2 border-[#0F5BA7] rounded-xl transform transition-all duration-300 ease-in-out hover:bg-[#0F5BA7] hover:text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-600"
+                >
+                  View Rendering
+                </button>
               </div>
             </section>
           </div>
