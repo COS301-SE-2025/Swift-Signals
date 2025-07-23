@@ -4,6 +4,8 @@ import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
 import "../styles/Dashboard.css";
 import { Chart, registerables } from "chart.js";
+import MapModal from "../components/MapModal";
+import { useState } from "react";
 
 // Icons used in this component
 import {
@@ -59,6 +61,10 @@ const topIntersections = [
 const Dashboard: React.FC = () => {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
+  const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+  const [mapIntersections, setMapIntersections] = useState<any[]>([]);
+  const [isLoadingMap, setIsLoadingMap] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
     if (chartRef.current) {
@@ -146,6 +152,41 @@ const Dashboard: React.FC = () => {
 
   const maxVolume = Math.max(...topIntersections.map((i) => i.volume), 0);
 
+  // Fetch intersections for map modal
+  const fetchMapIntersections = async () => {
+    setIsLoadingMap(true);
+    setMapError(null);
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await fetch("http://localhost:9090/intersections", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!response.ok) throw new Error("Failed to fetch intersections");
+      const data = await response.json();
+      // Add placeholder coordinates if missing
+      const intersectionsWithCoords = (data.intersections || []).map((intr: any, idx: number) => ({
+        ...intr,
+        details: {
+          ...intr.details,
+          latitude: intr.details.latitude ?? (-25.7479 + 0.01 * idx),
+          longitude: intr.details.longitude ?? (28.2293 + 0.01 * idx),
+        },
+      }));
+      setMapIntersections(intersectionsWithCoords);
+    } catch (err: any) {
+      setMapError(err.message || "Unknown error");
+      setMapIntersections([]);
+    } finally {
+      setIsLoadingMap(false);
+    }
+  };
+
+  const handleOpenMapModal = () => {
+    setIsMapModalOpen(true);
+    fetchMapIntersections();
+  };
+  const handleCloseMapModal = () => setIsMapModalOpen(false);
+
   return (
     <div className="dashboard-screen min-h-screen bg-gray-100 dark:bg-gray-900">
       <Navbar />
@@ -194,7 +235,7 @@ const Dashboard: React.FC = () => {
               <button className="quick-action-button bg-[#2B9348] text-white flex items-center justify-center gap-2">
                 <FaPlay /> Run Simulation
               </button>
-              <button className="quick-action-button border-2 border-[#0F5BA7] text-[#0F5BA7] bg-white hover:bg-[#e6f1fa] transition flex items-center justify-center gap-2 col-span-2 xl:col-span-1">
+              <button className="quick-action-button border-2 border-[#0F5BA7] text-[#0F5BA7] bg-white hover:bg-[#e6f1fa] transition flex items-center justify-center gap-2 col-span-2 xl:col-span-1" onClick={handleOpenMapModal}>
                 <FaMap /> View Map
               </button>
             </div>
@@ -299,6 +340,17 @@ const Dashboard: React.FC = () => {
       </main>
       <Footer />
       <HelpMenu />
+      <MapModal isOpen={isMapModalOpen} onClose={handleCloseMapModal} intersections={mapIntersections} />
+      {isLoadingMap && isMapModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded shadow text-center">Loading map data...</div>
+        </div>
+      )}
+      {mapError && isMapModalOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded shadow text-center text-red-600">{mapError}</div>
+        </div>
+      )}
     </div>
   );
 };
