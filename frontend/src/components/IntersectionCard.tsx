@@ -70,14 +70,14 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
       <div className="intBtns flex flex-col space-y-3">
         <button
           onClick={() => onSimulate(id)}
-          className="intersectionBtn bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-2 px-8 rounded-full"
+          className="intersectionBtn bg-[#0F5BA7] hover:bg-blue-700 text-white text-lg font-semibold py-2 px-8 rounded-full"
         >
           ▶ Simulate
         </button>
 
         <button
           onClick={() => onEdit(id)}
-          className="intersectionBtn bg-green-600 hover:bg-green-700 text-white text-lg font-semibold py-2 px-8 rounded-full"
+          className="intersectionBtn bg-[#2B9348] hover:bg-green-700 text-white text-lg font-semibold py-2 px-8 rounded-full"
         >
           ✏️ Edit
         </button>
@@ -92,14 +92,14 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
       <div className="mobileIntBtns flex flex-col space-y-3">
         <button
           onClick={() => onSimulate(id)}
-          className="intersectionBtn bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-1 px-2 rounded-full"
+          className="intersectionBtn bg-[#0F5BA7] hover:bg-blue-700 text-white text-lg font-semibold py-1 px-2 rounded-full"
         >
           ▶
         </button>
 
         <button
           onClick={() => onEdit(id)}
-          className="intersectionBtn bg-green-600 hover:bg-green-700 text-white text-lg font-semibold py-1 px-2 rounded-full"
+          className="intersectionBtn bg-[#2B9348] hover:bg-green-700 text-white text-lg font-semibold py-1 px-2 rounded-full"
         >
           ✏️
         </button>

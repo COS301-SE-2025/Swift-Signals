@@ -224,7 +224,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 disabled:bg-red-400 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-[#0F5BA7] text-white rounded-md hover:bg-red-800 disabled:bg-red-400 disabled:cursor-not-allowed"
             >
               {isLoading ? "Creating..." : "Create Intersection"}
             </button>
@@ -376,7 +376,7 @@ const Intersections = () => {
                 <input
                   type="text"
                   placeholder="Search by Name or ID..."
-                  className="searchBar w-full pl-4 pr-10 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
+                  className="searchBar w-full pl-4 pr-10 py-2 border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -386,7 +386,7 @@ const Intersections = () => {
               </div>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="addIntersectionBtn flex-shrink-0 bg-red-700 hover:bg-red-800 text-white font-medium py-2 px-4 rounded-md"
+                className="addIntersectionBtn flex-shrink-0 bg-[#0F5BA7] hover:bg-[#3DAEF0] text-white font-medium py-2 px-4 rounded-md"
               >
                 Add Intersection
               </button>
