@@ -31,15 +31,15 @@ body {
 
 .viewBtn {
   border-radius: 50px;
-  background-color: #92a4fb;
-  color: #000000;
+  background-color: #0F5BA7;
+  color: #ffffff;
   width: 50px;
 }
 
 .deleteBtn {
   border-radius: 50px;
   background-color: #ca5252;
-  color: #000000;
+  color: #ffffff;
   width: 50px;
 }
 
@@ -75,7 +75,7 @@ body {
 }
 
 .dark .intersection-pill {
-  background-color: #4f46e5;
+  background-color: #0F5BA7;
   color: #e0e7ff;
 }
 
@@ -86,7 +86,7 @@ body {
   cursor: pointer;
   font-size: 0.75rem;
   line-height: 1;
-  color: #4f46e5;
+  color: #0F5BA7;
   padding: 0;
 }
 
@@ -824,3 +824,4 @@ body {
     max-width: 70px;
   }
 }
+

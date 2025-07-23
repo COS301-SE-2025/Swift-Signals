@@ -1,5 +1,5 @@
 // src/components/IntersectionCard.tsx
-
+import { PlayCircle, PencilLine, Trash2 } from "lucide-react";
 import React from "react";
 import "../styles/IntersectionCard.css";
 
@@ -70,44 +70,44 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
       <div className="intBtns flex flex-col space-y-3">
         <button
           onClick={() => onSimulate(id)}
-          className="intersectionBtn bg-[#0F5BA7] hover:bg-blue-700 text-white text-lg font-semibold py-2 px-8 rounded-full"
+          className="intersectionBtn bg-[#0F5BA7] hover:bg-blue-700 text-white text-lg font-semibold py-2 px-8 rounded-full flex items-center justify-center gap-2"
         >
-          ▶ Simulate
+          <PlayCircle size={22} strokeWidth={2} /> Simulate
         </button>
 
         <button
           onClick={() => onEdit(id)}
-          className="intersectionBtn bg-[#2B9348] hover:bg-green-700 text-white text-lg font-semibold py-2 px-8 rounded-full"
+          className="intersectionBtn bg-[#2B9348] hover:bg-green-700 text-white text-lg font-semibold py-2 px-8 rounded-full flex items-center justify-center gap-2"
         >
-          ✏️ Edit
+          <PencilLine size={22} strokeWidth={2} /> Edit
         </button>
 
         <button
           onClick={() => onDelete(id)}
-          className="intersectionBtn bg-red-600 hover:bg-red-700 text-white text-lg font-semibold py-2 px-8 rounded-full"
+          className="intersectionBtn bg-red-600 hover:bg-red-700 text-white text-lg font-semibold py-2 px-8 rounded-full flex items-center justify-center gap-2"
         >
-          🗑️ Delete
+          <Trash2 size={22} strokeWidth={2} /> Delete
         </button>
       </div>
       <div className="mobileIntBtns flex flex-col space-y-3">
         <button
           onClick={() => onSimulate(id)}
-          className="intersectionBtn bg-[#0F5BA7] hover:bg-blue-700 text-white text-lg font-semibold py-1 px-2 rounded-full"
+          className="intersectionBtn bg-[#0F5BA7] hover:bg-blue-700 text-white text-lg font-semibold py-1 px-2 rounded-full flex items-center justify-center"
         >
-          ▶
+          <PlayCircle size={18} strokeWidth={2} />
         </button>
 
         <button
           onClick={() => onEdit(id)}
-          className="intersectionBtn bg-[#2B9348] hover:bg-green-700 text-white text-lg font-semibold py-1 px-2 rounded-full"
+          className="intersectionBtn bg-[#2B9348] hover:bg-green-700 text-white text-lg font-semibold py-1 px-2 rounded-full flex items-center justify-center"
         >
-          ✏️
+          <PencilLine size={18} strokeWidth={2} />
         </button>
         <button
           onClick={() => onDelete(id)}
-          className="intersectionBtn bg-red-600 hover:bg-red-700 text-white text-lg font-semibold py-1 px-2 rounded-full"
+          className="intersectionBtn bg-red-600 hover:bg-red-700 text-white text-lg font-semibold py-1 px-2 rounded-full flex items-center justify-center"
         >
-          🗑️
+          <Trash2 size={18} strokeWidth={2} />
         </button>
       </div>
     </div>

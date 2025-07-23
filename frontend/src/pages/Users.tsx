@@ -147,14 +147,12 @@ const Users = () => {
     },
   ];
 
-  // Detect screen size and adjust rowsPerPage
   useEffect(() => {
     const mediaQuery = window.matchMedia(
       "(max-width: 1400px) and (max-height: 800px)",
     );
     const handleMediaChange = (e: MediaQueryListEvent | MediaQueryList) => {
       setRowsPerPage(e.matches ? 7 : 9);
-      // Reset to first page when rowsPerPage changes to avoid invalid page
       setCurrentPage(1);
     };
 
@@ -166,7 +164,6 @@ const Users = () => {
 
   const totalPages = Math.ceil(users.length / rowsPerPage);
 
-  // Calculate the start and end indices for the current page
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const currentUsers = users.slice(startIndex, endIndex);
@@ -178,7 +175,6 @@ const Users = () => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  // Generate page numbers with ellipsis
   const getPageNumbers = () => {
     const pageNumbers: (number | string)[] = [];
     const maxPagesToShow = 5;

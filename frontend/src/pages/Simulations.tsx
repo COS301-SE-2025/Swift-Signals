@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, Trash2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { Bar } from "react-chartjs-2";
@@ -243,19 +244,19 @@ const NewSimulationModal: React.FC<{
             <div className="intersection-tabs flex space-x-2 mb-3">
               <button
                 onClick={() => setActiveTab("List")}
-                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === "List" ? "bg-indigo-600 text-white dark:bg-indigo-500" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === "List" ? "bg-[#2B9348] text-white dark:bg-indigo-500" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
               >
                 List
               </button>
               <button
                 onClick={() => setActiveTab("Search")}
-                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === "Search" ? "bg-indigo-600 text-white dark:bg-indigo-500" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === "Search" ? "bg-[#2B9348] text-white dark:bg-indigo-500" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
               >
                 Search
               </button>
               <button
                 onClick={() => setActiveTab("Map")}
-                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === "Map" ? "bg-indigo-600 text-white dark:bg-indigo-500" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === "Map" ? "bg-[#2B9348] text-white dark:bg-indigo-500" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
               >
                 Map
               </button>
@@ -264,7 +265,7 @@ const NewSimulationModal: React.FC<{
               <select
                 value=""
                 onChange={(e) => handleAddIntersection(e.target.value)}
-                className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full p-2 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2B9348]"
               >
                 <option value="">Select an intersection</option>
                 {intersections.map((intersection) => (
@@ -285,7 +286,7 @@ const NewSimulationModal: React.FC<{
                 />
                 <button
                   onClick={handleSearch}
-                  className="px-4 py-2 rounded-md text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-all duration-300"
+                  className="px-4 py-2 rounded-md text-sm font-medium bg-[#2B9348] text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 transition-all duration-300"
                 >
                   Add
                 </button>
@@ -326,7 +327,7 @@ const NewSimulationModal: React.FC<{
           </button>
           <button
             onClick={handleSubmit}
-            className="create-simulation-submit-btn px-4 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 dark:from-green-400 dark:to-green-500 dark:hover:from-green-500 dark:hover:to-green-600 transition-all duration-300"
+            className="create-simulation-submit-btn px-4 py-2 rounded-md text-sm font-medium bg-[#0F5BA7] text-white hover:from-green-600 hover:to-green-700 dark:from-green-400 dark:to-green-500 dark:hover:from-green-500 dark:hover:to-green-600 transition-all duration-300"
           >
             Create
           </button>
@@ -443,18 +444,15 @@ const SimulationTable: React.FC<{
         </thead>
         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
           {paginatedSimulations.map((sim) => {
-            // Create gradient for bar colors
             const canvas = document.createElement("canvas");
             const ctx = canvas.getContext("2d");
             const gradientWaitTime = ctx?.createLinearGradient(0, 0, 0, 100);
-            gradientWaitTime?.addColorStop(0, "#34D399");
-            gradientWaitTime?.addColorStop(1, "#10B981");
+            gradientWaitTime?.addColorStop(0, "#2B9348");
+            gradientWaitTime?.addColorStop(1, "#2B9348");
 
             const gradientThroughput = ctx?.createLinearGradient(0, 0, 0, 100);
-            gradientThroughput?.addColorStop(0, "#3B82F6");
-            gradientThroughput?.addColorStop(1, "#2563EB");
-
-            // Chart data for the row
+            gradientThroughput?.addColorStop(0, "#0F5BA7");
+            gradientThroughput?.addColorStop(1, "#0F5BA7");
             const chartData = {
               labels: ["Wait", "Throughput"],
               datasets: [
@@ -500,14 +498,14 @@ const SimulationTable: React.FC<{
                       className="viewBtn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium w-full text-center"
                       title="View Results"
                     >
-                      <i className="fas fa-eye"></i>
+                      <Eye size={18} strokeWidth={2} />
                     </button>
                     <button
                       onClick={() => handleDelete(sim.id)}
                       className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center"
                       title="Delete Simulation"
                     >
-                      <i className="fas fa-trash"></i>
+                      <Trash2 size={18} strokeWidth={2} />
                     </button>
                   </div>
                 </td>
@@ -521,7 +519,7 @@ const SimulationTable: React.FC<{
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 0}
-            className={`px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-indigo-500 to-indigo-600 text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             Prev
           </button>
@@ -529,7 +527,7 @@ const SimulationTable: React.FC<{
             <button
               key={index}
               onClick={() => handlePageChange(index)}
-              className={`px-3 py-1 rounded-full text-sm font-medium ${currentPage === index ? "bg-indigo-600 text-white dark:bg-indigo-500" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
+              className={`px-3 py-1 rounded-full text-sm font-medium ${currentPage === index ? "bg-[#0F5BA7] text-white dark:bg-indigo-500" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
             >
               {index + 1}
             </button>
@@ -537,7 +535,7 @@ const SimulationTable: React.FC<{
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages - 1}
-            className={`px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-indigo-500 to-indigo-600 text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${currentPage === totalPages - 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${currentPage === totalPages - 1 ? "opacity-50 cursor-not-allowed" : ""}`}
           >
             Next
           </button>
@@ -601,7 +599,7 @@ const Simulations: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => handleNewSimulation("simulations")}
-                  className="new-simulation-button px-4 py-2 rounded-md text-sm font-medium bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 dark:from-green-400 dark:to-green-500 dark:hover:from-green-500 dark:hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg"
+                  className="new-simulation-button px-4 py-2 rounded-md text-sm font-medium bg-[#0F5BA7] text-white hover:from-green-600 hover:to-green-700 dark:from-green-400 dark:to-green-500 dark:hover:from-green-500 dark:hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   New Simulation
                 </button>
