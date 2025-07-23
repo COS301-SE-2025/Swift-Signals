@@ -56,7 +56,7 @@
   height: 50px;
   border-radius: 50%;
   transform: translate(-380px, -50%);
-  background: #7a1410;
+  background: #0F5BA7;
   font-size: 22px;
   gap: 0; /* Remove gap when it's a circle */
 }
@@ -160,12 +160,12 @@
   background-color: #3a3a3a;
 }
 .help-tab-button.active {
-  color: #991915;
-  background-color: #fce8e7;
+  color: #0F5BA7;
+  background-color: #e8f1fa;
 }
 .dark .help-tab-button.active {
   color: white;
-  background-color: #7a1410;
+  background-color: #0F5BA7;
 }
 
 /* --- REVISED General Help Content & NEW Accordion Styles --- */
@@ -231,7 +231,7 @@
 }
 
 .accordion-header:hover {
-  color: #991915;
+  color: #0F5BA7;
 }
 .dark .accordion-header:hover {
   color: #e8c2c1;
@@ -264,7 +264,7 @@
 .accordion-item h4 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #991915;
+  color: #0F5BA7;
   margin-bottom: 0.5rem;
 }
 
@@ -328,7 +328,7 @@
   text-align: left;
 }
 .message-wrapper.user .chat-message p {
-  background-color: #991915;
+  background-color: #0F5BA7;
   color: white;
   border-bottom-right-radius: 5px;
 }
@@ -350,8 +350,8 @@
 }
 .quick-replies button {
   background-color: transparent;
-  border: 1px solid #991915;
-  color: #991915;
+  border: 1px solid #0F5BA7;
+  color: #0F5BA7;
   padding: 8px 15px;
   border-radius: 20px;
   cursor: pointer;
@@ -359,15 +359,15 @@
   transition: all 0.2s ease;
 }
 .dark .quick-replies button {
-  border-color: #b05a57;
-  color: #b05a57;
+  border-color: #406283;
+  color: #406283;
 }
 .quick-replies button:hover {
-  background-color: #991915;
+  background-color: #0F5BA7;
   color: white;
 }
 .dark .quick-replies button:hover {
-  background-color: #b05a57;
+  background-color: #406283;
   color: white;
 }
 .chatbot-input {
@@ -393,12 +393,12 @@
 }
 .chatbot-input input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(153, 25, 21, 0.3);
+  box-shadow: 0 0 0 2px rgba(21, 78, 153, 0.3);
 }
 .chatbot-input button {
   background: none;
   border: none;
-  color: #991915;
+  color: #0F5BA7;
   font-size: 22px;
   margin-left: 12px;
   cursor: pointer;
@@ -407,7 +407,7 @@
   transition: color 0.2s;
 }
 .chatbot-input button:hover {
-  color: #7a1410;
+  color: #0F5BA7;
 }
 .dark .chatbot-input button:hover {
   color: #b05a57;
@@ -590,12 +590,12 @@
 
 /* 'Yes' button */
 .confirmation-buttons button:last-of-type {
-  background-color: #991915;
+  background-color: #0F5BA7;
   color: white;
 }
 
 .confirmation-buttons button:last-of-type:hover {
-  background-color: #7a1410;
+  background-color: #0F5BA7;
 }
 
 .confirmation-buttons button:active {
@@ -640,7 +640,7 @@
 }
 
 .faq-question:hover {
-  color: #991915;
+  color: #0F5BA7;
 }
 .dark .faq-question:hover {
   color: #e8c2c1;
