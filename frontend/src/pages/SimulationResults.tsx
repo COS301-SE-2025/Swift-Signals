@@ -322,7 +322,7 @@ const SimulationResults: React.FC = () => {
             {simIntersections && simIntersections.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
                 {simIntersections.map((intersection: string, idx: number) => (
-                  <span key={idx} className="px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-medium text-[#0F5BA7] border border-[#0F5BA7] hover:bg-white/20 transition-all duration-300">
+                  <span key={idx} className="px-4 py-2 bg-white/10 dark:bg-[#161B22] backdrop-blur-md rounded-full text-sm font-medium text-[#0F5BA7] border-2 border-[#0F5BA7] hover:bg-white/20 transition-all duration-300">
                     {intersection}
                   </span>
                 ))}
@@ -336,42 +336,42 @@ const SimulationResults: React.FC = () => {
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Stats column */}
                 <div className="flex flex-row md:flex-col gap-4 md:gap-6 mb-2 md:mb-0 md:min-w-[180px] md:max-w-[220px]">
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1">Average Speed</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.avgSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1">Max Speed</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.maxSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1">Min Speed</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.minSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1">Total Distance</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.totalDistance.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1"># Vehicles</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.vehicleCount : "..."}</div>
                   </div>
                   {/* Traffic Light Stat Cards */}
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1"># TL Phases</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{numPhases}</div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1">TL Cycle Duration</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{totalCycle} <span className="text-base text-[#0F5BA7] font-normal">s</span></div>
                   </div>
                 </div>
                 {/* Graphs grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simAvgSpeedRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simVehCountRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simFinalSpeedHistRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simTotalDistHistRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simAvgSpeedRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simVehCountRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simFinalSpeedHistRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simTotalDistHistRef} className="w-full h-full" /></div>
                 </div>
               </div>
               {/* Action buttons */}
@@ -393,42 +393,42 @@ const SimulationResults: React.FC = () => {
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Stats column */}
                 <div className="flex flex-row md:flex-col gap-4 md:gap-6 mb-2 md:mb-0 md:min-w-[180px] md:max-w-[220px]">
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1">Average Speed</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.avgSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1">Max Speed</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.maxSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1">Min Speed</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.minSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1">Total Distance</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.totalDistance.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m</span></div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1"># Vehicles</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.vehicleCount : "..."}</div>
                   </div>
                   {/* Traffic Light Stat Cards */}
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1"># TL Phases</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{numPhases}</div>
                   </div>
-                  <div className="stat-cube bg-white dark:bg-gray-900/80 border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-gray-700 rounded-xl p-6 text-center shadow-md">
+                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
                     <div className="text-sm font-bold text-gray-600 mb-1">TL Cycle Duration</div>
                     <div className="text-2xl font-bold text-[#0F5BA7]">{totalCycle} <span className="text-base text-[#0F5BA7] font-normal">s</span></div>
                   </div>
                 </div>
                 {/* Graphs grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optAvgSpeedRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optVehCountRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optFinalSpeedHistRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-gray-900/60 outline outline-1 outline-gray-300 dark:outline-gray-700 rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optTotalDistHistRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optAvgSpeedRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optVehCountRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optFinalSpeedHistRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optTotalDistHistRef} className="w-full h-full" /></div>
                 </div>
               </div>
               {/* Action button */}

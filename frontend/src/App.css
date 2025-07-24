@@ -14,6 +14,16 @@
   margin: 0;
 }
 
+.dark #root:has(.simulation-results-page .simRes-main-content) {
+  background-color: #0D1117;
+  max-width: none;
+  padding-top: 2rem;
+  padding-left: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  margin: 0;
+}
+
 #root:has(.traffic-simulation-root) {
   max-width: none !important;
   margin: 0 !important;
