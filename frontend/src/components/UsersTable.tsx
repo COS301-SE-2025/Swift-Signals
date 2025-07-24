@@ -19,9 +19,9 @@ interface UsersTableProps {
 
 const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onDelete }) => {
   return (
-    <div className="usersTablePage bg-white rounded-lg shadow-sm overflow-hidden">
+    <div className="usersTablePage bg-white dark:bg-[#161B22] rounded-lg shadow-sm overflow-hidden">
       <table className="usersTable w-full border-collapse">
-        <thead className="border-b bg-gray-50">
+        <thead className="border-b bg-gray-50 dark:border-[#30363D]">
           <tr>
             <th className="px-4 py-3 font-bold text-black text-center">ID</th>
             <th className="px-4 py-3 font-bold text-black text-center">Name</th>
@@ -39,7 +39,7 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onDelete }) => {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id} className="border-b hover:bg-gray-50">
+            <tr key={user.id} className="border-b hover:bg-gray-50 dark:border-[#30363D]">
               <td className="px-4 py-3 text-black text-center">{user.id}</td>
               <td className="px-4 py-3 text-black">{user.name}</td>
               <td className="px-4 py-3 text-black">{user.email}</td>
@@ -51,14 +51,14 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onDelete }) => {
                 <div className="flex gap-2 justify-center">
                   <button
                     onClick={() => onEdit(user.id)}
-                    className="p-2 bg-[#2B9348] text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-colors"
+                    className="p-2 bg-[#2B9348] dark:bg-[#2DA44E] text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-colors"
                     aria-label="Edit user"
                   >
                     <PencilLine size={18} strokeWidth={2} />
                   </button>
                   <button
                     onClick={() => onDelete(user.id)}
-                    className="p-2 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                    className="p-2 bg-red-500 dark:bg-[#DA3633] text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
                     aria-label="Delete user"
                   >
                     <Trash2 size={18} strokeWidth={2} />
