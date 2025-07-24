@@ -1,10 +1,9 @@
-package postgres
+package db
 
 import (
 	"context"
 	"database/sql"
 
-	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 )
 
@@ -12,7 +11,7 @@ type PostgresUserRepo struct {
 	db *sql.DB
 }
 
-func NewPostgresUserRepo(db *sql.DB) db.UserRepository {
+func NewPostgresUserRepo(db *sql.DB) UserRepository {
 	return &PostgresUserRepo{db: db}
 }
 
