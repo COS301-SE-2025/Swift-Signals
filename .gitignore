@@ -23,6 +23,7 @@
 
 # Go workspace file
 go.work
+go.work.sum
 
 ### Linux ###
 *~
@@ -222,7 +223,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/

@@ -1,0 +1,37 @@
+# .github/workflows/api-unit-test.yml
+name: API Unit Tests
+
+on:
+  push:
+    branches: [api-gateway]
+  pull_request:
+    branches: [api-gateway]
+  workflow_dispatch:
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.3'  # Adjust to match Go version
+
+      - name: Display Go version
+        run: go version
+
+      - name: Run unit tests in api-gateway
+        working-directory: ./api-gateway  #Change to ./test if need be
+        run: |
+          go mod tidy
+          go test -v ./...
+
+#in go.mod or main_test.go you may need to check that you have something like this:
+  #import (
+    #"testing"
+    #"github.com/youruser/yourrepo/api-gateway"
+  #)
