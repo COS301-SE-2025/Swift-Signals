@@ -3,8 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import "../styles/HelpMenu.css";
 import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
-
-// Icons
 import {
   FaTimes,
   FaCommentDots,
@@ -14,7 +12,6 @@ import {
 } from "react-icons/fa";
 import { IoSend } from "react-icons/io5";
 
-// Other types
 type QuickReply = { text: string; payload: string };
 type ChatMessage = {
   text: string;
@@ -27,7 +24,6 @@ type TutorialType =
   | "intersections"
   | "simulations"
   | "users";
-// Add these new types
 type DialogflowMessage = {
   payload?: {
     fields?: {
@@ -63,7 +59,6 @@ type DialogflowQuickReplyOption = {
   };
 };
 
-// --- TUTORIAL STEP DEFINITIONS ---
 const dashboardTutorialSteps: TutorialStep[] = [
   {
     selector: ".card-grid",
@@ -271,7 +266,6 @@ const usersTutorialSteps: TutorialStep[] = [
   },
 ];
 
-// --- UPDATED: New, more detailed FAQ data ---
 const faqData = [
   {
     question: "What is Swift Signals?",
@@ -353,7 +347,6 @@ const HelpMenu: React.FC = () => {
     tutorialType: TutorialType;
   } | null>(null);
 
-  // --- ADDED: State to manage the open FAQ item ---
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
   const location = useLocation();
@@ -375,14 +368,11 @@ const HelpMenu: React.FC = () => {
     }
   }, [messages, isBotTyping]);
 
-  // This single, unified function handles all communication with the bot
   const sendQueryToBot = async (query: { text?: string; event?: string }) => {
     const { text, event } = query;
 
-    // Exit if the user tries to send an empty text message
     if (text && text.trim() === "") return;
 
-    // Add the user's message to the chat window UI only if it's a text message
     if (text) {
       const newUserMessage: ChatMessage = { text, sender: "user" };
       setMessages((prev) => [...prev, newUserMessage]);
@@ -408,7 +398,6 @@ const HelpMenu: React.FC = () => {
 
       let quickReplies: QuickReply[] = [];
       if (data.fulfillmentMessages) {
-        // FIXED: Replaced 'any' with 'DialogflowMessage'
         const payload = data.fulfillmentMessages.find(
           (msg: DialogflowMessage) => msg.payload,
         );
@@ -416,7 +405,6 @@ const HelpMenu: React.FC = () => {
           const options =
             payload.payload.fields.richContent.listValue.values[0].listValue
               .values[0].structValue.fields.options.listValue.values;
-          // FIXED: Replaced 'any' with 'DialogflowQuickReplyOption'
           quickReplies = options.map((option: DialogflowQuickReplyOption) => ({
             text: option.structValue.fields.text.stringValue,
             payload:
@@ -434,13 +422,10 @@ const HelpMenu: React.FC = () => {
 
       setMessages((prev) => [...prev, botResponse]);
 
-      // --- THE CORRECTED AND FINAL ACTION HANDLER ---
-      // It now looks inside the 'fields' object for the lowercase 'tutorialtopic'
       if (
         data.action === "start.tutorial" &&
         data.parameters?.fields?.tutorialtopic
       ) {
-        // Get the actual value from inside the object structure
         const tutorialType = data.parameters.fields.tutorialtopic
           .stringValue as TutorialType;
 
@@ -466,7 +451,6 @@ const HelpMenu: React.FC = () => {
     }
   };
 
-  // This useEffect hook correctly calls our unified function for the welcome message
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       sendQueryToBot({ event: "WELCOME" });
@@ -518,7 +502,6 @@ const HelpMenu: React.FC = () => {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
-  // --- ADDED: Handler to toggle individual FAQ items ---
   const toggleFaq = (index: number) => {
     setOpenFaqIndex((prevIndex) => (prevIndex === index ? null : index));
   };
@@ -730,7 +713,6 @@ const HelpMenu: React.FC = () => {
                 <div
                   className={`accordion-content ${openSections["faq"] ? "open" : ""}`}
                 >
-                  {/* --- UPDATED: Renders the new nested FAQ accordion --- */}
                   <div className="faq-list">
                     {faqData.map((item, index) => (
                       <div key={index} className="faq-item">
