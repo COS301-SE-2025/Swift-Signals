@@ -93,22 +93,22 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl relative">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 ">
+      <div className="bg-white dark:bg-[#161B22] p-8 rounded-lg shadow-xl w-full max-w-2xl relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 dark:hover:text-gray-200"
+          className="absolute top-4 right-4 text-gray-500 dark:text-[#E6EDF3] hover:text-gray-800 dark:hover:text-gray-200"
         >
           <X size={24} />
         </button>
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-white">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-[#E6EDF3]">
           Create New Intersection
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
             >
               Intersection Name
             </label>
@@ -117,7 +117,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
               name="name"
               id="name"
               required
-              className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
+              className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
               value={formData.name}
               onChange={handleChange}
             />
@@ -125,7 +125,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
           <div>
             <label
               htmlFor="details.address"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
             >
               Address
             </label>
@@ -134,7 +134,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
               name="details.address"
               id="details.address"
               required
-              className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
+              className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
               value={formData.details.address}
               onChange={handleChange}
             />
@@ -142,7 +142,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
           <div>
             <label
               htmlFor="traffic_density"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
             >
               Traffic Density
             </label>
@@ -150,7 +150,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
               name="traffic_density"
               id="traffic_density"
               required
-              className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
+              className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
               value={formData.traffic_density}
               onChange={handleChange}
             >
@@ -163,7 +163,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
             <div>
               <label
                 htmlFor="default_parameters.green"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
               >
                 Green Light (s)
               </label>
@@ -172,7 +172,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                 name="default_parameters.green"
                 id="default_parameters.green"
                 required
-                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
+                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
                 value={formData.default_parameters.green}
                 onChange={handleChange}
               />
@@ -180,7 +180,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
             <div>
               <label
                 htmlFor="default_parameters.yellow"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
               >
                 Yellow Light (s)
               </label>
@@ -189,7 +189,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                 name="default_parameters.yellow"
                 id="default_parameters.yellow"
                 required
-                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
+                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
                 value={formData.default_parameters.yellow}
                 onChange={handleChange}
               />
@@ -197,7 +197,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
             <div>
               <label
                 htmlFor="default_parameters.red"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
               >
                 Red Light (s)
               </label>
@@ -206,7 +206,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                 name="default_parameters.red"
                 id="default_parameters.red"
                 required
-                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
+                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
                 value={formData.default_parameters.red}
                 onChange={handleChange}
               />
@@ -217,14 +217,14 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+              className="px-4 py-2 bg-gray-300 dark:bg-[#161B22] dark:border-2 dark:border-[#DA3633] text-gray-800 rounded-md hover:bg-gray-400 dark:text-white dark:hover:bg-[#DA3633]"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 bg-[#0F5BA7] text-white rounded-md hover:bg-red-800 disabled:bg-red-400 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-[#0F5BA7] dark:bg-[#388BFD] text-white rounded-md hover:bg-red-800 disabled:bg-red-400 disabled:cursor-not-allowed"
             >
               {isLoading ? "Creating..." : "Create Intersection"}
             </button>
@@ -386,7 +386,7 @@ const Intersections = () => {
               </div>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className="addIntersectionBtn flex-shrink-0 bg-[#0F5BA7] hover:bg-[#3DAEF0] text-white font-medium py-2 px-4 rounded-md"
+                className="addIntersectionBtn flex-shrink-0 bg-[#0F5BA7] dark:bg-[#388BFD] hover:bg-[#3DAEF0] text-white font-medium py-2 px-4 rounded-md"
               >
                 Add Intersection
               </button>

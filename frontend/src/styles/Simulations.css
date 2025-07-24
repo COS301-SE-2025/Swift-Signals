@@ -18,7 +18,7 @@ body {
 }
 
 .dark .sim-main-content {
-  background-color: #000000;
+  background-color: #0D1117;
 }
 
 .table-fixed-height {
@@ -36,11 +36,21 @@ body {
   width: 50px;
 }
 
+.dark .viewBtn {
+  background-color: #388BFD;
+  color: #ffffff;
+}
+
 .deleteBtn {
   border-radius: 50px;
   background-color: #ca5252;
   color: #ffffff;
   width: 50px;
+}
+
+.dark .deleteBtn {
+  background-color: #DA3633;
+  color: #ffffff;
 }
 
 .simGrid {
@@ -75,8 +85,8 @@ body {
 }
 
 .dark .intersection-pill {
-  background-color: #0F5BA7;
-  color: #e0e7ff;
+  background-color: #388BFD;
+  color: #ffffff;
 }
 
 .intersection-pill .remove-cross {
