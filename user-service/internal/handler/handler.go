@@ -12,10 +12,10 @@ import (
 
 type Handler struct {
 	userpb.UnimplementedUserServiceServer
-	service *service.Service
+	service service.UserService
 }
 
-func NewHandler(s *service.Service) *Handler {
+func NewUserHandler(s service.UserService) *Handler {
 	return &Handler{service: s}
 }
 

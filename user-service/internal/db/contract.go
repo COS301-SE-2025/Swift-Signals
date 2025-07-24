@@ -2,10 +2,10 @@ package db
 
 import (
 	"context"
+
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 )
 
-// Repository interface defines the contract for user data operations
 type UserRepository interface {
 	CreateUser(ctx context.Context, user *model.User) (*model.User, error)
 	GetUserByID(ctx context.Context, id string) (*model.User, error)

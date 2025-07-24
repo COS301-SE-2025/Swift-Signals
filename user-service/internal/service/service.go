@@ -20,7 +20,7 @@ type Service struct {
 	repo db.UserRepository
 }
 
-func NewService(r db.UserRepository) *Service {
+func NewUserService(r db.UserRepository) UserService {
 	return &Service{repo: r}
 }
 
