@@ -1,0 +1,27 @@
+from concurrent import futures
+
+from google.protobuf.json_format import MessageToDict, ParseDict
+
+import grpc
+import optimisation_pb2 as pb
+import optimisation_pb2_grpc as pb_grpc
+
+
+class OptimisationServicer(pb_grpc.OptimisationServiceServicer):
+    def RunOptimisation(self, request, context):
+        print("RunOptimisationResult request received with intersection_type:",
+              request.parameters.intersection_type)
+
+
+def serve():
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    pb_grpc.add_OptimisationServiceServicer_to_server(
+        OptimisationServicer(), server)
+    server.add_insecure_port("localhost:50054")
+    server.start()
+    print("Optimisation Service listening on port :50054")
+    server.wait_for_termination()
+
+
+if __name__ == "__main__":
+    serve()
