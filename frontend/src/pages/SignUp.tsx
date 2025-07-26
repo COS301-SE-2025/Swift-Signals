@@ -174,7 +174,7 @@ const SignUp = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Username"
-              className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border-2 border-[#388BFD] rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
               disabled={isLoading}
             />
@@ -190,7 +190,7 @@ const SignUp = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
-              className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border-2 border-[#388BFD] rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
               disabled={isLoading}
             />
@@ -206,7 +206,7 @@ const SignUp = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border-2 border-[#388BFD] rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
               disabled={isLoading}
             />
@@ -215,7 +215,7 @@ const SignUp = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg disabled:bg-indigo-400 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full bg-indigo-600 dark:bg-[#388BFD] hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg disabled:bg-indigo-400 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isLoading && (
                 <svg
@@ -248,7 +248,7 @@ const SignUp = () => {
           <button
             type="button"
             onClick={() => navigate("/login")}
-            className="font-medium text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors bg-transparent border-none p-0 m-0 cursor-pointer"
+            className="font-medium text-indigo-600 dark:text-[#388BFD] hover:text-indigo-800 hover:underline transition-colors bg-transparent border-none p-0 m-0 cursor-pointer"
             style={{ background: "none" }}
           >
             Login here
