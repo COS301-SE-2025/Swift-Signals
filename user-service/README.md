@@ -12,8 +12,6 @@ go test -v ./internal/db/test ./internal/service/test ./internal/handler/test
 
 With coverage:
 ```bash
-go test -v -coverprofile=coverage.out -coverpkg=./inte
-rnal/db/,./internal/service/,./internal/handler/ ./interna
-l/db/test ./internal/service/test ./internal/handler/test
+go test -v -coverprofile=coverage.out -coverpkg=./internal/db/,./internal/service/,./internal/handler/ ./internal/db/test ./internal/service/test ./internal/handler/test
 ```
 
