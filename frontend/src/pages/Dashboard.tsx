@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import HelpMenu from "../components/HelpMenu"; // MODIFICATION: Import the new component
+import HelpMenu from "../components/HelpMenu";
 import "../styles/Dashboard.css";
 import { Chart, registerables } from "chart.js";
 
@@ -20,10 +20,34 @@ Chart.register(...registerables);
 
 // Data remains the same
 const simulations = [
-  { id: "#1234", intersection: "Main St & 5th Ave", status: "Complete", statusColor: "bg-statusGreen", textColor: "text-statusTextGreen" },
-  { id: "#1233", intersection: "Broadway & 7th St", status: "Running", statusColor: "bg-statusYellow", textColor: "text-statusTextYellow" },
-  { id: "#1232", intersection: "Park Ave & 3rd St", status: "Failed", statusColor: "bg-statusRed", textColor: "text-statusTextRed" },
-  { id: "#1231", intersection: "Broadway & 7th St", status: "Running", statusColor: "bg-statusYellow", textColor: "text-statusTextYellow" },
+  {
+    id: "#1234",
+    intersection: "Main St & 5th Ave",
+    status: "Complete",
+    statusColor: "bg-statusGreen",
+    textColor: "text-statusTextGreen",
+  },
+  {
+    id: "#1233",
+    intersection: "Broadway & 7th St",
+    status: "Running",
+    statusColor: "bg-statusYellow",
+    textColor: "text-statusTextYellow",
+  },
+  {
+    id: "#1232",
+    intersection: "Park Ave & 3rd St",
+    status: "Failed",
+    statusColor: "bg-statusRed",
+    textColor: "text-statusTextRed",
+  },
+  {
+    id: "#1231",
+    intersection: "Broadway & 7th St",
+    status: "Running",
+    statusColor: "bg-statusYellow",
+    textColor: "text-statusTextYellow",
+  },
 ];
 
 const topIntersections = [
@@ -35,8 +59,6 @@ const topIntersections = [
 const Dashboard: React.FC = () => {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
-
-  // All help-menu related states and functions have been removed.
 
   useEffect(() => {
     if (chartRef.current) {
@@ -52,28 +74,33 @@ const Dashboard: React.FC = () => {
         type: "line",
         data: {
           labels: ["6 AM", "7 AM", "8 AM", "9 AM", "10 AM"],
-          datasets: [{
-            label: "Traffic Volume",
-            data: [5000, 10000, 8000, 12000, 9000],
-            fill: true,
-            backgroundColor: gradient,
-            borderColor: "#991915",
-            borderWidth: 2.5,
-            pointRadius: 0,
-            pointHoverRadius: 8,
-            pointHoverBackgroundColor: "#991915",
-            pointHoverBorderColor: "#fff",
-            tension: 0.4,
-          }],
+          datasets: [
+            {
+              label: "Traffic Volume",
+              data: [5000, 10000, 8000, 12000, 9000],
+              fill: true,
+              backgroundColor: gradient,
+              borderColor: "#991915",
+              borderWidth: 2.5,
+              pointRadius: 0,
+              pointHoverRadius: 8,
+              pointHoverBackgroundColor: "#991915",
+              pointHoverBorderColor: "#fff",
+              tension: 0.4,
+            },
+          ],
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
+          interaction: { mode: "index", intersect: false },
           scales: {
             x: {
               grid: { display: false },
-              ticks: { color: "#6B7280", font: { size: 12, family: "'Inter', sans-serif" } },
+              ticks: {
+                color: "#6B7280",
+                font: { size: 12, family: "'Inter', sans-serif" },
+              },
               border: { display: false },
             },
             y: {
@@ -96,7 +123,11 @@ const Dashboard: React.FC = () => {
               bodyColor: "#E5E7EB",
               cornerRadius: 8,
               padding: 12,
-              titleFont: { weight: "bold", size: 14, family: "'Inter', sans-serif" },
+              titleFont: {
+                weight: "bold",
+                size: 14,
+                family: "'Inter', sans-serif",
+              },
               bodyFont: { size: 12, family: "'Inter', sans-serif" },
               displayColors: false,
               caretPadding: 10,
@@ -113,7 +144,7 @@ const Dashboard: React.FC = () => {
     };
   }, []);
 
-  const maxVolume = Math.max(...topIntersections.map(i => i.volume), 0);
+  const maxVolume = Math.max(...topIntersections.map((i) => i.volume), 0);
 
   return (
     <div className="dashboard-screen min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -122,7 +153,9 @@ const Dashboard: React.FC = () => {
         <div className="card-grid">
           <div className="card">
             <div className="card-icon-1">
-              <span className="text-blue-600"><FaRoad /></span>
+              <span className="text-blue-600">
+                <FaRoad />
+              </span>
             </div>
             <div>
               <h3 className="card-h3">Total Intersections</h3>
@@ -131,7 +164,9 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="card">
             <div className="card-icon-2">
-              <span className="text-green-600"><FaPlay /></span>
+              <span className="text-green-600">
+                <FaPlay />
+              </span>
             </div>
             <div>
               <h3 className="card-h3">Active Simulations</h3>
@@ -140,7 +175,9 @@ const Dashboard: React.FC = () => {
           </div>
           <div className="card">
             <div className="card-icon-3">
-              <span className="text-purple-600"><FaChartLine /></span>
+              <span className="text-purple-600">
+                <FaChartLine />
+              </span>
             </div>
             <div>
               <h3 className="card-h3">Optimization Runs</h3>
@@ -148,20 +185,23 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
-
         <div className="dashboard-main-grid">
           <div className="main-column">
-            <div className="flex flex-wrap items-center gap-4 mb-6">
+            {/* --- MODIFICATION START --- */}
+            {/* Replaced 'flex flex-wrap' with a responsive grid layout */}
+            <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
               <button className="quick-action-button bg-customIndigo text-white flex items-center justify-center gap-2">
                 <FaPlus /> New Intersection
               </button>
               <button className="quick-action-button bg-customGreen text-white flex items-center justify-center gap-2">
                 <FaPlay /> Run Simulation
               </button>
-              <button className="quick-action-button bg-customPurple text-white flex items-center justify-center gap-2">
+              {/* This button now spans 2 columns on smaller screens and 1 on extra-large screens */}
+              <button className="quick-action-button bg-customPurple text-white flex items-center justify-center gap-2 col-span-2 xl:col-span-1">
                 <FaMap /> View Map
               </button>
             </div>
+            {/* --- MODIFICATION END --- */}
             <div className="recent-simulations-tab bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">
                 Recent Simulations
@@ -178,11 +218,20 @@ const Dashboard: React.FC = () => {
                   </thead>
                   <tbody>
                     {simulations.map((sim) => (
-                      <tr key={sim.id} className="border-t dark:border-gray-700">
-                        <td className="p-2 text-gray-700 dark:text-gray-200">{sim.id}</td>
-                        <td className="p-2 text-gray-700 dark:text-gray-200">{sim.intersection}</td>
+                      <tr
+                        key={sim.id}
+                        className="border-t dark:border-gray-700"
+                      >
+                        <td className="p-2 text-gray-700 dark:text-gray-200">
+                          {sim.id}
+                        </td>
+                        <td className="p-2 text-gray-700 dark:text-gray-200">
+                          {sim.intersection}
+                        </td>
                         <td className="p-2">
-                          <span className={`status px-2 py-1 rounded-full text-xs ${sim.statusColor} ${sim.textColor}`}>
+                          <span
+                            className={`status px-2 py-1 rounded-full text-xs ${sim.statusColor} ${sim.textColor}`}
+                          >
                             {sim.status}
                           </span>
                         </td>
@@ -222,12 +271,17 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="intersection-list">
                 {topIntersections.map((intersection, index) => {
-                  const percentage = maxVolume > 0 ? (intersection.volume / maxVolume) * 100 : 0;
+                  const percentage =
+                    maxVolume > 0 ? (intersection.volume / maxVolume) * 100 : 0;
                   return (
                     <div key={index} className="intersection-item">
                       <div className="intersection-details">
-                        <span className="intersection-name">{intersection.name}</span>
-                        <span className="intersection-volume">{intersection.volumeText}</span>
+                        <span className="intersection-name">
+                          {intersection.name}
+                        </span>
+                        <span className="intersection-volume">
+                          {intersection.volumeText}
+                        </span>
                       </div>
                       <div className="progress-bar-container">
                         <div
@@ -248,8 +302,6 @@ const Dashboard: React.FC = () => {
         </div>
       </main>
       <Footer />
-
-      {/* MODIFICATION: The entire help menu is now handled by this single component */}
       <HelpMenu />
     </div>
   );

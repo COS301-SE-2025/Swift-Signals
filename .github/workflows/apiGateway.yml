@@ -3,9 +3,10 @@ name: API Unit Tests
 
 on:
   push:
-    branches: [main, dev, api-gateway]
+    branches: [api-gateway]
   pull_request:
-    branches: [main, dev, api-gateway]
+    branches: [api-gateway]
+  workflow_dispatch:
 
 jobs:
   run-tests:

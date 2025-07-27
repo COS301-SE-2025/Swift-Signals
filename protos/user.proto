@@ -18,22 +18,21 @@ service UserService {
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc DeleteUser(UserIDRequest) returns (google.protobuf.Empty);
 
-  rpc GetUserIntersectionIDs(UserIDRequest)
-      returns (stream IntersectionIDResponse);
-  rpc AddIntersectionID(AddIntersectionIDRequest)
-      returns (google.protobuf.Empty);
-  rpc RemoveIntersectionID(RemoveIntersectionIDRequest)
-      returns (google.protobuf.Empty);
+  rpc GetUserIntersectionIDs(UserIDRequest) returns (stream IntersectionIDResponse);
+  rpc AddIntersectionID(AddIntersectionIDRequest) returns (google.protobuf.Empty);
+  rpc RemoveIntersectionIDs(RemoveIntersectionIDRequest) returns (google.protobuf.Empty);
 
   rpc ChangePassword(ChangePasswordRequest) returns (google.protobuf.Empty);
   rpc ResetPassword(ResetPasswordRequest) returns (google.protobuf.Empty);
 
-  rpc MakeAdmin(MakeAdminRequest) returns (google.protobuf.Empty);
-  rpc RemoveAdmin(RemoveAdminRequest) returns (google.protobuf.Empty);
+  rpc MakeAdmin(AdminRequest) returns (google.protobuf.Empty);
+  rpc RemoveAdmin(AdminRequest) returns (google.protobuf.Empty);
 }
 
 // Common Messages
-message UserIDRequest { string user_id = 1; }
+message UserIDRequest {
+  string user_id = 1;
+}
 
 // Authentication Messages
 message RegisterUserRequest {
@@ -48,7 +47,9 @@ message LoginUserRequest {
 }
 
 // User CRUD Messages
-message GetUserByEmailRequest { string email = 1; }
+message GetUserByEmailRequest {
+  string email = 1;
+}
 
 message GetAllUsersRequest {
   int32 page = 1;
@@ -63,16 +64,18 @@ message UpdateUserRequest {
 }
 
 // Intersection ID Messages
-message IntersectionIDResponse { int32 intersection_id = 1; }
+message IntersectionIDResponse {
+  string intersection_id = 1;
+}
 
 message AddIntersectionIDRequest {
   string user_id = 1;
-  int32 intersection_id = 2;
+  string intersection_id = 2;
 }
 
 message RemoveIntersectionIDRequest {
   string user_id = 1;
-  repeated int32 intersection_id = 2;
+  repeated string intersection_id = 2;
 }
 
 // Password Management Messages
@@ -82,15 +85,12 @@ message ChangePasswordRequest {
   string new_password = 3;
 }
 
-message ResetPasswordRequest { string email = 1; }
-
-// Admin Management Messages
-message MakeAdminRequest {
-  string user_id = 1;
-  string admin_user_id = 2; // ID of the user making the request
+message ResetPasswordRequest {
+  string email = 1;
 }
 
-message RemoveAdminRequest {
+// Admin Management Messages
+message AdminRequest {
   string user_id = 1;
   string admin_user_id = 2; // ID of the user making the request
 }
@@ -101,7 +101,7 @@ message UserResponse {
   string name = 2;
   string email = 3;
   bool is_admin = 4;
-  repeated int32 intersection_ids = 5;
+  repeated string intersection_ids = 5;
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
 }

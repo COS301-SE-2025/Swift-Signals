@@ -3,13 +3,16 @@ package service
 import (
 	"context"
 	"errors"
-	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
+	"github.com/COS301-SE-2025/Swift-Signals/shared/jwt"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/google/uuid"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -21,13 +24,6 @@ func NewService(r db.UserRepository) *Service {
 	return &Service{repo: r}
 }
 
-var (
-	ErrInvalidEmail    = errors.New("invalid email format")
-	ErrInvalidPassword = errors.New("password must be at least 8 characters long")
-	ErrInvalidName     = errors.New("name cannot be empty")
-	ErrUserExists      = errors.New("user with this email already exists")
-)
-
 // emailRegex is a simple regex for basic email validation
 var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 
@@ -36,33 +32,40 @@ func normalizeEmail(email string) string {
 }
 
 // RegisterUser creates a new user with proper validation and password hashing
-func (s *Service) RegisterUser(ctx context.Context, name, email, password string) (*model.UserResponse, error) {
+func (s *Service) RegisterUser(ctx context.Context, name, email, password string) (*model.User, error) {
 
 	email = normalizeEmail(email)
 
-	// Validate input
+	// Validate input before using db resources
 	if err := s.validateUserInput(name, email, password); err != nil {
 		return nil, err
 	}
 
 	// Check if user already exists
 	existingUser, err := s.repo.GetUserByEmail(ctx, email)
-	if err != nil && !errors.Is(err, model.ErrUserNotFound) {
-		return nil, fmt.Errorf("failed to check existing user: %w", err)
+
+	// NOTE: Logic is dependent on GetUserByEmail returning nil if user does not exist
+	//       If this returns an error instead, we need to handle it differently
+	//       This is a limitation of the current implementation
+	//       Perhaps we should define EmailExists repository method instead
+
+	if err != nil {
+		return nil, errs.NewInternalError("failed to check existing user", err, map[string]any{"user": existingUser, "email": email})
+		// NOTE: Make sure to return publicUser in GetUserByEmail to ensure confidentail data is not leaked
 	}
 	if existingUser != nil {
-		return nil, ErrUserExists
+		return nil, errs.NewAlreadyExistsError("email already exists", map[string]any{"user": existingUser, "email": email})
 	}
 
 	// Hash password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, fmt.Errorf("failed to hash password: %w", err)
+		return nil, errs.NewInternalError("failed to hash password", err, nil)
 	}
 
 	// Create user
 	id := uuid.New().String()
-	user := &model.UserResponse{
+	user := &model.User{
 		ID:       id,
 		Name:     strings.TrimSpace(name),
 		Email:    strings.ToLower(strings.TrimSpace(email)),
@@ -71,42 +74,72 @@ func (s *Service) RegisterUser(ctx context.Context, name, email, password string
 
 	createdUser, err := s.repo.CreateUser(ctx, user)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create user: %w", err)
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError("failed to create user", err, map[string]any{})
 	}
-
 	return createdUser, nil
 }
 
 // validateUserInput validates the input parameters for user registration
 func (s *Service) validateUserInput(name, email, password string) error {
-	// Validate name
+	var validationErrors []string
+
 	if strings.TrimSpace(name) == "" {
-		return ErrInvalidName
+		validationErrors = append(validationErrors, "name is required")
 	}
-
-	// Validate email
-	email = strings.TrimSpace(email)
 	if email == "" || !emailRegex.MatchString(email) {
-		return ErrInvalidEmail
+		validationErrors = append(validationErrors, "email is invalid")
 	}
-
-	// Validate password
 	if len(password) < 8 {
-		return ErrInvalidPassword
+		validationErrors = append(validationErrors, "password is too short")
 	}
 
+	if len(validationErrors) > 0 {
+		combinedErrors := strings.Join(validationErrors, "; ")
+		return errs.NewValidationError(combinedErrors, map[string]any{"email": email})
+	}
 	return nil
 }
 
+func checkPassword(inputPassword, storedHashedPassword string) error {
+	return bcrypt.CompareHashAndPassword([]byte(storedHashedPassword), []byte(inputPassword))
+}
+
 // LoginUser authenticates a user and returns auth token
-func (s *Service) LoginUser(ctx context.Context, email, password string) (*model.LoginUserResponse, error) {
+func (s *Service) LoginUser(ctx context.Context, email, password string) (string, time.Time, error) {
 	// TODO: Implement user login
 	// - Validate input parameters
-	// - Find user by email
-	// - Verify password
-	// - Generate JWT token
-	// - Return auth response with token and user info
-	return nil, nil
+
+	// Find user by email
+	user, err := s.repo.GetUserByEmail(ctx, normalizeEmail(email))
+	if err != nil {
+		return "", time.Time{}, err
+	}
+	if user == nil {
+		return "", time.Time{}, errors.New("user does not exist")
+	}
+
+	// Verify password
+	err = checkPassword(password, user.Password)
+	if err != nil {
+		return "", time.Time{}, errors.New("invalid credentials")
+	}
+
+	// Generate JWT token
+	role := "regular"
+	if user.IsAdmin {
+		role = "admin"
+	}
+	expiryDate := time.Now().Add(time.Hour * 72)
+	token, err := jwt.GenerateToken(user.ID, role, time.Hour*72)
+	if err != nil {
+		return "", time.Time{}, err
+	}
+
+	return token, expiryDate, nil
 }
 
 // LogoutUser invalidates the user's session/token
@@ -119,16 +152,21 @@ func (s *Service) LogoutUser(ctx context.Context, userID string) error {
 }
 
 // GetUserByID retrieves a user by their ID
-func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.UserResponse, error) {
-	// TODO: Implement get user by ID
-	// - Validate user ID
-	// - Query database for user
-	// - Return user model or not found error
-	return nil, nil
+func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.User, error) {
+	// TODO: Validate user ID
+
+	// Query database for user
+	user, err := s.repo.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return user model or not found error
+	return user, nil
 }
 
 // GetUserByEmail retrieves a user by their email address
-func (s *Service) GetUserByEmail(ctx context.Context, email string) (*model.UserResponse, error) {
+func (s *Service) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
 	// TODO: Implement get user by email
 	// - Validate email format
 	// - Query database for user by email
@@ -137,7 +175,7 @@ func (s *Service) GetUserByEmail(ctx context.Context, email string) (*model.User
 }
 
 // GetAllUsers retrieves all users with pagination and filtering
-func (s *Service) GetAllUsers(ctx context.Context, page, pageSize int32, filter string) ([]*model.UserResponse, error) {
+func (s *Service) GetAllUsers(ctx context.Context, page, pageSize int32, filter string) ([]*model.User, error) {
 	// TODO: Implement get all users
 	// - Validate pagination parameters
 	// - Apply filters if provided
@@ -147,7 +185,7 @@ func (s *Service) GetAllUsers(ctx context.Context, page, pageSize int32, filter 
 }
 
 // UpdateUser updates user information
-func (s *Service) UpdateUser(ctx context.Context, userID, name, email string) (*model.UserResponse, error) {
+func (s *Service) UpdateUser(ctx context.Context, userID, name, email string) (*model.User, error) {
 	// TODO: Implement user update
 	// - Validate input parameters
 	// - Check if user exists
@@ -168,28 +206,63 @@ func (s *Service) DeleteUser(ctx context.Context, userID string) error {
 }
 
 // GetUserIntersectionIDs retrieves all intersection IDs for a user
-func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]int32, error) {
-	// TODO: Implement get user intersection IDs
-	// - Validate user ID
-	// - Check if user exists
-	// - Query database for user's intersection IDs
+func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]string, error) {
+	// TODO: Validate user ID
+
+	// Check if user exists
+	user, err := s.repo.GetUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, errors.New("user not found")
+	}
+
+	// Query database for user's intersection IDs
+	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
 	// - Return slice of intersection IDs
-	return nil, nil
+	return intIDs, nil
 }
 
 // AddIntersectionID adds an intersection ID to a user's list
-func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersectionID int32) error {
-	// TODO: Implement add intersection ID
-	// - Validate user ID and intersection ID
-	// - Check if user exists
-	// - Check if intersection ID already exists for user
-	// - Add intersection ID to user's list
-	// - Update database
+func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersectionID string) error {
+	// TODO: Validate user ID and intersection ID
+
+	// Check if user exists
+	user, err := s.repo.GetUserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	if user == nil {
+		return errors.New("user not found")
+	}
+
+	// Check if intersection ID already exists for user
+	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	for _, intID := range intIDs {
+		if intID == intersectionID {
+			return errors.New("intersection already exists")
+		}
+	}
+
+	// Add intersection ID to user's list
+	err = s.repo.AddIntersectionID(ctx, userID, intersectionID)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 // RemoveIntersectionID removes an intersection ID from a user's list
-func (s *Service) RemoveIntersectionID(ctx context.Context, userID string, intersectionID []int32) error {
+func (s *Service) RemoveIntersectionIDs(ctx context.Context, userID string, intersectionID []string) error {
 	// TODO: Implement remove intersection ID
 	// - Validate user ID and intersection ID
 	// - Check if user exists

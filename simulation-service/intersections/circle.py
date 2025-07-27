@@ -204,7 +204,7 @@ def generateTrips(netFile, tripFile, density, params):
     period = {"low": "12", "medium": "6", "high": "3"}.get(density, "6")
 
     cmd = [
-        "python",
+        "python3",
         os.path.join(TOOLS_PATH, "randomTrips.py"),
         "-n",
         netFile,

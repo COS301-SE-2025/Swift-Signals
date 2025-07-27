@@ -219,7 +219,7 @@ def generateTrips(netFile, tripFile, density, params):
         os.makedirs(tripDir, exist_ok=True)
 
     cmd = [
-        "python",
+        "python3",
         os.path.join(TOOLS_PATH, "randomTrips.py"),
         "-n",
         netFile,

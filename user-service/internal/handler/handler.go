@@ -4,6 +4,7 @@ import (
 	"context"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/service"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -20,9 +21,11 @@ func NewHandler(s *service.Service) *Handler {
 
 func (h *Handler) RegisterUser(ctx context.Context, req *userpb.RegisterUserRequest) (*userpb.UserResponse, error) {
 	user, err := h.service.RegisterUser(ctx, req.GetName(), req.GetEmail(), req.GetPassword())
+
 	if err != nil {
-		return nil, err
+		return nil, errs.HandleServiceError(err)
 	}
+
 	return &userpb.UserResponse{
 		Id:              user.ID,
 		Name:            user.Name,
@@ -32,17 +35,18 @@ func (h *Handler) RegisterUser(ctx context.Context, req *userpb.RegisterUserRequ
 		CreatedAt:       timestamppb.New(user.CreatedAt),
 		UpdatedAt:       timestamppb.New(user.UpdatedAt),
 	}, nil
+
 }
 
 func (h *Handler) LoginUser(ctx context.Context, req *userpb.LoginUserRequest) (*userpb.LoginUserResponse, error) {
-	loginResponse, err := h.service.LoginUser(ctx, req.GetEmail(), req.GetPassword())
+	token, expiryTime, err := h.service.LoginUser(ctx, req.GetEmail(), req.GetPassword())
 	if err != nil {
 		return nil, err
 	}
 
 	return &userpb.LoginUserResponse{
-		Token:     loginResponse.Token,
-		ExpiresAt: timestamppb.New(loginResponse.ExpiresAt),
+		Token:     token,
+		ExpiresAt: timestamppb.New(expiryTime),
 	}, nil
 }
 
@@ -160,8 +164,8 @@ func (h *Handler) AddIntersectionID(ctx context.Context, req *userpb.AddIntersec
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) RemoveIntersectionID(ctx context.Context, req *userpb.RemoveIntersectionIDRequest) (*emptypb.Empty, error) {
-	err := h.service.RemoveIntersectionID(ctx, req.GetUserId(), req.GetIntersectionId())
+func (h *Handler) RemoveIntersectionIDs(ctx context.Context, req *userpb.RemoveIntersectionIDRequest) (*emptypb.Empty, error) {
+	err := h.service.RemoveIntersectionIDs(ctx, req.GetUserId(), req.GetIntersectionId())
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +188,7 @@ func (h *Handler) ResetPassword(ctx context.Context, req *userpb.ResetPasswordRe
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) MakeAdmin(ctx context.Context, req *userpb.MakeAdminRequest) (*emptypb.Empty, error) {
+func (h *Handler) MakeAdmin(ctx context.Context, req *userpb.AdminRequest) (*emptypb.Empty, error) {
 	err := h.service.MakeAdmin(ctx, req.GetUserId(), req.GetAdminUserId())
 	if err != nil {
 		return nil, err
@@ -192,7 +196,7 @@ func (h *Handler) MakeAdmin(ctx context.Context, req *userpb.MakeAdminRequest) (
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) RemoveAdmin(ctx context.Context, req *userpb.RemoveAdminRequest) (*emptypb.Empty, error) {
+func (h *Handler) RemoveAdmin(ctx context.Context, req *userpb.AdminRequest) (*emptypb.Empty, error) {
 	err := h.service.RemoveAdmin(ctx, req.GetUserId(), req.GetAdminUserId())
 	if err != nil {
 		return nil, err
