@@ -24,7 +24,6 @@ def load_from_dict(data: dict) -> tuple[dict, dict]:
     sim = data["intersection"]["simulation_parameters"]
     raw_density = data["intersection"].get("traffic_density", 1)
 
-    raw_density = data["intersection"].get("traffic_density", 1)
     density = _map_density(raw_density)
 
     raw_type = int(sim.get("intersection_type", 0))
