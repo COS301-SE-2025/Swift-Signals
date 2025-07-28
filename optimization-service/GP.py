@@ -19,6 +19,8 @@ REFERENCE_RESULT = "../simulation-service/out/results/simulation_results.json"
 generated_param_files = []
 generated_result_files = []
 
+ALL_RESULTS_CSV = "ga_results/all_individuas_log.csv"
+
 """Fitness Function"""
 def evaluate(individual):
     green, yellow, red, speed, seed = individual
@@ -81,10 +83,10 @@ def evaluate(individual):
         """Compute weighted fitness (lower is better)"""
         PENALTY_BRAKES = 1000
         PENALTY_STOPS = 1000
-        PENALTY_COLLISIONS = 2000
+        PENALTY_COLLISIONS = 20000
 
         fitness = (
-            waiting +
+            waiting * 2 +
             travel +
             PENALTY_BRAKES * brakes +
             PENALTY_STOPS * stops +
@@ -97,6 +99,11 @@ def evaluate(individual):
         print(f"[Penalty] Exception during evaluation: {e}")
         return 1e6,
 
+def log_individual_to_file(individual, generation, ind_id):
+    with open(ALL_RESULTS_CSV, "a") as f:
+        f.write(f"{generation},{ind_id},{individual[0]},{individual[1]},{individual[2]},"
+                f"{individual[3]},{individual[4]},{individual.fitness.values[0]}\n")
+
 """DEAP Setup"""
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
 creator.create("Individual", list, fitness=creator.FitnessMin)
@@ -106,7 +113,7 @@ toolbox.register("green", random.randint, 10, 60)
 toolbox.register("yellow", random.randint, 3, 8)
 toolbox.register("red", random.randint, 10, 60)
 toolbox.register("speed", lambda: random.choice([40, 60, 80, 100]))
-toolbox.register("seed", random.randint, 0, 10000)
+toolbox.register("seed", lambda: 1408)
 
 toolbox.register("individual", tools.initCycle, creator.Individual,
                  (toolbox.green, toolbox.yellow, toolbox.red, toolbox.speed, toolbox.seed), n=1)
@@ -125,8 +132,6 @@ def custom_mutate(individual, indpb=0.2):
         individual[2] = random.randint(10, 60)  #Red
     if random.random() < indpb:
         individual[3] = random.choice([40, 60, 80, 100])  #Speed (restricted)
-    if random.random() < indpb:
-        individual[4] = random.randint(0, 10000)  #Seed
     return individual,
 
 toolbox.register("mutate", custom_mutate)
@@ -214,11 +219,15 @@ def main():
     logbook = tools.Logbook()
     logbook.header = ["gen", "nevals"] + stats.fields
 
+    with open(ALL_RESULTS_CSV, "w") as f:
+        f.write("generation,individual_id,green,yellow,red,speed,seed,fitness\n")
+
     """Evaluate the initial population"""
     print("Evaluating initial population...")
     with tqdm(total=len(pop), desc="Gen 0") as pbar:
-        for ind in pop:
+        for i, ind in enumerate(pop):
             ind.fitness.values = toolbox.evaluate(ind)
+            log_individual_to_file(ind, generation=0, ind_id=i)
             pbar.update(1)
 
     record = stats.compile(pop)
@@ -241,12 +250,13 @@ def main():
                 toolbox.mutate(mutant)
                 del mutant.fitness.values
 
-        """Evaluate invalid individuals"""
+        """Evaluate individuals"""
         invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
         print(f"Evaluating Gen {gen}...")
         with tqdm(total=len(invalid_ind), desc=f"Gen {gen}") as pbar:
-            for ind in invalid_ind:
+            for i, ind in enumerate(offspring):
                 ind.fitness.values = toolbox.evaluate(ind)
+                log_individual_to_file(ind, generation=gen, ind_id=i)
                 pbar.update(1)
 
         pop[:] = offspring
@@ -256,7 +266,7 @@ def main():
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
 
     """Save results"""
-    os.makedirs("ga_results", exist_ok=True)
+    os.makedirs("ga_results", exist_ok=True)    
     with open("ga_results/best_result.pkl", "wb") as f:
         pickle.dump((pop, hof, logbook), f)
 
