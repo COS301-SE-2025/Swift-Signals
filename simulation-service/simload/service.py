@@ -3,12 +3,16 @@ from datetime import datetime
 from simload import generator, params as param_mod
 from simload.constants import IntersectionType
 
+import threading
+
 _RUN_COUNTER = 0
+_RUN_COUNTER_LOCK = threading.Lock()
 
 
 def run_simulation(input_data: dict) -> dict:
-    global _RUN_COUNTER
-    _RUN_COUNTER += 1
+    global _RUN_COUNTER, _RUN_COUNTER_LOCK
+    with _RUN_COUNTER_LOCK:
+        _RUN_COUNTER += 1
 
     mapped, raw = param_mod.load_from_dict(input_data)
 
