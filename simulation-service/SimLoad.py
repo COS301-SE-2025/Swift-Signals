@@ -78,6 +78,8 @@ def loadParams():
         mapped["Yellow"] = sim_params.get("Yellow", 3)
         mapped["Red"] = sim_params.get("Red", 30)
 
+    output_path = data["intersection"].get("output_path", None)
+
     return {
         "mapped": mapped,
         "raw": {
@@ -86,6 +88,7 @@ def loadParams():
             "Speed": sim_params.get("Speed", 40),
             "seed": sim_params.get("seed", 42),
         },
+        "output_path": output_path,
     }
 
 
@@ -193,10 +196,11 @@ def saveParams(params, intersection_type_str, simName):
 
     with open(fileName, "w") as f:
         json.dump(output, f, indent=4)
-    print(f"Saved parameters to {fileName}")
+    #print(f"Saved parameters to {fileName}")
 
 
 def main():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
     params = loadParams()
     mapped = params["mapped"]
     raw = params["raw"]
@@ -250,25 +254,36 @@ def main():
         },
     }
 
-    """Save the output to a file"""
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    results_path = os.path.join(base_dir, "out/results/simulation_results.json")
+    timestamp = time.strftime("%Y%m%d-%H%M%S")
+    intersection_type = mapped.get("Intersection Type", "unknown")
+
+    custom_result_path = params.get("output_path", None)
+
+    if custom_result_path:
+        results_path = os.path.abspath(custom_result_path)
+        output_path = os.path.join(base_dir, "out/simulationOut",
+                                   f"simulation_output_{intersection_type}_{timestamp}.json")
+    else:
+        results_filename = f"simulation_results_{intersection_type}_{timestamp}.json"
+        output_filename = f"simulation_output_{intersection_type}_{timestamp}.json"
+        results_path = os.path.join(base_dir, "out/results", results_filename)
+        output_path = os.path.join(base_dir, "out/simulationOut", output_filename)
+
     os.makedirs(os.path.dirname(results_path), exist_ok=True)
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
     with open(results_path, "w") as f:
         json.dump(output, f, indent=2)
+    #print(f"Simulation saved to {results_path}")
 
-    print("Simulation saved to simulation_results.json")
-
-    output_path = os.path.join(base_dir, "out/simulationOut/simulation_output.json")
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as jf:
         json.dump(fullOut, jf, indent=2)
 
-    print("Simulation output saved to simulation_output.json")
+    #print(f"Simulation output saved to {output_path}")
 
     try:
         os.remove("run_count.txt")
-        print("Cleaned up run_count.txt")
+        #print("Cleaned up run_count.txt")
     except FileNotFoundError:
         pass
     except Exception as e:

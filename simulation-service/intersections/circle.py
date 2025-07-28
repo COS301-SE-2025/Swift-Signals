@@ -5,10 +5,10 @@ import xml.etree.ElementTree as ET
 
 def generate(params):
     allowedSpeeds = [40, 60, 80, 100, 120]
-    speedKm = params.get("Speed", 40)
+    speedKm = params.get("Speed", 60)
     if speedKm not in allowedSpeeds:
-        print(f"Warning: Speed {speedKm}km/h not allowed. Using default 40km/h.")
-        speedKm = 40
+        print(f"Warning: Speed {speedKm}km/h not allowed. Using default -60km/h.")
+        speedKm = 60
     speedInMs = speedKm * (1000 / 3600)
 
     base = "roundabout"
