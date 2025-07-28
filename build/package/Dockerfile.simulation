@@ -15,7 +15,7 @@ WORKDIR /app
 COPY simulation-service/requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-RUN pip3 install pytest # NOTE: Can be removed for production dockerfile
+# RUN pip3 install pytest # NOTE: Can be removed for production dockerfile
 
 COPY protos/ /app/protos
 RUN mkdir -p /app/gen/python && \
@@ -28,7 +28,6 @@ ENV PYTHONPATH="/app/gen/python:$PYTHONPATH"
 
 COPY simulation-service/ /app/
 
-# CMD ["pytest"]
 CMD ["python3", "server/server.py"]
 
 EXPOSE 50053
