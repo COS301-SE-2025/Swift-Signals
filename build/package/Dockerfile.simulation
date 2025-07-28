@@ -22,7 +22,8 @@ RUN mkdir -p /app/gen/python && \
     touch /app/gen/python/__init__.py && \
     python3 -m grpc_tools.protoc \
         --proto_path=protos/ \
-        --grpc_python_out=gen/python \
+        --python_out=gen/python/ \
+        --grpc_python_out=gen/python/ \
         protos/simulation.proto
 ENV PYTHONPATH="/app/gen/python:$PYTHONPATH"
 
