@@ -26,7 +26,7 @@ def main(argv: list[str] | None = None) -> None:
     args = parse_cli(argv)
     mapped, raw = param_mod.load_from_file(args.params)
 
-    intersection_type = IntersectionType(raw["Intersection Type"])
+    intersection_type = IntersectionType(raw["intersection_type"])
     sim_name = intersection_type.name.title()
 
     with io_utils.run_counter() as run_count:
