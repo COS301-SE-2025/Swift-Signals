@@ -8,19 +8,18 @@ option go_package = "protos/gen/intersection";
 
 // Service definition
 service IntersectionService {
-  rpc CreateIntersection(CreateIntersectionRequest)
-      returns (IntersectionResponse);
+  rpc CreateIntersection(CreateIntersectionRequest) returns (IntersectionResponse);
   rpc GetIntersection(IntersectionIDRequest) returns (IntersectionResponse);
-  rpc GetAllIntersections(GetAllIntersectionsRequest)
-      returns (stream IntersectionResponse);
-  rpc UpdateIntersection(UpdateIntersectionRequest)
-      returns (IntersectionResponse);
+  rpc GetAllIntersections(GetAllIntersectionsRequest) returns (stream IntersectionResponse);
+  rpc UpdateIntersection(UpdateIntersectionRequest) returns (IntersectionResponse);
   rpc DeleteIntersection(IntersectionIDRequest) returns (google.protobuf.Empty);
   rpc PutOptimisation(PutOptimisationRequest) returns (PutOptimisationResponse);
 }
 
 // Common Messages
-message IntersectionIDRequest { string id = 1; }
+message IntersectionIDRequest {
+  string id = 1;
+}
 
 message IntersectionResponse {
   string id = 1;
@@ -62,7 +61,9 @@ message PutOptimisationRequest {
   OptimisationParameters parameters = 2;
 }
 
-message PutOptimisationResponse { bool improved = 1; }
+message PutOptimisationResponse {
+  bool improved = 1;
+}
 
 // Intersection details (address information)
 message IntersectionDetails {
