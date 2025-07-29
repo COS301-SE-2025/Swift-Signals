@@ -10,17 +10,21 @@ import optimisation_pb2_grpc as pb_grpc
 
 class OptimisationServicer(pb_grpc.OptimisationServiceServicer):
     def RunOptimisation(self, request, context):
-        print("RunOptimisation request received with intersection_type:",
-              request.parameters.intersection_type)
-        print(MessageToDict(request, preserving_proto_field_name=True,
-              use_integers_for_enums=True))
+        print(
+            "RunOptimisation request received with intersection_type:",
+            request.parameters.intersection_type,
+        )
+        print(
+            MessageToDict(
+                request, preserving_proto_field_name=True, use_integers_for_enums=True
+            )
+        )
         return request
 
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    pb_grpc.add_OptimisationServiceServicer_to_server(
-        OptimisationServicer(), server)
+    pb_grpc.add_OptimisationServiceServicer_to_server(OptimisationServicer(), server)
 
     SERVICE_NAMES = (
         pb.DESCRIPTOR.services_by_name["OptimisationService"].full_name,
