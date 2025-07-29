@@ -10,7 +10,7 @@ import optimisation_pb2_grpc as pb_grpc
 
 class OptimisationServicer(pb_grpc.OptimisationServiceServicer):
     def RunOptimisation(self, request, context):
-        print("RunOptimisationResult request received with intersection_type:",
+        print("RunOptimisation request received with intersection_type:",
               request.parameters.intersection_type)
         print(MessageToDict(request, preserving_proto_field_name=True,
               use_integers_for_enums=True))
