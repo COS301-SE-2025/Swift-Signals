@@ -1,8 +1,8 @@
 services:
   user-service:
     build:
-      context: ../user-service
-      dockerfile: ../build/package/Dockerfile.user
+      context: ..
+      dockerfile: build/package/Dockerfile.user
     image: swift-signals/user-service:dev
     container_name: user-service
     environment:
@@ -37,8 +37,8 @@ services:
 
   intersection-service:
     build:
-      context: ../intersection-service
-      dockerfile: ../build/package/Dockerfile.intersection
+      context: ..
+      dockerfile: build/package/Dockerfile.intersection
     image: swift-signals/intersection-service:dev
     container_name: intersection-service
     environment:
@@ -66,8 +66,8 @@ services:
 
   api-gateway:
     build:
-      context: ../api-gateway
-      dockerfile: ../build/package/Dockerfile.api-gateway
+      context: ..
+      dockerfile: build/package/Dockerfile.api-gateway
     image: swift-signals/api-gateway:dev
     container_name: api-gateway
     depends_on:
