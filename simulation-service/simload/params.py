@@ -2,8 +2,10 @@ import json
 from pathlib import Path
 from datetime import datetime
 from simload.constants import (
-    IntersectionType, TrafficDensity,
-    DEFAULT_SEED, DEFAULT_SPEED
+    IntersectionType,
+    TrafficDensity,
+    DEFAULT_SEED,
+    DEFAULT_SPEED,
 )
 
 
@@ -37,11 +39,13 @@ def load_from_dict(data: dict) -> tuple[dict, dict]:
     }
 
     if intersection is IntersectionType.TRAFFIC_LIGHT:
-        mapped.update({
-            "green": sim.get("green", 25),
-            "yellow": sim.get("yellow", 25),
-            "red": sim.get("red", 25),
-        })
+        mapped.update(
+            {
+                "green": sim.get("green", 25),
+                "yellow": sim.get("yellow", 25),
+                "red": sim.get("red", 25),
+            }
+        )
 
     raw = {
         "traffic_density": raw_density,
@@ -74,9 +78,7 @@ def build_output_doc(
             "traffic_density": raw_params["traffic_density"],
             "status": 0,
             "run_count": run_count,
-            "parameters": {
-                "intersection_type": raw_params["intersection_type"]
-            },
+            "parameters": {"intersection_type": raw_params["intersection_type"]},
             "results": results,
         },
     }

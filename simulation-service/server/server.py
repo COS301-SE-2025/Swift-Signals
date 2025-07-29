@@ -11,32 +11,28 @@ import SimLoad
 
 class SimulationServicer(pb_grpc.SimulationServiceServicer):
     def GetSimulationResults(self, request, context):
-        print("GetSimulationResults request received with id:",
-              request.intersection_id)
+        print("GetSimulationResults request received with id:", request.intersection_id)
 
         req_dict = {
-            "intersection": MessageToDict(request,
-                                          preserving_proto_field_name=True,
-                                          use_integers_for_enums=True)
+            "intersection": MessageToDict(
+                request, preserving_proto_field_name=True, use_integers_for_enums=True
+            )
         }
-        results = SimLoad.main(
-            req_dict)[0]["intersection"]["results"]
+        results = SimLoad.main(req_dict)[0]["intersection"]["results"]
         msg_results = pb.SimulationResultsResponse()
         ParseDict(results, msg_results)
 
         return msg_results
 
     def GetSimulationOutput(self, request, context):
-        print("GetSimulationOutput request received with id:",
-              request.intersection_id)
+        print("GetSimulationOutput request received with id:", request.intersection_id)
 
         req_dict = {
-            "intersection": MessageToDict(request,
-                                          preserving_proto_field_name=True,
-                                          use_integers_for_enums=True)
+            "intersection": MessageToDict(
+                request, preserving_proto_field_name=True, use_integers_for_enums=True
+            )
         }
-        results = SimLoad.main(
-            req_dict)[1]
+        results = SimLoad.main(req_dict)[1]
         msg_results = pb.SimulationOutputResponse()
         ParseDict(results, msg_results)
 
@@ -45,8 +41,7 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    pb_grpc.add_SimulationServiceServicer_to_server(
-        SimulationServicer(), server)
+    pb_grpc.add_SimulationServiceServicer_to_server(SimulationServicer(), server)
 
     SERVICE_NAMES = (
         pb.DESCRIPTOR.services_by_name["SimulationService"].full_name,

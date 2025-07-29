@@ -12,13 +12,17 @@ LOG = logging.getLogger(__name__)
 
 
 def parse_cli(argv: list[str] | None = None) -> argparse.Namespace:
-    p = argparse.ArgumentParser(
-        description="Run a SUMO intersection simulation.")
-    p.add_argument("--params", type=Path, required=True,
-                   help="Path to parameter JSON file")
+    p = argparse.ArgumentParser(description="Run a SUMO intersection simulation.")
+    p.add_argument(
+        "--params", type=Path, required=True, help="Path to parameter JSON file"
+    )
     p.add_argument("--owner", default="username")
-    p.add_argument("--outdir", type=Path, default=Path("out"),
-                   help="Directory where output files are stored")
+    p.add_argument(
+        "--outdir",
+        type=Path,
+        default=Path("out"),
+        help="Directory where output files are stored",
+    )
     return p.parse_args(argv)
 
 
@@ -46,9 +50,11 @@ def main(argv: list[str] | None = None) -> None:
         io_utils.ensure_dir(simout_dir)
 
         (results_dir / "simulation_results.json").write_text(
-            json.dumps(output_doc, indent=2))
+            json.dumps(output_doc, indent=2)
+        )
         (simout_dir / "simulation_output.json").write_text(
-            json.dumps(full_out, indent=2))
+            json.dumps(full_out, indent=2)
+        )
 
         print(full_out)
 
