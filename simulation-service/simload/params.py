@@ -38,9 +38,9 @@ def load_from_dict(data: dict) -> tuple[dict, dict]:
 
     if intersection is IntersectionType.TRAFFIC_LIGHT:
         mapped.update({
-            "green":   sim.get("green", 25),
-            "yellow":  sim.get("yellow", 25),
-            "red":     sim.get("red", 25),
+            "green": sim.get("green", 25),
+            "yellow": sim.get("yellow", 25),
+            "red": sim.get("red", 25),
         })
 
     raw = {

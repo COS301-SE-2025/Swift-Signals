@@ -3,6 +3,7 @@ from pathlib import Path
 
 RUN_COUNTER_FILE = Path("run_count.txt")
 
+
 @contextmanager
 def run_counter():
     """Context manager that yields the next run number and updates the counter."""
@@ -14,6 +15,7 @@ def run_counter():
         yield count
     finally:
         RUN_COUNTER_FILE.write_text(str(count))
+
 
 def ensure_dir(path: Path) -> None:
     path.mkdir(parents=True, exist_ok=True)

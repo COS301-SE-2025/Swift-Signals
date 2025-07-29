@@ -2,10 +2,10 @@ from intersections import circle, stopStreet, tJunction, trafficLight
 from simload.constants import IntersectionType
 
 _GENERATOR_DISPATCH = {
-    IntersectionType.TRAFFIC_LIGHT:  trafficLight.generate,
-    IntersectionType.ROUNDABOUT:     circle.generate,
-    IntersectionType.FOUR_WAY_STOP:  stopStreet.generate,
-    IntersectionType.T_JUNCTION:     tJunction.generate,
+    IntersectionType.TRAFFIC_LIGHT: trafficLight.generate,
+    IntersectionType.ROUNDABOUT: circle.generate,
+    IntersectionType.FOUR_WAY_STOP: stopStreet.generate,
+    IntersectionType.T_JUNCTION: tJunction.generate,
 }
 
 
