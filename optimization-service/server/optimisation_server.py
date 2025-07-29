@@ -11,6 +11,8 @@ class OptimisationServicer(pb_grpc.OptimisationServiceServicer):
     def RunOptimisation(self, request, context):
         print("RunOptimisationResult request received with intersection_type:",
               request.parameters.intersection_type)
+        print(MessageToDict(request))
+        return request
 
 
 def serve():
