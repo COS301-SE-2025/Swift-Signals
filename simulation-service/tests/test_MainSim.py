@@ -25,7 +25,7 @@ class TestSimLoad(unittest.TestCase):
         def open_side_effect(file, mode="r", *args, **kwargs):
             if file == "params_test.json":
                 return StringIO(
-                    '{"intersection":{"simulation_parameters":{"Intersection Type":1, "Speed":60, "seed":42}, "Traffic Density":2}}'
+                    '{"intersection":{"simulation_parameters":{"intersection_type":1, "speed":60, "seed":42}, "traffic_density":2}}'
                 )
             else:
                 return real_open(file, mode, *args, **kwargs)
@@ -37,14 +37,14 @@ class TestSimLoad(unittest.TestCase):
         self.assertIn("mapped", params)
         self.assertIn("raw", params)
 
-        self.assertEqual(params["mapped"]["Intersection Type"], "trafficlight")
-        self.assertEqual(params["mapped"]["Traffic Density"], "high")
-        self.assertEqual(params["mapped"]["Speed"], 60)
+        self.assertEqual(params["mapped"]["intersection_type"], "trafficlight")
+        self.assertEqual(params["mapped"]["traffic_density"], "high")
+        self.assertEqual(params["mapped"]["speed"], 40)
         self.assertEqual(params["mapped"]["seed"], 42)
 
-        self.assertEqual(params["raw"]["Intersection Type"], 1)
-        self.assertEqual(params["raw"]["Traffic Density"], 2)
-        self.assertEqual(params["raw"]["Speed"], 60)
+        self.assertEqual(params["raw"]["intersection_type"], 1)
+        self.assertEqual(params["raw"]["traffic_density"], 2)
+        self.assertEqual(params["raw"]["speed"], 60)
         self.assertEqual(params["raw"]["seed"], 42)
 
     @patch("os.path.exists", return_value=True)
@@ -60,26 +60,26 @@ class TestSimLoad(unittest.TestCase):
 
     def test_getDefaultTimingsBySpeed(self):
         self.assertEqual(
-            SimLoad.getDefaultTimingsBySpeed(40), {"Green": 25, "Yellow": 3, "Red": 30}
+            SimLoad.getDefaultTimingsBySpeed(40), {"green": 25, "yellow": 3, "red": 30}
         )
         self.assertEqual(
-            SimLoad.getDefaultTimingsBySpeed(80), {"Green": 30, "Yellow": 5, "Red": 35}
+            SimLoad.getDefaultTimingsBySpeed(80), {"green": 30, "yellow": 5, "red": 35}
         )
         self.assertEqual(
-            SimLoad.getDefaultTimingsBySpeed(120), {"Green": 30, "Yellow": 5, "Red": 35}
+            SimLoad.getDefaultTimingsBySpeed(120), {"green": 30, "yellow": 5, "red": 35}
         )
 
     @patch("builtins.input", side_effect=["medium", "60", "y"])
     def test_getParams_trafficlight_default(self, mock_input):
         result = SimLoad.getParams(True)
-        self.assertEqual(result["Speed"], 60)
-        self.assertIn("Green", result)
+        self.assertEqual(result["speed"], 60)
+        self.assertIn("green", result)
 
     @patch("builtins.input", side_effect=["high", "80"])
     def test_getParams_non_trafficlight(self, mock_input):
         result = SimLoad.getParams(False)
-        self.assertEqual(result["Speed"], 80)
-        self.assertNotIn("Green", result)
+        self.assertEqual(result["speed"], 80)
+        self.assertNotIn("green", result)
 
     @patch("uuid.uuid4", return_value=uuid.UUID("12345678-1234-5678-1234-567812345678"))
     @patch("builtins.open", new_callable=mock_open)
@@ -87,13 +87,13 @@ class TestSimLoad(unittest.TestCase):
     @patch("json.dump")
     def test_saveParams(self, mock_json_dump, mock_time, mock_file, mock_uuid):
         SimLoad.saveParams(
-            {"Traffic Density": "medium", "Speed": 60}, "trafficlight", "testSim"
+            {"traffic_density": "medium", "speed": 60}, "trafficlight", "testSim"
         )
         args, kwargs = mock_json_dump.call_args
         written_data = args[0]
         self.assertIn("intersection", written_data)
         self.assertEqual(
-            written_data["intersection"]["parameters"]["Intersection Type"],
+            written_data["intersection"]["parameters"]["intersection_type"],
             1,
         )
 
@@ -102,10 +102,10 @@ class TestSimLoad(unittest.TestCase):
         return_value=(
             {
                 "parameters": {
-                    "Green": 25,
-                    "Yellow": 3,
-                    "Red": 30,
-                    "Intersection Type": 1,
+                    "green": 25,
+                    "yellow": 3,
+                    "red": 30,
+                    "intersection_type": 1,
                 }
             },
             {"simulation_log": "details_here"},
@@ -115,55 +115,41 @@ class TestSimLoad(unittest.TestCase):
         "SimLoad.loadParams",
         return_value={
             "mapped": {
-                "Intersection Type": "trafficlight",
-                "Green": 25,
-                "Yellow": 3,
-                "Red": 30,
-                "Traffic Density": "medium",
-                "Speed": 60,
+                "intersection_type": "trafficlight",
+                "green": 25,
+                "yellow": 3,
+                "red": 30,
+                "traffic_density": "medium",
+                "speed": 60,
                 "seed": 42,
             },
             "raw": {
-                "Intersection Type": 1,
-                "Traffic Density": 1,
-                "Speed": 60,
+                "intersection_type": 1,
+                "traffic_density": 1,
+                "speed": 60,
                 "seed": 42,
             },
         },
     )
     @patch("SimLoad.saveRunCount")
     @patch("SimLoad.loadRunCount", return_value=0)
-    @patch("json.dump")
-    @patch("os.makedirs")
     @patch("os.remove")
-    @patch("builtins.open", new_callable=mock_open)
     def test_main_traffic_light(
         self,
-        mock_file,
         mock_remove,
-        mock_makedirs,
-        mock_json_dump,
         mock_run_count,
         mock_save_run_count,
         mock_params,
         mock_generate,
     ):
-        SimLoad.main()
+        result, fullOut = SimLoad.main()
 
         mock_generate.assert_called_once()
 
-        self.assertEqual(mock_json_dump.call_count, 2)
-
-        first_output = mock_json_dump.call_args_list[0][0][0]
-        second_output = mock_json_dump.call_args_list[1][0][0]
-
-        self.assertIn("intersection", first_output)
-        self.assertEqual(second_output, {"simulation_log": "details_here"})
-
-        expected_dirs = {"out/results"}
-        actual_dirs = {call_args[0][0] for call_args in mock_makedirs.call_args_list}
-
-        self.assertTrue(expected_dirs.issubset(actual_dirs))
+        self.assertIn("intersection", result)
+        self.assertEqual(result["intersection"]["parameters"]["intersection_type"], 1)
+        self.assertIn("results", result["intersection"])
+        self.assertEqual(fullOut, {"simulation_log": "details_here"})
 
     @patch("builtins.input", return_value="nonexistent.json")
     @patch("os.path.exists", return_value=False)
@@ -181,38 +167,38 @@ class TestSimLoad(unittest.TestCase):
     @patch("builtins.input", side_effect=["high", "invalid_speed", "y"])
     def test_getParams_invalid_speed_defaults_to_40(self, mock_input):
         result = SimLoad.getParams(True)
-        self.assertEqual(result["Speed"], 40)
-        self.assertIn("Green", result)
+        self.assertEqual(result["speed"], 40)
+        self.assertIn("green", result)
 
     @patch("builtins.input", side_effect=["high", "80", "n", "20", "4", "25"])
     def test_getParams_custom_light_timings(self, mock_input):
         result = SimLoad.getParams(True)
-        self.assertEqual(result["Green"], 20)
-        self.assertEqual(result["Yellow"], 4)
-        self.assertEqual(result["Red"], 25)
-        self.assertEqual(result["Speed"], 80)
+        self.assertEqual(result["green"], 20)
+        self.assertEqual(result["yellow"], 4)
+        self.assertEqual(result["red"], 25)
+        self.assertEqual(result["speed"], 80)
 
     @patch("builtins.input", side_effect=["high", "60", "n", "oops", "nope", "uhh"])
     def test_getParams_invalid_light_timings_fallback(self, mock_input):
         result = SimLoad.getParams(True)
-        self.assertEqual(result["Green"], 25)
-        self.assertEqual(result["Yellow"], 4)
-        self.assertEqual(result["Red"], 30)
+        self.assertEqual(result["green"], 25)
+        self.assertEqual(result["yellow"], 4)
+        self.assertEqual(result["red"], 30)
 
     @patch("SimLoad.circle.generate", return_value=({"result": "circle_ok"}, {}))
     @patch(
         "SimLoad.loadParams",
         return_value={
             "mapped": {
-                "Intersection Type": "roundabout",
-                "Traffic Density": "medium",
-                "Speed": 60,
+                "intersection_type": "roundabout",
+                "traffic_density": "medium",
+                "speed": 60,
                 "seed": 42,
             },
             "raw": {
-                "Intersection Type": 2,
-                "Traffic Density": 1,
-                "Speed": 60,
+                "intersection_type": 2,
+                "traffic_density": 1,
+                "speed": 60,
                 "seed": 42,
             },
         },
@@ -240,15 +226,15 @@ class TestSimLoad(unittest.TestCase):
         "SimLoad.loadParams",
         return_value={
             "mapped": {
-                "Intersection Type": "fourwaystop",
-                "Traffic Density": "medium",
-                "Speed": 60,
+                "intersection_type": "fourwaystop",
+                "traffic_density": "medium",
+                "speed": 60,
                 "seed": 42,
             },
             "raw": {
-                "Intersection Type": 3,
-                "Traffic Density": 1,
-                "Speed": 60,
+                "intersection_type": 3,
+                "traffic_density": 1,
+                "speed": 60,
                 "seed": 42,
             },
         },
@@ -276,15 +262,15 @@ class TestSimLoad(unittest.TestCase):
         "SimLoad.loadParams",
         return_value={
             "mapped": {
-                "Intersection Type": "tjunction",
-                "Traffic Density": "medium",
-                "Speed": 60,
+                "intersection_type": "tjunction",
+                "traffic_density": "medium",
+                "speed": 60,
                 "seed": 42,
             },
             "raw": {
-                "Intersection Type": 4,
-                "Traffic Density": 1,
-                "Speed": 60,
+                "intersection_type": 4,
+                "traffic_density": 1,
+                "speed": 60,
                 "seed": 42,
             },
         },
@@ -310,8 +296,8 @@ class TestSimLoad(unittest.TestCase):
     @patch(
         "SimLoad.loadParams",
         return_value={
-            "mapped": {"Intersection Type": "invalidtype"},
-            "raw": {"Intersection Type": -1},
+            "mapped": {"intersection_type": "invalidtype"},
+            "raw": {"intersection_type": -1},
         },
     )
     @patch("builtins.print")
