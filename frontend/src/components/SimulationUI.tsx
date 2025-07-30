@@ -1,7 +1,6 @@
 import React from 'react';
 import type { FC } from 'react';
 
-// Define the props the UI component will accept
 interface SimulationUIProps {
   time: number;
   vehicleCount: number;
@@ -11,15 +10,14 @@ interface SimulationUIProps {
   onRestart: () => void;
   onSpeedChange: (newSpeed: number) => void;
   trafficLightStates: { [key: string]: string };
-  // --- New metrics ---
   activeVehicles: number;
   completedVehicles: number;
   avgSpeed: number;
   progress: number;
   totalSimTime: number;
+  scale?: number;
 }
 
-// Simple inline styles for the UI panel
 const styles: { [key: string]: React.CSSProperties } = {
   uiPanel: {
     position: 'absolute',
@@ -35,7 +33,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     border: '1px solid #23272f',
     backdropFilter: 'blur(2px)',
     WebkitBackdropFilter: 'blur(2px)',
-    transition: 'box-shadow 0.2s',
+    transition: 'transform 0.2s ease-in-out',
+    transformOrigin: 'top left',
   },
   title: {
     margin: '0 0 18px 0',
@@ -123,10 +122,10 @@ const styles: { [key: string]: React.CSSProperties } = {
 };
 
 const lightColorMap: { [key: string]: string } = {
-        g: '#28a745', // green
-        y: '#ffc107', // yellow
-        r: '#dc3545', // red
-    };
+  g: '#28a745',
+  y: '#ffc107',
+  r: '#dc3545',
+};
 
 export const SimulationUI: FC<SimulationUIProps> = ({
   time,
@@ -142,15 +141,19 @@ export const SimulationUI: FC<SimulationUIProps> = ({
   avgSpeed,
   progress,
   totalSimTime,
+  scale = 1,
 }) => {
-  // Button hover state
   const [hoveredBtn, setHoveredBtn] = React.useState<string | null>(null);
-  // Convert avgSpeed from m/s to km/h
   const avgSpeedKmh = avgSpeed * 3.6;
+
+  const panelStyle = {
+    ...styles.uiPanel,
+    transform: `scale(${scale})`,
+  };
+
   return (
-    <div style={styles.uiPanel}>
+    <div style={panelStyle}>
       <h3 style={styles.title}>Simulation</h3>
-      {/* Progress Bar */}
       <div style={styles.progressBarContainer}>
         <div style={{ ...styles.progressBar, width: `${Math.round(progress * 100)}%` }} />
       </div>
@@ -191,10 +194,7 @@ export const SimulationUI: FC<SimulationUIProps> = ({
       <div style={styles.sectionHeader}>Controls</div>
       <div style={styles.controls}>
         <button
-          style={{
-            ...styles.button,
-            ...(hoveredBtn === 'playpause' ? styles.buttonHover : {}),
-          }}
+          style={{ ...styles.button, ...(hoveredBtn === 'playpause' ? styles.buttonHover : {}), }}
           onClick={onPlayPause}
           onMouseEnter={() => setHoveredBtn('playpause')}
           onMouseLeave={() => setHoveredBtn(null)}
@@ -202,10 +202,7 @@ export const SimulationUI: FC<SimulationUIProps> = ({
           {isPlaying ? 'Pause' : 'Play'}
         </button>
         <button
-          style={{
-            ...styles.button,
-            ...(hoveredBtn === 'restart' ? styles.buttonHover : {}),
-          }}
+          style={{ ...styles.button, ...(hoveredBtn === 'restart' ? styles.buttonHover : {}), }}
           onClick={onRestart}
           onMouseEnter={() => setHoveredBtn('restart')}
           onMouseLeave={() => setHoveredBtn(null)}

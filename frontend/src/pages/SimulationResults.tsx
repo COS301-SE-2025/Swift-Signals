@@ -303,8 +303,8 @@ const SimulationResults: React.FC = () => {
       }
     : { numPhases: 0, totalCycle: 0 };
     
-  const handleViewRendering = () => {
-    window.open('/traffic-simulation', '_blank');
+  const handleViewComparison = () => {
+    window.open('/comparison-rendering', '_blank');
   };
   return (
     <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
@@ -380,10 +380,10 @@ const SimulationResults: React.FC = () => {
                   Optimize
                 </button>
                 <button 
-                  onClick={handleViewRendering} 
+                  onClick={handleViewComparison} 
                   className="px-8 py-3 text-base font-bold text-[#0F5BA7] bg-transparent border-2 border-[#0F5BA7] rounded-xl transform transition-all duration-300 ease-in-out hover:bg-[#0F5BA7] hover:text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-600"
                 >
-                  View Rendering
+                  View Comparison Rendering
                 </button>
               </div>
             </section>
@@ -433,12 +433,12 @@ const SimulationResults: React.FC = () => {
               </div>
               {/* Action button */}
               <div className="flex flex-row gap-4 justify-center mt-12">
-                <button 
+                {/* <button 
                   onClick={handleViewRendering} 
                   className="px-8 py-3 text-base font-bold text-[#0F5BA7] bg-transparent border-2 border-[#0F5BA7] rounded-xl transform transition-all duration-300 ease-in-out hover:bg-[#0F5BA7] hover:text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-600"
                 >
                   View Rendering
-                </button>
+                </button> */}
               </div>
             </section>
           </div>
