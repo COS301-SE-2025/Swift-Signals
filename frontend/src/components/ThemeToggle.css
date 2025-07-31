@@ -76,12 +76,11 @@
   outline-offset: 2px;
 }
 
-/* Animation for the track background color on toggle */
 .toggle-track {
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .dark .toggle-track {
-  background-color: #059669;
-  border-color: #10b981;
+  background-color: #388BFD;
+  border-color: #388BFD;
 }

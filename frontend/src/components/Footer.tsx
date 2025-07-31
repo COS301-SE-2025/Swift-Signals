@@ -17,12 +17,10 @@ const Footer: React.FC = () => {
           </span>
         </div>
 
-        {/* Center - Copyright */}
         <div className="footer-copyright text-xs opacity-75">
           © {new Date().getFullYear()} Swift Signals. All rights reserved.
         </div>
 
-        {/* Right - Theme Toggle */}
         <div className="footer-toggle">
           <ThemeToggle />
         </div>

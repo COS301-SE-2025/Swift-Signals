@@ -161,7 +161,6 @@ const SimulationResults: React.FC = () => {
   };
 
   useEffect(() => {
-    // Fetching the simulation data from the provided JSON file
     fetch("/simulation_output (1).json")
       .then((res) => {
         if (!res.ok) {
@@ -181,30 +180,24 @@ const SimulationResults: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Cleanup previous chart instances
     chartInstances.current.forEach((c) => c?.destroy());
     chartInstances.current = [];
 
     if (!simData || !simData.vehicles) return;
 
-    // --- Prepare data for charts ---
     const stats = computeStats(simData.vehicles);
     const allTimes = getAllTimes(simData.vehicles);
     const avgSpeedOverTime = getAverageSpeedOverTime(simData.vehicles, allTimes);
     const vehCountOverTime = getVehicleCountOverTime(simData.vehicles, allTimes);
     const totalDistPerVeh = getTotalDistancePerVehicle(simData.vehicles);
-
-    // Downsample time-series data for cleaner line charts
     const MAX_TIME_POINTS = 100;
     const { downsampledLabels: timeLabels, downsampledData: downsampledAvgSpeed } = downsampleData(allTimes, avgSpeedOverTime, MAX_TIME_POINTS);
     const { downsampledData: downsampledVehCount } = downsampleData(allTimes, vehCountOverTime, MAX_TIME_POINTS);
-    
-    // Prepare histogram data
+
     const { counts: finalSpeedHist, labels: finalSpeedHistLabels } = getHistogramData(stats.finalSpeeds, 2, 40);
     const maxDist = totalDistPerVeh.length > 0 ? Math.max(...totalDistPerVeh) : 0;
     const { counts: totalDistHist, labels: totalDistHistLabels } = getHistogramData(totalDistPerVeh, 50, Math.ceil(maxDist / 50) * 50);
 
-    // --- Chart Rendering ---
     const baseOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -262,7 +255,7 @@ const SimulationResults: React.FC = () => {
         options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Histogram of Total Distance", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Distance (m)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Number of Vehicles" } } } },
     });
 
-    // Optimized Charts (using same data for demonstration)
+    // Optimized Charts (Will eventually use optimized data)
     createChart(chartRefs.optAvgSpeedRef, {
         type: "line",
         data: { labels: timeLabels, datasets: [{ label: "Average Speed (Optimized)", data: downsampledAvgSpeed, borderColor: "#2B9348", backgroundColor: "#48ac4d33", fill: true, tension: 0.3 }] },
@@ -284,12 +277,11 @@ const SimulationResults: React.FC = () => {
         options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Total Distance Hist. (Optimized)", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Distance (m)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Number of Vehicles" } } } },
     });
 
-    // Cleanup function
     return () => {
       chartInstances.current.forEach((c) => c?.destroy());
       chartInstances.current = [];
     };
-  }, [simData]); // Re-render charts when simData changes
+  }, [simData]);
 
   if (loading) return <div className="text-center text-gray-700 dark:text-gray-300 py-10">Loading simulation data...</div>;
   if (error) return <div className="text-center text-red-500 py-10">{error}</div>;
@@ -317,61 +309,138 @@ const SimulationResults: React.FC = () => {
               {simName}
             </h1>
             {simDesc && (
-              <p className="simDesc text-lg text-gray-400 mb-4 leading-relaxed">{simDesc}</p>
+              <p className="simDesc text-lg text-gray-400 mb-4 leading-relaxed">
+                {simDesc}
+              </p>
             )}
             {simIntersections && simIntersections.length > 0 && (
               <div className="flex flex-wrap gap-2 mb-2">
                 {simIntersections.map((intersection: string, idx: number) => (
-                  <span key={idx} className="px-4 py-2 bg-white/10 dark:bg-[#161B22] backdrop-blur-md rounded-full text-sm font-medium text-[#0F5BA7] border-2 border-[#0F5BA7] hover:bg-white/20 transition-all duration-300">
+                  <span
+                    key={idx}
+                    className="px-4 py-2 bg-white/10 dark:bg-[#161B22] backdrop-blur-md rounded-full text-sm font-medium text-[#0F5BA7] border-2 border-[#0F5BA7] hover:bg-white/20 transition-all duration-300"
+                  >
                     {intersection}
                   </span>
                 ))}
               </div>
             )}
+
+            <button
+              onClick={handleViewComparison}
+              className="px-28 py-3 text-base font-bold text-white bg-[#0F5BA7] border-2 border-[#0F5BA7] rounded-xl transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#0F5BA7]/50 hover:shadow-xl hover:shadow-[#0F5BA7]/40 mb-0 mt-4"
+            >
+              View Rendering
+            </button>
           </div>
           <div className="flex flex-col space-y-24">
             {/* Simulation Results Section */}
             <section className="visSection simulation-section bg-white/5 backdrop-blur-md p-6 px-8 md:px-12 rounded-xl shadow-lg border border-gray-800/50 w-full max-w-full mx-auto text-center">
-              <h2 className="text-2xl font-semibold mb-4 bg-[#0F5BA7] bg-clip-text text-transparent">Simulation Results</h2>
+              <h2 className="text-2xl font-semibold mb-4 bg-[#0F5BA7] bg-clip-text text-transparent">
+                Simulation Results
+              </h2>
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Stats column */}
                 <div className="flex flex-row md:flex-col gap-4 md:gap-6 mb-2 md:mb-0 md:min-w-[180px] md:max-w-[220px]">
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">Average Speed</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.avgSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      Average Speed
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {stats ? stats.avgSpeed.toFixed(2) : "..."}{" "}
+                      <span className="text-base text-[#0F5BA7] font-normal">
+                        m/s
+                      </span>
+                    </div>
                   </div>
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">Max Speed</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.maxSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      Max Speed
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {stats ? stats.maxSpeed.toFixed(2) : "..."}{" "}
+                      <span className="text-base text-[#0F5BA7] font-normal">
+                        m/s
+                      </span>
+                    </div>
                   </div>
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">Min Speed</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.minSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      Min Speed
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {stats ? stats.minSpeed.toFixed(2) : "..."}{" "}
+                      <span className="text-base text-[#0F5BA7] font-normal">
+                        m/s
+                      </span>
+                    </div>
                   </div>
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">Total Distance</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.totalDistance.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m</span></div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      Total Distance
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {stats ? stats.totalDistance.toFixed(2) : "..."}{" "}
+                      <span className="text-base text-[#0F5BA7] font-normal">
+                        m
+                      </span>
+                    </div>
                   </div>
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1"># Vehicles</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.vehicleCount : "..."}</div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      # Vehicles
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {stats ? stats.vehicleCount : "..."}
+                    </div>
                   </div>
                   {/* Traffic Light Stat Cards */}
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1"># TL Phases</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{numPhases}</div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      # TL Phases
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {numPhases}
+                    </div>
                   </div>
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">TL Cycle Duration</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{totalCycle} <span className="text-base text-[#0F5BA7] font-normal">s</span></div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      TL Cycle Duration
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {totalCycle}{" "}
+                      <span className="text-base text-[#0F5BA7] font-normal">
+                        s
+                      </span>
+                    </div>
                   </div>
                 </div>
                 {/* Graphs grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simAvgSpeedRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simVehCountRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simFinalSpeedHistRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.simTotalDistHistRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
+                    <canvas
+                      ref={chartRefs.simAvgSpeedRef}
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
+                    <canvas
+                      ref={chartRefs.simVehCountRef}
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
+                    <canvas
+                      ref={chartRefs.simFinalSpeedHistRef}
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
+                    <canvas
+                      ref={chartRefs.simTotalDistHistRef}
+                      className="w-full h-full"
+                    />
+                  </div>
                 </div>
               </div>
               {/* Action buttons */}
@@ -379,66 +448,116 @@ const SimulationResults: React.FC = () => {
                 <button className="px-8 py-3 text-base font-bold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/50 transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-blue-500/60 focus:outline-none focus:ring-4 focus:ring-blue-300">
                   Optimize
                 </button>
-                <button 
-                  onClick={handleViewComparison} 
-                  className="px-8 py-3 text-base font-bold text-[#0F5BA7] bg-transparent border-2 border-[#0F5BA7] rounded-xl transform transition-all duration-300 ease-in-out hover:bg-[#0F5BA7] hover:text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-600"
-                >
-                  View Comparison Rendering
-                </button>
               </div>
             </section>
             {/* Optimized Results Section */}
             <section className="visSection optimized-section bg-white/5 backdrop-blur-md p-6 px-8 md:px-12 rounded-xl shadow-lg border border-gray-800/50 w-full max-w-full mx-auto mt-12 text-center">
-              <h2 className="text-2xl font-semibold mb-4 bg-[#0F5BA7] bg-clip-text text-transparent">Optimized Results</h2>
+              <h2 className="text-2xl font-semibold mb-4 bg-[#0F5BA7] bg-clip-text text-transparent">
+                Optimized Results
+              </h2>
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Stats column */}
                 <div className="flex flex-row md:flex-col gap-4 md:gap-6 mb-2 md:mb-0 md:min-w-[180px] md:max-w-[220px]">
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">Average Speed</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.avgSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      Average Speed
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {stats ? stats.avgSpeed.toFixed(2) : "..."}{" "}
+                      <span className="text-base text-[#0F5BA7] font-normal">
+                        m/s
+                      </span>
+                    </div>
                   </div>
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">Max Speed</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.maxSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      Max Speed
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {stats ? stats.maxSpeed.toFixed(2) : "..."}{" "}
+                      <span className="text-base text-[#0F5BA7] font-normal">
+                        m/s
+                      </span>
+                    </div>
                   </div>
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">Min Speed</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.minSpeed.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m/s</span></div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      Min Speed
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {stats ? stats.minSpeed.toFixed(2) : "..."}{" "}
+                      <span className="text-base text-[#0F5BA7] font-normal">
+                        m/s
+                      </span>
+                    </div>
                   </div>
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">Total Distance</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.totalDistance.toFixed(2) : "..."} <span className="text-base text-[#0F5BA7] font-normal">m</span></div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      Total Distance
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {stats ? stats.totalDistance.toFixed(2) : "..."}{" "}
+                      <span className="text-base text-[#0F5BA7] font-normal">
+                        m
+                      </span>
+                    </div>
                   </div>
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1"># Vehicles</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{stats ? stats.vehicleCount : "..."}</div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      # Vehicles
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {stats ? stats.vehicleCount : "..."}
+                    </div>
                   </div>
                   {/* Traffic Light Stat Cards */}
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1"># TL Phases</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{numPhases}</div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      # TL Phases
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {numPhases}
+                    </div>
                   </div>
                   <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">TL Cycle Duration</div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">{totalCycle} <span className="text-base text-[#0F5BA7] font-normal">s</span></div>
+                    <div className="text-sm font-bold text-gray-600 mb-1">
+                      TL Cycle Duration
+                    </div>
+                    <div className="text-2xl font-bold text-[#0F5BA7]">
+                      {totalCycle}{" "}
+                      <span className="text-base text-[#0F5BA7] font-normal">
+                        s
+                      </span>
+                    </div>
                   </div>
                 </div>
                 {/* Graphs grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optAvgSpeedRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optVehCountRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optFinalSpeedHistRef} className="w-full h-full" /></div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center"><canvas ref={chartRefs.optTotalDistHistRef} className="w-full h-full" /></div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
+                    <canvas
+                      ref={chartRefs.optAvgSpeedRef}
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
+                    <canvas
+                      ref={chartRefs.optVehCountRef}
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
+                    <canvas
+                      ref={chartRefs.optFinalSpeedHistRef}
+                      className="w-full h-full"
+                    />
+                  </div>
+                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
+                    <canvas
+                      ref={chartRefs.optTotalDistHistRef}
+                      className="w-full h-full"
+                    />
+                  </div>
                 </div>
-              </div>
-              {/* Action button */}
-              <div className="flex flex-row gap-4 justify-center mt-12">
-                {/* <button 
-                  onClick={handleViewRendering} 
-                  className="px-8 py-3 text-base font-bold text-[#0F5BA7] bg-transparent border-2 border-[#0F5BA7] rounded-xl transform transition-all duration-300 ease-in-out hover:bg-[#0F5BA7] hover:text-white hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-600"
-                >
-                  View Rendering
-                </button> */}
               </div>
             </section>
           </div>
