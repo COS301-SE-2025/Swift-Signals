@@ -78,6 +78,20 @@ services:
       - app-network
 
 
+  optimisation-service:
+    build:
+      context: ..
+      dockerfile: build/package/Dockerfile.optimisation
+    image: swift-signals/optimisation-service:dev
+    container_name: optimisation-service
+    environment:
+      APP_PORT: 50054
+    ports:
+      - "50054:50054"
+    networks:
+      - app-network
+
+
   api-gateway:
     build:
       context: ..
