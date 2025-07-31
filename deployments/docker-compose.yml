@@ -71,9 +71,9 @@ services:
     image: swift-signals/simulation-service:dev
     container_name: simulation-service
     environment:
-      APP_PORT: 50153
+      APP_PORT: 50053
     ports:
-      - "50153:50153"
+      - "50053:50053"
     networks:
       - app-network
 
