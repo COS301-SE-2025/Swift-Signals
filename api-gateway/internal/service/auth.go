@@ -4,15 +4,16 @@ import (
 	"context"
 	"errors"
 
-	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 )
 
 type AuthService struct {
-	userClient *client.UserClient
+	userClient client.UserClientInterface
 }
 
-func NewAuthService(uc *client.UserClient) *AuthService {
+func NewAuthService(uc client.UserClientInterface) AuthServiceInterface {
 	return &AuthService{
 		userClient: uc,
 	}
@@ -21,7 +22,7 @@ func NewAuthService(uc *client.UserClient) *AuthService {
 func (s *AuthService) RegisterUser(ctx context.Context, req model.RegisterRequest) (model.RegisterResponse, error) {
 	registerResp, err := s.userClient.RegisterUser(ctx, req.Username, req.Email, req.Password)
 	if err != nil {
-		return model.RegisterResponse{}, errors.New("unable to register user")
+		return model.RegisterResponse{}, errs.NewInternalError("unable to register", err, nil)
 	}
 	resp := model.RegisterResponse{
 		UserID: registerResp.Id,
@@ -52,3 +53,13 @@ func (s *AuthService) LogoutUser(ctx context.Context, token string) (model.Logou
 	}
 	return resp, nil
 }
+
+// AuthServiceInterface creates stub for testing
+type AuthServiceInterface interface {
+	RegisterUser(ctx context.Context, req model.RegisterRequest) (model.RegisterResponse, error)
+	LoginUser(ctx context.Context, req model.LoginRequest) (model.LoginResponse, error)
+	LogoutUser(ctx context.Context, token string) (model.LogoutResponse, error)
+}
+
+// Note: Asserts Interface Implementation
+var _ AuthServiceInterface = (*AuthService)(nil)

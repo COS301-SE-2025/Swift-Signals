@@ -10,10 +10,10 @@ import (
 )
 
 type IntersectionHandler struct {
-	service *service.IntersectionService
+	service service.IntersectionServiceInterface
 }
 
-func NewIntersectionHandler(s *service.IntersectionService) *IntersectionHandler {
+func NewIntersectionHandler(s service.IntersectionServiceInterface) *IntersectionHandler {
 	return &IntersectionHandler{
 		service: s,
 	}
