@@ -1,4 +1,5 @@
 from concurrent import futures
+import os
 
 from google.protobuf.json_format import MessageToDict, ParseDict
 
@@ -24,7 +25,8 @@ class OptimisationServicer(pb_grpc.OptimisationServiceServicer):
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    pb_grpc.add_OptimisationServiceServicer_to_server(OptimisationServicer(), server)
+    pb_grpc.add_OptimisationServiceServicer_to_server(
+        OptimisationServicer(), server)
 
     SERVICE_NAMES = (
         pb.DESCRIPTOR.services_by_name["OptimisationService"].full_name,
@@ -32,9 +34,10 @@ def serve():
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
 
-    server.add_insecure_port("[::]:50054")
+    port = os.environ.get("APP_PORT", "50054")
+    server.add_insecure_port(f"[::]:{port}")
     server.start()
-    print("Optimisation Service listening on port :50054")
+    print(f"Optimisation Service listening on port :{port}")
     server.wait_for_termination()
 
 

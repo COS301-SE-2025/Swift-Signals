@@ -18,5 +18,3 @@ ENV PYTHONPATH="/app/gen/python:$PYTHONPATH"
 COPY optimization-service/ .
 
 CMD ["python", "server/server.py"]
-
-EXPOSE 50054
