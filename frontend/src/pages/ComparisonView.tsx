@@ -93,25 +93,18 @@ const ComparisonView: React.FC = () => {
 
   const getButtonContent = (side: 'left' | 'right') => {
     const isExpanded = expanded === side;
-    const isOtherExpanded = expanded !== 'none' && expanded !== side;
     
     if (isExpanded) {
       return {
-        icon: side === 'left' ? '→' : '←',
-        text: 'Expand',
-        tooltip: 'Expand to show both views'
-      };
-    } else if (isOtherExpanded) {
-      return {
-        icon: side === 'left' ? '←' : '→',
-        text: 'Collapse',
-        tooltip: `Collapse ${side === 'left' ? 'original' : 'optimized'} view (will collapse other side)`
+        icon: '⤢',
+        text: 'Exit Fullscreen',
+        tooltip: 'Exit fullscreen to show both views'
       };
     } else {
       return {
-        icon: side === 'left' ? '←' : '→',
-        text: 'Collapse',
-        tooltip: `Collapse ${side === 'left' ? 'original' : 'optimized'} view (will collapse other side)`
+        icon: '⛶',
+        text: 'Fullscreen',
+        tooltip: `View ${side === 'left' ? 'original' : 'optimized'} simulation in fullscreen`
       };
     }
   };
@@ -164,6 +157,7 @@ const ComparisonView: React.FC = () => {
         />
       </div>
 
+      {/* Divider collapses when a view is expanded */}
       <div style={{ ...dividerStyle, width: expanded === 'none' ? '2px' : '0px' }} />
 
       {/* Right side: Optimized Simulation */}
@@ -177,7 +171,7 @@ const ComparisonView: React.FC = () => {
         <ModernButton 
           side="right" 
           onClick={toggleRight}
-          position="left"
+          position="right"
         />
       </div>
     </div>
