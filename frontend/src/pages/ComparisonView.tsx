@@ -146,7 +146,7 @@ const ComparisonView: React.FC = () => {
       <div style={getDynamicStyles('left')}>
         <TrafficSimulation
           dataUrl={originalDataUrl}
-          scale={0.65}
+          scale={expanded === 'left' ? 1.0 : 0.65}
           isExpanded={expanded === 'left'}
         />
         <div style={labelStyle}>Original Simulation</div>
@@ -164,7 +164,7 @@ const ComparisonView: React.FC = () => {
       <div style={getDynamicStyles('right')}>
         <TrafficSimulation
           dataUrl={optimizedDataUrl}
-          scale={0.65}
+          scale={expanded === 'right' ? 1.0 : 0.65}
           isExpanded={expanded === 'right'}
         />
         <div style={labelStyle}>Optimized Simulation</div>
