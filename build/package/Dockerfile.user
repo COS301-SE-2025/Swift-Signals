@@ -3,7 +3,7 @@ FROM golang:1.24.4-alpine
 WORKDIR /app
 COPY protos/ protos/
 COPY shared/ shared/
-COPY user-service/ user-service
+COPY user-service/ user-service/
 
 WORKDIR user-service
 RUN go mod download
