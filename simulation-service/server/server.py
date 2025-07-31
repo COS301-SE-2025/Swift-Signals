@@ -12,8 +12,7 @@ import SimLoad
 
 class SimulationServicer(pb_grpc.SimulationServiceServicer):
     def GetSimulationResults(self, request, context):
-        print("GetSimulationResults request received with id:",
-              request.intersection_id)
+        print("GetSimulationResults request received with id:", request.intersection_id)
 
         req_dict = {
             "intersection": MessageToDict(
@@ -27,8 +26,7 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
         return msg_results
 
     def GetSimulationOutput(self, request, context):
-        print("GetSimulationOutput request received with id:",
-              request.intersection_id)
+        print("GetSimulationOutput request received with id:", request.intersection_id)
 
         req_dict = {
             "intersection": MessageToDict(
@@ -44,8 +42,7 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    pb_grpc.add_SimulationServiceServicer_to_server(
-        SimulationServicer(), server)
+    pb_grpc.add_SimulationServiceServicer_to_server(SimulationServicer(), server)
 
     SERVICE_NAMES = (
         pb.DESCRIPTOR.services_by_name["SimulationService"].full_name,

@@ -1,7 +1,7 @@
 from concurrent import futures
 import os
 
-from google.protobuf.json_format import MessageToDict, ParseDict
+from google.protobuf.json_format import MessageToDict
 
 import grpc
 from grpc_reflection.v1alpha import reflection
@@ -25,8 +25,7 @@ class OptimisationServicer(pb_grpc.OptimisationServiceServicer):
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    pb_grpc.add_OptimisationServiceServicer_to_server(
-        OptimisationServicer(), server)
+    pb_grpc.add_OptimisationServiceServicer_to_server(OptimisationServicer(), server)
 
     SERVICE_NAMES = (
         pb.DESCRIPTOR.services_by_name["OptimisationService"].full_name,
