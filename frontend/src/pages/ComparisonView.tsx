@@ -77,8 +77,47 @@ const ComparisonView: React.FC = () => {
     transition: 'transform 0.3s ease',
   };
 
+  const exitButtonStyle: React.CSSProperties = {
+    position: 'absolute',
+    bottom: '24px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 1001,
+    background: 'linear-gradient(135deg, rgba(220,38,38,0.9) 0%, rgba(185,28,28,0.8) 100%)',
+    backdropFilter: 'blur(16px)',
+    border: '1px solid rgba(255,255,255,0.18)',
+    borderRadius: '16px',
+    padding: '12px 24px',
+    cursor: 'pointer',
+    fontWeight: '600',
+    fontSize: '14px',
+    color: 'rgba(255,255,255,0.95)',
+    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    boxShadow: '0 8px 32px rgba(220,38,38,0.3)',
+    minWidth: '120px',
+    justifyContent: 'center',
+  };
+
+  const exitButtonHoverStyle: React.CSSProperties = {
+    background: 'linear-gradient(135deg, rgba(239,68,68,0.95) 0%, rgba(220,38,38,0.9) 100%)',
+    transform: 'translateX(-50%) translateY(2px)',
+    boxShadow: '0 12px 40px rgba(220,38,38,0.4)',
+    border: '1px solid rgba(255,255,255,0.3)',
+  };
+
   const toggleLeft = () => setExpanded(prev => prev === 'left' ? 'none' : 'left');
   const toggleRight = () => setExpanded(prev => prev === 'right' ? 'none' : 'right');
+  
+  const handleExit = () => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.close();
+    }
+  };
 
   const getDynamicStyles = (side: 'left' | 'right') => {
     const isExpanded = expanded === side;
@@ -140,8 +179,36 @@ const ComparisonView: React.FC = () => {
     );
   };
 
+  const ExitButton = () => {
+    const [isHovered, setIsHovered] = useState(false);
+    
+    return (
+      <button
+        onClick={handleExit}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={{
+          ...exitButtonStyle,
+          ...(isHovered ? exitButtonHoverStyle : {}),
+        }}
+        title="Close tab and return to previous page"
+      >
+        <span style={{
+          ...iconStyle,
+          transform: isHovered ? 'scale(1.1)' : 'scale(1)'
+        }}>
+          ✕
+        </span>
+        <span>Exit</span>
+      </button>
+    );
+  };
+
   return (
     <div style={containerStyle}>
+      {/* Exit Button - Centered at top */}
+      <ExitButton />
+
       {/* Left side: Original Simulation */}
       <div style={getDynamicStyles('left')}>
         <TrafficSimulation
