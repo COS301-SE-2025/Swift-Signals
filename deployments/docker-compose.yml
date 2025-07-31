@@ -64,6 +64,20 @@ services:
       - app-network
 
 
+  simulation-service:
+    build:
+      context: ..
+      dockerfile: build/package/Dockerfile.simulation
+    image: swift-signals/simulation-service:dev
+    container_name: simulation-service
+    environment:
+      APP_PORT: 50053
+    ports:
+      - "50053:50053"
+    networks:
+      - app-network
+
+
   api-gateway:
     build:
       context: ..
