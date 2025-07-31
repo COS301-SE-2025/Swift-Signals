@@ -304,7 +304,7 @@ const SimulationResults: React.FC = () => {
     : { numPhases: 0, totalCycle: 0 };
     
   const handleViewComparison = () => {
-    window.open('/comparison-rendering', '_blank');
+    window.location.href = '/comparison-rendering';
   };
   return (
     <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">

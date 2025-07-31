@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import TrafficSimulation from './TrafficSimulation';
+import HelpMenu from "../components/HelpMenu";
 
 const ComparisonView: React.FC = () => {
   const originalDataUrl = "/simulation_output (1).json";
@@ -241,6 +242,7 @@ const ComparisonView: React.FC = () => {
           position="right"
         />
       </div>
+      <HelpMenu />
     </div>
   );
 };
