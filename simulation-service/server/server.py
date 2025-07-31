@@ -1,4 +1,5 @@
 from concurrent import futures
+import os
 
 from google.protobuf.json_format import MessageToDict, ParseDict
 import grpc
@@ -11,7 +12,8 @@ import SimLoad
 
 class SimulationServicer(pb_grpc.SimulationServiceServicer):
     def GetSimulationResults(self, request, context):
-        print("GetSimulationResults request received with id:", request.intersection_id)
+        print("GetSimulationResults request received with id:",
+              request.intersection_id)
 
         req_dict = {
             "intersection": MessageToDict(
@@ -25,7 +27,8 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
         return msg_results
 
     def GetSimulationOutput(self, request, context):
-        print("GetSimulationOutput request received with id:", request.intersection_id)
+        print("GetSimulationOutput request received with id:",
+              request.intersection_id)
 
         req_dict = {
             "intersection": MessageToDict(
@@ -41,7 +44,8 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    pb_grpc.add_SimulationServiceServicer_to_server(SimulationServicer(), server)
+    pb_grpc.add_SimulationServiceServicer_to_server(
+        SimulationServicer(), server)
 
     SERVICE_NAMES = (
         pb.DESCRIPTOR.services_by_name["SimulationService"].full_name,
@@ -49,9 +53,10 @@ def serve():
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
 
-    server.add_insecure_port("[::]:50053")
+    port = os.environ.get("APP_PORT", "50053")
+    server.add_insecure_port(f"[::]:{port}")
     server.start()
-    print("Simulation Service listening on port :50053")
+    print(f"Simulation Service listening on port :{port}")
     server.wait_for_termination()
 
 

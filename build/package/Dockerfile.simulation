@@ -30,5 +30,3 @@ ENV PYTHONPATH="/app/gen/python:$PYTHONPATH"
 COPY simulation-service/ /app/
 
 CMD ["python3", "server/server.py"]
-
-EXPOSE 50053
