@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import TrafficSimulation from './TrafficSimulation';
 import HelpMenu from "../components/HelpMenu";
+import Footer from "../components/Footer";
 
 const ComparisonView: React.FC = () => {
   const originalDataUrl = "/simulation_output (1).json";
@@ -11,8 +12,9 @@ const ComparisonView: React.FC = () => {
     display: 'flex',
     flexDirection: 'row',
     width: '100vw',
-    height: '100vh',
-    backgroundColor: '#1e1e1e'
+    height: 'calc(100vh - 50px)',
+    backgroundColor: '#1e1e1e',
+    paddingBottom: '0',
   };
 
   const viewStyle: React.CSSProperties = {
@@ -80,7 +82,7 @@ const ComparisonView: React.FC = () => {
 
   const exitButtonStyle: React.CSSProperties = {
     position: 'absolute',
-    bottom: '24px',
+    bottom: '70px',
     left: '50%',
     transform: 'translateX(-50%)',
     zIndex: 1001,
@@ -206,44 +208,46 @@ const ComparisonView: React.FC = () => {
   };
 
   return (
-    <div style={containerStyle}>
-      {/* Exit Button - Centered at top */}
-      <ExitButton />
+    <>
+      <div style={containerStyle}>
+        <ExitButton />
 
-      {/* Left side: Original Simulation */}
-      <div style={getDynamicStyles('left')}>
-        <TrafficSimulation
-          dataUrl={originalDataUrl}
-          scale={expanded === 'left' ? 1.0 : 0.65}
-          isExpanded={expanded === 'left'}
-        />
-        <div style={labelStyle}>Original Simulation</div>
-        <ModernButton 
-          side="left" 
-          onClick={toggleLeft}
-          position="right"
-        />
+        {/* Left side: Original Simulation */}
+        <div style={getDynamicStyles('left')}>
+          <TrafficSimulation
+            dataUrl={originalDataUrl}
+            scale={expanded === 'left' ? 1.0 : 0.65}
+            isExpanded={expanded === 'left'}
+          />
+          <div style={labelStyle}>Original Simulation</div>
+          <ModernButton 
+            side="left" 
+            onClick={toggleLeft}
+            position="right"
+          />
+        </div>
+
+        <div style={{ ...dividerStyle, width: expanded === 'none' ? '2px' : '0px' }} />
+
+        {/* Right side: Optimized Simulation */}
+        <div style={getDynamicStyles('right')}>
+          <TrafficSimulation
+            dataUrl={optimizedDataUrl}
+            scale={expanded === 'right' ? 1.0 : 0.65}
+            isExpanded={expanded === 'right'}
+          />
+          <div style={labelStyle}>Optimized Simulation</div>
+          <ModernButton 
+            side="right" 
+            onClick={toggleRight}
+            position="right"
+          />
+        </div>
+        
+        <HelpMenu />
       </div>
-
-      {/* Divider collapses when a view is expanded */}
-      <div style={{ ...dividerStyle, width: expanded === 'none' ? '2px' : '0px' }} />
-
-      {/* Right side: Optimized Simulation */}
-      <div style={getDynamicStyles('right')}>
-        <TrafficSimulation
-          dataUrl={optimizedDataUrl}
-          scale={expanded === 'right' ? 1.0 : 0.65}
-          isExpanded={expanded === 'right'}
-        />
-        <div style={labelStyle}>Optimized Simulation</div>
-        <ModernButton 
-          side="right" 
-          onClick={toggleRight}
-          position="right"
-        />
-      </div>
-      <HelpMenu />
-    </div>
+      <Footer />
+    </>
   );
 };
 
