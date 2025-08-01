@@ -32,5 +32,6 @@ require (
 require (
 	github.com/COS301-SE-2025/Swift-Signals/protos/gen v0.0.0-00010101000000-000000000000
 	github.com/COS301-SE-2025/Swift-Signals/shared v0.0.0-00010101000000-000000000000
+	github.com/DATA-DOG/go-sqlmock v1.5.2
 	github.com/google/uuid v1.6.0
 )

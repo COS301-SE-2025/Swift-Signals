@@ -20,7 +20,7 @@ type Service struct {
 	repo db.UserRepository
 }
 
-func NewService(r db.UserRepository) *Service {
+func NewUserService(r db.UserRepository) UserService {
 	return &Service{repo: r}
 }
 
@@ -50,9 +50,9 @@ func (s *Service) RegisterUser(ctx context.Context, name, email, password string
 	//       Perhaps we should define EmailExists repository method instead
 
 	if err != nil {
-		return nil, errs.NewInternalError("failed to check existing user", err, map[string]any{"user": existingUser, "email": email})
-		// NOTE: Make sure to return publicUser in GetUserByEmail to ensure confidentail data is not leaked
+		return nil, errs.NewInternalError("failed to check existing user", err, map[string]any{"email": email})
 	}
+
 	if existingUser != nil {
 		return nil, errs.NewAlreadyExistsError("email already exists", map[string]any{"user": existingUser, "email": email})
 	}
