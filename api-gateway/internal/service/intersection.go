@@ -5,16 +5,23 @@ import (
 	"errors"
 	"io"
 
-	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 )
+
+type IntersectionServiceInterface interface {
+	GetAllIntersections(ctx context.Context) (model.Intersections, error)
+	GetIntersectionByID(ctx context.Context, id string) (model.Intersection, error)
+	CreateIntersection(ctx context.Context, req model.CreateIntersectionRequest) (model.CreateIntersectionResponse, error)
+	UpdateIntersectionByID(ctx context.Context, id string, req model.UpdateIntersectionRequest) (model.Intersection, error)
+}
 
 type IntersectionService struct {
 	intrClient *client.IntersectionClient
 }
 
-func NewIntersectionService(ic *client.IntersectionClient) *IntersectionService {
+func NewIntersectionService(ic *client.IntersectionClient) IntersectionServiceInterface {
 	return &IntersectionService{
 		intrClient: ic,
 	}

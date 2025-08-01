@@ -12,7 +12,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
@@ -67,7 +67,7 @@ func mustConnectUserService(address string) *client.UserClient {
 		log.Fatalf("failed to connect to User gRPC server: %v", err)
 	}
 	log.Println("Connected to User-Service")
-	return client.NewUserClient(conn)
+	return client.NewUserClientFromConn(conn)
 }
 
 func mustConnectIntersectionService(address string) *client.IntersectionClient {

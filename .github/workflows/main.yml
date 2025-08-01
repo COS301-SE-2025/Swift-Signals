@@ -43,6 +43,8 @@ jobs:
       - name: Run unit tests in api-gateway
         working-directory: ./api-gateway
         run: |
+          go install github.com/vektra/mockery/v2@latest
+          mockery
           go mod tidy
           go test -v ./...
 

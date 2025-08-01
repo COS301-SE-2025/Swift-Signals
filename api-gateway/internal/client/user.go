@@ -13,10 +13,14 @@ type UserClient struct {
 	client userpb.UserServiceClient
 }
 
-func NewUserClient(conn *grpc.ClientConn) *UserClient {
+func NewUserClient(client userpb.UserServiceClient) *UserClient {
 	return &UserClient{
-		client: userpb.NewUserServiceClient(conn),
+		client: client,
 	}
+}
+
+func NewUserClientFromConn(conn *grpc.ClientConn) *UserClient {
+	return NewUserClient(userpb.NewUserServiceClient(conn))
 }
 
 func (uc *UserClient) RegisterUser(ctx context.Context, name, email, password string) (*userpb.UserResponse, error) {
