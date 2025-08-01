@@ -31,9 +31,9 @@ func (r *PostgresUserRepo) CreateUser(ctx context.Context, u *model.User) (*mode
 }
 
 func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id string) (*model.User, error) {
-	query := `SELECT id, name, email, password, is_admin, created_at, updated_at 
+	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at 
 	          FROM users 
-	          WHERE id = $1`
+	          WHERE uuid = $1`
 	row := r.db.QueryRowContext(ctx, query, id)
 
 	user := &model.User{}
@@ -55,7 +55,7 @@ func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id string) (*model.U
 }
 
 func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
-	query := `SELECT id, name, email, password, is_admin, created_at, updated_at 
+	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at 
 	          FROM users 
 	          WHERE email = $1`
 	row := r.db.QueryRowContext(ctx, query, email)
@@ -85,7 +85,7 @@ func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*m
 func (r *PostgresUserRepo) UpdateUser(ctx context.Context, u *model.User) (*model.User, error) {
 	query := `UPDATE users
 	          SET name = $1, email = $2, password = $3, is_admin = $4, updated_at = NOW()
-	          WHERE id = $5`
+	          WHERE uuid = $5`
 	_, err := r.db.ExecContext(ctx, query, u.Name, u.Email, u.Password, u.IsAdmin, u.ID)
 	if err != nil {
 		return nil, err
@@ -95,15 +95,15 @@ func (r *PostgresUserRepo) UpdateUser(ctx context.Context, u *model.User) (*mode
 
 func (r *PostgresUserRepo) DeleteUser(ctx context.Context, id string) error {
 	query := `DELETE FROM users 
-	          WHERE id = $1`
+	          WHERE uuid = $1`
 	_, err := r.db.ExecContext(ctx, query, id)
 	return err
 }
 
 func (r *PostgresUserRepo) ListUsers(ctx context.Context, limit, offset int) ([]*model.User, error) {
-	query := `SELECT id, name, email, password, is_admin, created_at, updated_at 
+	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at 
 	          FROM users 
-	          ORDER BY id LIMIT $1 OFFSET $2`
+	          ORDER BY uuid LIMIT $1 OFFSET $2`
 	rows, err := r.db.QueryContext(ctx, query, limit, offset)
 	if err != nil {
 		return nil, err
