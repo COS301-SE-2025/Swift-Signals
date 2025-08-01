@@ -1,12 +1,17 @@
-# Running Go Unit Tests
+To generate mocks/ type `mockery` in /user-service directory in the terminal
 
-This project uses Go's built-in testing framework. 
-
-## 🧪 Run All Unit Tests
-
-Ensure that you are in the `Swift-Signals/api-gateway` directory
-
+To run all of the unit tests with clean output run:
 ```bash
-go test ./... -v 
+go test ./internal/client/test/user ./internal/service/test/auth ./internal/handler/test/auth
+```
+
+With verbose:
+```bash
+go test -v ./internal/client/test/user ./internal/service/test/auth ./internal/handler/test/auth 
+```
+
+With coverage:
+```bash
+go test -v -coverprofile=coverage.out -coverpkg=./internal/client/,./internal/service/,./internal/handler/ ./internal/client/test/user ./internal/service/test/auth ./internal/handler/test/auth 
 ```
 
