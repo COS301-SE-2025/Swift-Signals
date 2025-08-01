@@ -1,14 +1,13 @@
 FROM golang:1.24.4-alpine
 
 WORKDIR /app
+COPY protos/ protos/
+COPY shared/ shared/
+COPY intersection-service/ intersection-service/
 
-COPY . .
-
+WORKDIR intersection-service
 RUN go mod download
 
 WORKDIR cmd
-
 RUN go build -o main 
-
 CMD ["./main"]
-
