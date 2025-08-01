@@ -1,8 +1,8 @@
 services:
   user-service:
     build:
-      context: ../user-service
-      dockerfile: ../build/package/Dockerfile.user
+      context: ..
+      dockerfile: build/package/Dockerfile.user
     image: swift-signals/user-service:dev
     container_name: user-service
     environment:
@@ -37,8 +37,8 @@ services:
 
   intersection-service:
     build:
-      context: ../intersection-service
-      dockerfile: ../build/package/Dockerfile.intersection
+      context: ..
+      dockerfile: build/package/Dockerfile.intersection
     image: swift-signals/intersection-service:dev
     container_name: intersection-service
     environment:
@@ -64,10 +64,38 @@ services:
       - app-network
 
 
+  simulation-service:
+    build:
+      context: ..
+      dockerfile: build/package/Dockerfile.simulation
+    image: swift-signals/simulation-service:dev
+    container_name: simulation-service
+    environment:
+      APP_PORT: 50053
+    ports:
+      - "50053:50053"
+    networks:
+      - app-network
+
+
+  optimisation-service:
+    build:
+      context: ..
+      dockerfile: build/package/Dockerfile.optimisation
+    image: swift-signals/optimisation-service:dev
+    container_name: optimisation-service
+    environment:
+      APP_PORT: 50054
+    ports:
+      - "50054:50054"
+    networks:
+      - app-network
+
+
   api-gateway:
     build:
-      context: ../api-gateway
-      dockerfile: ../build/package/Dockerfile.api-gateway
+      context: ..
+      dockerfile: build/package/Dockerfile.api-gateway
     image: swift-signals/api-gateway:dev
     container_name: api-gateway
     depends_on:

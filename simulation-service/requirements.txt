@@ -1,3 +1,4 @@
+traci
 grpcio
 grpcio-tools
 grpcio-reflection
