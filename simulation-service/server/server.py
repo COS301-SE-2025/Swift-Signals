@@ -1,4 +1,5 @@
 from concurrent import futures
+import os
 
 from google.protobuf.json_format import MessageToDict, ParseDict
 import grpc
@@ -49,9 +50,10 @@ def serve():
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
 
-    server.add_insecure_port("[::]:50053")
+    port = os.environ.get("APP_PORT", "50053")
+    server.add_insecure_port(f"[::]:{port}")
     server.start()
-    print("Simulation Service listening on port :50053")
+    print(f"Simulation Service listening on port :{port}")
     server.wait_for_termination()
 
 

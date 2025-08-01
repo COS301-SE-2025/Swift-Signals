@@ -1,6 +1,7 @@
 from concurrent import futures
+import os
 
-from google.protobuf.json_format import MessageToDict, ParseDict
+from google.protobuf.json_format import MessageToDict
 
 import grpc
 from grpc_reflection.v1alpha import reflection
@@ -32,9 +33,10 @@ def serve():
     )
     reflection.enable_server_reflection(SERVICE_NAMES, server)
 
-    server.add_insecure_port("[::]:50054")
+    port = os.environ.get("APP_PORT", "50054")
+    server.add_insecure_port(f"[::]:{port}")
     server.start()
-    print("Optimisation Service listening on port :50054")
+    print(f"Optimisation Service listening on port :{port}")
     server.wait_for_termination()
 
 
