@@ -9,7 +9,7 @@ import (
 type TestSuite struct {
 	suite.Suite
 	service *mocks.MockUserService
-	handler handler.UserHandler
+	handler *handler.Handler
 }
 
 func (suite *TestSuite) SetupTest() {
