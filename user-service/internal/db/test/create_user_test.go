@@ -36,7 +36,6 @@ func (suite *TestSuite) TestCreateUser_Success() {
 	suite.Equal(testUser, result)
 
 	suite.NoError(suite.mock.ExpectationsWereMet())
-
 }
 
 func (suite *TestSuite) TestCreateUser_Duplicate_Email() {
@@ -87,7 +86,6 @@ func (suite *TestSuite) TestCreateUser_Duplicate_UUID() {
 	suite.Nil(svcError.Context)
 
 	suite.NoError(suite.mock.ExpectationsWereMet())
-
 }
 
 func TestDBRegisterUser(t *testing.T) {

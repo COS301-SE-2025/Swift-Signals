@@ -2,6 +2,7 @@ package test
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/DATA-DOG/go-sqlmock"
@@ -24,5 +25,7 @@ func (suite *TestSuite) SetupTest() {
 }
 
 func (suite *TestSuite) TearDownTest() {
-	suite.db.Close()
+	if err := suite.db.Close(); err != nil {
+		log.Printf("Failed to close suite: %v", err)
+	}
 }

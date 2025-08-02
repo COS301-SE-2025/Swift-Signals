@@ -81,27 +81,46 @@ func handleCreateErrors(pqErr *pq.Error, ctx ErrorContext) error {
 		// Unique constraint violation
 		if ctx.Table == "users" {
 			if strings.Contains(pqErr.Detail, "email") {
-				return errs.NewAlreadyExistsError("email already exists", map[string]any{"email": extractEmailFromDetail(pqErr.Detail)})
+				return errs.NewAlreadyExistsError(
+					"email already exists",
+					map[string]any{"email": extractEmailFromDetail(pqErr.Detail)},
+				)
 			} else if strings.Contains(pqErr.Detail, "uuid") {
 				return errs.NewAlreadyExistsError("user ID already exists", nil)
 			}
 		}
-		return errs.NewAlreadyExistsError("duplicate value violates unique constraint", map[string]any{"detail": pqErr.Detail})
+		return errs.NewAlreadyExistsError(
+			"duplicate value violates unique constraint",
+			map[string]any{"detail": pqErr.Detail},
+		)
 	case "23503":
 		// Foreign key violation
 		return errs.NewDatabaseError("invalid reference to related resource", pqErr, nil)
 	case "23502":
 		// Not-null constraint violation
-		return errs.NewDatabaseError("missing required field", pqErr, map[string]any{"column": pqErr.Column})
+		return errs.NewDatabaseError(
+			"missing required field",
+			pqErr,
+			map[string]any{"column": pqErr.Column},
+		)
 	case "23514":
 		// Check constraint violation
-		return errs.NewValidationError("data violates check constraint", map[string]any{"constraint": pqErr.Constraint})
+		return errs.NewValidationError(
+			"data violates check constraint",
+			map[string]any{"constraint": pqErr.Constraint},
+		)
 	case "22001":
 		// String data right truncation
-		return errs.NewValidationError("field value too long", map[string]any{"column": pqErr.Column})
+		return errs.NewValidationError(
+			"field value too long",
+			map[string]any{"column": pqErr.Column},
+		)
 	case "22P02":
 		// Invalid text representation
-		return errs.NewValidationError("invalid data format", map[string]any{"detail": pqErr.Detail})
+		return errs.NewValidationError(
+			"invalid data format",
+			map[string]any{"detail": pqErr.Detail},
+		)
 	}
 	return nil // Will fall through to default handling
 }
@@ -110,10 +129,17 @@ func handleReadErrors(pqErr *pq.Error, ctx ErrorContext) error {
 	switch pqErr.Code {
 	case "22P02":
 		// Invalid text representation
-		return errs.NewValidationError("invalid query parameter format", map[string]any{"detail": pqErr.Detail})
+		return errs.NewValidationError(
+			"invalid query parameter format",
+			map[string]any{"detail": pqErr.Detail},
+		)
 	case "42703":
 		// Undefined column
-		return errs.NewInternalError("query references undefined column", pqErr, map[string]any{"column": pqErr.Column})
+		return errs.NewInternalError(
+			"query references undefined column",
+			pqErr,
+			map[string]any{"column": pqErr.Column},
+		)
 	case "42P01":
 		// Undefined table
 		return errs.NewInternalError("query references undefined table", pqErr, nil)
@@ -126,24 +152,43 @@ func handleUpdateErrors(pqErr *pq.Error, ctx ErrorContext) error {
 	case "23505":
 		// Unique constraint violation
 		if ctx.Table == "users" && strings.Contains(pqErr.Detail, "email") {
-			return errs.NewAlreadyExistsError("email already exists", map[string]any{"email": extractEmailFromDetail(pqErr.Detail)})
+			return errs.NewAlreadyExistsError(
+				"email already exists",
+				map[string]any{"email": extractEmailFromDetail(pqErr.Detail)},
+			)
 		}
-		return errs.NewAlreadyExistsError("duplicate value violates unique constraint", map[string]any{"detail": pqErr.Detail})
+		return errs.NewAlreadyExistsError(
+			"duplicate value violates unique constraint",
+			map[string]any{"detail": pqErr.Detail},
+		)
 	case "23503":
 		// Foreign key violation
 		return errs.NewDatabaseError("invalid reference to related resource", pqErr, nil)
 	case "23502":
 		// Not-null constraint violation
-		return errs.NewDatabaseError("missing required field", pqErr, map[string]any{"column": pqErr.Column})
+		return errs.NewDatabaseError(
+			"missing required field",
+			pqErr,
+			map[string]any{"column": pqErr.Column},
+		)
 	case "23514":
 		// Check constraint violation
-		return errs.NewValidationError("data violates check constraint", map[string]any{"constraint": pqErr.Constraint})
+		return errs.NewValidationError(
+			"data violates check constraint",
+			map[string]any{"constraint": pqErr.Constraint},
+		)
 	case "22001":
 		// String data right truncation
-		return errs.NewValidationError("field value too long", map[string]any{"column": pqErr.Column})
+		return errs.NewValidationError(
+			"field value too long",
+			map[string]any{"column": pqErr.Column},
+		)
 	case "22P02":
 		// Invalid text representation
-		return errs.NewValidationError("invalid data format", map[string]any{"detail": pqErr.Detail})
+		return errs.NewValidationError(
+			"invalid data format",
+			map[string]any{"detail": pqErr.Detail},
+		)
 	}
 	return nil
 }
@@ -152,10 +197,17 @@ func handleDeleteErrors(pqErr *pq.Error, ctx ErrorContext) error {
 	switch pqErr.Code {
 	case "23503":
 		// Foreign key violation (trying to delete referenced row)
-		return errs.NewDatabaseError("cannot delete record that is referenced by other records", pqErr, nil)
+		return errs.NewDatabaseError(
+			"cannot delete record that is referenced by other records",
+			pqErr,
+			nil,
+		)
 	case "22P02":
 		// Invalid text representation
-		return errs.NewValidationError("invalid query parameter format", map[string]any{"detail": pqErr.Detail})
+		return errs.NewValidationError(
+			"invalid query parameter format",
+			map[string]any{"detail": pqErr.Detail},
+		)
 	}
 	return nil
 }
