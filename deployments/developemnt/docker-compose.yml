@@ -1,8 +1,8 @@
 services:
   user-service:
     build:
-      context: ..
-      dockerfile: build/package/Dockerfile.user
+      context: ../..
+      dockerfile: deployment/development/dockerfiles/Dockerfile.user
     image: swift-signals/user-service:dev
     container_name: user-service
     environment:
@@ -37,8 +37,8 @@ services:
 
   intersection-service:
     build:
-      context: ..
-      dockerfile: build/package/Dockerfile.intersection
+      context: ../..
+      dockerfile: development/development/dockerfiles/Dockerfile.intersection
     image: swift-signals/intersection-service:dev
     container_name: intersection-service
     environment:
@@ -66,8 +66,8 @@ services:
 
   simulation-service:
     build:
-      context: ..
-      dockerfile: build/package/Dockerfile.simulation
+      context: ../..
+      dockerfile: deployment/development/dockerfiles/Dockerfile.simulation
     image: swift-signals/simulation-service:dev
     container_name: simulation-service
     environment:
@@ -80,8 +80,8 @@ services:
 
   optimisation-service:
     build:
-      context: ..
-      dockerfile: build/package/Dockerfile.optimisation
+      context: ../..
+      dockerfile: deployment/development/dockerfiles/Dockerfile.optimisation
     image: swift-signals/optimisation-service:dev
     container_name: optimisation-service
     environment:
@@ -94,8 +94,8 @@ services:
 
   api-gateway:
     build:
-      context: ..
-      dockerfile: build/package/Dockerfile.api-gateway
+      context: ../..
+      dockerfile: deployment/development/dockerfiles/Dockerfile.api-gateway
     image: swift-signals/api-gateway:dev
     container_name: api-gateway
     depends_on:
@@ -112,8 +112,8 @@ services:
 
   chatbot-server:
     build:
-      context: ../frontend/chatbot_server
-      dockerfile: ../../build/package/Dockerfile.chatbot
+      context: ../../frontend/chatbot_server
+      dockerfile: ../deployments/developemnt/dockerfiles/Dockerfile.chatbot
     image: swift-signals/chatbot-server:dev
     container_name: chatbot-server
     environment:
@@ -128,8 +128,8 @@ services:
 
   frontend:
     build:
-      context: ../frontend
-      dockerfile: ../build/package/Dockerfile.frontend
+      context: ../../frontend/
+      dockerfile: ../deployment/development/dockerfiles/Dockerfile.frontend
     image: swift-signals/frontend:dev
     container_name: frontend
     depends_on:
