@@ -3,10 +3,11 @@ package auth
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/stretchr/testify/mock"
@@ -40,8 +41,13 @@ func (suite *TestSuite) TestRegisterUser_Success() {
 	suite.Equal(expectedResponse, response)
 	suite.service.AssertExpectations(suite.T())
 }
+
 func (suite *TestSuite) TestRegister_InvalidJSON() {
-	req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBufferString(`{"invalid": json}`))
+	req := httptest.NewRequest(
+		http.MethodPost,
+		"/register",
+		bytes.NewBufferString(`{"invalid": json}`),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	w := httptest.NewRecorder()
 
@@ -131,7 +137,8 @@ func (suite *TestSuite) TestRegister_ServiceError() {
 	}
 
 	emptyResponse := model.RegisterResponse{}
-	suite.service.On("RegisterUser", mock.Anything, expectedRequest).Return(emptyResponse, errors.New("user already exists"))
+	suite.service.On("RegisterUser", mock.Anything, expectedRequest).
+		Return(emptyResponse, errs.NewAlreadyExistsError("user already exists", map[string]any{}))
 
 	body, _ := json.Marshal(expectedRequest)
 	req := httptest.NewRequest(http.MethodPost, "/register", bytes.NewBuffer(body))
@@ -140,7 +147,7 @@ func (suite *TestSuite) TestRegister_ServiceError() {
 
 	suite.handler.Register(w, req)
 
-	suite.Equal(http.StatusInternalServerError, w.Code)
+	suite.Equal(http.StatusConflict, w.Code)
 	suite.Contains(w.Body.String(), "user already exists")
 	suite.service.AssertExpectations(suite.T())
 }
