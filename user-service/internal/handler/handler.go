@@ -6,6 +6,7 @@ import (
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/service"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/util"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -20,12 +21,20 @@ func NewUserHandler(s service.UserService) *Handler {
 }
 
 func (h *Handler) RegisterUser(ctx context.Context, req *userpb.RegisterUserRequest) (*userpb.UserResponse, error) {
-	user, err := h.service.RegisterUser(ctx, req.GetName(), req.GetEmail(), req.GetPassword())
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing register user request")
 
+	user, err := h.service.RegisterUser(ctx, req.GetName(), req.GetEmail(), req.GetPassword())
 	if err != nil {
+		logger.Error("registration failed",
+			"error", err.Error(),
+		)
 		return nil, errs.HandleServiceError(err)
 	}
 
+	logger.Info("registration successful",
+		"user_id", user.ID,
+	)
 	return &userpb.UserResponse{
 		Id:              user.ID,
 		Name:            user.Name,
@@ -35,7 +44,6 @@ func (h *Handler) RegisterUser(ctx context.Context, req *userpb.RegisterUserRequ
 		CreatedAt:       timestamppb.New(user.CreatedAt),
 		UpdatedAt:       timestamppb.New(user.UpdatedAt),
 	}, nil
-
 }
 
 func (h *Handler) LoginUser(ctx context.Context, req *userpb.LoginUserRequest) (*userpb.LoginUserResponse, error) {
