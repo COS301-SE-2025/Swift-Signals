@@ -10,9 +10,9 @@
 .simulation-results-page .simRes-main-content {
   width: 100%;
   height: 100vh;
-  padding: 20px;
+  padding: 20px 0;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: flex-start;
   overflow-y: auto;
   margin: 0;
@@ -67,200 +67,10 @@
 }
 
 .simulation-results-page .visSection {
-  width: 80vw;
+  width: 95vw;
+  max-width: none;
   background-color: #fff;
-}
-
-
-.simulation-results-page .grid {
-  justify-content: center;
-  justify-items: center;
-}
-
-.simulation-results-page .paramInput {
-  background-color: #fff;
-  color: #000000;
-}
-
-.dark .simulation-results-page .paramInput {
-  background-color: #2a2a2a;
-  color: #fff;
-}
-
-.simulation-results-page .simName {
-  color: #000000;
-}
-
-.dark .simulation-results-page .simName {
-  color: #fff;
-}
-
-.simulation-results-page .simDesc {
-  color: #000000;
-}
-
-.dark .simulation-results-page .simDesc {
-  color: #fff;
-}
-
-.simulation-results-page .simInt {
-  color: #3730a3;
-  border-color: #e0e7ff;
-  background-color: #e0e7ff;
-}
-
-.dark .simulation-results-page .simInt {
-  color: #e0e7ff;
-  border-color: #4f46e5;
-  background-color: #4f46e5;
-}
-
-.simulation-results-page .statTitle {
-  color: #000000;
-}
-
-.dark .simulation-results-page .statTitle {
-  color: #fff;
-}
-
-.simulation-results-page .chart-container {
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-  transition: transform 0.2s ease;
-}
-
-.simulation-results-page .chart-container:hover {
-  transform: scale(1.02);
-}
-
-.simulation-results-page .fullscreen-modal {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.8);
-  z-index: 1000;
-  margin-bottom: 80px;
-}
-
-.simulation-results-page .fullscreen-modal canvas {
-  max-height: 90vh;
-  max-width: 100%;
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 20px;
-  color: #000000;
-}
-
-.dark .simulation-results-page .fullscreen-modal canvas {
-  background-color: #2a2a2a;
-}
-
-@media screen and (max-width: 1400px) and (max-height: 800px) {
-  .simRes-main-content {
-    justify-content: center;
-    align-items: center;
-    overflow-x: hidden;
-  }
-
-  .simulation-results-page .grid {
-    gap: 0px;
-  }
-
-  .simulation-results-page .results {
-    width: 95%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: 50px;
-    margin-right: 50px;
-    justify-content: center;
-  }
-
-  .visSection {
-    width: 100%;
-    height: 100%;
-    max-width: 600px;
-    max-height: 500px;
-  }
-
-  .parameters h3 {
-    font-size: 1rem;
-    margin-bottom: 10px;
-  }
-}
-
-.simulation-results-page .results {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 50px;
-  margin-bottom: 100px;
-}
-
-.simulation-results-page .simRes-main-content {
-  width: 100%;
-  height: 100vh;
-  padding: 20px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  overflow-y: auto;
-  margin: 0;
-  background-color: #f0f0f0;
-}
-
-.dark .simulation-results-page .simRes-main-content {
-  background-color: #0D1117;
-}
-
-.simulation-results-page .visualization-box {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.simulation-results-page canvas {
-  max-width: 100%;
-  height: 100% !important;
-}
-
-.simulation-results-page input[type="number"] {
-  appearance: textfield;
-}
-
-.simulation-results-page input[type="number"]::-webkit-outer-spin-button,
-.simulation-results-page input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.simulation-results-page .flex-2 {
-  width: 600px;
-  background-color: #fff;
-}
-
-.dark .simulation-results-page .flex-2 {
-  background-color: #2a2a2a;
-}
-
-.simulation-results-page .md\:w-1\/3 {
-  min-width: 20px;
-}
-
-.simulation-results-page .parameters {
-  width: 180px;
-  background-color: #fff;
-}
-
-.dark .simulation-results-page .parameters {
-  background-color: #2a2a2a;
-}
-
-.simulation-results-page .visSection {
-  width: 80vw;
-  background-color: #fff;
+  margin: 0 auto;
 }
 
 .dark .simulation-results-page .visSection {
@@ -351,6 +161,52 @@
   background-color: #2a2a2a;
 }
 
+.simulation-results-page .stat-cube {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 90px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.simulation-results-page .stat-cube:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+}
+
+@media screen and (max-width: 1400px) {
+  .simulation-results-page .visSection {
+    width: 92vw;
+    padding: 6px;
+  }
+  
+  .simulation-results-page .simRes-main-content {
+    padding: 20px 0;
+  }
+}
+
+@media screen and (max-width: 1200px) {
+  .simulation-results-page .visSection {
+    width: 90vw;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .simulation-results-page .visSection {
+    width: 88vw;
+    padding: 4px;
+  }
+  
+  .simulation-results-page .simRes-main-content {
+    padding: 20px 0;
+  }
+  
+  .simulation-results-page .stat-cube {
+    min-height: 80px;
+    padding: 3px !important;
+  }
+}
+
 @media screen and (max-width: 1400px) and (max-height: 800px) {
   .simRes-main-content {
     justify-content: center;
@@ -385,11 +241,11 @@
   }
 }
 
-/* --- Added for Glowing Effect --- */
 .simulation-section {
-  box-shadow: 0 0 25px 5px rgba(59, 130, 246, 0.45); /* Blue glow */
+  box-shadow: 0 0 30px 8px rgba(59, 130, 246, 0.35);
+  transition: box-shadow 0.3s ease-in-out;
 }
 
-.optimized-section {
-  box-shadow: 0 0 25px 5px rgba(16, 185, 129, 0.45); /* Green glow */
+.simulation-section:hover {
+  box-shadow: 0 0 40px 12px rgba(59, 130, 246, 0.45);
 }

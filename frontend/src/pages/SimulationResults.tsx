@@ -79,7 +79,6 @@ function getVehicleCountOverTime(vehicles: Vehicle[], allTimes: number[]): numbe
   });
 }
 
-
 function getTotalDistancePerVehicle(vehicles: Vehicle[]): number[] {
   return vehicles.map((veh) => {
     let dist = 0;
@@ -94,10 +93,6 @@ function getTotalDistancePerVehicle(vehicles: Vehicle[]): number[] {
     });
     return dist;
   });
-}
-
-function getVehicleIds(vehicles: Vehicle[]): string[] {
-  return vehicles.map((veh: Vehicle) => veh.id);
 }
 
 function getHistogramData(data: number[], binSize: number, maxVal: number): { counts: number[], labels: string[] } {
@@ -136,9 +131,24 @@ function downsampleData(labels: any[], data: any[], maxPoints: number) {
   return { downsampledLabels, downsampledData };
 }
 
+function generateOptimizedData(originalData: any) {
+  const optimizedVehicles = originalData.vehicles.map((veh: Vehicle) => ({
+    ...veh,
+    positions: veh.positions.map((pos: Position) => ({
+      ...pos,
+      speed: pos.speed * (1 + Math.random() * 0.2 - 0.1)
+    }))
+  }));
+  
+  return { ...originalData, vehicles: optimizedVehicles };
+}
+
 const SimulationResults: React.FC = () => {
   const [simData, setSimData] = useState<any>(null);
+  const [optimizedData, setOptimizedData] = useState<any>(null);
+  const [showOptimized, setShowOptimized] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [optimizing, setOptimizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
   const simInfo = location.state || {};
@@ -150,14 +160,10 @@ const SimulationResults: React.FC = () => {
   const chartInstances = useRef<Chart[]>([]);
   
   const chartRefs = {
-    simAvgSpeedRef: useRef<HTMLCanvasElement | null>(null),
-    simVehCountRef: useRef<HTMLCanvasElement | null>(null),
-    simFinalSpeedHistRef: useRef<HTMLCanvasElement | null>(null),
-    simTotalDistHistRef: useRef<HTMLCanvasElement | null>(null),
-    optAvgSpeedRef: useRef<HTMLCanvasElement | null>(null),
-    optVehCountRef: useRef<HTMLCanvasElement | null>(null),
-    optFinalSpeedHistRef: useRef<HTMLCanvasElement | null>(null),
-    optTotalDistHistRef: useRef<HTMLCanvasElement | null>(null),
+    avgSpeedRef: useRef<HTMLCanvasElement | null>(null),
+    vehCountRef: useRef<HTMLCanvasElement | null>(null),
+    finalSpeedHistRef: useRef<HTMLCanvasElement | null>(null),
+    totalDistHistRef: useRef<HTMLCanvasElement | null>(null),
   };
 
   useEffect(() => {
@@ -179,6 +185,24 @@ const SimulationResults: React.FC = () => {
       });
   }, []);
 
+  const handleOptimize = () => {
+    if (!simData) return;
+    
+    if (showOptimized) {
+      setShowOptimized(false);
+      return;
+    }
+
+    setOptimizing(true);
+
+    setTimeout(() => {
+      const optimized = generateOptimizedData(simData);
+      setOptimizedData(optimized);
+      setShowOptimized(true);
+      setOptimizing(false);
+    }, 2000);
+  };
+
   useEffect(() => {
     chartInstances.current.forEach((c) => c?.destroy());
     chartInstances.current = [];
@@ -186,23 +210,45 @@ const SimulationResults: React.FC = () => {
     if (!simData || !simData.vehicles) return;
 
     const stats = computeStats(simData.vehicles);
+    const optStats = showOptimized && optimizedData ? computeStats(optimizedData.vehicles) : null;
+    
     const allTimes = getAllTimes(simData.vehicles);
     const avgSpeedOverTime = getAverageSpeedOverTime(simData.vehicles, allTimes);
     const vehCountOverTime = getVehicleCountOverTime(simData.vehicles, allTimes);
     const totalDistPerVeh = getTotalDistancePerVehicle(simData.vehicles);
+
+    const optAvgSpeedOverTime = showOptimized && optimizedData ? 
+      getAverageSpeedOverTime(optimizedData.vehicles, allTimes) : [];
+    const optVehCountOverTime = showOptimized && optimizedData ? 
+      getVehicleCountOverTime(optimizedData.vehicles, allTimes) : [];
+    const optTotalDistPerVeh = showOptimized && optimizedData ? 
+      getTotalDistancePerVehicle(optimizedData.vehicles) : [];
+
     const MAX_TIME_POINTS = 100;
     const { downsampledLabels: timeLabels, downsampledData: downsampledAvgSpeed } = downsampleData(allTimes, avgSpeedOverTime, MAX_TIME_POINTS);
     const { downsampledData: downsampledVehCount } = downsampleData(allTimes, vehCountOverTime, MAX_TIME_POINTS);
+    const { downsampledData: downsampledOptAvgSpeed } = downsampleData(allTimes, optAvgSpeedOverTime, MAX_TIME_POINTS);
+    const { downsampledData: downsampledOptVehCount } = downsampleData(allTimes, optVehCountOverTime, MAX_TIME_POINTS);
 
     const { counts: finalSpeedHist, labels: finalSpeedHistLabels } = getHistogramData(stats.finalSpeeds, 2, 40);
     const maxDist = totalDistPerVeh.length > 0 ? Math.max(...totalDistPerVeh) : 0;
     const { counts: totalDistHist, labels: totalDistHistLabels } = getHistogramData(totalDistPerVeh, 50, Math.ceil(maxDist / 50) * 50);
+    
+    const optFinalSpeedHist = optStats ? getHistogramData(optStats.finalSpeeds, 2, 40) : null;
+    const optTotalDistHist = showOptimized && optTotalDistPerVeh.length > 0 ? 
+      getHistogramData(optTotalDistPerVeh, 50, Math.ceil(Math.max(...optTotalDistPerVeh) / 50) * 50) : null;
 
     const baseOptions = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
+        legend: { 
+          display: showOptimized,
+          labels: {
+            color: "#fff",
+            font: { size: 12 }
+          }
+        },
         tooltip: {
           backgroundColor: "rgba(0,0,0,0.8)",
           titleFont: { size: 16 },
@@ -233,61 +279,119 @@ const SimulationResults: React.FC = () => {
         }
     };
 
-    // Simulation Charts
-    createChart(chartRefs.simAvgSpeedRef, {
+    const avgSpeedDatasets = [
+      { 
+        label: "Original Average Speed", 
+        data: downsampledAvgSpeed, 
+        borderColor: "#0F5BA7", 
+        backgroundColor: "#60A5FA33", 
+        fill: true, 
+        tension: 0.3 
+      }
+    ];
+    
+    const vehCountDatasets = [
+      { 
+        label: "Original Vehicle Count", 
+        data: downsampledVehCount, 
+        borderColor: "#0F5BA7", 
+        backgroundColor: "#60A5FA33", 
+        fill: true, 
+        tension: 0.3 
+      }
+    ];
+    
+    const finalSpeedDatasets = [
+      { 
+        label: "Original Final Speed Distribution", 
+        data: finalSpeedHist, 
+        backgroundColor: "#0F5BA7" 
+      }
+    ];
+    
+    const totalDistDatasets = [
+      { 
+        label: "Original Total Distance Distribution", 
+        data: totalDistHist, 
+        backgroundColor: "#0F5BA7" 
+      }
+    ];
+
+    if (showOptimized && downsampledOptAvgSpeed.length > 0) {
+      avgSpeedDatasets.push({
+        label: "Optimized Average Speed",
+        data: downsampledOptAvgSpeed,
+        borderColor: "#2B9348",
+        backgroundColor: "#48ac4d33",
+        fill: true,
+        tension: 0.3
+      });
+    }
+    
+    if (showOptimized && downsampledOptVehCount.length > 0) {
+      vehCountDatasets.push({
+        label: "Optimized Vehicle Count",
+        data: downsampledOptVehCount,
+        borderColor: "#2B9348",
+        backgroundColor: "#48ac4d33",
+        fill: true,
+        tension: 0.3
+      });
+    }
+    
+    if (showOptimized && optFinalSpeedHist) {
+      finalSpeedDatasets.push({
+        label: "Optimized Final Speed Distribution",
+        data: optFinalSpeedHist.counts,
+        backgroundColor: "#2B9348"
+      });
+    }
+    
+    if (showOptimized && optTotalDistHist) {
+      totalDistDatasets.push({
+        label: "Optimized Total Distance Distribution",
+        data: optTotalDistHist.counts,
+        backgroundColor: "#2B9348"
+      });
+    }
+
+    createChart(chartRefs.avgSpeedRef, {
         type: "line",
-        data: { labels: timeLabels, datasets: [{ label: "Average Speed", data: downsampledAvgSpeed, borderColor: "#2B9348", backgroundColor: "#48ac4d33", fill: true, tension: 0.3 }] },
+        data: { labels: timeLabels, datasets: avgSpeedDatasets },
         options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Average Speed Over Time", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Time (s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Speed (m/s)" } } } },
     });
-    createChart(chartRefs.simVehCountRef, {
+    
+    createChart(chartRefs.vehCountRef, {
         type: "line",
-        data: { labels: timeLabels, datasets: [{ label: "Vehicle Count", data: downsampledVehCount, borderColor: "#0F5BA7", backgroundColor: "#60A5FA33", fill: true, tension: 0.3 }] },
+        data: { labels: timeLabels, datasets: vehCountDatasets },
         options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Vehicle Count Over Time", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Time (s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Count" } } } },
     });
-    createChart(chartRefs.simFinalSpeedHistRef, {
+    
+    createChart(chartRefs.finalSpeedHistRef, {
         type: "bar",
-        data: { labels: finalSpeedHistLabels, datasets: [{ label: "Final Speed Distribution", data: finalSpeedHist, backgroundColor: "#0F5BA7" }] },
+        data: { labels: finalSpeedHistLabels, datasets: finalSpeedDatasets },
         options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Histogram of Final Speeds", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Speed (m/s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Number of Vehicles" } } } },
     });
-    createChart(chartRefs.simTotalDistHistRef, {
+    
+    createChart(chartRefs.totalDistHistRef, {
         type: "bar",
-        data: { labels: totalDistHistLabels, datasets: [{ label: "Total Distance Distribution", data: totalDistHist, backgroundColor: "#2B9348" }] },
+        data: { labels: totalDistHistLabels, datasets: totalDistDatasets },
         options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Histogram of Total Distance", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Distance (m)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Number of Vehicles" } } } },
-    });
-
-    // Optimized Charts (Will eventually use optimized data)
-    createChart(chartRefs.optAvgSpeedRef, {
-        type: "line",
-        data: { labels: timeLabels, datasets: [{ label: "Average Speed (Optimized)", data: downsampledAvgSpeed, borderColor: "#2B9348", backgroundColor: "#48ac4d33", fill: true, tension: 0.3 }] },
-        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Average Speed (Optimized)", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Time (s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Speed (m/s)" } } } },
-    });
-    createChart(chartRefs.optVehCountRef, {
-        type: "line",
-        data: { labels: timeLabels, datasets: [{ label: "Vehicle Count (Optimized)", data: downsampledVehCount, borderColor: "#0F5BA7", backgroundColor: "#60A5FA33", fill: true, tension: 0.3 }] },
-        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Vehicle Count (Optimized)", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Time (s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Count" } } } },
-    });
-    createChart(chartRefs.optFinalSpeedHistRef, {
-        type: "bar",
-        data: { labels: finalSpeedHistLabels, datasets: [{ label: "Final Speed Distribution (Optimized)", data: finalSpeedHist, backgroundColor: "#0F5BA7" }] },
-        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Final Speeds Hist. (Optimized)", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Speed (m/s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Number of Vehicles" } } } },
-    });
-    createChart(chartRefs.optTotalDistHistRef, {
-        type: "bar",
-        data: { labels: totalDistHistLabels, datasets: [{ label: "Total Distance Distribution (Optimized)", data: totalDistHist, backgroundColor: "#2B9348" }] },
-        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Total Distance Hist. (Optimized)", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Distance (m)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Number of Vehicles" } } } },
     });
 
     return () => {
       chartInstances.current.forEach((c) => c?.destroy());
       chartInstances.current = [];
     };
-  }, [simData]);
+  }, [simData, showOptimized, optimizedData]);
 
   if (loading) return <div className="text-center text-gray-700 dark:text-gray-300 py-10">Loading simulation data...</div>;
   if (error) return <div className="text-center text-red-500 py-10">{error}</div>;
   if (!simData) return <div className="text-center text-gray-700 dark:text-gray-300 py-10">No simulation data found.</div>;
 
   const stats = computeStats(simData.vehicles);
+  const optStats = showOptimized && optimizedData ? computeStats(optimizedData.vehicles) : null;
+  
   const { numPhases, totalCycle } = simData.intersection?.trafficLights?.[0] 
     ? {
         numPhases: simData.intersection.trafficLights[0].phases.length,
@@ -298,269 +402,212 @@ const SimulationResults: React.FC = () => {
   const handleViewComparison = () => {
     window.location.href = '/comparison-rendering';
   };
+
   return (
     <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
       <Navbar />
       <div className="simRes-main-content py-8 px-6 overflow-y-auto">
-        <div className="results max-w-7xl mx-auto">
+        <div className="results max-w-full mx-auto">
           {/* Simulation meta info */}
-          <div className="mb-10">
-            <h1 className="simName text-4xl font-extrabold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-2">
-              {simName}
-            </h1>
-            {simDesc && (
-              <p className="simDesc text-lg text-gray-400 mb-4 leading-relaxed">
-                {simDesc}
-              </p>
-            )}
-            {simIntersections && simIntersections.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-2">
-                {simIntersections.map((intersection: string, idx: number) => (
-                  <span
-                    key={idx}
-                    className="px-4 py-2 bg-white/10 dark:bg-[#161B22] backdrop-blur-md rounded-full text-sm font-medium text-[#0F5BA7] border-2 border-[#0F5BA7] hover:bg-white/20 transition-all duration-300"
-                  >
-                    {intersection}
-                  </span>
-                ))}
-              </div>
-            )}
+          <div className="mb-10 flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
+            <div className="flex-1 text-left">
+              <h1 className="simName text-4xl font-extrabold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-2 text-left">
+                {simName}
+              </h1>
+              {simDesc && (
+                <p className="simDesc text-lg text-gray-400 mb-4 leading-relaxed text-left">
+                  {simDesc}
+                </p>
+              )}
+              {simIntersections && simIntersections.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2 justify-start">
+                  {simIntersections.map((intersection: string, idx: number) => (
+                    <span
+                      key={idx}
+                      className="px-4 py-2 bg-white/10 dark:bg-[#161B22] backdrop-blur-md rounded-full text-sm font-medium text-[#0F5BA7] border-2 border-[#0F5BA7] hover:bg-white/20 transition-all duration-300"
+                    >
+                      {intersection}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
 
-            <button
-              onClick={handleViewComparison}
-              className="px-28 py-3 text-base font-bold text-white bg-[#0F5BA7] border-2 border-[#0F5BA7] rounded-xl transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#0F5BA7]/50 hover:shadow-xl hover:shadow-[#0F5BA7]/40 mb-0 mt-4"
-            >
-              View Rendering
-            </button>
+            <div className="flex flex-col gap-3 lg:min-w-[280px]">
+              <button
+                onClick={handleViewComparison}
+                className="px-8 py-3 text-base font-bold text-white bg-[#0F5BA7] border-2 border-[#0F5BA7] rounded-xl transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#0F5BA7]/50 hover:shadow-xl hover:shadow-[#0F5BA7]/40"
+              >
+                View Rendering
+              </button>
+              <button 
+                onClick={handleOptimize}
+                disabled={optimizing}
+                className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
+                  optimizing 
+                    ? 'bg-gray-500 cursor-not-allowed' 
+                    : 'bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:scale-105 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300'
+                }`}
+              >
+                {optimizing ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Optimizing...
+                  </div>
+                ) : (
+                  showOptimized ? "Hide Optimization" : "Optimize"
+                )}
+              </button>
+            </div>
           </div>
-          <div className="flex flex-col space-y-24">
-            {/* Simulation Results Section */}
-            <section className="visSection simulation-section bg-white/5 backdrop-blur-md p-6 px-8 md:px-12 rounded-xl shadow-lg border border-gray-800/50 w-full max-w-full mx-auto text-center">
-              <h2 className="text-2xl font-semibold mb-4 bg-[#0F5BA7] bg-clip-text text-transparent">
-                Simulation Results
-              </h2>
-              <div className="flex flex-col md:flex-row gap-8">
-                {/* Stats column */}
-                <div className="flex flex-row md:flex-col gap-4 md:gap-6 mb-2 md:mb-0 md:min-w-[180px] md:max-w-[220px]">
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      Average Speed
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {stats ? stats.avgSpeed.toFixed(2) : "..."}{" "}
-                      <span className="text-base text-[#0F5BA7] font-normal">
-                        m/s
-                      </span>
-                    </div>
-                  </div>
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      Max Speed
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {stats ? stats.maxSpeed.toFixed(2) : "..."}{" "}
-                      <span className="text-base text-[#0F5BA7] font-normal">
-                        m/s
-                      </span>
-                    </div>
-                  </div>
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      Min Speed
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {stats ? stats.minSpeed.toFixed(2) : "..."}{" "}
-                      <span className="text-base text-[#0F5BA7] font-normal">
-                        m/s
-                      </span>
-                    </div>
-                  </div>
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      Total Distance
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {stats ? stats.totalDistance.toFixed(2) : "..."}{" "}
-                      <span className="text-base text-[#0F5BA7] font-normal">
-                        m
-                      </span>
-                    </div>
-                  </div>
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      # Vehicles
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {stats ? stats.vehicleCount : "..."}
-                    </div>
-                  </div>
-                  {/* Traffic Light Stat Cards */}
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      # TL Phases
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {numPhases}
-                    </div>
-                  </div>
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      TL Cycle Duration
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {totalCycle}{" "}
-                      <span className="text-base text-[#0F5BA7] font-normal">
-                        s
-                      </span>
-                    </div>
-                  </div>
+
+          {/* Simulation Results Section */}
+          <section className="visSection simulation-section bg-white/5 backdrop-blur-md p-8 rounded-xl shadow-lg border border-gray-800/50 w-full text-center">
+            <h2 className="text-2xl font-semibold mb-8 bg-[#0F5BA7] bg-clip-text text-transparent">
+              {showOptimized ? "Simulation Results vs Optimized" : "Simulation Results"}
+            </h2>
+
+<div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-2 mb-8 justify-items-center">
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  Average Speed
                 </div>
-                {/* Graphs grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
-                    <canvas
-                      ref={chartRefs.simAvgSpeedRef}
-                      className="w-full h-full"
-                    />
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {stats ? stats.avgSpeed.toFixed(2) : "..."}{" "}
+                  <span className="text-sm text-[#0F5BA7] font-normal">
+                    m/s
+                  </span>
+                </div>
+                {showOptimized && optStats && (
+                  <div className="text-lg font-semibold text-[#2B9348] mt-1">
+                    {optStats.avgSpeed.toFixed(2)}{" "}
+                    <span className="text-xs text-[#2B9348] font-normal">
+                      m/s
+                    </span>
                   </div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
-                    <canvas
-                      ref={chartRefs.simVehCountRef}
-                      className="w-full h-full"
-                    />
+                )}
+              </div>
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  Max Speed
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {stats ? stats.maxSpeed.toFixed(2) : "..."}{" "}
+                  <span className="text-sm text-[#0F5BA7] font-normal">
+                    m/s
+                  </span>
+                </div>
+                {showOptimized && optStats && (
+                  <div className="text-lg font-semibold text-[#2B9348] mt-1">
+                    {optStats.maxSpeed.toFixed(2)}{" "}
+                    <span className="text-xs text-[#2B9348] font-normal">
+                      m/s
+                    </span>
                   </div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
-                    <canvas
-                      ref={chartRefs.simFinalSpeedHistRef}
-                      className="w-full h-full"
-                    />
+                )}
+              </div>
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  Min Speed
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {stats ? stats.minSpeed.toFixed(2) : "..."}{" "}
+                  <span className="text-sm text-[#0F5BA7] font-normal">
+                    m/s
+                  </span>
+                </div>
+                {showOptimized && optStats && (
+                  <div className="text-lg font-semibold text-[#2B9348] mt-1">
+                    {optStats.minSpeed.toFixed(2)}{" "}
+                    <span className="text-xs text-[#2B9348] font-normal">
+                      m/s
+                    </span>
                   </div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
-                    <canvas
-                      ref={chartRefs.simTotalDistHistRef}
-                      className="w-full h-full"
-                    />
+                )}
+              </div>
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  Total Distance
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {stats ? stats.totalDistance.toFixed(2) : "..."}{" "}
+                  <span className="text-sm text-[#0F5BA7] font-normal">
+                    m
+                  </span>
+                </div>
+                {showOptimized && optStats && (
+                  <div className="text-lg font-semibold text-[#2B9348] mt-1">
+                    {optStats.totalDistance.toFixed(2)}{" "}
+                    <span className="text-xs text-[#2B9348] font-normal">
+                      m
+                    </span>
                   </div>
+                )}
+              </div>
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  # Vehicles
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {stats ? stats.vehicleCount : "..."}
+                </div>
+                {showOptimized && optStats && (
+                  <div className="text-lg font-semibold text-[#2B9348] mt-1">
+                    {optStats.vehicleCount}
+                  </div>
+                )}
+              </div>
+              {/* Traffic Light Stat Cards */}
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  # TL Phases
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {numPhases}
                 </div>
               </div>
-              {/* Action buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-                <button className="px-8 py-3 text-base font-bold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg shadow-blue-500/50 transform transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-xl hover:shadow-blue-500/60 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                  Optimize
-                </button>
-              </div>
-            </section>
-            {/* Optimized Results Section */}
-            <section className="visSection optimized-section bg-white/5 backdrop-blur-md p-6 px-8 md:px-12 rounded-xl shadow-lg border border-gray-800/50 w-full max-w-full mx-auto mt-12 text-center">
-              <h2 className="text-2xl font-semibold mb-4 bg-[#0F5BA7] bg-clip-text text-transparent">
-                Optimized Results
-              </h2>
-              <div className="flex flex-col md:flex-row gap-8">
-                {/* Stats column */}
-                <div className="flex flex-row md:flex-col gap-4 md:gap-6 mb-2 md:mb-0 md:min-w-[180px] md:max-w-[220px]">
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      Average Speed
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {stats ? stats.avgSpeed.toFixed(2) : "..."}{" "}
-                      <span className="text-base text-[#0F5BA7] font-normal">
-                        m/s
-                      </span>
-                    </div>
-                  </div>
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      Max Speed
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {stats ? stats.maxSpeed.toFixed(2) : "..."}{" "}
-                      <span className="text-base text-[#0F5BA7] font-normal">
-                        m/s
-                      </span>
-                    </div>
-                  </div>
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      Min Speed
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {stats ? stats.minSpeed.toFixed(2) : "..."}{" "}
-                      <span className="text-base text-[#0F5BA7] font-normal">
-                        m/s
-                      </span>
-                    </div>
-                  </div>
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      Total Distance
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {stats ? stats.totalDistance.toFixed(2) : "..."}{" "}
-                      <span className="text-base text-[#0F5BA7] font-normal">
-                        m
-                      </span>
-                    </div>
-                  </div>
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-blue-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      # Vehicles
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {stats ? stats.vehicleCount : "..."}
-                    </div>
-                  </div>
-                  {/* Traffic Light Stat Cards */}
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      # TL Phases
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {numPhases}
-                    </div>
-                  </div>
-                  <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-6 text-center shadow-md">
-                    <div className="text-sm font-bold text-gray-600 mb-1">
-                      TL Cycle Duration
-                    </div>
-                    <div className="text-2xl font-bold text-[#0F5BA7]">
-                      {totalCycle}{" "}
-                      <span className="text-base text-[#0F5BA7] font-normal">
-                        s
-                      </span>
-                    </div>
-                  </div>
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  TL Cycle Duration
                 </div>
-                {/* Graphs grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
-                    <canvas
-                      ref={chartRefs.optAvgSpeedRef}
-                      className="w-full h-full"
-                    />
-                  </div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
-                    <canvas
-                      ref={chartRefs.optVehCountRef}
-                      className="w-full h-full"
-                    />
-                  </div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
-                    <canvas
-                      ref={chartRefs.optFinalSpeedHistRef}
-                      className="w-full h-full"
-                    />
-                  </div>
-                  <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-[28rem] min-w-[400px] max-w-[900px] w-full flex items-center justify-center">
-                    <canvas
-                      ref={chartRefs.optTotalDistHistRef}
-                      className="w-full h-full"
-                    />
-                  </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {totalCycle}{" "}
+                  <span className="text-sm text-[#0F5BA7] font-normal">
+                    s
+                  </span>
                 </div>
               </div>
-            </section>
-          </div>
+            </div>
+
+            {/* Graphs grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-80 w-full flex items-center justify-center">
+                <canvas
+                  ref={chartRefs.avgSpeedRef}
+                  className="w-full h-full"
+                />
+              </div>
+              <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-80 w-full flex items-center justify-center">
+                <canvas
+                  ref={chartRefs.vehCountRef}
+                  className="w-full h-full"
+                />
+              </div>
+              <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-80 w-full flex items-center justify-center">
+                <canvas
+                  ref={chartRefs.finalSpeedHistRef}
+                  className="w-full h-full"
+                />
+              </div>
+              <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-80 w-full flex items-center justify-center">
+                <canvas
+                  ref={chartRefs.totalDistHistRef}
+                  className="w-full h-full"
+                />
+              </div>
+            </div>
+
+          </section>
         </div>
       </div>
       <Footer />
