@@ -6,6 +6,7 @@ import (
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 )
 
@@ -20,6 +21,13 @@ func NewAuthService(uc client.UserClientInterface) AuthServiceInterface {
 }
 
 func (s *AuthService) RegisterUser(ctx context.Context, req model.RegisterRequest) (model.RegisterResponse, error) {
+	logger := util.LoggerFromContext(ctx).With(
+		"service", "auth",
+	)
+
+	logger.Debug("calling user client to register user",
+		"username", req.Username,
+	)
 	registerResp, err := s.userClient.RegisterUser(ctx, req.Username, req.Email, req.Password)
 	if err != nil {
 		return model.RegisterResponse{}, errs.NewInternalError("unable to register", err, nil)

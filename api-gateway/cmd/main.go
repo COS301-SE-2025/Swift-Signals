@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -55,7 +56,11 @@ func main() {
 	userClient := mustConnectUserService(cfg.UserServiceAddr)
 	intrClient := mustConnectIntersectionService(cfg.IntersectionAddr)
 
-	mux := setupRoutes(userClient, intrClient)
+	baseLogger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	}))
+
+	mux := setupRoutes(baseLogger, userClient, intrClient)
 
 	server := createServer(cfg.Port, mux)
 	runServer(server)
@@ -79,7 +84,7 @@ func mustConnectIntersectionService(address string) *client.IntersectionClient {
 	return client.NewIntersectionClient(conn)
 }
 
-func setupRoutes(userClient *client.UserClient, intrClient *client.IntersectionClient) http.Handler {
+func setupRoutes(logger *slog.Logger, userClient *client.UserClient, intrClient *client.IntersectionClient) http.Handler {
 	mux := http.NewServeMux()
 
 	// Auth routes
@@ -109,7 +114,7 @@ func setupRoutes(userClient *client.UserClient, intrClient *client.IntersectionC
 
 	// Middleware stack
 	return middleware.CreateStack(
-		middleware.Logging,
+		middleware.Logging(logger),
 		middleware.CORS,
 	)(mux)
 }
