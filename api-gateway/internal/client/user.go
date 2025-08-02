@@ -39,9 +39,6 @@ func (uc *UserClient) RegisterUser(
 
 	user, err := uc.client.RegisterUser(ctx, req)
 	if err != nil {
-		log.Println("=======================")
-		log.Println(util.GrpcErrorToErr(err))
-		log.Println("=======================")
 		return nil, util.GrpcErrorToErr(err)
 	}
 	return user, nil
