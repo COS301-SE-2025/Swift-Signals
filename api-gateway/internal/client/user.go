@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -32,7 +33,11 @@ func (uc *UserClient) RegisterUser(ctx context.Context, name, email, password st
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.RegisterUser(ctx, req)
+	user, err := uc.client.RegisterUser(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return user, nil
 }
 
 func (uc *UserClient) LoginUser(ctx context.Context, email, password string) (*userpb.LoginUserResponse, error) {

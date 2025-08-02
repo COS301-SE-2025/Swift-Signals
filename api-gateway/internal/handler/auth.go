@@ -7,6 +7,7 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -45,7 +46,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		logger.Warn("failed to decode request body",
 			"error", err.Error(),
 		)
-		util.SendErrorResponse(w, err)
+		util.SendErrorResponse(w, errs.NewValidationError("Invalid request payload", map[string]any{}))
 		return
 	}
 
@@ -54,7 +55,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		logger.Warn("validation failed",
 			"error", err.Error(),
 		)
-		util.SendErrorResponse(w, err)
+		util.SendErrorResponse(w, errs.NewValidationError("Username, email, and password are required", map[string]any{}))
 		return
 	}
 
@@ -64,10 +65,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 			"error", err.Error(),
 		)
 
-		util.SendErrorResponse(
-			w,
-			err,
-		)
+		util.SendErrorResponse(w, err)
 		return
 	}
 
