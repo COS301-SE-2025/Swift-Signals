@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
