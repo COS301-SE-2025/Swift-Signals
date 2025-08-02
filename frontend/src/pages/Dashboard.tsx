@@ -7,7 +7,6 @@ import { Chart, registerables } from "chart.js";
 import MapModal from "../components/MapModal";
 import { useState } from "react";
 
-// Icons used in this component
 import {
   FaRoad,
   FaPlay,
@@ -17,10 +16,8 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 
-// Register Chart.js components
 Chart.register(...registerables);
 
-// Data remains the same
 const simulations = [
   {
     id: "#1234",
@@ -73,9 +70,16 @@ const Dashboard: React.FC = () => {
       }
       const ctx = chartRef.current.getContext("2d");
       if (!ctx) return;
+
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      
       const gradient = ctx.createLinearGradient(0, 0, 0, 200);
       gradient.addColorStop(0, "rgba(15, 91, 167, 0.4)");
       gradient.addColorStop(1, "rgba(15, 91, 167, 0)");
+
+      const labelColor = isDarkMode ? "#F0F6FC" : "#6B7280";
+      const gridColor = isDarkMode ? "#30363D" : "#E5E7EB";
+      
       chartInstanceRef.current = new Chart(ctx, {
         type: "line",
         data: {
@@ -104,15 +108,15 @@ const Dashboard: React.FC = () => {
             x: {
               grid: { display: false },
               ticks: {
-                color: "#6B7280",
+                color: labelColor,
                 font: { size: 12, family: "'Inter', sans-serif" },
               },
               border: { display: false },
             },
             y: {
-              grid: { color: "#E5E7EB", drawTicks: false },
+              grid: { color: gridColor, drawTicks: false },
               ticks: {
-                color: "#6B7280",
+                color: labelColor,
                 stepSize: 2500,
                 font: { size: 12, family: "'Inter', sans-serif" },
                 padding: 10,
@@ -163,7 +167,6 @@ const Dashboard: React.FC = () => {
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");
       const data = await response.json();
-      // Add placeholder coordinates if missing
       const intersectionsWithCoords = (data.intersections || []).map((intr: any, idx: number) => ({
         ...intr,
         details: {
@@ -246,7 +249,7 @@ const Dashboard: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="table-auto w-full text-left">
                   <thead>
-                    <tr className="text-gray-600 dark:text-[#8B949E]">
+                    <tr className="text-gray-600 dark:text-[#C9D1D9]">
                       <th className="p-2">ID</th>
                       <th className="p-2">Intersection</th>
                       <th className="p-2">Status</th>
@@ -259,10 +262,10 @@ const Dashboard: React.FC = () => {
                         key={sim.id}
                         className="border-t dark:border-[#30363D]"
                       >
-                        <td className="p-2 text-gray-700 dark:text-[#E6EDF3]">
+                        <td className="p-2 text-gray-700 dark:text-[#F0F6FC]">
                           {sim.id}
                         </td>
-                        <td className="p-2 text-gray-700 dark:text-[#E6EDF3]">
+                        <td className="p-2 text-gray-700 dark:text-[#F0F6FC]">
                           {sim.intersection}
                         </td>
                         <td className="p-2">

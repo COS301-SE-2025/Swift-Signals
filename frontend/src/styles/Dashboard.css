@@ -1,4 +1,3 @@
-/* General Layout & Theming */
 body {
   overflow-x: hidden;
 }
@@ -68,8 +67,8 @@ body {
 }
 
 .dark .card-icon-1 {
-  color: #388BFD;
-  background-color: rgba(44, 89, 156, 0.192);
+  color: #58A6FF;
+  background-color: rgba(88, 166, 255, 0.2);
 }
 
 .card-icon-2 {
@@ -77,8 +76,8 @@ body {
   background-color: #d4e9f9;
 }
 .dark .card-icon-2 {
-  color: #388BFD;
-  background-color: rgba(44, 89, 156, 0.192);
+  color: #58A6FF;
+  background-color: rgba(88, 166, 255, 0.2);
 }
 
 .card-icon-3 {
@@ -86,8 +85,8 @@ body {
   background-color: #d4e9f9;
 }
 .dark .card-icon-3 {
-  color: #388BFD;
-  background-color: rgba(44, 89, 156, 0.192);
+  color: #58A6FF;
+  background-color: rgba(88, 166, 255, 0.2);
 }
 
 .card-text {
@@ -180,6 +179,14 @@ body {
 .dark .recent-simulations-tab th,
 .dark .recent-simulations-tab td {
   border-color: #374151;
+}
+
+.dark .recent-simulations-tab td {
+  color: #F0F6FC !important;
+}
+
+.dark .recent-simulations-tab th {
+  color: #C9D1D9 !important;
 }
 
 .status {
@@ -282,7 +289,7 @@ body {
   font-weight: 500;
 }
 .dark .intersection-name {
-  color: #d1d5db;
+  color: #F0F6FC;
 }
 
 .intersection-volume {
@@ -290,7 +297,7 @@ body {
   font-size: 0.9em;
 }
 .dark .intersection-volume {
-  color: #9ca3af;
+  color: #C9D1D9;
 }
 
 .progress-bar-container {
