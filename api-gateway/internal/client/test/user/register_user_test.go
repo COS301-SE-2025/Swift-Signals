@@ -11,7 +11,6 @@ import (
 )
 
 func (suite *TestSuite) TestRegisterUser_BuildsCorrectRequest() {
-
 	suite.grpcClient.Mock.On("RegisterUser", mock.AnythingOfType("*context.timerCtx"),
 		mock.MatchedBy(func(req *userpb.RegisterUserRequest) bool {
 			return req.Name == "Valid Name" &&
@@ -28,7 +27,6 @@ func (suite *TestSuite) TestRegisterUser_BuildsCorrectRequest() {
 }
 
 func (suite *TestSuite) TestRegisterUser_SetsTimeoutContext() {
-
 	suite.grpcClient.On("RegisterUser",
 		mock.MatchedBy(func(ctx context.Context) bool {
 			deadline, hasDeadline := ctx.Deadline()

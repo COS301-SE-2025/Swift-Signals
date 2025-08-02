@@ -20,7 +20,10 @@ func NewAuthService(uc client.UserClientInterface) AuthServiceInterface {
 	}
 }
 
-func (s *AuthService) RegisterUser(ctx context.Context, req model.RegisterRequest) (model.RegisterResponse, error) {
+func (s *AuthService) RegisterUser(
+	ctx context.Context,
+	req model.RegisterRequest,
+) (model.RegisterResponse, error) {
 	logger := util.LoggerFromContext(ctx).With(
 		"service", "auth",
 	)
@@ -39,7 +42,10 @@ func (s *AuthService) RegisterUser(ctx context.Context, req model.RegisterReques
 	return resp, nil
 }
 
-func (s *AuthService) LoginUser(ctx context.Context, req model.LoginRequest) (model.LoginResponse, error) {
+func (s *AuthService) LoginUser(
+	ctx context.Context,
+	req model.LoginRequest,
+) (model.LoginResponse, error) {
 	loginResp, err := s.userClient.LoginUser(ctx, req.Email, req.Password)
 	if err != nil {
 		return model.LoginResponse{}, errors.New("unable to login user")

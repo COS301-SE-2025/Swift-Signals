@@ -13,8 +13,15 @@ import (
 type IntersectionServiceInterface interface {
 	GetAllIntersections(ctx context.Context) (model.Intersections, error)
 	GetIntersectionByID(ctx context.Context, id string) (model.Intersection, error)
-	CreateIntersection(ctx context.Context, req model.CreateIntersectionRequest) (model.CreateIntersectionResponse, error)
-	UpdateIntersectionByID(ctx context.Context, id string, req model.UpdateIntersectionRequest) (model.Intersection, error)
+	CreateIntersection(
+		ctx context.Context,
+		req model.CreateIntersectionRequest,
+	) (model.CreateIntersectionResponse, error)
+	UpdateIntersectionByID(
+		ctx context.Context,
+		id string,
+		req model.UpdateIntersectionRequest,
+	) (model.Intersection, error)
 }
 
 type IntersectionService struct {
@@ -27,10 +34,12 @@ func NewIntersectionService(ic *client.IntersectionClient) IntersectionServiceIn
 	}
 }
 
-func (s *IntersectionService) GetAllIntersections(ctx context.Context) (model.Intersections, error) {
+func (s *IntersectionService) GetAllIntersections(
+	ctx context.Context,
+) (model.Intersections, error) {
 	stream, err := s.intrClient.GetAllIntersections(ctx)
 	if err != nil {
-		return model.Intersections{}, errors.New("Unable to get all intersections")
+		return model.Intersections{}, errors.New("unable to get all intersections")
 	}
 
 	intersections := []model.Intersection{}
@@ -40,7 +49,7 @@ func (s *IntersectionService) GetAllIntersections(ctx context.Context) (model.In
 			break
 		}
 		if err != nil {
-			return model.Intersections{}, errors.New("Unable to get all intersections")
+			return model.Intersections{}, errors.New("unable to get all intersections")
 		}
 		intersection := util.RPCIntersectionToIntersection(rpcIntersection)
 		intersections = append(intersections, intersection)
@@ -50,10 +59,13 @@ func (s *IntersectionService) GetAllIntersections(ctx context.Context) (model.In
 	return resp, nil
 }
 
-func (s *IntersectionService) GetIntersectionByID(ctx context.Context, id string) (model.Intersection, error) {
+func (s *IntersectionService) GetIntersectionByID(
+	ctx context.Context,
+	id string,
+) (model.Intersection, error) {
 	pbResp, err := s.intrClient.GetIntersection(ctx, id)
 	if err != nil {
-		return model.Intersection{}, errors.New("Unable to get intersection by ID")
+		return model.Intersection{}, errors.New("unable to get intersection by ID")
 	}
 
 	resp := util.RPCIntersectionToIntersection(pbResp)
@@ -61,7 +73,10 @@ func (s *IntersectionService) GetIntersectionByID(ctx context.Context, id string
 	return resp, nil
 }
 
-func (s *IntersectionService) CreateIntersection(ctx context.Context, req model.CreateIntersectionRequest) (model.CreateIntersectionResponse, error) {
+func (s *IntersectionService) CreateIntersection(
+	ctx context.Context,
+	req model.CreateIntersectionRequest,
+) (model.CreateIntersectionResponse, error) {
 	intersection := model.Intersection{
 		Name:           req.Name,
 		Details:        req.Details,
@@ -72,7 +87,7 @@ func (s *IntersectionService) CreateIntersection(ctx context.Context, req model.
 	}
 	pbResp, err := s.intrClient.CreateIntersection(ctx, intersection)
 	if err != nil {
-		return model.CreateIntersectionResponse{}, errors.New("Unable to create intersection")
+		return model.CreateIntersectionResponse{}, errors.New("unable to create intersection")
 	}
 
 	resp := model.CreateIntersectionResponse{
@@ -82,6 +97,10 @@ func (s *IntersectionService) CreateIntersection(ctx context.Context, req model.
 	return resp, nil
 }
 
-func (s *IntersectionService) UpdateIntersectionByID(ctx context.Context, id string, req model.UpdateIntersectionRequest) (model.Intersection, error) {
+func (s *IntersectionService) UpdateIntersectionByID(
+	ctx context.Context,
+	id string,
+	req model.UpdateIntersectionRequest,
+) (model.Intersection, error) {
 	return model.Intersection{}, nil
 }

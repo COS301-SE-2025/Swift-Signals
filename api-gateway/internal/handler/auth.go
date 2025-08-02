@@ -46,7 +46,10 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		logger.Warn("failed to decode request body",
 			"error", err.Error(),
 		)
-		util.SendErrorResponse(w, errs.NewValidationError("Invalid request payload", map[string]any{}))
+		util.SendErrorResponse(
+			w,
+			errs.NewValidationError("Invalid request payload", map[string]any{}),
+		)
 		return
 	}
 
@@ -55,7 +58,10 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 		logger.Warn("validation failed",
 			"error", err.Error(),
 		)
-		util.SendErrorResponse(w, errs.NewValidationError("Username, email, and password are required", map[string]any{}))
+		util.SendErrorResponse(
+			w,
+			errs.NewValidationError("Username, email, and password are required", map[string]any{}),
+		)
 		return
 	}
 

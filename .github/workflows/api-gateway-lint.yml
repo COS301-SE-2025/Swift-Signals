@@ -1,0 +1,49 @@
+name: API Linting
+
+on:
+  push:
+    branches: [api-gateway]
+  pull_request:
+    branches: [api-gateway]
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Lint api-gateway code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.3'  
+
+      - name: Install formatting tools
+        run: |
+          go install mvdan.cc/gofumports@latest
+          go install mvdan.cc/gofumpt@latest
+
+      - name: Add Go bin to PATH
+        run: echo "${HOME}/go/bin" >> $GITHUB_PATH
+
+      - name: Generate Proto Files
+        working-directory: ./protos
+        run: |
+          protoc --go_out=./gen/user/ --go_opt=paths=source_relative --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative user.proto 
+          protoc --go_out=./gen/intersection/ --go_opt=paths=source_relative --go-grpc_out=./gen/intersection/ --go-grpc_opt=paths=source_relative intersection.proto
+          protoc --go_out=./gen/simulation/ --go_opt=paths=source_relative --go-grpc_out=./gen/simulation/ --go-grpc_opt=paths=source_relative simulation.proto
+
+      - name: Generate Mockery Files
+        working-directory: ./api-gateway
+        run: |
+          go install github.com/vektra/mockery/v2@latest
+          mockery
+
+      - name: Run unit tests in api-gateway
+        working-directory: ./api-gateway  
+        run: |
+          go mod tidy
+          go test -v ./.. 

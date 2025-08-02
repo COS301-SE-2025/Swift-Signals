@@ -72,7 +72,7 @@ func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Req
 	// TODO: Implement User Verification
 	// ...
 
-	resp, err := h.service.GetIntersectionByID(r.Context(), id)
+	resp, _ := h.service.GetIntersectionByID(r.Context(), id)
 
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }

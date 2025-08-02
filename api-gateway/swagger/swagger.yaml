@@ -1,18 +1,9 @@
 basePath: /
 definitions:
-  model.AuthResponse:
-    properties:
-      message:
-        example: Login successful
-        type: string
-      token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-        type: string
-    type: object
   model.CreateIntersectionRequest:
     properties:
       default_parameters:
-        $ref: '#/definitions/model.simulationParameters'
+        $ref: '#/definitions/model.SimulationParameters'
       details:
         properties:
           address:
@@ -38,6 +29,18 @@ definitions:
         example: "2"
         type: string
     type: object
+  model.Details:
+    properties:
+      address:
+        example: Corner of Foo and Bar
+        type: string
+      city:
+        example: Pretoria
+        type: string
+      province:
+        example: Gauteng
+        type: string
+    type: object
   model.ErrorResponse:
     properties:
       code:
@@ -50,26 +53,16 @@ definitions:
   model.Intersection:
     properties:
       best_parameters:
-        $ref: '#/definitions/model.optimisationParameters'
+        $ref: '#/definitions/model.OptimisationParameters'
       created_at:
         example: "2025-06-24T15:04:05Z"
         type: string
       current_parameters:
-        $ref: '#/definitions/model.optimisationParameters'
+        $ref: '#/definitions/model.OptimisationParameters'
       default_parameters:
-        $ref: '#/definitions/model.optimisationParameters'
+        $ref: '#/definitions/model.OptimisationParameters'
       details:
-        properties:
-          address:
-            example: Corner of Foo and Bar
-            type: string
-          city:
-            example: Pretoria
-            type: string
-          province:
-            example: Gauteng
-            type: string
-        type: object
+        $ref: '#/definitions/model.Details'
       id:
         example: "1"
         type: string
@@ -108,11 +101,28 @@ definitions:
     - email
     - password
     type: object
+  model.LoginResponse:
+    properties:
+      message:
+        example: Login successful
+        type: string
+      token:
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        type: string
+    type: object
   model.LogoutResponse:
     properties:
       message:
         example: Logout successful
         type: string
+    type: object
+  model.OptimisationParameters:
+    properties:
+      optimisation_type:
+        example: grid_search
+        type: string
+      simulation_parameters:
+        $ref: '#/definitions/model.SimulationParameters'
     type: object
   model.RegisterRequest:
     properties:
@@ -130,6 +140,12 @@ definitions:
     - password
     - username
     type: object
+  model.RegisterResponse:
+    properties:
+      user_id:
+        example: "1"
+        type: string
+    type: object
   model.ResetPasswordRequest:
     properties:
       email:
@@ -144,33 +160,7 @@ definitions:
         example: Password reset instructions sent to your email.
         type: string
     type: object
-  model.UpdateIntersectionRequest:
-    properties:
-      details:
-        properties:
-          address:
-            example: Corner of Foo and Bar
-            type: string
-          city:
-            example: Pretoria
-            type: string
-          province:
-            example: Gauteng
-            type: string
-        type: object
-      name:
-        example: My Updated Intersection
-        type: string
-    type: object
-  model.optimisationParameters:
-    properties:
-      optimisation_type:
-        example: grid_search
-        type: string
-      simulation_parameters:
-        $ref: '#/definitions/model.simulationParameters'
-    type: object
-  model.simulationParameters:
+  model.SimulationParameters:
     properties:
       green:
         example: 10
@@ -191,15 +181,32 @@ definitions:
         example: 2
         type: integer
     type: object
+  model.UpdateIntersectionRequest:
+    properties:
+      details:
+        properties:
+          address:
+            example: Corner of Foo and Bar
+            type: string
+          city:
+            example: Pretoria
+            type: string
+          province:
+            example: Gauteng
+            type: string
+        type: object
+      name:
+        example: My Updated Intersection
+        type: string
+    type: object
 host: localhost:9090
 info:
   contact:
     email: insideinsights2025@gmail.com
     name: Inside Insights Team
     url: https://swagger.io/
-  description: |-
-    This is the API Gateway for the Swift-Signals project,
-    forwarding requests to backend gRPC microservices.
+  description: This is the API Gateway for the Swift-Signals project, forwarding requests
+    to backend gRPC microservices.
   termsOfService: http://example.com/terms/
   title: Authentication API Gateway
   version: "1.0"
@@ -357,7 +364,7 @@ paths:
         "200":
           description: Successful login
           schema:
-            $ref: '#/definitions/model.AuthResponse'
+            $ref: '#/definitions/model.LoginResponse'
         "400":
           description: Invalid request payload or credentials
           schema:
@@ -412,7 +419,7 @@ paths:
         "201":
           description: User successfully registered
           schema:
-            $ref: '#/definitions/model.AuthResponse'
+            $ref: '#/definitions/model.RegisterResponse'
         "400":
           description: Invalid request payload or missing fields
           schema:
@@ -428,7 +435,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Resets a user's password in case they forgot it.
+      description: Reset's a user's password in case they forgot it.
       parameters:
       - description: User Email
         in: body
