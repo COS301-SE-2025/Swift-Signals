@@ -12,7 +12,10 @@ type Position = { time: number; x: number; y: number; speed: number };
 type Vehicle = { id: string; positions: Position[] };
 
 function computeStats(vehicles: Vehicle[]) {
-  let totalSpeed = 0, maxSpeed = -Infinity, minSpeed = Infinity, speedCount = 0;
+  let totalSpeed = 0,
+    maxSpeed = -Infinity,
+    minSpeed = Infinity,
+    speedCount = 0;
   let totalDistance = 0;
   const finalSpeeds: number[] = [];
 
@@ -49,13 +52,19 @@ function computeStats(vehicles: Vehicle[]) {
 
 function getAllTimes(vehicles: Vehicle[]): number[] {
   const timeSet = new Set<number>();
-  vehicles.forEach((veh) => veh.positions.forEach((pos) => timeSet.add(pos.time)));
+  vehicles.forEach((veh) =>
+    veh.positions.forEach((pos) => timeSet.add(pos.time))
+  );
   return Array.from(timeSet).sort((a, b) => a - b);
 }
 
-function getAverageSpeedOverTime(vehicles: Vehicle[], allTimes: number[]): number[] {
+function getAverageSpeedOverTime(
+  vehicles: Vehicle[],
+  allTimes: number[]
+): number[] {
   return allTimes.map((t) => {
-    let sum = 0, count = 0;
+    let sum = 0,
+      count = 0;
     vehicles.forEach((veh) => {
       const pos = veh.positions.find((p) => p.time === t);
       if (pos) {
@@ -67,7 +76,10 @@ function getAverageSpeedOverTime(vehicles: Vehicle[], allTimes: number[]): numbe
   });
 }
 
-function getVehicleCountOverTime(vehicles: Vehicle[], allTimes: number[]): number[] {
+function getVehicleCountOverTime(
+  vehicles: Vehicle[],
+  allTimes: number[]
+): number[] {
   return allTimes.map((t) => {
     let count = 0;
     vehicles.forEach((veh) => {
@@ -95,23 +107,29 @@ function getTotalDistancePerVehicle(vehicles: Vehicle[]): number[] {
   });
 }
 
-function getHistogramData(data: number[], binSize: number, maxVal: number): { counts: number[], labels: string[] } {
-    const bins = Math.ceil(maxVal / binSize);
-    const counts: number[] = Array(bins).fill(0);
-    const labels: string[] = [];
+function getHistogramData(
+  data: number[],
+  binSize: number,
+  maxVal: number
+): { counts: number[]; labels: string[] } {
+  const bins = Math.ceil(maxVal / binSize);
+  const counts: number[] = Array(bins).fill(0);
+  const labels: string[] = [];
 
-    data.forEach((v: number) => {
-        if (v >= 0) {
-            const idx = Math.min(Math.floor(v / binSize), bins - 1);
-            counts[idx]++;
-        }
-    });
-
-    for (let i = 0; i < bins; i++) {
-        labels.push(`${(i * binSize).toFixed(0)}-${((i + 1) * binSize).toFixed(0)}`);
+  data.forEach((v: number) => {
+    if (v >= 0) {
+      const idx = Math.min(Math.floor(v / binSize), bins - 1);
+      counts[idx]++;
     }
+  });
 
-    return { counts, labels };
+  for (let i = 0; i < bins; i++) {
+    labels.push(
+      `${(i * binSize).toFixed(0)}-${((i + 1) * binSize).toFixed(0)}`
+    );
+  }
+
+  return { counts, labels };
 }
 
 function downsampleData(labels: any[], data: any[], maxPoints: number) {
@@ -136,10 +154,10 @@ function generateOptimizedData(originalData: any) {
     ...veh,
     positions: veh.positions.map((pos: Position) => ({
       ...pos,
-      speed: pos.speed * (1 + Math.random() * 0.2 - 0.1)
-    }))
+      speed: pos.speed * (1 + Math.random() * 0.2 - 0.1),
+    })),
   }));
-  
+
   return { ...originalData, vehicles: optimizedVehicles };
 }
 
@@ -152,13 +170,14 @@ const SimulationResults: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const location = useLocation();
   const simInfo = location.state || {};
-  
+
   const simName = simInfo.name || simData?.name || "Simulation";
   const simDesc = simInfo.description || simData?.description || "";
-  const simIntersections = simInfo.intersections || simData?.intersections || [];
+  const simIntersections =
+    simInfo.intersections || simData?.intersections || [];
 
   const chartInstances = useRef<Chart[]>([]);
-  
+
   const chartRefs = {
     avgSpeedRef: useRef<HTMLCanvasElement | null>(null),
     vehCountRef: useRef<HTMLCanvasElement | null>(null),
@@ -179,7 +198,9 @@ const SimulationResults: React.FC = () => {
         setLoading(false);
       })
       .catch((err) => {
-        setError("Failed to load simulation data. Please check the file path and format.");
+        setError(
+          "Failed to load simulation data. Please check the file path and format."
+        );
         setLoading(false);
         console.error(err);
       });
@@ -187,7 +208,7 @@ const SimulationResults: React.FC = () => {
 
   const handleOptimize = () => {
     if (!simData) return;
-    
+
     if (showOptimized) {
       setShowOptimized(false);
       return;
@@ -210,44 +231,85 @@ const SimulationResults: React.FC = () => {
     if (!simData || !simData.vehicles) return;
 
     const stats = computeStats(simData.vehicles);
-    const optStats = showOptimized && optimizedData ? computeStats(optimizedData.vehicles) : null;
-    
+    const optStats =
+      showOptimized && optimizedData
+        ? computeStats(optimizedData.vehicles)
+        : null;
+
     const allTimes = getAllTimes(simData.vehicles);
-    const avgSpeedOverTime = getAverageSpeedOverTime(simData.vehicles, allTimes);
-    const vehCountOverTime = getVehicleCountOverTime(simData.vehicles, allTimes);
+    const avgSpeedOverTime = getAverageSpeedOverTime(
+      simData.vehicles,
+      allTimes
+    );
+    const vehCountOverTime = getVehicleCountOverTime(
+      simData.vehicles,
+      allTimes
+    );
     const totalDistPerVeh = getTotalDistancePerVehicle(simData.vehicles);
 
-    const optAvgSpeedOverTime = showOptimized && optimizedData ? 
-      getAverageSpeedOverTime(optimizedData.vehicles, allTimes) : [];
-    const optVehCountOverTime = showOptimized && optimizedData ? 
-      getVehicleCountOverTime(optimizedData.vehicles, allTimes) : [];
-    const optTotalDistPerVeh = showOptimized && optimizedData ? 
-      getTotalDistancePerVehicle(optimizedData.vehicles) : [];
+    const optAvgSpeedOverTime =
+      showOptimized && optimizedData
+        ? getAverageSpeedOverTime(optimizedData.vehicles, allTimes)
+        : [];
+    const optVehCountOverTime =
+      showOptimized && optimizedData
+        ? getVehicleCountOverTime(optimizedData.vehicles, allTimes)
+        : [];
+    const optTotalDistPerVeh =
+      showOptimized && optimizedData
+        ? getTotalDistancePerVehicle(optimizedData.vehicles)
+        : [];
 
     const MAX_TIME_POINTS = 100;
-    const { downsampledLabels: timeLabels, downsampledData: downsampledAvgSpeed } = downsampleData(allTimes, avgSpeedOverTime, MAX_TIME_POINTS);
-    const { downsampledData: downsampledVehCount } = downsampleData(allTimes, vehCountOverTime, MAX_TIME_POINTS);
-    const { downsampledData: downsampledOptAvgSpeed } = downsampleData(allTimes, optAvgSpeedOverTime, MAX_TIME_POINTS);
-    const { downsampledData: downsampledOptVehCount } = downsampleData(allTimes, optVehCountOverTime, MAX_TIME_POINTS);
+    const {
+      downsampledLabels: timeLabels,
+      downsampledData: downsampledAvgSpeed,
+    } = downsampleData(allTimes, avgSpeedOverTime, MAX_TIME_POINTS);
+    const { downsampledData: downsampledVehCount } = downsampleData(
+      allTimes,
+      vehCountOverTime,
+      MAX_TIME_POINTS
+    );
+    const { downsampledData: downsampledOptAvgSpeed } = downsampleData(
+      allTimes,
+      optAvgSpeedOverTime,
+      MAX_TIME_POINTS
+    );
+    const { downsampledData: downsampledOptVehCount } = downsampleData(
+      allTimes,
+      optVehCountOverTime,
+      MAX_TIME_POINTS
+    );
 
-    const { counts: finalSpeedHist, labels: finalSpeedHistLabels } = getHistogramData(stats.finalSpeeds, 2, 40);
-    const maxDist = totalDistPerVeh.length > 0 ? Math.max(...totalDistPerVeh) : 0;
-    const { counts: totalDistHist, labels: totalDistHistLabels } = getHistogramData(totalDistPerVeh, 50, Math.ceil(maxDist / 50) * 50);
-    
-    const optFinalSpeedHist = optStats ? getHistogramData(optStats.finalSpeeds, 2, 40) : null;
-    const optTotalDistHist = showOptimized && optTotalDistPerVeh.length > 0 ? 
-      getHistogramData(optTotalDistPerVeh, 50, Math.ceil(Math.max(...optTotalDistPerVeh) / 50) * 50) : null;
+    const { counts: finalSpeedHist, labels: finalSpeedHistLabels } =
+      getHistogramData(stats.finalSpeeds, 2, 40);
+    const maxDist =
+      totalDistPerVeh.length > 0 ? Math.max(...totalDistPerVeh) : 0;
+    const { counts: totalDistHist, labels: totalDistHistLabels } =
+      getHistogramData(totalDistPerVeh, 50, Math.ceil(maxDist / 50) * 50);
+
+    const optFinalSpeedHist = optStats
+      ? getHistogramData(optStats.finalSpeeds, 2, 40)
+      : null;
+    const optTotalDistHist =
+      showOptimized && optTotalDistPerVeh.length > 0
+        ? getHistogramData(
+            optTotalDistPerVeh,
+            50,
+            Math.ceil(Math.max(...optTotalDistPerVeh) / 50) * 50
+          )
+        : null;
 
     const baseOptions = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { 
+        legend: {
           display: showOptimized,
           labels: {
             color: "#fff",
-            font: { size: 12 }
-          }
+            font: { size: 12 },
+          },
         },
         tooltip: {
           backgroundColor: "rgba(0,0,0,0.8)",
@@ -258,63 +320,66 @@ const SimulationResults: React.FC = () => {
         },
       },
       scales: {
-        x: { 
-            grid: { color: "rgba(255,255,255,0.1)" }, 
-            ticks: { color: "#ccc", maxTicksLimit: 10 }, 
-            title: { display: true, color: "#fff", font: { size: 14 } } 
+        x: {
+          grid: { color: "rgba(255,255,255,0.1)" },
+          ticks: { color: "#ccc", maxTicksLimit: 10 },
+          title: { display: true, color: "#fff", font: { size: 14 } },
         },
-        y: { 
-            grid: { color: "rgba(255,255,255,0.1)" }, 
-            ticks: { color: "#ccc" }, 
-            title: { display: true, color: "#fff", font: { size: 14 } },
-            beginAtZero: true
+        y: {
+          grid: { color: "rgba(255,255,255,0.1)" },
+          ticks: { color: "#ccc" },
+          title: { display: true, color: "#fff", font: { size: 14 } },
+          beginAtZero: true,
         },
       },
     };
-    
-    const createChart = (ref: React.RefObject<HTMLCanvasElement | null>, config: any) => {
-        if (ref.current) {
-            const chart = new Chart(ref.current, config);
-            chartInstances.current.push(chart);
-        }
+
+    const createChart = (
+      ref: React.RefObject<HTMLCanvasElement | null>,
+      config: any
+    ) => {
+      if (ref.current) {
+        const chart = new Chart(ref.current, config);
+        chartInstances.current.push(chart);
+      }
     };
 
     const avgSpeedDatasets = [
-      { 
-        label: "Original Average Speed", 
-        data: downsampledAvgSpeed, 
-        borderColor: "#0F5BA7", 
-        backgroundColor: "#60A5FA33", 
-        fill: true, 
-        tension: 0.3 
-      }
+      {
+        label: "Original Average Speed",
+        data: downsampledAvgSpeed,
+        borderColor: "#0F5BA7",
+        backgroundColor: "#60A5FA33",
+        fill: true,
+        tension: 0.3,
+      },
     ];
-    
+
     const vehCountDatasets = [
-      { 
-        label: "Original Vehicle Count", 
-        data: downsampledVehCount, 
-        borderColor: "#0F5BA7", 
-        backgroundColor: "#60A5FA33", 
-        fill: true, 
-        tension: 0.3 
-      }
+      {
+        label: "Original Vehicle Count",
+        data: downsampledVehCount,
+        borderColor: "#0F5BA7",
+        backgroundColor: "#60A5FA33",
+        fill: true,
+        tension: 0.3,
+      },
     ];
-    
+
     const finalSpeedDatasets = [
-      { 
-        label: "Original Final Speed Distribution", 
-        data: finalSpeedHist, 
-        backgroundColor: "#0F5BA7" 
-      }
+      {
+        label: "Original Final Speed Distribution",
+        data: finalSpeedHist,
+        backgroundColor: "#0F5BA7",
+      },
     ];
-    
+
     const totalDistDatasets = [
-      { 
-        label: "Original Total Distance Distribution", 
-        data: totalDistHist, 
-        backgroundColor: "#0F5BA7" 
-      }
+      {
+        label: "Original Total Distance Distribution",
+        data: totalDistHist,
+        backgroundColor: "#0F5BA7",
+      },
     ];
 
     if (showOptimized && downsampledOptAvgSpeed.length > 0) {
@@ -324,10 +389,10 @@ const SimulationResults: React.FC = () => {
         borderColor: "#2B9348",
         backgroundColor: "#48ac4d33",
         fill: true,
-        tension: 0.3
+        tension: 0.3,
       });
     }
-    
+
     if (showOptimized && downsampledOptVehCount.length > 0) {
       vehCountDatasets.push({
         label: "Optimized Vehicle Count",
@@ -335,48 +400,142 @@ const SimulationResults: React.FC = () => {
         borderColor: "#2B9348",
         backgroundColor: "#48ac4d33",
         fill: true,
-        tension: 0.3
+        tension: 0.3,
       });
     }
-    
+
     if (showOptimized && optFinalSpeedHist) {
       finalSpeedDatasets.push({
         label: "Optimized Final Speed Distribution",
         data: optFinalSpeedHist.counts,
-        backgroundColor: "#2B9348"
+        backgroundColor: "#2B9348",
       });
     }
-    
+
     if (showOptimized && optTotalDistHist) {
       totalDistDatasets.push({
         label: "Optimized Total Distance Distribution",
         data: optTotalDistHist.counts,
-        backgroundColor: "#2B9348"
+        backgroundColor: "#2B9348",
       });
     }
 
     createChart(chartRefs.avgSpeedRef, {
-        type: "line",
-        data: { labels: timeLabels, datasets: avgSpeedDatasets },
-        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Average Speed Over Time", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Time (s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Speed (m/s)" } } } },
+      type: "line",
+      data: { labels: timeLabels, datasets: avgSpeedDatasets },
+      options: {
+        ...baseOptions,
+        plugins: {
+          ...baseOptions.plugins,
+          title: {
+            display: true,
+            text: "Average Speed Over Time",
+            color: "#fff",
+            font: { size: 18 },
+          },
+        },
+        scales: {
+          ...baseOptions.scales,
+          x: {
+            ...baseOptions.scales.x,
+            title: { ...baseOptions.scales.x.title, text: "Time (s)" },
+          },
+          y: {
+            ...baseOptions.scales.y,
+            title: { ...baseOptions.scales.y.title, text: "Speed (m/s)" },
+          },
+        },
+      },
     });
-    
+
     createChart(chartRefs.vehCountRef, {
-        type: "line",
-        data: { labels: timeLabels, datasets: vehCountDatasets },
-        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Vehicle Count Over Time", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Time (s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Count" } } } },
+      type: "line",
+      data: { labels: timeLabels, datasets: vehCountDatasets },
+      options: {
+        ...baseOptions,
+        plugins: {
+          ...baseOptions.plugins,
+          title: {
+            display: true,
+            text: "Vehicle Count Over Time",
+            color: "#fff",
+            font: { size: 18 },
+          },
+        },
+        scales: {
+          ...baseOptions.scales,
+          x: {
+            ...baseOptions.scales.x,
+            title: { ...baseOptions.scales.x.title, text: "Time (s)" },
+          },
+          y: {
+            ...baseOptions.scales.y,
+            title: { ...baseOptions.scales.y.title, text: "Count" },
+          },
+        },
+      },
     });
-    
+
     createChart(chartRefs.finalSpeedHistRef, {
-        type: "bar",
-        data: { labels: finalSpeedHistLabels, datasets: finalSpeedDatasets },
-        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Histogram of Final Speeds", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Speed (m/s)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Number of Vehicles" } } } },
+      type: "bar",
+      data: { labels: finalSpeedHistLabels, datasets: finalSpeedDatasets },
+      options: {
+        ...baseOptions,
+        plugins: {
+          ...baseOptions.plugins,
+          title: {
+            display: true,
+            text: "Histogram of Final Speeds",
+            color: "#fff",
+            font: { size: 18 },
+          },
+        },
+        scales: {
+          ...baseOptions.scales,
+          x: {
+            ...baseOptions.scales.x,
+            title: { ...baseOptions.scales.x.title, text: "Speed (m/s)" },
+          },
+          y: {
+            ...baseOptions.scales.y,
+            title: {
+              ...baseOptions.scales.y.title,
+              text: "Number of Vehicles",
+            },
+          },
+        },
+      },
     });
-    
+
     createChart(chartRefs.totalDistHistRef, {
-        type: "bar",
-        data: { labels: totalDistHistLabels, datasets: totalDistDatasets },
-        options: { ...baseOptions, plugins: { ...baseOptions.plugins, title: { display: true, text: "Histogram of Total Distance", color: "#fff", font: {size: 18} } }, scales: { ...baseOptions.scales, x: { ...baseOptions.scales.x, title: { ...baseOptions.scales.x.title, text: "Distance (m)" } }, y: { ...baseOptions.scales.y, title: { ...baseOptions.scales.y.title, text: "Number of Vehicles" } } } },
+      type: "bar",
+      data: { labels: totalDistHistLabels, datasets: totalDistDatasets },
+      options: {
+        ...baseOptions,
+        plugins: {
+          ...baseOptions.plugins,
+          title: {
+            display: true,
+            text: "Histogram of Total Distance",
+            color: "#fff",
+            font: { size: 18 },
+          },
+        },
+        scales: {
+          ...baseOptions.scales,
+          x: {
+            ...baseOptions.scales.x,
+            title: { ...baseOptions.scales.x.title, text: "Distance (m)" },
+          },
+          y: {
+            ...baseOptions.scales.y,
+            title: {
+              ...baseOptions.scales.y.title,
+              text: "Number of Vehicles",
+            },
+          },
+        },
+      },
     });
 
     return () => {
@@ -385,22 +544,39 @@ const SimulationResults: React.FC = () => {
     };
   }, [simData, showOptimized, optimizedData]);
 
-  if (loading) return <div className="text-center text-gray-700 dark:text-gray-300 py-10">Loading simulation data...</div>;
-  if (error) return <div className="text-center text-red-500 py-10">{error}</div>;
-  if (!simData) return <div className="text-center text-gray-700 dark:text-gray-300 py-10">No simulation data found.</div>;
+  if (loading)
+    return (
+      <div className="text-center text-gray-700 dark:text-gray-300 py-10">
+        Loading simulation data...
+      </div>
+    );
+  if (error)
+    return <div className="text-center text-red-500 py-10">{error}</div>;
+  if (!simData)
+    return (
+      <div className="text-center text-gray-700 dark:text-gray-300 py-10">
+        No simulation data found.
+      </div>
+    );
 
   const stats = computeStats(simData.vehicles);
-  const optStats = showOptimized && optimizedData ? computeStats(optimizedData.vehicles) : null;
-  
-  const { numPhases, totalCycle } = simData.intersection?.trafficLights?.[0] 
+  const optStats =
+    showOptimized && optimizedData
+      ? computeStats(optimizedData.vehicles)
+      : null;
+
+  const { numPhases, totalCycle } = simData.intersection?.trafficLights?.[0]
     ? {
         numPhases: simData.intersection.trafficLights[0].phases.length,
-        totalCycle: simData.intersection.trafficLights[0].phases.reduce((sum: number, p: any) => sum + (p.duration || 0), 0)
+        totalCycle: simData.intersection.trafficLights[0].phases.reduce(
+          (sum: number, p: any) => sum + (p.duration || 0),
+          0
+        ),
       }
     : { numPhases: 0, totalCycle: 0 };
-    
+
   const handleViewComparison = () => {
-    window.location.href = '/comparison-rendering';
+    window.location.href = "/comparison-rendering";
   };
 
   return (
@@ -440,13 +616,13 @@ const SimulationResults: React.FC = () => {
               >
                 View Rendering
               </button>
-              <button 
+              <button
                 onClick={handleOptimize}
                 disabled={optimizing}
                 className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
-                  optimizing 
-                    ? 'bg-gray-500 cursor-not-allowed' 
-                    : 'bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:scale-105 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300'
+                  optimizing
+                    ? "bg-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:scale-105 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
                 }`}
               >
                 {optimizing ? (
@@ -454,8 +630,10 @@ const SimulationResults: React.FC = () => {
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                     Optimizing...
                   </div>
+                ) : showOptimized ? (
+                  "Hide Optimization"
                 ) : (
-                  showOptimized ? "Hide Optimization" : "Optimize"
+                  "Optimize"
                 )}
               </button>
             </div>
@@ -463,11 +641,25 @@ const SimulationResults: React.FC = () => {
 
           {/* Simulation Results Section */}
           <section className="visSection simulation-section bg-white/5 backdrop-blur-md p-8 rounded-xl shadow-lg border border-gray-800/50 w-full text-center">
-            <h2 className="text-2xl font-semibold mb-8 bg-[#0F5BA7] bg-clip-text text-transparent">
-              {showOptimized ? "Simulation Results vs Optimized" : "Simulation Results"}
+            <h2 className="text-2xl font-semibold mb-8">
+              {showOptimized ? (
+                <>
+                  <span className="bg-[#0F5BA7] bg-clip-text text-transparent">
+                    Simulation Results
+                  </span>
+                  <span className="text-gray-400"> vs </span>
+                  <span className="bg-[#2B9348] bg-clip-text text-transparent">
+                    Optimized Results
+                  </span>
+                </>
+              ) : (
+                <span className="bg-[#0F5BA7] bg-clip-text text-transparent">
+                  Simulation Results
+                </span>
+              )}
             </h2>
 
-<div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-2 mb-8 justify-items-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-2 mb-8 justify-items-center">
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
                   Average Speed
@@ -531,9 +723,7 @@ const SimulationResults: React.FC = () => {
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
                   {stats ? stats.totalDistance.toFixed(2) : "..."}{" "}
-                  <span className="text-sm text-[#0F5BA7] font-normal">
-                    m
-                  </span>
+                  <span className="text-sm text-[#0F5BA7] font-normal">m</span>
                 </div>
                 {showOptimized && optStats && (
                   <div className="text-lg font-semibold text-[#2B9348] mt-1">
@@ -572,9 +762,7 @@ const SimulationResults: React.FC = () => {
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
                   {totalCycle}{" "}
-                  <span className="text-sm text-[#0F5BA7] font-normal">
-                    s
-                  </span>
+                  <span className="text-sm text-[#0F5BA7] font-normal">s</span>
                 </div>
               </div>
             </div>
@@ -582,16 +770,10 @@ const SimulationResults: React.FC = () => {
             {/* Graphs grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-80 w-full flex items-center justify-center">
-                <canvas
-                  ref={chartRefs.avgSpeedRef}
-                  className="w-full h-full"
-                />
+                <canvas ref={chartRefs.avgSpeedRef} className="w-full h-full" />
               </div>
               <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-80 w-full flex items-center justify-center">
-                <canvas
-                  ref={chartRefs.vehCountRef}
-                  className="w-full h-full"
-                />
+                <canvas ref={chartRefs.vehCountRef} className="w-full h-full" />
               </div>
               <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-80 w-full flex items-center justify-center">
                 <canvas
@@ -606,7 +788,6 @@ const SimulationResults: React.FC = () => {
                 />
               </div>
             </div>
-
           </section>
         </div>
       </div>
