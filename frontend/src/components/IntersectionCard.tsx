@@ -1,14 +1,12 @@
-// src/components/IntersectionCard.tsx
 import { PlayCircle, PencilLine, Trash2 } from "lucide-react";
 import React from "react";
 import "../styles/IntersectionCard.css";
 
-// The props interface has been updated to include `location` and `lanes`
 interface IntersectionCardProps {
   id: number;
   name: string;
-  location: string; // <-- ADDED
-  lanes: string; // <-- ADDED
+  location: string;
+  lanes: string;
   image?: string;
   onSimulate: (id: number) => void;
   onEdit: (id: number) => void;
@@ -18,8 +16,8 @@ interface IntersectionCardProps {
 const IntersectionCard: React.FC<IntersectionCardProps> = ({
   id,
   name,
-  location, // <-- Now correctly received as a prop
-  lanes, // <-- Now correctly received as a prop
+  location,
+  lanes,
   image,
   onSimulate,
   onEdit,
@@ -57,7 +55,6 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
             {name}
           </h3>
           <p className="intersectionID text-xl text-gray-700 dark:text-[#8B949E]">ID: {id}</p>
-          {/* These fields now use the new props */}
           <p className="intersectionLocation text-xl text-gray-700 dark:text-[#8B949E]">
             Location: {location}
           </p>
@@ -70,21 +67,21 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
       <div className="intBtns flex flex-col space-y-3">
         <button
           onClick={() => onSimulate(id)}
-          className="intersectionBtn bg-[#0F5BA7] dark:bg-[#388BFD] hover:bg-blue-700 text-white text-lg font-semibold py-2 px-8 rounded-full flex items-center justify-center gap-2"
+          className="simButton intersectionBtn bg-[#0F5BA7] dark:bg-[#388BFD] hover:bg-blue-700 text-white text-lg font-semibold py-2 px-8 rounded-full flex items-center justify-center gap-2"
         >
           <PlayCircle size={22} strokeWidth={2} /> Simulate
         </button>
 
         <button
           onClick={() => onEdit(id)}
-          className="intersectionBtn bg-[#2B9348] dark:bg-[#2DA44E] hover:bg-green-700 text-white text-lg font-semibold py-2 px-8 rounded-full flex items-center justify-center gap-2"
+          className="editButton intersectionBtn bg-[#2B9348] dark:bg-[#2DA44E] hover:bg-green-700 text-white text-lg font-semibold py-2 px-8 rounded-full flex items-center justify-center gap-2"
         >
           <PencilLine size={22} strokeWidth={2} /> Edit
         </button>
 
         <button
           onClick={() => onDelete(id)}
-          className="intersectionBtn bg-red-600 dark:bg-[#DA3633] hover:bg-red-700 text-white text-lg font-semibold py-2 px-8 rounded-full flex items-center justify-center gap-2"
+          className="deleteIntButton intersectionBtn bg-red-600 dark:bg-[#DA3633] hover:bg-red-700 text-white text-lg font-semibold py-2 px-8 rounded-full flex items-center justify-center gap-2"
         >
           <Trash2 size={22} strokeWidth={2} /> Delete
         </button>

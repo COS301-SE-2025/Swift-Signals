@@ -145,19 +145,19 @@ const intersectionTutorialSteps: TutorialStep[] = [
     position: "left",
   },
   {
-    selector: ".intersectionBtn.bg-blue-600",
+    selector: ".simButton",
     title: "Simulate Button",
     text: "Click this button to run a traffic simulation for the selected intersection.",
     position: "right",
   },
   {
-    selector: ".intersectionBtn.bg-green-600",
+    selector: ".editButton",
     title: "Edit Button",
     text: "Click this button to edit the details of the selected intersection.",
     position: "right",
   },
   {
-    selector: ".intersectionBtn.bg-red-600",
+    selector: ".deleteIntButton",
     title: "Delete Button",
     text: "Click this button to delete the selected intersection.",
     position: "right",
@@ -247,13 +247,13 @@ const usersTutorialSteps: TutorialStep[] = [
     position: "left",
   },
   {
-    selector: ".p-2.bg-green-500",
+    selector: ".editUser",
     title: "Edit User",
     text: "This allows you to edit the user's details. This can only be done by an administrator.",
     position: "left",
   },
   {
-    selector: ".p-2.bg-red-500",
+    selector: ".deleteUser",
     title: "Delete Cards",
     text: "This allows you to delete the user's details. This can only be done by an administrator.",
     position: "left",

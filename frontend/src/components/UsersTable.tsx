@@ -51,14 +51,14 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onDelete }) => {
                 <div className="flex gap-2 justify-center">
                   <button
                     onClick={() => onEdit(user.id)}
-                    className="p-2 bg-[#2B9348] dark:bg-[#2DA44E] text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-colors"
+                    className="editUser p-2 bg-[#2B9348] dark:bg-[#2DA44E] text-white rounded-full flex items-center justify-center hover:bg-green-600 transition-colors"
                     aria-label="Edit user"
                   >
                     <PencilLine size={18} strokeWidth={2} />
                   </button>
                   <button
                     onClick={() => onDelete(user.id)}
-                    className="p-2 bg-red-500 dark:bg-[#DA3633] text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                    className="deleteUser p-2 bg-red-500 dark:bg-[#DA3633] text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
                     aria-label="Delete user"
                   >
                     <Trash2 size={18} strokeWidth={2} />
