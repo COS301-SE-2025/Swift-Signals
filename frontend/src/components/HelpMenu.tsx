@@ -73,19 +73,19 @@ const dashboardTutorialSteps: TutorialStep[] = [
     position: "right",
   },
   {
-    selector: ".quick-action-button.bg-customIndigo",
+    selector: ".newInt",
     title: "Add a New Intersection",
     text: "Click this button to open the form for creating a new traffic intersection.",
     position: "bottom",
   },
   {
-    selector: ".quick-action-button.bg-customGreen",
+    selector: ".runSim",
     title: "Run a Simulation",
     text: "Click this button to open the form for running a traffic simulation.",
     position: "bottom",
   },
   {
-    selector: ".quick-action-button.bg-customPurple",
+    selector: ".viewMap",
     title: "View Map",
     text: "This will take you to a full-screen map view of all your monitored intersections.",
     position: "bottom",
@@ -118,10 +118,10 @@ const navigationTutorialSteps: TutorialStep[] = [
     position: "bottom",
   },
   {
-    selector: ".dark-mode-toggle",
+    selector: ".footer-toggle",
     title: "Appearance Toggle",
     text: "Switch between light and dark modes.",
-    position: "top",
+    position: "right",
   },
 ];
 

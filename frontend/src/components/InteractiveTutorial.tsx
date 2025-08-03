@@ -4,11 +4,8 @@ import React, {
   useState,
   useCallback,
 } from "react";
-import "../styles/InteractiveTutorial.css";
-import { FaTimes } from "react-icons/fa";
+import { X } from "lucide-react";
 
-// --- TYPE IS UPDATED ---
-// Added optional 'action' function and 'center' position
 export type TutorialStep = {
   selector: string;
   title: string;
@@ -31,11 +28,27 @@ type Props = {
 const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [position, setPosition] = useState<Position | null>(null);
+  const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);
+  const [isDark, setIsDark] = useState(false);
 
   const currentStep = steps[stepIndex];
 
-  // --- NEW: useEffect to handle actions ---
-  // This hook runs when the step changes. If the new step has an action, it executes it.
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    };
+
+    checkDarkMode();
+
+    const observer = new MutationObserver(checkDarkMode);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     if (currentStep && typeof currentStep.action === "function") {
       currentStep.action();
@@ -45,16 +58,16 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
   const calculatePosition = useCallback(() => {
     if (!currentStep) return;
 
-    // --- UPDATED: Handle 'center' position for action steps ---
     if (currentStep.position === "center") {
       setPosition({
-        highlight: { display: "none" }, // No highlight for centered steps
+        highlight: { display: "none" },
         popover: {
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
         },
       });
+      setHighlightRect(null);
       return;
     }
 
@@ -70,6 +83,7 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
           transform: "translate(-50%, -50%)",
         },
       });
+      setHighlightRect(null);
       return;
     }
 
@@ -81,6 +95,8 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
       element.scrollIntoView({ behavior: "auto", block: "center" });
       rect = element.getBoundingClientRect();
     }
+
+    setHighlightRect(rect);
 
     const popoverRect = { width: 320, height: 150 };
 
@@ -148,42 +164,137 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
 
   if (!currentStep) return null;
 
+  const overlayColor = isDark ? "rgba(0, 0, 0, 0.85)" : "rgba(0, 0, 0, 0.65)";
+  const glowColor = isDark ? "rgba(56, 139, 253, 0.9)" : "rgba(78, 140, 255, 0.6)";
+  const glowBorderColor = isDark ? "rgba(147, 197, 253, 0.6)" : "rgba(255, 255, 255, 0.3)";
+
   return (
-    <div className="tutorial-overlay">
-      {position && !position.isError && (
-        <div className="tutorial-highlight" style={position.highlight}></div>
+    <div className="fixed inset-0 z-[10000]">
+      <svg className="absolute inset-0 w-full h-full pointer-events-none">
+        <defs>
+          <mask id="tutorial-mask">
+            <rect x="0" y="0" width="100%" height="100%" fill="white" />
+            {highlightRect && (
+              <rect
+                x={highlightRect.left - 8}
+                y={highlightRect.top - 8}
+                width={highlightRect.width + 16}
+                height={highlightRect.height + 16}
+                rx="8"
+                fill="black"
+              />
+            )}
+          </mask>
+        </defs>
+        <rect 
+          x="0" 
+          y="0" 
+          width="100%" 
+          height="100%" 
+          fill={overlayColor}
+          mask="url(#tutorial-mask)"
+          className="pointer-events-auto"
+        />
+      </svg>
+
+      {position && !position.isError && highlightRect && (
+        <div 
+          className="absolute pointer-events-none transition-all duration-400 ease-out"
+          style={{
+            ...position.highlight,
+            boxShadow: isDark 
+              ? `0 0 0 6px ${glowBorderColor}, 0 0 32px 12px ${glowColor}, inset 0 0 20px 4px rgba(56, 139, 253, 0.2)`
+              : `0 0 0 4px ${glowBorderColor}, 0 0 24px 8px ${glowColor}`,
+            borderRadius: '8px',
+          }}
+        />
       )}
 
       {position && (
-        <div className="tutorial-popover" style={position.popover}>
+        <div 
+          className={`absolute rounded-lg p-6 shadow-lg transition-all duration-400 ease-out border ${
+            isDark 
+              ? 'bg-gray-800 text-gray-100 border-gray-700' 
+              : 'bg-white text-gray-800 border-gray-200'
+          }`}
+          style={{
+            ...position.popover,
+            width: '320px',
+            maxWidth: 'calc(100vw - 40px)',
+            zIndex: 10002,
+          }}
+        >
           {position.isError ? (
             <>
-              <h4>Element Not Found</h4>
-              <p>
+              <h4 className={`text-xl font-semibold mb-3 ${
+                isDark ? 'text-red-400' : 'text-red-700'
+              }`}>
+                Element Not Found
+              </h4>
+              <p className="text-sm leading-relaxed mb-6">
                 Could not find the element for this step.
                 <br />
-                Required selector: <code>{currentStep.selector}</code>
+                Required selector: <code className={`px-2 py-1 rounded font-mono text-xs ${
+                  isDark 
+                    ? 'bg-gray-700 text-red-400' 
+                    : 'bg-gray-100 text-red-600'
+                }`}>
+                  {currentStep.selector}
+                </code>
               </p>
             </>
           ) : (
             <>
-              <h4>{currentStep.title}</h4>
-              <p>{currentStep.text}</p>
+              <h4 className={`text-xl font-semibold mb-3 ${
+                isDark ? 'text-red-400' : 'text-red-700'
+              }`}>
+                {currentStep.title}
+              </h4>
+              <p className="text-sm leading-relaxed mb-6">{currentStep.text}</p>
             </>
           )}
-          <div className="tutorial-navigation">
-            <span className="tutorial-step-count">
+          <div className={`flex justify-between items-center border-t pt-4 mt-4 ${
+            isDark ? 'border-gray-700' : 'border-gray-200'
+          }`}>
+            <span className={`text-sm ${
+              isDark ? 'text-gray-400' : 'text-gray-600'
+            }`}>
               {stepIndex + 1} / {steps.length}
             </span>
-            <div className="nav-buttons">
-              {stepIndex > 0 && <button onClick={handlePrev}>Previous</button>}
-              <button onClick={handleNext}>
+            <div className="flex gap-2">
+              {stepIndex > 0 && (
+                <button 
+                  onClick={handlePrev}
+                  className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                    isDark
+                      ? 'bg-gray-700 text-gray-100 border border-gray-600 hover:bg-gray-600'
+                      : 'bg-gray-100 text-gray-800 border border-gray-300 hover:bg-gray-200'
+                  }`}
+                >
+                  Previous
+                </button>
+              )}
+              <button 
+                onClick={handleNext}
+                className={`px-4 py-2 rounded-md font-medium transition-colors ${
+                  isDark
+                    ? 'bg-red-600 text-white hover:bg-red-700'
+                    : 'bg-red-700 text-white hover:bg-red-800'
+                }`}
+              >
                 {stepIndex === steps.length - 1 ? "Finish" : "Next"}
               </button>
             </div>
           </div>
-          <button className="tutorial-close-button" onClick={onClose}>
-            <FaTimes />
+          <button 
+            className={`absolute top-3 right-3 p-2 rounded-full transition-colors ${
+              isDark
+                ? 'text-gray-400 hover:bg-gray-700 hover:text-gray-100'
+                : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-800 shadow-sm border border-gray-200'
+            }`}
+            onClick={onClose}
+          >
+            <X size={20} />
           </button>
         </div>
       )}

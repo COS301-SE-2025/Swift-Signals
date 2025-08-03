@@ -232,13 +232,13 @@ const Dashboard: React.FC = () => {
         <div className="dashboard-main-grid">
           <div className="main-column">
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-              <button className="quick-action-button bg-[#0F5BA7] dark:bg-[#388BFD] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2">
+              <button className="newInt quick-action-button bg-[#0F5BA7] dark:bg-[#388BFD] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2">
                 <FaPlus /> New Intersection
               </button>
-              <button className="quick-action-button bg-[#2B9348] dark:bg-[#2DA44E] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2">
+              <button className="runSim quick-action-button bg-[#2B9348] dark:bg-[#2DA44E] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2">
                 <FaPlay /> Run Simulation
               </button>
-              <button className="quick-action-button border-2 border-[#0F5BA7] dark:border-[#388BFD] text-[#0F5BA7] dark:text-[#388BFD] bg-white dark:bg-[#0D1117] hover:bg-[#e6f1fa] transition flex items-center justify-center gap-2 col-span-2 xl:col-span-1" onClick={handleOpenMapModal}>
+              <button className="viewMap quick-action-button border-2 border-[#0F5BA7] dark:border-[#388BFD] text-[#0F5BA7] dark:text-[#388BFD] bg-white dark:bg-[#0D1117] hover:bg-[#e6f1fa] transition flex items-center justify-center gap-2 col-span-2 xl:col-span-1" onClick={handleOpenMapModal}>
                 <FaMap /> View Map
               </button>
             </div>
