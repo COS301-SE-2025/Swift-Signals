@@ -1,10 +1,10 @@
-name: API Linting
+name: User Service Linting
 
 on:
   push:
-    branches: [api-gateway]
+    branches: [user-service]
   pull_request:
-    branches: [api-gateway]
+    branches: [user-service]
   workflow_dispatch:
 
 permissions:
@@ -23,4 +23,4 @@ jobs:
         uses: golangci/golangci-lint-action@v8
         with:
           version: v2.1
-          working-directory: ./api-gateway
+          working-directory: ./user-service
