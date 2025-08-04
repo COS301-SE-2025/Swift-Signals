@@ -222,7 +222,7 @@ def cleanup_files():
 def main():
     random.seed(1408)
     ngen = 30
-    pop_size = 20
+    pop_size = 30
     cxpb = 0.5
     mutpb = 0.3
 
