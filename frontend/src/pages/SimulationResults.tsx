@@ -149,18 +149,6 @@ function downsampleData(labels: any[], data: any[], maxPoints: number) {
   return { downsampledLabels, downsampledData };
 }
 
-function generateOptimizedData(originalData: any) {
-  const optimizedVehicles = originalData.vehicles.map((veh: Vehicle) => ({
-    ...veh,
-    positions: veh.positions.map((pos: Position) => ({
-      ...pos,
-      speed: pos.speed * (1 + Math.random() * 0.2 - 0.1),
-    })),
-  }));
-
-  return { ...originalData, vehicles: optimizedVehicles };
-}
-
 const SimulationResults: React.FC = () => {
   const [simData, setSimData] = useState<any>(null);
   const [optimizedData, setOptimizedData] = useState<any>(null);
@@ -168,6 +156,7 @@ const SimulationResults: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [optimizing, setOptimizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [optimizedDataExists, setOptimizedDataExists] = useState(false);
   const location = useLocation();
   const simInfo = location.state || {};
 
@@ -185,6 +174,7 @@ const SimulationResults: React.FC = () => {
     totalDistHistRef: useRef<HTMLCanvasElement | null>(null),
   };
 
+  // Load original simulation data
   useEffect(() => {
     fetch("/simulation_output (1).json")
       .then((res) => {
@@ -206,22 +196,65 @@ const SimulationResults: React.FC = () => {
       });
   }, []);
 
+  // Check if optimized data exists and load it
+  useEffect(() => {
+    fetch("/optimized_output.json")
+      .then((res) => {
+        if (!res.ok) {
+          // File doesn't exist or can't be accessed
+          setOptimizedDataExists(false);
+          return null;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (data) {
+          setOptimizedData(data);
+          setOptimizedDataExists(true);
+        }
+      })
+      .catch((err) => {
+        console.log("Optimized data file not found or invalid:", err);
+        setOptimizedDataExists(false);
+      });
+  }, []);
+
   const handleOptimize = () => {
-    if (!simData) return;
+    if (!optimizedDataExists) {
+      setError("No optimized data available. Please run the optimization first.");
+      return;
+    }
 
     if (showOptimized) {
       setShowOptimized(false);
       return;
     }
 
-    setOptimizing(true);
-
-    setTimeout(() => {
-      const optimized = generateOptimizedData(simData);
-      setOptimizedData(optimized);
+    if (optimizedData) {
+      // Data is already loaded, just show it
       setShowOptimized(true);
-      setOptimizing(false);
-    }, 2000);
+      return;
+    }
+
+    // Load optimized data if not already loaded
+    setOptimizing(true);
+    fetch("/optimized_output.json")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setOptimizedData(data);
+        setShowOptimized(true);
+        setOptimizing(false);
+      })
+      .catch((err) => {
+        setError("Failed to load optimized data. Please check if the optimization has been run.");
+        setOptimizing(false);
+        console.error(err);
+      });
   };
 
   useEffect(() => {
@@ -232,7 +265,7 @@ const SimulationResults: React.FC = () => {
 
     const stats = computeStats(simData.vehicles);
     const optStats =
-      showOptimized && optimizedData
+      showOptimized && optimizedData && optimizedData.vehicles
         ? computeStats(optimizedData.vehicles)
         : null;
 
@@ -248,15 +281,15 @@ const SimulationResults: React.FC = () => {
     const totalDistPerVeh = getTotalDistancePerVehicle(simData.vehicles);
 
     const optAvgSpeedOverTime =
-      showOptimized && optimizedData
+      showOptimized && optimizedData && optimizedData.vehicles
         ? getAverageSpeedOverTime(optimizedData.vehicles, allTimes)
         : [];
     const optVehCountOverTime =
-      showOptimized && optimizedData
+      showOptimized && optimizedData && optimizedData.vehicles
         ? getVehicleCountOverTime(optimizedData.vehicles, allTimes)
         : [];
     const optTotalDistPerVeh =
-      showOptimized && optimizedData
+      showOptimized && optimizedData && optimizedData.vehicles
         ? getTotalDistancePerVehicle(optimizedData.vehicles)
         : [];
 
@@ -561,7 +594,7 @@ const SimulationResults: React.FC = () => {
 
   const stats = computeStats(simData.vehicles);
   const optStats =
-    showOptimized && optimizedData
+    showOptimized && optimizedData && optimizedData.vehicles
       ? computeStats(optimizedData.vehicles)
       : null;
 
@@ -618,22 +651,26 @@ const SimulationResults: React.FC = () => {
               </button>
               <button
                 onClick={handleOptimize}
-                disabled={optimizing}
+                disabled={optimizing || !optimizedDataExists}
                 className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
                   optimizing
                     ? "bg-gray-500 cursor-not-allowed"
+                    : !optimizedDataExists
+                    ? "bg-gray-600 cursor-not-allowed"
                     : "bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:scale-105 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
                 }`}
               >
                 {optimizing ? (
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Optimizing...
+                    Loading...
                   </div>
+                ) : !optimizedDataExists ? (
+                  "No Optimized Data"
                 ) : showOptimized ? (
                   "Hide Optimization"
                 ) : (
-                  "Optimize"
+                  "Show Optimization"
                 )}
               </button>
             </div>
