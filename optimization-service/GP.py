@@ -98,7 +98,7 @@ def evaluate_waiting_and_travel(individual):
         return 1e6,
     waiting = result.get("Total Waiting Time", 1e6)
     travel = result.get("Total Travel Time", 1e6)
-    return 0.7 * waiting + 0.3 * travel,  # Weighted objective
+    return 0.9 * waiting + 0.3 * travel,  # Weighted objective
 
 def evaluate_safety_given_waiting(individual):
     if individual[3] < 60:
@@ -117,7 +117,7 @@ def evaluate_safety_given_waiting(individual):
         1000 * brakes +
         1000 * stops +
         20000 * collisions +
-        0.5 * waiting
+        0.9 * waiting
     )
     return fitness,
 
@@ -224,7 +224,7 @@ def main():
     ngen_waiting = 30
     ngen_safety = 15
     pop_size = 30
-    cxpb = 0.7
+    cxpb = 0.5
     mutpb = 0.3
 
     # Phase 1: Minimize waiting time
