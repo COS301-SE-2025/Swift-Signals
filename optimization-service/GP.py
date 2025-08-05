@@ -224,7 +224,7 @@ def main():
     ngen_waiting = 30
     ngen_safety = 15
     pop_size = 30
-    cxpb = 0.5
+    cxpb = 0.7
     mutpb = 0.3
 
     # Phase 1: Minimize waiting time
