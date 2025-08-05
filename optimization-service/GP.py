@@ -221,7 +221,8 @@ def cleanup_files():
 
 def main():
     random.seed(1408)
-    ngen = 30
+    ngen_waiting = 30
+    ngen_safety = 15
     pop_size = 30
     cxpb = 0.5
     mutpb = 0.3
@@ -234,7 +235,7 @@ def main():
     hof_wait = tools.HallOfFame(3)
     with open(ALL_RESULTS_CSV, "w") as f:
         f.write("generation,individual_id,green,yellow,red,speed,seed,fitness\n")
-    run_ga(pop, hof_wait, ngen, cxpb, mutpb, label="WaitingTime")
+    run_ga(pop, hof_wait, ngen_waiting, cxpb, mutpb, label="WaitingTime")
 
     # Phase 2: Minimize safety issues
     print("\n--- Phase 2: Minimizing Safety Hazards ---")
@@ -243,7 +244,7 @@ def main():
     pop2 = [toolbox.clone(ind) for ind in hof_wait]
     pop2 += toolbox.population(n=pop_size - len(pop2))
     hof_safety = tools.HallOfFame(1)
-    run_ga(pop2, hof_safety, ngen, cxpb, mutpb, label="Safety")
+    run_ga(pop2, hof_safety, ngen_safety, cxpb, mutpb, label="Safety")
 
     # Save and compare best
     os.makedirs("out", exist_ok=True)
