@@ -227,7 +227,7 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
           {position.isError ? (
             <>
               <h4 className={`text-xl font-semibold mb-3 ${
-                isDark ? 'text-red-400' : 'text-red-700'
+                isDark ? 'text-blue-400' : 'text-blue-600'
               }`}>
                 Element Not Found
               </h4>
@@ -246,7 +246,7 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
           ) : (
             <>
               <h4 className={`text-xl font-semibold mb-3 ${
-                isDark ? 'text-red-400' : 'text-red-700'
+                isDark ? 'text-blue-400' : 'text-blue-600'
               }`}>
                 {currentStep.title}
               </h4>
@@ -278,8 +278,8 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
                 onClick={handleNext}
                 className={`px-4 py-2 rounded-md font-medium transition-colors ${
                   isDark
-                    ? 'bg-red-600 text-white hover:bg-red-700'
-                    : 'bg-red-700 text-white hover:bg-red-800'
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-green-600 text-white hover:bg-green-700'
                 }`}
               >
                 {stepIndex === steps.length - 1 ? "Finish" : "Next"}
