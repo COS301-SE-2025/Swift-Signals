@@ -23,7 +23,9 @@ type TutorialType =
   | "navigation"
   | "intersections"
   | "simulations"
-  | "users";
+  | "users"
+  | "simulation-results"
+  | "comparison-view";
 type DialogflowMessage = {
   payload?: {
     fields?: {
@@ -135,13 +137,97 @@ const intersectionTutorialSteps: TutorialStep[] = [
   {
     selector: ".addIntersectionBtn",
     title: "Add Intersection",
-    text: "Click this button to open the form for adding a new traffic intersection.",
+    text: "Click this button to open the form for adding a new traffic intersection. Let's see how to create a new intersection - the tutorial will now open the form for you.",
     position: "bottom",
+  },
+  {
+    selector: "body",
+    title: "Opening Form",
+    text: "Please wait...",
+    position: "center",
+    autoAdvance: true,
+    waitFor: ".fixed.inset-0.bg-black.bg-opacity-50",
+    action: () => {
+      const button = document.querySelector(
+        ".addIntersectionBtn",
+      ) as HTMLElement;
+      if (button) button.click();
+    },
+  },
+  {
+    selector: ".fixed.inset-0.bg-black.bg-opacity-50 > div",
+    title: "Add Intersection Modal",
+    text: "This modal allows you to create a new traffic intersection. Fill in all the required details to add it to your system.",
+    position: "left",
+  },
+  {
+    selector: "#name",
+    title: "Intersection Name",
+    text: "Enter a descriptive name for your intersection to help identify it later.",
+    position: "right",
+  },
+  {
+    selector: "#details\\.address",
+    title: "Address Field",
+    text: "Provide the street address where this intersection is located.",
+    position: "right",
+  },
+  {
+    selector: "#traffic_density",
+    title: "Traffic Density",
+    text: "Select the expected traffic volume: Low, Medium, or High. This affects simulation parameters.",
+    position: "left",
+  },
+  {
+    selector: "#default_parameters\\.green",
+    title: "Green Light Duration",
+    text: "Set the default duration (in seconds) for the green light phase.",
+    position: "bottom",
+  },
+  {
+    selector: "#default_parameters\\.yellow",
+    title: "Yellow Light Duration",
+    text: "Set the default duration (in seconds) for the yellow/amber light phase.",
+    position: "bottom",
+  },
+  {
+    selector: "#default_parameters\\.red",
+    title: "Red Light Duration",
+    text: "Set the default duration (in seconds) for the red light phase.",
+    position: "bottom",
+  },
+  {
+    selector: "button[type='submit']",
+    title: "Create Intersection",
+    text: "Once you've filled in all the details, click this button to create your new intersection. Now let's close this modal to continue exploring the intersections page.",
+    position: "left",
+  },
+  {
+    selector: "body",
+    title: "Closing Modal",
+    text: "Please wait...",
+    position: "center",
+    autoAdvance: true,
+    waitFor: ".intersectionCard",
+    action: () => {
+      const closeButton = document.querySelector(
+        ".fixed.inset-0.bg-black.bg-opacity-50 button[onClick]",
+      ) as HTMLElement;
+      if (closeButton) {
+        closeButton.click();
+      } else {
+        // Try alternative selector for the X button
+        const xButton = document.querySelector(
+          ".absolute.top-4.right-4",
+        ) as HTMLElement;
+        if (xButton) xButton.click();
+      }
+    },
   },
   {
     selector: ".intersectionCard",
     title: "Intersection Cards",
-    text: "Each card represents a traffic intersection, displaying key information.",
+    text: "Each card represents a traffic intersection, displaying key information like name, location, and type.",
     position: "left",
   },
   {
@@ -206,6 +292,8 @@ const simulationsTutorialSteps: TutorialStep[] = [
     title: "Opening Form",
     text: "Please wait...",
     position: "center",
+    autoAdvance: true,
+    waitFor: ".simulation-modal-content",
     action: () => {
       const button = document.querySelector(
         ".new-simulation-button",
@@ -216,26 +304,98 @@ const simulationsTutorialSteps: TutorialStep[] = [
   {
     selector: ".simulation-modal-content",
     title: "New Simulation Form",
-    text: "In this form, you can define all the parameters for your new simulation.",
+    text: "This modal allows you to create a new simulation. Fill in all the required details to set up your traffic simulation.",
     position: "left",
   },
   {
     selector: ".simulation-name-input",
-    title: "Name and Description",
-    text: "Give your simulation a unique name and an optional description so you can easily identify it later.",
+    title: "Simulation Name",
+    text: "Give your simulation a unique name so you can easily identify it later.",
+    position: "right",
+  },
+  {
+    selector: "textarea",
+    title: "Simulation Description",
+    text: "Add an optional description to provide more details about this simulation.",
     position: "right",
   },
   {
     selector: ".intersection-tabs",
-    title: "Add Intersections",
-    text: "You can add intersections to your simulation from a pre-defined list, by searching, or by selecting them on a map.",
+    title: "Intersection Selection Methods",
+    text: "You can add intersections to your simulation using three different methods: List, Search, or Map. Let's explore each one.",
+    position: "left",
+  },
+  {
+    selector: ".intersection-tabs button:nth-child(1)",
+    title: "List Tab",
+    text: "The List tab shows pre-defined intersections. This is the default active tab showing available intersections in a dropdown.",
+    position: "bottom",
+  },
+  {
+    selector: ".intersection-tabs button:nth-child(2)",
+    title: "Search Tab", 
+    text: "The Search tab allows you to find intersections by searching for street names. Click this tab to explore street search.",
+    position: "bottom",
+    action: () => {
+      const searchButton = document.querySelector('.intersection-tabs button:nth-child(2)') as HTMLElement;
+      if (searchButton) searchButton.click();
+    },
+  },
+  {
+    selector: "input[placeholder*='Type a street name']",
+    title: "First Street Search",
+    text: "Type the name of the first street to search for real South African streets. The system will find matching streets automatically.",
+    position: "right",
+  },
+  {
+    selector: ".intersection-tabs button:nth-child(3)",
+    title: "Map Tab",
+    text: "The Map tab lets you visually select intersections by clicking on a map. Click this tab to explore map selection.",
+    position: "bottom",
+    action: () => {
+      const mapButton = document.querySelector('.intersection-tabs button:nth-child(3)') as HTMLElement;
+      if (mapButton) mapButton.click();
+    },
+  },
+  {
+    selector: ".leaflet-container",
+    title: "Interactive Map",
+    text: "Click anywhere on this map to automatically find the nearest road intersection. The system will snap your click to actual intersections.",
+    position: "right",
+  },
+  {
+    selector: ".flex.flex-wrap.gap-2",
+    title: "Selected Intersections Area",
+    text: "Selected intersections will appear as pills in this area. You can remove them by clicking the × button on each pill when you select intersections.",
     position: "left",
   },
   {
     selector: ".create-simulation-submit-btn",
     title: "Create Simulation",
-    text: "Once you have filled out the form, click here to create and run your simulation.",
+    text: "Once you've named your simulation and selected intersections, click here to create and run your simulation. Now let's close this modal to continue exploring.",
     position: "right",
+  },
+  {
+    selector: "body",
+    title: "Closing Modal",
+    text: "Please wait...",
+    position: "center",
+    autoAdvance: true,
+    waitFor: ".sims",
+    action: () => {
+      const closeButton = document.querySelector(".crossBtn") as HTMLElement;
+      if (closeButton) {
+        closeButton.click();
+      } else {
+        // Try alternative close method
+        const modalOverlay = document.querySelector(".fixed.inset-0.z-50") as HTMLElement;
+        if (modalOverlay) {
+          // Click outside the modal to close
+          const event = new MouseEvent('click', { bubbles: true });
+          modalOverlay.dispatchEvent(event);
+        }
+      }
+    },
   },
 ];
 
@@ -263,6 +423,192 @@ const usersTutorialSteps: TutorialStep[] = [
     title: "Users Page Navigation",
     text: "Here you can navigate to view multiple pages of users.",
     position: "right",
+  },
+];
+
+const simulationResultsTutorialSteps: TutorialStep[] = [
+  {
+    selector: ".simName",
+    title: "Simulation Name",
+    text: "This displays the name of the current simulation being analyzed. You can customize this when creating simulations.",
+    position: "bottom",
+  },
+  {
+    selector: ".simDesc",
+    title: "Simulation Description",
+    text: "This shows the detailed description of what this simulation is testing or analyzing.",
+    position: "bottom",
+  },
+  {
+    selector: ".flex.flex-wrap.gap-2.mb-2",
+    title: "Selected Intersections",
+    text: "These pills show which intersections are included in this simulation. Each intersection contributes to the overall traffic analysis.",
+    position: "bottom",
+  },
+  {
+    selector: ".flex.flex-col.gap-3 button:nth-child(1)",
+    title: "3D Rendering View",
+    text: "Click this button to see an interactive 3D visualization of the traffic simulation in action.",
+    position: "left",
+  },
+  {
+    selector: ".flex.flex-col.gap-3 button:nth-child(2)",
+    title: "Optimization Toggle",
+    text: "This button lets you compare original simulation results with optimized traffic light timings. Green indicates optimization data is available.",
+    position: "left",
+  },
+  {
+    selector: ".stat-cube:nth-child(1)",
+    title: "Average Speed Statistics",
+    text: "This card shows the average speed of all vehicles throughout the simulation. Higher speeds generally indicate better traffic flow.",
+    position: "bottom",
+  },
+  {
+    selector: ".stat-cube:nth-child(2)",
+    title: "Maximum Speed Statistics",
+    text: "This displays the highest speed reached by any vehicle during the simulation period.",
+    position: "bottom",
+  },
+  {
+    selector: ".stat-cube:nth-child(3)",
+    title: "Minimum Speed Statistics",
+    text: "This shows the lowest speed recorded, which helps identify congestion points where vehicles slow down significantly.",
+    position: "bottom",
+  },
+  {
+    selector: ".stat-cube:nth-child(4)",
+    title: "Total Distance Traveled",
+    text: "This represents the cumulative distance traveled by all vehicles, indicating overall traffic volume and activity.",
+    position: "bottom",
+  },
+  {
+    selector: ".stat-cube:nth-child(5)",
+    title: "Vehicle Count",
+    text: "This shows the total number of vehicles that participated in the simulation.",
+    position: "bottom",
+  },
+  {
+    selector: ".stat-cube:nth-child(6)",
+    title: "Traffic Light Phases",
+    text: "This displays the number of different signal phases (red, yellow, green combinations) configured for the intersection.",
+    position: "bottom",
+  },
+  {
+    selector: ".stat-cube:nth-child(7)",
+    title: "Cycle Duration",
+    text: "This shows the total time for one complete traffic light cycle, measured in seconds.",
+    position: "bottom",
+  },
+  {
+    selector: ".grid.grid-cols-1.lg\\:grid-cols-2 > div:nth-child(1)",
+    title: "Average Speed Over Time Chart",
+    text: "This line chart shows how average vehicle speeds changed throughout the simulation. Look for patterns that indicate rush hours or congestion periods.",
+    position: "right",
+  },
+  {
+    selector: ".grid.grid-cols-1.lg\\:grid-cols-2 > div:nth-child(2)",
+    title: "Vehicle Count Over Time Chart",
+    text: "This chart tracks the number of active vehicles at each time point, helping identify peak traffic periods.",
+    position: "left",
+  },
+  {
+    selector: ".grid.grid-cols-1.lg\\:grid-cols-2 > div:nth-child(3)",
+    title: "Final Speed Distribution",
+    text: "This histogram shows how many vehicles ended the simulation at different speed ranges, indicating overall traffic efficiency.",
+    position: "right",
+  },
+  {
+    selector: ".grid.grid-cols-1.lg\\:grid-cols-2 > div:nth-child(4)",
+    title: "Total Distance Distribution",
+    text: "This histogram displays the distribution of total distances traveled by individual vehicles, showing travel pattern variations.",
+    position: "left",
+  },
+];
+
+const comparisonViewTutorialSteps: TutorialStep[] = [
+  {
+    selector: ".traffic-simulation-root:first-of-type",
+    title: "Original Simulation View",
+    text: "This left panel shows the original traffic simulation with your initial intersection settings. It displays the baseline traffic flow before optimization.",
+    position: "right",
+  },
+  {
+    selector: ".traffic-simulation-root:last-of-type",
+    title: "Optimized Simulation View",
+    text: "This right panel shows the optimized traffic simulation with improved traffic light timings. Compare this with the original to see the optimization benefits.",
+    position: "left",
+  },
+  {
+    selector: "div[style*='position: absolute'][style*='top: 24px'][style*='left: 24px']",
+    title: "Simulation Control Panel",
+    text: "This panel controls both simulations simultaneously. You can play/pause, restart, adjust speed, and monitor real-time statistics for the active simulation.",
+    position: "right",
+  },
+  {
+    selector: "div[style*='progress']",
+    title: "Simulation Progress",
+    text: "The progress bar shows how much of the simulation has completed. Both simulations run in sync, making comparison easy.",
+    position: "bottom",
+  },
+  {
+    selector: "div[style*='border-bottom: 1px solid']:nth-of-type(2)",
+    title: "Vehicle Statistics",
+    text: "Monitor total, active, and completed vehicles plus average speed in real-time. These metrics help you understand traffic efficiency differences.",
+    position: "bottom",
+  },
+  {
+    selector: "div[style*='border-top: 1px solid']",
+    title: "Traffic Light Status",
+    text: "See the current traffic light states for all directions (North, South, East, West). Colors indicate red, yellow, or green light phases.",
+    position: "bottom",
+  },
+  {
+    selector: "button[style*='flex-grow: 1']:first-child",
+    title: "Play/Pause Control",
+    text: "Control both simulations simultaneously. Play to start/resume or pause to analyze specific moments in the traffic flow.",
+    position: "bottom",
+  },
+  {
+    selector: "button[style*='flex-grow: 1']:last-child",
+    title: "Restart Simulations",
+    text: "Reset both simulations back to the beginning. Useful for comparing different scenarios from the start.",
+    position: "bottom",
+  },
+  {
+    selector: "input[type='range']",
+    title: "Speed Control",
+    text: "Adjust the simulation playback speed from 1x to 20x. Higher speeds let you observe long-term traffic patterns more quickly.",
+    position: "top",
+  },
+  {
+    selector: "button[title*='original']:first-of-type, button[title*='View left']:first-of-type",
+    title: "Left Panel Fullscreen",
+    text: "Click this button to expand the original simulation to fullscreen for detailed analysis. Click again to return to side-by-side view.",
+    position: "bottom",
+  },
+  {
+    selector: "button[title*='optimized']:last-of-type, button[title*='View right']:last-of-type",
+    title: "Right Panel Fullscreen",
+    text: "Click this button to expand the optimized simulation to fullscreen for detailed analysis. Click again to return to side-by-side view.",
+    position: "bottom",
+  },
+  {
+    selector: "button[style*='position: absolute'][style*='bottom: 70px']",
+    title: "Exit Comparison View",
+    text: "Click this button to close the comparison view and return to the previous page. Your analysis session will end.",
+    position: "top",
+  },
+  {
+    selector: "canvas",
+    title: "3D Traffic Visualization",
+    text: "Each panel contains a 3D visualization of the intersection. Watch vehicles move through the intersection and observe traffic light changes in real-time.",
+    position: "center",
+  },
+  {
+    selector: "div[style*='position: absolute'][style*='bottom: 20px']",
+    title: "Simulation Labels",
+    text: "These labels at the bottom of each panel clearly identify which simulation you're viewing: 'Original Simulation' vs 'Optimized Simulation'.",
+    position: "top",
   },
 ];
 
@@ -464,6 +810,8 @@ const HelpMenu: React.FC = () => {
       simulations: { path: "/simulations", name: "Simulations" },
       users: { path: "/users", name: "Users" },
       navigation: { path: "", name: "Navigation" },
+      "simulation-results": { path: "/simulation-results", name: "Simulation Results" },
+      "comparison-view": { path: "/comparison-rendering", name: "3D Comparison View" },
     };
 
     const config = tutorialConfig[tutorialType];
@@ -535,6 +883,18 @@ const HelpMenu: React.FC = () => {
       {activeTutorial === "navigation" && (
         <InteractiveTutorial
           steps={navigationTutorialSteps}
+          onClose={() => setActiveTutorial(null)}
+        />
+      )}
+      {activeTutorial === "simulation-results" && (
+        <InteractiveTutorial
+          steps={simulationResultsTutorialSteps}
+          onClose={() => setActiveTutorial(null)}
+        />
+      )}
+      {activeTutorial === "comparison-view" && (
+        <InteractiveTutorial
+          steps={comparisonViewTutorialSteps}
           onClose={() => setActiveTutorial(null)}
         />
       )}
@@ -696,6 +1056,18 @@ const HelpMenu: React.FC = () => {
                     <button onClick={() => startTutorial("users")}>
                       <h4>Users Tutorial</h4>
                       <p>Learn how to run view, edit, and delete users.</p>
+                    </button>
+                  </div>
+                  <div className="accordion-item tutorial-launcher">
+                    <button onClick={() => startTutorial("simulation-results")}>
+                      <h4>Simulation Results Tutorial</h4>
+                      <p>Learn how to analyze simulation data, charts, and statistics.</p>
+                    </button>
+                  </div>
+                  <div className="accordion-item tutorial-launcher">
+                    <button onClick={() => startTutorial("comparison-view")}>
+                      <h4>3D Comparison View Tutorial</h4>
+                      <p>Learn how to compare original vs optimized simulations in 3D.</p>
                     </button>
                   </div>
                 </div>

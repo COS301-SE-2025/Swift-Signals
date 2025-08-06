@@ -12,6 +12,8 @@ export type TutorialStep = {
   text: string;
   position?: "top" | "bottom" | "left" | "right" | "center";
   action?: () => void;
+  autoAdvance?: boolean;
+  waitFor?: string; // CSS selector to wait for before auto-advancing
 };
 
 type Position = {
@@ -54,6 +56,46 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
       currentStep.action();
     }
   }, [currentStep]);
+
+  // Auto-advance logic
+  useEffect(() => {
+    if (!currentStep?.autoAdvance) return;
+
+    let timeoutId: NodeJS.Timeout;
+    
+    const checkForAdvance = () => {
+      if (currentStep.waitFor) {
+        const element = document.querySelector(currentStep.waitFor);
+        if (element) {
+          timeoutId = setTimeout(() => {
+            if (stepIndex < steps.length - 1) {
+              setStepIndex(stepIndex + 1);
+            } else {
+              onClose();
+            }
+          }, 500); // Small delay to ensure smooth transition
+        } else {
+          // Keep checking every 100ms
+          timeoutId = setTimeout(checkForAdvance, 100);
+        }
+      } else {
+        // Auto-advance after action without waiting for element
+        timeoutId = setTimeout(() => {
+          if (stepIndex < steps.length - 1) {
+            setStepIndex(stepIndex + 1);
+          } else {
+            onClose();
+          }
+        }, 1000);
+      }
+    };
+
+    checkForAdvance();
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [currentStep, stepIndex, steps.length, onClose]);
 
   const calculatePosition = useCallback(() => {
     if (!currentStep) return;
