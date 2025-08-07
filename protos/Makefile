@@ -14,7 +14,7 @@ generate: user.proto intersection.proto simulation.proto
 	cd gen/ && go mod init github.com/COS301-SE-2025/Swift-Signals/protos/gen && go mod tidy
 
 install-protoc:
-  sudo apt-get update && sudo apt-get install -y protobuf-compiler
+	sudo apt-get update && sudo apt-get install -y protobuf-compiler
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.0
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
-  echo "${HOME}/go/bin" >> $GITHUB_PATH
+	echo "${HOME}/go/bin" >> $GITHUB_PATH
