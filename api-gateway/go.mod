@@ -1,6 +1,6 @@
 module github.com/COS301-SE-2025/Swift-Signals/api-gateway
 
-go 1.24.5
+go 1.24.6
 
 replace (
 	github.com/COS301-SE-2025/Swift-Signals/protos/gen => ../protos/gen
@@ -8,15 +8,15 @@ replace (
 )
 
 require (
-	github.com/COS301-SE-2025/Swift-Signals/protos/gen v0.1.0
+	github.com/COS301-SE-2025/Swift-Signals/protos/gen v0.0.0-00010101000000-000000000000
 	github.com/COS301-SE-2025/Swift-Signals/shared v0.0.0-00010101000000-000000000000
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/google/uuid v1.6.0
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/http-swagger v1.3.4
-	github.com/swaggo/swag v1.16.4
+	github.com/swaggo/swag v1.16.6
 	google.golang.org/grpc v1.74.2
-	google.golang.org/protobuf v1.36.6
+	google.golang.org/protobuf v1.36.7
 )
 
 require (
@@ -36,6 +36,7 @@ require (
 	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/swaggo/files v0.0.0-20220610200504-28940afbdbfe // indirect
 	golang.org/x/crypto v0.38.0 // indirect
+	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/text v0.25.0 // indirect

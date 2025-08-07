@@ -1,4 +1,4 @@
-FROM golang:1.24.5-alpine
+FROM golang:1.24.6-alpine
 
 WORKDIR /app
 COPY protos/ protos/
@@ -26,8 +26,10 @@ RUN go mod init "github.com/COS301-SE-2025/Swift-Signals/protos/gen"
 
 
 WORKDIR /app/api-gateway/
-RUN go mod tidy
-RUN go mod download
+RUN go install github.com/vektra/mockery/v2@latest && \
+    mockery
+RUN go mod tidy && \
+    go mod download
 
 WORKDIR cmd/
 RUN go build -o main 

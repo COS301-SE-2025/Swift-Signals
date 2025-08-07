@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"log"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
@@ -25,6 +26,7 @@ func (h *Handler) RegisterUser(
 ) (*userpb.UserResponse, error) {
 	user, err := h.service.RegisterUser(ctx, req.GetName(), req.GetEmail(), req.GetPassword())
 	if err != nil {
+		log.Println(err.Error())
 		return nil, errs.HandleServiceError(err)
 	}
 
@@ -45,6 +47,7 @@ func (h *Handler) LoginUser(
 ) (*userpb.LoginUserResponse, error) {
 	token, expiryTime, err := h.service.LoginUser(ctx, req.GetEmail(), req.GetPassword())
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 
