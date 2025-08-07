@@ -23,11 +23,11 @@ jobs:
       working-directory: ./protos
       run: |
         mkdir -p gen/user gen/intersection gen/simulation
-        cd gen
-        go mod init github.com/COS301-SE-2025/Swift-Signals/protos/gen
         protoc --go_out=./gen/user/ --go_opt=paths=source_relative --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative user.proto 
         protoc --go_out=./gen/intersection/ --go_opt=paths=source_relative --go-grpc_out=./gen/intersection/ --go-grpc_opt=paths=source_relative intersection.proto
         protoc --go_out=./gen/simulation/ --go_opt=paths=source_relative --go-grpc_out=./gen/simulation/ --go-grpc_opt=paths=source_relative simulation.proto
+        cd gen
+        go mod init github.com/COS301-SE-2025/Swift-Signals/protos/gen
 
     - name: lint
       runs-on: ubuntu-latest
