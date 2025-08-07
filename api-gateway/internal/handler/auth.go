@@ -95,6 +95,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	resp, err := h.service.LoginUser(r.Context(), req)
 	if err != nil {
 		util.SendErrorResponse(w, err)
+		return
 	}
 
 	util.SendJSONResponse(w, http.StatusOK, resp)
