@@ -39,7 +39,7 @@ func (s *Service) RegisterUser(
 	logger := util.LoggerFromContext(ctx)
 
 	// Validate input before using db resources
-	logger.Debug("validaing input")
+	logger.Debug("validating input")
 	email = normalizeEmail(email)
 	if err := s.validateUserInput(name, email, password); err != nil {
 		return nil, err
