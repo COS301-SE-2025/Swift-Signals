@@ -93,8 +93,8 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 ">
-      <div className="bg-white dark:bg-[#161B22] p-8 rounded-lg shadow-xl w-full max-w-2xl relative">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+      <div className="bg-white dark:bg-[#161B22] p-4 sm:p-8 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 dark:text-[#E6EDF3] hover:text-gray-800 dark:hover:text-gray-200"
