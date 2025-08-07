@@ -35,6 +35,8 @@ jobs:
         working-directory: ./protos
         run: |
           mkdir -p gen/user
+          cd gen
+          go mod init github.com/COS301-SE-2025/Swift-Signals/protos/gen
           protoc --go_out=./gen/user/ --go_opt=paths=source_relative --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative user.proto 
 
       - name: Generate Mockery Files
