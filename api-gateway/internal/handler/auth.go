@@ -7,15 +7,20 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type AuthHandler struct {
-	service service.AuthServiceInterface
+	service   service.AuthServiceInterface
+	validator *validator.Validate
 }
 
 func NewAuthHandler(s service.AuthServiceInterface) *AuthHandler {
 	return &AuthHandler{
-		service: s,
+		service:   s,
+		validator: validator.New(),
 	}
 }
 
@@ -30,23 +35,43 @@ func NewAuthHandler(s service.AuthServiceInterface) *AuthHandler {
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /register [post]
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
+	logger := util.LoggerFromContext(r.Context()).With(
+		"handler", "auth",
+		"action", "register",
+	)
+	logger.Info("processing register user request")
+
 	var req model.RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		util.SendErrorResponse(w, http.StatusBadRequest, "Invalid request payload")
+		logger.Warn("failed to decode request body",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(w, errs.NewValidationError("Invalid request payload", map[string]any{}))
 		return
 	}
 
-	// Basic validation  NOTE: might be moved to middleware later on
-	if req.Username == "" || req.Email == "" || req.Password == "" {
-		util.SendErrorResponse(w, http.StatusBadRequest, "Username, email, and password are required")
+	logger.Debug("validating request")
+	if err := h.validator.Struct(req); err != nil {
+		logger.Warn("validation failed",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(w, errs.NewValidationError("Username, email, and password are required", map[string]any{}))
 		return
 	}
 
 	resp, err := h.service.RegisterUser(r.Context(), req)
 	if err != nil {
-		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		logger.Error("registration failed",
+			"error", err.Error(),
+		)
+
+		util.SendErrorResponse(w, err)
+		return
 	}
 
+	logger.Info("registration successful",
+		"user_id", resp.UserID,
+	)
 	util.SendJSONResponse(w, http.StatusCreated, resp)
 }
 
@@ -63,13 +88,14 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 	var req model.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		util.SendErrorResponse(w, http.StatusBadRequest, "Invalid request payload")
+		util.SendErrorResponse(w, err)
 		return
 	}
 
 	resp, err := h.service.LoginUser(r.Context(), req)
 	if err != nil {
-		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		util.SendErrorResponse(w, err)
+		return
 	}
 
 	util.SendJSONResponse(w, http.StatusOK, resp)
@@ -88,13 +114,14 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	token, err := util.GetToken(r)
 	if err != nil {
-		util.SendErrorResponse(w, http.StatusUnauthorized, "Authorization token is missing")
+		util.SendErrorResponse(w, err)
 		return
 	}
 
 	resp, err := h.service.LogoutUser(r.Context(), token)
 	if err != nil {
-		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		util.SendErrorResponse(w, err)
+		return
 	}
 
 	util.SendJSONResponse(w, http.StatusOK, resp)
@@ -113,11 +140,9 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	var req model.ResetPasswordRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		util.SendErrorResponse(w, http.StatusBadRequest, "Invalid request payload")
+		util.SendErrorResponse(w, err)
 		return
 	}
-
-	// TODO: Implement Service Logic
 
 	resp := &model.ResetPasswordResponse{
 		Message: "Reset Example Successful",
