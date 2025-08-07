@@ -60,7 +60,7 @@ func GrpcErrorToErr(err error) *errs.ServiceError {
 	case codes.AlreadyExists:
 		return errs.NewAlreadyExistsError(err.Error(), map[string]any{})
 	case codes.Unauthenticated:
-		return errs.NewAlreadyExistsError(err.Error(), map[string]any{})
+		return errs.NewUnauthorizedError(err.Error(), map[string]any{})
 	case codes.PermissionDenied:
 		return errs.NewForbiddenError(err.Error(), map[string]any{})
 	default:
