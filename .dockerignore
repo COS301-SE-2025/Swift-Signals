@@ -2,3 +2,4 @@ README.md
 Makefile
 .env
 .env.example
+**/gen/
