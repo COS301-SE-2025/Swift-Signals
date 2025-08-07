@@ -20,8 +20,11 @@ func NewSimulationClient(conn *grpc.ClientConn) *SimulationClient {
 	}
 }
 
-func (sc *SimulationClient) GetSimulationResults(ctx context.Context, id string, simulation_parameters model.SimulationParameters) (*simulationpb.SimulationResultsResponse, error) {
-
+func (sc *SimulationClient) GetSimulationResults(
+	ctx context.Context,
+	id string,
+	simulation_parameters model.SimulationParameters,
+) (*simulationpb.SimulationResultsResponse, error) {
 	intersection, ok := simulationpb.IntersectionType_value[simulation_parameters.IntersectionType]
 
 	if !ok {
@@ -41,8 +44,11 @@ func (sc *SimulationClient) GetSimulationResults(ctx context.Context, id string,
 	return sc.client.GetSimulationResults(ctx, req)
 }
 
-func (sc *SimulationClient) GetSimulationOutput(ctx context.Context, id string, simulation_parameters model.SimulationParameters) (*simulationpb.SimulationOutputResponse, error) {
-
+func (sc *SimulationClient) GetSimulationOutput(
+	ctx context.Context,
+	id string,
+	simulation_parameters model.SimulationParameters,
+) (*simulationpb.SimulationOutputResponse, error) {
 	intersection, ok := simulationpb.IntersectionType_value[simulation_parameters.IntersectionType]
 
 	if !ok {

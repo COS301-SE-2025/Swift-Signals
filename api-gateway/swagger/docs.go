@@ -252,7 +252,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Successful login",
                         "schema": {
-                            "$ref": "#/definitions/model.AuthResponse"
+                            "$ref": "#/definitions/model.LoginResponse"
                         }
                     },
                     "400": {
@@ -338,7 +338,7 @@ const docTemplate = `{
                     "201": {
                         "description": "User successfully registered",
                         "schema": {
-                            "$ref": "#/definitions/model.AuthResponse"
+                            "$ref": "#/definitions/model.RegisterResponse"
                         }
                     },
                     "400": {
@@ -404,24 +404,11 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "model.AuthResponse": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string",
-                    "example": "Login successful"
-                },
-                "token": {
-                    "type": "string",
-                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-                }
-            }
-        },
         "model.CreateIntersectionRequest": {
             "type": "object",
             "properties": {
                 "default_parameters": {
-                    "$ref": "#/definitions/model.simulationParameters"
+                    "$ref": "#/definitions/model.SimulationParameters"
                 },
                 "details": {
                     "type": "object",
@@ -459,6 +446,23 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Details": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "Corner of Foo and Bar"
+                },
+                "city": {
+                    "type": "string",
+                    "example": "Pretoria"
+                },
+                "province": {
+                    "type": "string",
+                    "example": "Gauteng"
+                }
+            }
+        },
         "model.ErrorResponse": {
             "type": "object",
             "properties": {
@@ -476,34 +480,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "best_parameters": {
-                    "$ref": "#/definitions/model.optimisationParameters"
+                    "$ref": "#/definitions/model.OptimisationParameters"
                 },
                 "created_at": {
                     "type": "string",
                     "example": "2025-06-24T15:04:05Z"
                 },
                 "current_parameters": {
-                    "$ref": "#/definitions/model.optimisationParameters"
+                    "$ref": "#/definitions/model.OptimisationParameters"
                 },
                 "default_parameters": {
-                    "$ref": "#/definitions/model.optimisationParameters"
+                    "$ref": "#/definitions/model.OptimisationParameters"
                 },
                 "details": {
-                    "type": "object",
-                    "properties": {
-                        "address": {
-                            "type": "string",
-                            "example": "Corner of Foo and Bar"
-                        },
-                        "city": {
-                            "type": "string",
-                            "example": "Pretoria"
-                        },
-                        "province": {
-                            "type": "string",
-                            "example": "Gauteng"
-                        }
-                    }
+                    "$ref": "#/definitions/model.Details"
                 },
                 "id": {
                     "type": "string",
@@ -559,12 +549,37 @@ const docTemplate = `{
                 }
             }
         },
+        "model.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Login successful"
+                },
+                "token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                }
+            }
+        },
         "model.LogoutResponse": {
             "type": "object",
             "properties": {
                 "message": {
                     "type": "string",
                     "example": "Logout successful"
+                }
+            }
+        },
+        "model.OptimisationParameters": {
+            "type": "object",
+            "properties": {
+                "optimisation_type": {
+                    "type": "string",
+                    "example": "grid_search"
+                },
+                "simulation_parameters": {
+                    "$ref": "#/definitions/model.SimulationParameters"
                 }
             }
         },
@@ -590,6 +605,15 @@ const docTemplate = `{
                 }
             }
         },
+        "model.RegisterResponse": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "string",
+                    "example": "1"
+                }
+            }
+        },
         "model.ResetPasswordRequest": {
             "type": "object",
             "required": [
@@ -608,6 +632,35 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "Password reset instructions sent to your email."
+                }
+            }
+        },
+        "model.SimulationParameters": {
+            "type": "object",
+            "properties": {
+                "green": {
+                    "type": "integer",
+                    "example": 10
+                },
+                "intersection_type": {
+                    "type": "string",
+                    "example": "t-junction"
+                },
+                "red": {
+                    "type": "integer",
+                    "example": 6
+                },
+                "seed": {
+                    "type": "integer",
+                    "example": 3247128304
+                },
+                "speed": {
+                    "type": "integer",
+                    "example": 60
+                },
+                "yellow": {
+                    "type": "integer",
+                    "example": 2
                 }
             }
         },
@@ -636,47 +689,6 @@ const docTemplate = `{
                     "example": "My Updated Intersection"
                 }
             }
-        },
-        "model.optimisationParameters": {
-            "type": "object",
-            "properties": {
-                "optimisation_type": {
-                    "type": "string",
-                    "example": "grid_search"
-                },
-                "simulation_parameters": {
-                    "$ref": "#/definitions/model.simulationParameters"
-                }
-            }
-        },
-        "model.simulationParameters": {
-            "type": "object",
-            "properties": {
-                "green": {
-                    "type": "integer",
-                    "example": 10
-                },
-                "intersection_type": {
-                    "type": "string",
-                    "example": "t-junction"
-                },
-                "red": {
-                    "type": "integer",
-                    "example": 6
-                },
-                "seed": {
-                    "type": "integer",
-                    "example": 3247128304
-                },
-                "speed": {
-                    "type": "integer",
-                    "example": 60
-                },
-                "yellow": {
-                    "type": "integer",
-                    "example": 2
-                }
-            }
         }
     },
     "securityDefinitions": {
@@ -696,7 +708,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/",
 	Schemes:          []string{"http"},
 	Title:            "Authentication API Gateway",
-	Description:      "This is the API Gateway for the Swift-Signals project,\nforwarding requests to backend gRPC microservices.",
+	Description:      "This is the API Gateway for the Swift-Signals project, forwarding requests to backend gRPC microservices.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

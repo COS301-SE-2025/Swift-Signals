@@ -1,0 +1,26 @@
+name: API Linting
+
+on:
+  push:
+    branches: [api-gateway]
+  pull_request:
+    branches: [api-gateway]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  golangci:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v8
+        with:
+          version: v2.1
+          working-directory: ./api-gateway

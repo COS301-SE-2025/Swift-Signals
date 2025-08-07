@@ -23,7 +23,8 @@ func (suite *TestSuite) TestRegisterUser_Success() {
 		UserID: "created-id",
 	}
 
-	suite.client.Mock.On("RegisterUser", mock.Anything, "Valid Name", "valid@gmail.com", "8characters").Return(&userpb.UserResponse{Id: "created-id"}, nil)
+	suite.client.Mock.On("RegisterUser", mock.Anything, "Valid Name", "valid@gmail.com", "8characters").
+		Return(&userpb.UserResponse{Id: "created-id"}, nil)
 
 	ctx := context.Background()
 	result, err := suite.service.RegisterUser(ctx, expectedRequest)
@@ -41,7 +42,8 @@ func (suite *TestSuite) TestRegisterUser_Failure() {
 		Password: "8characters",
 	}
 
-	suite.client.Mock.On("RegisterUser", mock.Anything, "Valid Name", "valid@gmail.com", "8characters").Return(nil, errors.New("internal error caused"))
+	suite.client.Mock.On("RegisterUser", mock.Anything, "Valid Name", "valid@gmail.com", "8characters").
+		Return(nil, errors.New("internal error caused"))
 
 	ctx := context.Background()
 	_, err := suite.service.RegisterUser(ctx, expectedRequest)
@@ -58,6 +60,7 @@ func (suite *TestSuite) TestRegisterUser_Failure() {
 	suite.Equal(expectedErrorMessage, svcError.Cause.Error())
 	suite.client.AssertExpectations(suite.T())
 }
+
 func TestServiceRegisterUser(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }

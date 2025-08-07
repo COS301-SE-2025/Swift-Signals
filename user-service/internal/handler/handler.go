@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"log"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
@@ -19,10 +20,13 @@ func NewUserHandler(s service.UserService) *Handler {
 	return &Handler{service: s}
 }
 
-func (h *Handler) RegisterUser(ctx context.Context, req *userpb.RegisterUserRequest) (*userpb.UserResponse, error) {
+func (h *Handler) RegisterUser(
+	ctx context.Context,
+	req *userpb.RegisterUserRequest,
+) (*userpb.UserResponse, error) {
 	user, err := h.service.RegisterUser(ctx, req.GetName(), req.GetEmail(), req.GetPassword())
-
 	if err != nil {
+		log.Println(err.Error())
 		return nil, errs.HandleServiceError(err)
 	}
 
@@ -35,12 +39,15 @@ func (h *Handler) RegisterUser(ctx context.Context, req *userpb.RegisterUserRequ
 		CreatedAt:       timestamppb.New(user.CreatedAt),
 		UpdatedAt:       timestamppb.New(user.UpdatedAt),
 	}, nil
-
 }
 
-func (h *Handler) LoginUser(ctx context.Context, req *userpb.LoginUserRequest) (*userpb.LoginUserResponse, error) {
+func (h *Handler) LoginUser(
+	ctx context.Context,
+	req *userpb.LoginUserRequest,
+) (*userpb.LoginUserResponse, error) {
 	token, expiryTime, err := h.service.LoginUser(ctx, req.GetEmail(), req.GetPassword())
 	if err != nil {
+		log.Println(err.Error())
 		return nil, err
 	}
 
@@ -50,7 +57,10 @@ func (h *Handler) LoginUser(ctx context.Context, req *userpb.LoginUserRequest) (
 	}, nil
 }
 
-func (h *Handler) LogoutUser(ctx context.Context, req *userpb.UserIDRequest) (*emptypb.Empty, error) {
+func (h *Handler) LogoutUser(
+	ctx context.Context,
+	req *userpb.UserIDRequest,
+) (*emptypb.Empty, error) {
 	err := h.service.LogoutUser(ctx, req.GetUserId())
 	if err != nil {
 		return nil, err
@@ -58,7 +68,10 @@ func (h *Handler) LogoutUser(ctx context.Context, req *userpb.UserIDRequest) (*e
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) GetUserByID(ctx context.Context, req *userpb.UserIDRequest) (*userpb.UserResponse, error) {
+func (h *Handler) GetUserByID(
+	ctx context.Context,
+	req *userpb.UserIDRequest,
+) (*userpb.UserResponse, error) {
 	user, err := h.service.GetUserByID(ctx, req.GetUserId())
 	if err != nil {
 		return nil, err
@@ -74,7 +87,10 @@ func (h *Handler) GetUserByID(ctx context.Context, req *userpb.UserIDRequest) (*
 	}, nil
 }
 
-func (h *Handler) GetUserByEmail(ctx context.Context, req *userpb.GetUserByEmailRequest) (*userpb.UserResponse, error) {
+func (h *Handler) GetUserByEmail(
+	ctx context.Context,
+	req *userpb.GetUserByEmailRequest,
+) (*userpb.UserResponse, error) {
 	user, err := h.service.GetUserByEmail(ctx, req.GetEmail())
 	if err != nil {
 		return nil, err
@@ -90,7 +106,10 @@ func (h *Handler) GetUserByEmail(ctx context.Context, req *userpb.GetUserByEmail
 	}, nil
 }
 
-func (h *Handler) GetAllUsers(req *userpb.GetAllUsersRequest, stream userpb.UserService_GetAllUsersServer) error {
+func (h *Handler) GetAllUsers(
+	req *userpb.GetAllUsersRequest,
+	stream userpb.UserService_GetAllUsersServer,
+) error {
 	ctx := stream.Context()
 	users, err := h.service.GetAllUsers(ctx, req.GetPage(), req.GetPageSize(), req.GetFilter())
 	if err != nil {
@@ -114,7 +133,10 @@ func (h *Handler) GetAllUsers(req *userpb.GetAllUsersRequest, stream userpb.User
 	return nil
 }
 
-func (h *Handler) UpdateUser(ctx context.Context, req *userpb.UpdateUserRequest) (*userpb.UserResponse, error) {
+func (h *Handler) UpdateUser(
+	ctx context.Context,
+	req *userpb.UpdateUserRequest,
+) (*userpb.UserResponse, error) {
 	user, err := h.service.UpdateUser(ctx, req.GetUserId(), req.GetName(), req.GetEmail())
 	if err != nil {
 		return nil, err
@@ -130,7 +152,10 @@ func (h *Handler) UpdateUser(ctx context.Context, req *userpb.UpdateUserRequest)
 	}, nil
 }
 
-func (h *Handler) DeleteUser(ctx context.Context, req *userpb.UserIDRequest) (*emptypb.Empty, error) {
+func (h *Handler) DeleteUser(
+	ctx context.Context,
+	req *userpb.UserIDRequest,
+) (*emptypb.Empty, error) {
 	err := h.service.DeleteUser(ctx, req.GetUserId())
 	if err != nil {
 		return nil, err
@@ -138,7 +163,10 @@ func (h *Handler) DeleteUser(ctx context.Context, req *userpb.UserIDRequest) (*e
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) GetUserIntersectionIDs(req *userpb.UserIDRequest, stream userpb.UserService_GetUserIntersectionIDsServer) error {
+func (h *Handler) GetUserIntersectionIDs(
+	req *userpb.UserIDRequest,
+	stream userpb.UserService_GetUserIntersectionIDsServer,
+) error {
 	ctx := stream.Context()
 	intersectionIDs, err := h.service.GetUserIntersectionIDs(ctx, req.GetUserId())
 	if err != nil {
@@ -156,7 +184,10 @@ func (h *Handler) GetUserIntersectionIDs(req *userpb.UserIDRequest, stream userp
 	return nil
 }
 
-func (h *Handler) AddIntersectionID(ctx context.Context, req *userpb.AddIntersectionIDRequest) (*emptypb.Empty, error) {
+func (h *Handler) AddIntersectionID(
+	ctx context.Context,
+	req *userpb.AddIntersectionIDRequest,
+) (*emptypb.Empty, error) {
 	err := h.service.AddIntersectionID(ctx, req.GetUserId(), req.GetIntersectionId())
 	if err != nil {
 		return nil, err
@@ -164,7 +195,10 @@ func (h *Handler) AddIntersectionID(ctx context.Context, req *userpb.AddIntersec
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) RemoveIntersectionIDs(ctx context.Context, req *userpb.RemoveIntersectionIDRequest) (*emptypb.Empty, error) {
+func (h *Handler) RemoveIntersectionIDs(
+	ctx context.Context,
+	req *userpb.RemoveIntersectionIDRequest,
+) (*emptypb.Empty, error) {
 	err := h.service.RemoveIntersectionIDs(ctx, req.GetUserId(), req.GetIntersectionId())
 	if err != nil {
 		return nil, err
@@ -172,15 +206,26 @@ func (h *Handler) RemoveIntersectionIDs(ctx context.Context, req *userpb.RemoveI
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) ChangePassword(ctx context.Context, req *userpb.ChangePasswordRequest) (*emptypb.Empty, error) {
-	err := h.service.ChangePassword(ctx, req.GetUserId(), req.GetCurrentPassword(), req.GetNewPassword())
+func (h *Handler) ChangePassword(
+	ctx context.Context,
+	req *userpb.ChangePasswordRequest,
+) (*emptypb.Empty, error) {
+	err := h.service.ChangePassword(
+		ctx,
+		req.GetUserId(),
+		req.GetCurrentPassword(),
+		req.GetNewPassword(),
+	)
 	if err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) ResetPassword(ctx context.Context, req *userpb.ResetPasswordRequest) (*emptypb.Empty, error) {
+func (h *Handler) ResetPassword(
+	ctx context.Context,
+	req *userpb.ResetPasswordRequest,
+) (*emptypb.Empty, error) {
 	err := h.service.ResetPassword(ctx, req.GetEmail())
 	if err != nil {
 		return nil, err
@@ -196,7 +241,10 @@ func (h *Handler) MakeAdmin(ctx context.Context, req *userpb.AdminRequest) (*emp
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) RemoveAdmin(ctx context.Context, req *userpb.AdminRequest) (*emptypb.Empty, error) {
+func (h *Handler) RemoveAdmin(
+	ctx context.Context,
+	req *userpb.AdminRequest,
+) (*emptypb.Empty, error) {
 	err := h.service.RemoveAdmin(ctx, req.GetUserId(), req.GetAdminUserId())
 	if err != nil {
 		return nil, err

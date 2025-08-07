@@ -8,6 +8,7 @@ This script sets up Git aliases to streamline a PR-based microservice developmen
 ```
 main (production)
 ├── dev (development/staging)
+│   ├── feature/dev/<feature_name>
 │   ├── microservice (feature integration)
 │   │   └── feature/microservice/<feature_name>
 │   ├── frontend (feature integration)

@@ -33,7 +33,9 @@ func RPCDetailsToDetails(rpc *intersection.IntersectionDetails) model.Details {
 	}
 }
 
-func RPCOptiParamToOptiParam(rpc *intersection.OptimisationParameters) model.OptimisationParameters {
+func RPCOptiParamToOptiParam(
+	rpc *intersection.OptimisationParameters,
+) model.OptimisationParameters {
 	return model.OptimisationParameters{
 		OptimisationType:     rpc.OptimisationType.String(),
 		SimulationParameters: RPCSimParamToSimParam(rpc.Parameters),
