@@ -11,6 +11,7 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/shared/jwt"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/util"
 	"github.com/google/uuid"
 
 	"golang.org/x/crypto/bcrypt"
@@ -33,22 +34,22 @@ func normalizeEmail(email string) string {
 
 // RegisterUser creates a new user with proper validation and password hashing
 func (s *Service) RegisterUser(ctx context.Context, name, email, password string) (*model.User, error) {
-
-	email = normalizeEmail(email)
+	logger := util.LoggerFromContext(ctx)
 
 	// Validate input before using db resources
+	logger.Debug("validaing input")
+	email = normalizeEmail(email)
 	if err := s.validateUserInput(name, email, password); err != nil {
 		return nil, err
 	}
 
 	// Check if user already exists
+	logger.Debug("checking if email already exists")
 	existingUser, err := s.repo.GetUserByEmail(ctx, email)
-
 	// NOTE: Logic is dependent on GetUserByEmail returning nil if user does not exist
 	//       If this returns an error instead, we need to handle it differently
 	//       This is a limitation of the current implementation
 	//       Perhaps we should define EmailExists repository method instead
-
 	if err != nil {
 		return nil, errs.NewInternalError("failed to check existing user", err, map[string]any{"email": email})
 	}
@@ -58,12 +59,14 @@ func (s *Service) RegisterUser(ctx context.Context, name, email, password string
 	}
 
 	// Hash password
+	logger.Debug("hashing password")
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, errs.NewInternalError("failed to hash password", err, nil)
 	}
 
 	// Create user
+	logger.Debug("creating user")
 	id := uuid.New().String()
 	user := &model.User{
 		ID:       id,
