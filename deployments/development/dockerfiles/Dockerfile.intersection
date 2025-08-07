@@ -1,11 +1,12 @@
-FROM golang:1.24.4-alpine
+FROM golang:1.24.5-alpine
 
 WORKDIR /app
 COPY protos/ protos/
 COPY shared/ shared/
-COPY user-service/ user-service/
+COPY intersection-service/ intersection-service/
 
-WORKDIR user-service
+WORKDIR intersection-service
+RUN go mod tidy
 RUN go mod download
 
 WORKDIR cmd
