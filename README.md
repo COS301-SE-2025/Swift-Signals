@@ -1,6 +1,6 @@
 # Swift-Signals
 
-![Swift Signals Logo](assets/images/SwiftLogo.png)
+![Swift Signals Logo](docs/assets/images/SwiftLogo.png)
 
 # Badges
 ![API Gateway](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/apiGateway.yml/badge.svg)

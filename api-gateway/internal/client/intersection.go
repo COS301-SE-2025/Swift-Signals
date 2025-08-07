@@ -22,7 +22,10 @@ func NewIntersectionClient(conn *grpc.ClientConn) *IntersectionClient {
 	}
 }
 
-func (ic *IntersectionClient) CreateIntersection(ctx context.Context, intersection model.Intersection) (*intersectionpb.IntersectionResponse, error) {
+func (ic *IntersectionClient) CreateIntersection(
+	ctx context.Context,
+	intersection model.Intersection,
+) (*intersectionpb.IntersectionResponse, error) {
 	req := &intersectionpb.CreateIntersectionRequest{
 		Name:              intersection.Name,
 		Details:           convertDetailsToProto(intersection.Details),
@@ -35,7 +38,10 @@ func (ic *IntersectionClient) CreateIntersection(ctx context.Context, intersecti
 	return ic.client.CreateIntersection(ctx, req)
 }
 
-func (ic *IntersectionClient) GetIntersection(ctx context.Context, id string) (*intersectionpb.IntersectionResponse, error) {
+func (ic *IntersectionClient) GetIntersection(
+	ctx context.Context,
+	id string,
+) (*intersectionpb.IntersectionResponse, error) {
 	req := &intersectionpb.IntersectionIDRequest{
 		Id: id,
 	}
@@ -45,13 +51,19 @@ func (ic *IntersectionClient) GetIntersection(ctx context.Context, id string) (*
 	return ic.client.GetIntersection(ctx, req)
 }
 
-func (ic *IntersectionClient) GetAllIntersections(ctx context.Context) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error) {
+func (ic *IntersectionClient) GetAllIntersections(
+	ctx context.Context,
+) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error) {
 	req := &intersectionpb.GetAllIntersectionsRequest{}
 
 	return ic.client.GetAllIntersections(ctx, req)
 }
 
-func (ic *IntersectionClient) UpdateIntersection(ctx context.Context, id, name string, details model.Details) (*intersectionpb.IntersectionResponse, error) {
+func (ic *IntersectionClient) UpdateIntersection(
+	ctx context.Context,
+	id, name string,
+	details model.Details,
+) (*intersectionpb.IntersectionResponse, error) {
 	req := &intersectionpb.UpdateIntersectionRequest{
 		Id:      id,
 		Name:    name,
@@ -63,7 +75,10 @@ func (ic *IntersectionClient) UpdateIntersection(ctx context.Context, id, name s
 	return ic.client.UpdateIntersection(ctx, req)
 }
 
-func (ic *IntersectionClient) DeleteIntersection(ctx context.Context, id string) (*emptypb.Empty, error) {
+func (ic *IntersectionClient) DeleteIntersection(
+	ctx context.Context,
+	id string,
+) (*emptypb.Empty, error) {
 	req := &intersectionpb.IntersectionIDRequest{
 		Id: id,
 	}
@@ -73,7 +88,11 @@ func (ic *IntersectionClient) DeleteIntersection(ctx context.Context, id string)
 	return ic.client.DeleteIntersection(ctx, req)
 }
 
-func (ic *IntersectionClient) PutOptimisation(ctx context.Context, id string, parameters model.OptimisationParameters) (*intersectionpb.PutOptimisationResponse, error) {
+func (ic *IntersectionClient) PutOptimisation(
+	ctx context.Context,
+	id string,
+	parameters model.OptimisationParameters,
+) (*intersectionpb.PutOptimisationResponse, error) {
 	req := &intersectionpb.PutOptimisationRequest{
 		Id:         id,
 		Parameters: convertParametersToProto(parameters),
@@ -84,12 +103,25 @@ func (ic *IntersectionClient) PutOptimisation(ctx context.Context, id string, pa
 
 // NOTE: Creates stub for testing
 type IntersectionClientInterface interface {
-	CreateIntersection(ctx context.Context, intersection model.Intersection) (*intersectionpb.IntersectionResponse, error)
+	CreateIntersection(
+		ctx context.Context,
+		intersection model.Intersection,
+	) (*intersectionpb.IntersectionResponse, error)
 	GetIntersection(ctx context.Context, id string) (*intersectionpb.IntersectionResponse, error)
-	GetAllIntersections(ctx context.Context) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error)
-	UpdateIntersection(ctx context.Context, id, name string, details model.Details) (*intersectionpb.IntersectionResponse, error)
+	GetAllIntersections(
+		ctx context.Context,
+	) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error)
+	UpdateIntersection(
+		ctx context.Context,
+		id, name string,
+		details model.Details,
+	) (*intersectionpb.IntersectionResponse, error)
 	DeleteIntersection(ctx context.Context, id string) (*emptypb.Empty, error)
-	PutOptimisation(ctx context.Context, id string, parameters model.OptimisationParameters) (*intersectionpb.PutOptimisationResponse, error)
+	PutOptimisation(
+		ctx context.Context,
+		id string,
+		parameters model.OptimisationParameters,
+	) (*intersectionpb.PutOptimisationResponse, error)
 }
 
 // NOTE: Asserts Interface Implementation
@@ -107,16 +139,20 @@ func convertDetailsToProto(details model.Details) *intersectionpb.IntersectionDe
 	}
 }
 
-func convertParametersToProto(parameters model.OptimisationParameters) *intersectionpb.OptimisationParameters {
+func convertParametersToProto(
+	parameters model.OptimisationParameters,
+) *intersectionpb.OptimisationParameters {
 	return &intersectionpb.OptimisationParameters{
 		OptimisationType: StringToOptimisationType(parameters.OptimisationType),
 		Parameters: &intersectionpb.SimulationParameters{
-			IntersectionType: StringToIntersectionType(parameters.SimulationParameters.IntersectionType),
-			Green:            int32(parameters.SimulationParameters.Green),
-			Yellow:           int32(parameters.SimulationParameters.Yellow),
-			Red:              int32(parameters.SimulationParameters.Red),
-			Speed:            int32(parameters.SimulationParameters.Speed),
-			Seed:             int32(parameters.SimulationParameters.Seed),
+			IntersectionType: StringToIntersectionType(
+				parameters.SimulationParameters.IntersectionType,
+			),
+			Green:  int32(parameters.SimulationParameters.Green),
+			Yellow: int32(parameters.SimulationParameters.Yellow),
+			Red:    int32(parameters.SimulationParameters.Red),
+			Speed:  int32(parameters.SimulationParameters.Speed),
+			Seed:   int32(parameters.SimulationParameters.Seed),
 		},
 	}
 }

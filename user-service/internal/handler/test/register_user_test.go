@@ -8,11 +8,10 @@ import (
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func (suite *TestSuite) TestRegisterUser_Success() {
@@ -34,7 +33,8 @@ func (suite *TestSuite) TestRegisterUser_Success() {
 
 	ctx := context.Background()
 
-	suite.service.On("RegisterUser", ctx, req.Name, req.Email, req.Password).Return(expectedUser, nil)
+	suite.service.On("RegisterUser", ctx, req.Name, req.Email, req.Password).
+		Return(expectedUser, nil)
 
 	result, err := suite.handler.RegisterUser(ctx, req)
 
@@ -44,11 +44,9 @@ func (suite *TestSuite) TestRegisterUser_Success() {
 	suite.Equal(expectedUser.Email, result.GetEmail())
 
 	suite.service.AssertExpectations(suite.T())
-
 }
 
 func (suite *TestSuite) TestRegisterUser_Failure() {
-
 	req := &userpb.RegisterUserRequest{
 		Name:     "Invalid",
 		Email:    "fail@example.com",

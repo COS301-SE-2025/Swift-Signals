@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 )
@@ -37,7 +38,15 @@ func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id string) (*model.U
 	row := r.db.QueryRowContext(ctx, query, id)
 
 	user := &model.User{}
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
+	err := row.Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.Password,
+		&user.IsAdmin,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +70,15 @@ func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*m
 	row := r.db.QueryRowContext(ctx, query, email)
 
 	user := &model.User{}
-	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
+	err := row.Scan(
+		&user.ID,
+		&user.Name,
+		&user.Email,
+		&user.Password,
+		&user.IsAdmin,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No user found with that email
@@ -100,7 +117,10 @@ func (r *PostgresUserRepo) DeleteUser(ctx context.Context, id string) error {
 	return err
 }
 
-func (r *PostgresUserRepo) ListUsers(ctx context.Context, limit, offset int) ([]*model.User, error) {
+func (r *PostgresUserRepo) ListUsers(
+	ctx context.Context,
+	limit, offset int,
+) ([]*model.User, error) {
 	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at 
 	          FROM users 
 	          ORDER BY uuid LIMIT $1 OFFSET $2`
@@ -108,12 +128,24 @@ func (r *PostgresUserRepo) ListUsers(ctx context.Context, limit, offset int) ([]
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			log.Printf("Failed to close rows: %v", err)
+		}
+	}()
 
 	var users []*model.User
 	for rows.Next() {
 		user := &model.User{}
-		err := rows.Scan(&user.ID, &user.Name, &user.Email, &user.Password, &user.IsAdmin, &user.CreatedAt, &user.UpdatedAt)
+		err := rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Email,
+			&user.Password,
+			&user.IsAdmin,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -132,7 +164,11 @@ func (r *PostgresUserRepo) ListUsers(ctx context.Context, limit, offset int) ([]
 	return users, nil
 }
 
-func (r *PostgresUserRepo) AddIntersectionID(ctx context.Context, userID string, intID string) error {
+func (r *PostgresUserRepo) AddIntersectionID(
+	ctx context.Context,
+	userID string,
+	intID string,
+) error {
 	query := `INSERT INTO user_intersections (user_id, intersection_id) 
 	          VALUES ($1, $2) 
 	          ON CONFLICT DO NOTHING`
@@ -140,7 +176,10 @@ func (r *PostgresUserRepo) AddIntersectionID(ctx context.Context, userID string,
 	return err
 }
 
-func (r *PostgresUserRepo) GetIntersectionsByUserID(ctx context.Context, userID string) ([]string, error) {
+func (r *PostgresUserRepo) GetIntersectionsByUserID(
+	ctx context.Context,
+	userID string,
+) ([]string, error) {
 	query := `SELECT intersection_id 
 	          FROM user_intersections 
 	          WHERE user_id = $1`
@@ -148,7 +187,11 @@ func (r *PostgresUserRepo) GetIntersectionsByUserID(ctx context.Context, userID 
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			log.Printf("Failed to close rows: %v", err)
+		}
+	}()
 
 	var ids []string
 	for rows.Next() {

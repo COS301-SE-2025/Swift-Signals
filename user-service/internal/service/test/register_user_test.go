@@ -12,7 +12,6 @@ import (
 )
 
 func (suite *TestSuite) TestRegisterUser_Success() {
-
 	email := "valid@gmail.com"
 	name := "Valid Name"
 	plainPassword := "8characters"
@@ -170,7 +169,8 @@ func (suite *TestSuite) TestRegisterUser_Fail_To_Create_User() {
 	suite.Equal(errs.ErrInternal, svcError.Code)
 	suite.Equal("failed to create user", svcError.Message)
 
-	expectedError := errs.NewInternalError("failed to create user", anyError, map[string]any{}).Error()
+	expectedError := errs.NewInternalError("failed to create user", anyError, map[string]any{}).
+		Error()
 
 	suite.Equal(expectedError, svcError.Error())
 	suite.Equal(map[string]any{}, svcError.Context)

@@ -13,7 +13,6 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/util"
 	"github.com/google/uuid"
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -33,7 +32,10 @@ func normalizeEmail(email string) string {
 }
 
 // RegisterUser creates a new user with proper validation and password hashing
-func (s *Service) RegisterUser(ctx context.Context, name, email, password string) (*model.User, error) {
+func (s *Service) RegisterUser(
+	ctx context.Context,
+	name, email, password string,
+) (*model.User, error) {
 	logger := util.LoggerFromContext(ctx)
 
 	// Validate input before using db resources
@@ -51,11 +53,18 @@ func (s *Service) RegisterUser(ctx context.Context, name, email, password string
 	//       This is a limitation of the current implementation
 	//       Perhaps we should define EmailExists repository method instead
 	if err != nil {
-		return nil, errs.NewInternalError("failed to check existing user", err, map[string]any{"email": email})
+		return nil, errs.NewInternalError(
+			"failed to check existing user",
+			err,
+			map[string]any{"email": email},
+		)
 	}
 
 	if existingUser != nil {
-		return nil, errs.NewAlreadyExistsError("email already exists", map[string]any{"user": existingUser, "email": email})
+		return nil, errs.NewAlreadyExistsError(
+			"email already exists",
+			map[string]any{"user": existingUser, "email": email},
+		)
 	}
 
 	// Hash password
@@ -112,7 +121,10 @@ func checkPassword(inputPassword, storedHashedPassword string) error {
 }
 
 // LoginUser authenticates a user and returns auth token
-func (s *Service) LoginUser(ctx context.Context, email, password string) (string, time.Time, error) {
+func (s *Service) LoginUser(
+	ctx context.Context,
+	email, password string,
+) (string, time.Time, error) {
 	// TODO: Implement user login
 	// - Validate input parameters
 
@@ -178,7 +190,11 @@ func (s *Service) GetUserByEmail(ctx context.Context, email string) (*model.User
 }
 
 // GetAllUsers retrieves all users with pagination and filtering
-func (s *Service) GetAllUsers(ctx context.Context, page, pageSize int32, filter string) ([]*model.User, error) {
+func (s *Service) GetAllUsers(
+	ctx context.Context,
+	page, pageSize int32,
+	filter string,
+) ([]*model.User, error) {
 	// TODO: Implement get all users
 	// - Validate pagination parameters
 	// - Apply filters if provided
@@ -232,7 +248,11 @@ func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]
 }
 
 // AddIntersectionID adds an intersection ID to a user's list
-func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersectionID string) error {
+func (s *Service) AddIntersectionID(
+	ctx context.Context,
+	userID string,
+	intersectionID string,
+) error {
 	// TODO: Validate user ID and intersection ID
 
 	// Check if user exists
@@ -265,7 +285,11 @@ func (s *Service) AddIntersectionID(ctx context.Context, userID string, intersec
 }
 
 // RemoveIntersectionID removes an intersection ID from a user's list
-func (s *Service) RemoveIntersectionIDs(ctx context.Context, userID string, intersectionID []string) error {
+func (s *Service) RemoveIntersectionIDs(
+	ctx context.Context,
+	userID string,
+	intersectionID []string,
+) error {
 	// TODO: Implement remove intersection ID
 	// - Validate user ID and intersection ID
 	// - Check if user exists
@@ -275,7 +299,10 @@ func (s *Service) RemoveIntersectionIDs(ctx context.Context, userID string, inte
 }
 
 // ChangePassword updates a user's password
-func (s *Service) ChangePassword(ctx context.Context, userID, currentPassword, newPassword string) error {
+func (s *Service) ChangePassword(
+	ctx context.Context,
+	userID, currentPassword, newPassword string,
+) error {
 	// TODO: Implement password change
 	// - Validate user ID and passwords
 	// - Check if user exists

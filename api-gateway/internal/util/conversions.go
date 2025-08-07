@@ -3,6 +3,10 @@ package util
 import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func RPCIntersectionToIntersection(rpc *intersection.IntersectionResponse) model.Intersection {
@@ -29,7 +33,9 @@ func RPCDetailsToDetails(rpc *intersection.IntersectionDetails) model.Details {
 	}
 }
 
-func RPCOptiParamToOptiParam(rpc *intersection.OptimisationParameters) model.OptimisationParameters {
+func RPCOptiParamToOptiParam(
+	rpc *intersection.OptimisationParameters,
+) model.OptimisationParameters {
 	return model.OptimisationParameters{
 		OptimisationType:     rpc.OptimisationType.String(),
 		SimulationParameters: RPCSimParamToSimParam(rpc.Parameters),
@@ -44,5 +50,22 @@ func RPCSimParamToSimParam(rpc *intersection.SimulationParameters) model.Simulat
 		Green:            int(rpc.Green),
 		Speed:            int(rpc.Speed),
 		Seed:             int(rpc.Seed),
+	}
+}
+
+func GrpcErrorToErr(err error) *errs.ServiceError {
+	switch status.Code(err) {
+	case codes.InvalidArgument:
+		return errs.NewValidationError(err.Error(), map[string]any{})
+	case codes.NotFound:
+		return errs.NewNotFoundError(err.Error(), map[string]any{})
+	case codes.AlreadyExists:
+		return errs.NewAlreadyExistsError(err.Error(), map[string]any{})
+	case codes.Unauthenticated:
+		return errs.NewUnauthorizedError(err.Error(), map[string]any{})
+	case codes.PermissionDenied:
+		return errs.NewForbiddenError(err.Error(), map[string]any{})
+	default:
+		return errs.NewInternalError(err.Error(), err, map[string]any{})
 	}
 }

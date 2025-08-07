@@ -11,9 +11,9 @@ type LoginResponse struct {
 }
 
 type RegisterRequest struct {
-	Username string `json:"username" example:"johndoe"               binding:"required"`
-	Email    string `json:"email"    example:"newuser@example.com"   binding:"required"`
-	Password string `json:"password" example:"VeryStrongPassword456" binding:"required"`
+	Username string `json:"username" example:"johndoe"               binding:"required" validate:"required,min=3,max=32"`
+	Email    string `json:"email"    example:"newuser@example.com"   binding:"required" validate:"required,email"`
+	Password string `json:"password" example:"VeryStrongPassword456" binding:"required" validate:"required,min=8,max=64"`
 }
 
 type RegisterResponse struct {

@@ -1,0 +1,36 @@
+FROM golang:1.24.6-alpine
+
+WORKDIR /app
+COPY protos/ protos/
+COPY shared/ shared/
+COPY api-gateway/ api-gateway/
+
+WORKDIR /app/protos/
+RUN apk add --no-cache protobuf protobuf-dev && \
+    rm -rf /var/cache/apk/* && \
+    go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest && \
+    mkdir -p /app/protos/gen/user /app/protos/gen/intersection /app/protos/gen/simulation
+RUN protoc --go_out=./gen/user/ --go_opt=paths=source_relative \
+           --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative \
+           user.proto && \
+    protoc --go_out=./gen/intersection/ --go_opt=paths=source_relative \
+           --go-grpc_out=./gen/intersection/ --go-grpc_opt=paths=source_relative \
+           intersection.proto && \
+    protoc --go_out=./gen/simulation/ --go_opt=paths=source_relative \
+           --go-grpc_out=./gen/simulation/ --go-grpc_opt=paths=source_relative \
+           simulation.proto
+
+WORKDIR gen/
+RUN go mod init "github.com/COS301-SE-2025/Swift-Signals/protos/gen"
+
+
+WORKDIR /app/api-gateway/
+RUN go install github.com/vektra/mockery/v2@latest && \
+    mockery
+RUN go mod tidy && \
+    go mod download
+
+WORKDIR cmd/
+RUN go build -o main 
+CMD ["./main"]

@@ -4,22 +4,22 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"google.golang.org/grpc"
-
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
-	"github.com/COS301-SE-2025/Swift-Signals/shared/config"
-
 	_ "github.com/COS301-SE-2025/Swift-Signals/api-gateway/swagger"
+	"github.com/COS301-SE-2025/Swift-Signals/shared/config"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Config struct {
@@ -30,8 +30,7 @@ type Config struct {
 
 // @title Authentication API Gateway
 // @version 1.0
-// @description This is the API Gateway for the Swift-Signals project,
-// @description forwarding requests to backend gRPC microservices.
+// @description This is the API Gateway for the Swift-Signals project, forwarding requests to backend gRPC microservices.
 // @termsOfService http://example.com/terms/
 
 // @contact.name Inside Insights Team
@@ -55,14 +54,21 @@ func main() {
 	userClient := mustConnectUserService(cfg.UserServiceAddr)
 	intrClient := mustConnectIntersectionService(cfg.IntersectionAddr)
 
-	mux := setupRoutes(userClient, intrClient)
+	baseLogger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+	}))
+
+	mux := setupRoutes(baseLogger, userClient, intrClient)
 
 	server := createServer(cfg.Port, mux)
 	runServer(server)
 }
 
 func mustConnectUserService(address string) *client.UserClient {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.NewClient(
+		address,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	) // TODO: Add TLS
 	if err != nil {
 		log.Fatalf("failed to connect to User gRPC server: %v", err)
 	}
@@ -71,7 +77,10 @@ func mustConnectUserService(address string) *client.UserClient {
 }
 
 func mustConnectIntersectionService(address string) *client.IntersectionClient {
-	conn, err := grpc.Dial(address, grpc.WithInsecure()) // NOTE: Will change to use TLS later on
+	conn, err := grpc.NewClient(
+		address,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	) // TODO: Add TLS
 	if err != nil {
 		log.Fatalf("failed to connect to Intersection gRPC server: %v", err)
 	}
@@ -79,7 +88,11 @@ func mustConnectIntersectionService(address string) *client.IntersectionClient {
 	return client.NewIntersectionClient(conn)
 }
 
-func setupRoutes(userClient *client.UserClient, intrClient *client.IntersectionClient) http.Handler {
+func setupRoutes(
+	logger *slog.Logger,
+	userClient *client.UserClient,
+	intrClient *client.IntersectionClient,
+) http.Handler {
 	mux := http.NewServeMux()
 
 	// Auth routes
@@ -109,7 +122,7 @@ func setupRoutes(userClient *client.UserClient, intrClient *client.IntersectionC
 
 	// Middleware stack
 	return middleware.CreateStack(
-		middleware.Logging,
+		middleware.Logging(logger),
 		middleware.CORS,
 	)(mux)
 }

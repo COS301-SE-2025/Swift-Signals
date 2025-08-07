@@ -8,19 +8,16 @@ import (
 )
 
 type TestConfig struct {
-	Port  int    `env:"PORT" envDefault:"8080"`
-	Env   string `env:"ENV" envDefault:"development"`
+	Port  int    `env:"PORT"  envDefault:"8080"`
+	Env   string `env:"ENV"   envDefault:"development"`
 	Debug bool   `env:"DEBUG" envDefault:"false"`
 	NoTag string // Should be ignored
 }
 
 func TestLoadWithEnvVariables(t *testing.T) {
-	os.Setenv("PORT", "9000")
-	os.Setenv("ENV", "production")
-	os.Setenv("DEBUG", "true")
-	defer os.Unsetenv("PORT")
-	defer os.Unsetenv("ENV")
-	defer os.Unsetenv("DEBUG")
+	setEnv(t, "PORT", "9000")
+	setEnv(t, "ENV", "production")
+	setEnv(t, "DEBUG", "true")
 
 	var cfg TestConfig
 	err := Load(&cfg)
@@ -32,9 +29,9 @@ func TestLoadWithEnvVariables(t *testing.T) {
 }
 
 func TestLoadWithDefaults(t *testing.T) {
-	os.Unsetenv("PORT")
-	os.Unsetenv("ENV")
-	os.Unsetenv("DEBUG")
+	unsetEnv(t, "PORT")
+	unsetEnv(t, "ENV")
+	unsetEnv(t, "DEBUG")
 
 	var cfg TestConfig
 	err := Load(&cfg)
@@ -43,4 +40,23 @@ func TestLoadWithDefaults(t *testing.T) {
 	assert.Equal(t, 8080, cfg.Port)
 	assert.Equal(t, "development", cfg.Env)
 	assert.Equal(t, false, cfg.Debug)
+}
+
+func setEnv(t *testing.T, key, value string) {
+	t.Helper()
+	if err := os.Setenv(key, value); err != nil {
+		t.Fatalf("Failed to set env %s: %v", key, err)
+	}
+	t.Cleanup(func() {
+		if err := os.Unsetenv(key); err != nil {
+			t.Logf("Failed to unset env %s: %v", key, err)
+		}
+	})
+}
+
+func unsetEnv(t *testing.T, key string) {
+	t.Helper()
+	if err := os.Unsetenv(key); err != nil {
+		t.Fatalf("Failed to unset env %s: %v", key, err)
+	}
 }

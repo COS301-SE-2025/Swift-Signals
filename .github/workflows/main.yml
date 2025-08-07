@@ -7,49 +7,22 @@ on:
     branches: [main, dev, quality-assurance]
 
 jobs:
-  go-standard-check:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.24.3'
-
-      - name: Install Protobuf Compiler
-        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
-
-      - name: Install protoc-gen-go and protoc-gen-go-grpc
-        run: |
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.0
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
-
-      - name: Add Go bin to PATH
-        run: echo "${HOME}/go/bin" >> $GITHUB_PATH
-
-      - name: Generate Proto Files
-        working-directory: ./protos
-        run: |
-          protoc --go_out=./gen/user/ --go_opt=paths=source_relative --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative user.proto 
-          protoc --go_out=./gen/intersection/ --go_opt=paths=source_relative --go-grpc_out=./gen/intersection/ --go-grpc_opt=paths=source_relative intersection.proto
-          protoc --go_out=./gen/simulation/ --go_opt=paths=source_relative --go-grpc_out=./gen/simulation/ --go-grpc_opt=paths=source_relative simulation.proto
-
-      - name: Run unit tests in api-gateway
-        working-directory: ./api-gateway
-        run: |
-          go install github.com/vektra/mockery/v2@latest
-          mockery
-          go mod tidy
-          go test -v ./...
+  # TODO: Add integration tests for api-gateway
+  # go-standard-check:
+  #   runs-on: ubuntu-latest
+  #
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
+  #
+  #     - name: Set up Go
+  #       uses: actions/setup-go@v4
+  #       with:
+  #         go-version: '1.24.3'
+  #
 
   python-standard-check:
-    needs: go-standard-check
+    # needs: go-standard-check
     runs-on: ubuntu-latest
 
     steps:
