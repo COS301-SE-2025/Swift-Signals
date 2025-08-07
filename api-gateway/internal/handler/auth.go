@@ -121,6 +121,7 @@ func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	resp, err := h.service.LogoutUser(r.Context(), token)
 	if err != nil {
 		util.SendErrorResponse(w, err)
+		return
 	}
 
 	util.SendJSONResponse(w, http.StatusOK, resp)
