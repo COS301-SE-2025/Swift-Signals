@@ -92,18 +92,46 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /login [post]
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
+	logger := util.LoggerFromContext(r.Context()).With(
+		"handler", "auth",
+		"action", "login",
+	)
+	logger.Info("processing login request")
+
 	var req model.LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		util.SendErrorResponse(w, err)
+		logger.Warn("failed to decode request body",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(
+			w,
+			errs.NewValidationError("Invalid request payload", map[string]any{}),
+		)
+		return
+	}
+
+	logger.Debug("validating request")
+	if err := h.validator.Struct(req); err != nil {
+		logger.Warn("validation failed",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(
+			w,
+			errs.NewValidationError("Email and password are required", map[string]any{}),
+		)
 		return
 	}
 
 	resp, err := h.service.LoginUser(r.Context(), req)
 	if err != nil {
+		logger.Error("login failed",
+			"error", err.Error(),
+		)
 		util.SendErrorResponse(w, err)
 		return
 	}
 
+	logger.Info("login successful")
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }
 
@@ -118,9 +146,18 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /logout [post]
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
+	logger := util.LoggerFromContext(r.Context()).With(
+		"handler", "auth",
+		"action", "login",
+	)
+	logger.Info("processing logout request")
+
 	token, err := util.GetToken(r)
 	if err != nil {
-		util.SendErrorResponse(w, err)
+		logger.Warn("failed to retrieve authentication token",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(w, errs.NewValidationError(err.Error(), map[string]any{}))
 		return
 	}
 
