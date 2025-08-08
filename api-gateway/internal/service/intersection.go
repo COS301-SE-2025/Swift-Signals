@@ -119,6 +119,19 @@ func (s *IntersectionService) UpdateIntersectionByID(
 	return resp, nil
 }
 
+func (s *IntersectionService) DeleteIntersectionByID(
+	ctx context.Context,
+	id string,
+) error {
+	logger := util.LoggerFromContext(ctx).With(
+		"service", "intersection",
+	)
+
+	logger.Debug("calling intersection client to update intersection")
+	_, err := s.intrClient.DeleteIntersection(ctx, id)
+	return err
+}
+
 // IntersectionServiceInterface creates stub for testing
 type IntersectionServiceInterface interface {
 	GetAllIntersections(ctx context.Context) (model.Intersections, error)
@@ -132,6 +145,7 @@ type IntersectionServiceInterface interface {
 		id string,
 		req model.UpdateIntersectionRequest,
 	) (model.Intersection, error)
+	DeleteIntersectionByID(ctx context.Context, id string) error
 }
 
 // Note: Asserts Interface Implementation

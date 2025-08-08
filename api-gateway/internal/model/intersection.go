@@ -11,10 +11,6 @@ type CreateIntersectionRequest struct {
 	DefaultParameters SimulationParameters `json:"default_parameters"                           binding:"required" validate:"required"`
 }
 
-type CreateIntersectionResponse struct {
-	Id string `json:"id" example:"2"`
-}
-
 type UpdateIntersectionRequest struct {
 	Name    string `json:"name"    example:"My Updated Intersection"`
 	Details struct {
@@ -22,4 +18,8 @@ type UpdateIntersectionRequest struct {
 		City     string `json:"city"     example:"Pretoria"`
 		Province string `json:"province" example:"Gauteng"`
 	} `json:"details"`
+}
+
+type CreateIntersectionResponse struct {
+	Id string `json:"id" example:"2"`
 }

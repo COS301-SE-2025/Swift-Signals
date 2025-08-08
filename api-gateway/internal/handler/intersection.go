@@ -217,3 +217,42 @@ func (h *IntersectionHandler) UpdateIntersection(w http.ResponseWriter, r *http.
 	)
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }
+
+// @Summary Delete Intersection
+// @Description Deletes the intersection with the given ID.
+// @Tags Intersections
+// @Accept json
+// @Produce json
+// @Param id path string true "Intersection ID"
+// @Success 204 "No Content"
+// @Failure 400 {object} model.ErrorResponse "Bad Request: Invalid input"
+// @Failure 401 {object} model.ErrorResponse "Unauthorized: Token missing or invalid"
+// @Failure 404 {object} model.ErrorResponse "Not Found: Intersection does not exist"
+// @Failure 500 {object} model.ErrorResponse "Internal server error"
+// @Router /intersections/{id} [delete]
+func (h *IntersectionHandler) DeleteIntersection(w http.ResponseWriter, r *http.Request) {
+	logger := util.LoggerFromContext(r.Context()).With(
+		"handler", "intersection",
+		"action", "deleteIntersection",
+	)
+	logger.Info("processing deleteIntersection request")
+
+	// TODO: Implement User Verification
+	// ...
+
+	id := r.PathValue("id")
+
+	err := h.service.DeleteIntersectionByID(r.Context(), id)
+	if err != nil {
+		logger.Error("request failed",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(w, err)
+		return
+	}
+
+	logger.Info("request successful",
+		"intersection_id", id,
+	)
+	w.WriteHeader(http.StatusNoContent)
+}
