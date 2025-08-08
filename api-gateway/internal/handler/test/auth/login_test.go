@@ -20,7 +20,7 @@ func (suite *TestSuite) TestLogin_Success() {
 		Password: "8characters",
 	}
 	expectedResponse := model.LoginResponse{
-		Message: "Login successfull",
+		Message: "Login successful",
 		Token:   "very.real.token",
 	}
 
