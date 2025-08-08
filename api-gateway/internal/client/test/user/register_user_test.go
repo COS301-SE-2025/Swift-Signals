@@ -21,7 +21,7 @@ func (suite *TestSuite) TestRegisterUser_BuildsCorrectRequest() {
 	ctx := context.Background()
 	_, err := suite.client.RegisterUser(ctx, "Valid Name", "valid@gmail.com", "8characters")
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 
 	suite.grpcClient.AssertExpectations(suite.T())
 }
@@ -42,7 +42,7 @@ func (suite *TestSuite) TestRegisterUser_SetsTimeoutContext() {
 	ctx := context.Background()
 	_, err := suite.client.RegisterUser(ctx, "Test Name", "test@gmail.com", "testpassword")
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.grpcClient.AssertExpectations(suite.T())
 }
 

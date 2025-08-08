@@ -28,7 +28,7 @@ func (suite *TestSuite) TestLoginUser_Success() {
 	ctx := context.Background()
 	result, err := suite.service.LoginUser(ctx, expectedRequest)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(expectedResponse, result)
 
 	suite.client.AssertExpectations(suite.T())
@@ -46,7 +46,7 @@ func (suite *TestSuite) TestLoginUser_InvalidCredentials() {
 	ctx := context.Background()
 	_, err := suite.service.LoginUser(ctx, expectedRequest)
 
-	suite.Error(err)
+	suite.Require().Error(err)
 
 	svcError, ok := err.(*errs.ServiceError)
 	suite.True(ok)
@@ -68,7 +68,7 @@ func (suite *TestSuite) TestLoginUser_UserNotFound() {
 	ctx := context.Background()
 	_, err := suite.service.LoginUser(ctx, expectedRequest)
 
-	suite.Error(err)
+	suite.Require().Error(err)
 
 	svcError, ok := err.(*errs.ServiceError)
 	suite.True(ok)
@@ -90,7 +90,7 @@ func (suite *TestSuite) TestLoginUser_InternalError() {
 	ctx := context.Background()
 	_, err := suite.service.LoginUser(ctx, expectedRequest)
 
-	suite.Error(err)
+	suite.Require().Error(err)
 
 	svcError, ok := err.(*errs.ServiceError)
 	suite.True(ok)
@@ -112,7 +112,7 @@ func (suite *TestSuite) TestLoginUser_ValidationError() {
 	ctx := context.Background()
 	_, err := suite.service.LoginUser(ctx, expectedRequest)
 
-	suite.Error(err)
+	suite.Require().Error(err)
 
 	svcError, ok := err.(*errs.ServiceError)
 	suite.True(ok)
@@ -139,7 +139,7 @@ func (suite *TestSuite) TestLoginUser_EmptyResponse() {
 	ctx := context.Background()
 	result, err := suite.service.LoginUser(ctx, expectedRequest)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(expectedResponse, result)
 
 	suite.client.AssertExpectations(suite.T())
@@ -157,7 +157,7 @@ func (suite *TestSuite) TestLoginUser_AccountLocked() {
 	ctx := context.Background()
 	_, err := suite.service.LoginUser(ctx, expectedRequest)
 
-	suite.Error(err)
+	suite.Require().Error(err)
 
 	svcError, ok := err.(*errs.ServiceError)
 	suite.True(ok)

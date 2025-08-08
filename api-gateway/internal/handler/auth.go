@@ -8,7 +8,6 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
-
 	"github.com/go-playground/validator/v10"
 )
 
