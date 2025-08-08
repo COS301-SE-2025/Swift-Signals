@@ -2,27 +2,13 @@ package service
 
 import (
 	"context"
-	"errors"
 	"io"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 )
-
-type IntersectionServiceInterface interface {
-	GetAllIntersections(ctx context.Context) (model.Intersections, error)
-	GetIntersectionByID(ctx context.Context, id string) (model.Intersection, error)
-	CreateIntersection(
-		ctx context.Context,
-		req model.CreateIntersectionRequest,
-	) (model.CreateIntersectionResponse, error)
-	UpdateIntersectionByID(
-		ctx context.Context,
-		id string,
-		req model.UpdateIntersectionRequest,
-	) (model.Intersection, error)
-}
 
 type IntersectionService struct {
 	intrClient *client.IntersectionClient
@@ -37,9 +23,14 @@ func NewIntersectionService(ic *client.IntersectionClient) IntersectionServiceIn
 func (s *IntersectionService) GetAllIntersections(
 	ctx context.Context,
 ) (model.Intersections, error) {
+	logger := util.LoggerFromContext(ctx).With(
+		"service", "intersection",
+	)
+
+	logger.Debug("starting grpc stream")
 	stream, err := s.intrClient.GetAllIntersections(ctx)
 	if err != nil {
-		return model.Intersections{}, errors.New("unable to get all intersections")
+		return model.Intersections{}, err
 	}
 
 	intersections := []model.Intersection{}
@@ -49,7 +40,11 @@ func (s *IntersectionService) GetAllIntersections(
 			break
 		}
 		if err != nil {
-			return model.Intersections{}, errors.New("unable to get all intersections")
+			return model.Intersections{}, errs.NewInternalError(
+				"unable to get all intersections",
+				err,
+				map[string]any{},
+			)
 		}
 		intersection := util.RPCIntersectionToIntersection(rpcIntersection)
 		intersections = append(intersections, intersection)
@@ -63,13 +58,17 @@ func (s *IntersectionService) GetIntersectionByID(
 	ctx context.Context,
 	id string,
 ) (model.Intersection, error) {
+	logger := util.LoggerFromContext(ctx).With(
+		"service", "intersection",
+	)
+
+	logger.Debug("calling intersection client to get intersection")
 	pbResp, err := s.intrClient.GetIntersection(ctx, id)
 	if err != nil {
-		return model.Intersection{}, errors.New("unable to get intersection by ID")
+		return model.Intersection{}, err
 	}
 
 	resp := util.RPCIntersectionToIntersection(pbResp)
-
 	return resp, nil
 }
 
@@ -77,6 +76,11 @@ func (s *IntersectionService) CreateIntersection(
 	ctx context.Context,
 	req model.CreateIntersectionRequest,
 ) (model.CreateIntersectionResponse, error) {
+	logger := util.LoggerFromContext(ctx).With(
+		"service", "intersection",
+	)
+
+	logger.Debug("calling intersection client to create intersection")
 	intersection := model.Intersection{
 		Name:           req.Name,
 		Details:        req.Details,
@@ -87,13 +91,12 @@ func (s *IntersectionService) CreateIntersection(
 	}
 	pbResp, err := s.intrClient.CreateIntersection(ctx, intersection)
 	if err != nil {
-		return model.CreateIntersectionResponse{}, errors.New("unable to create intersection")
+		return model.CreateIntersectionResponse{}, err
 	}
 
 	resp := model.CreateIntersectionResponse{
 		Id: pbResp.Id,
 	}
-
 	return resp, nil
 }
 
@@ -102,5 +105,33 @@ func (s *IntersectionService) UpdateIntersectionByID(
 	id string,
 	req model.UpdateIntersectionRequest,
 ) (model.Intersection, error) {
-	return model.Intersection{}, nil
+	logger := util.LoggerFromContext(ctx).With(
+		"service", "intersection",
+	)
+
+	logger.Debug("calling intersection client to update intersection")
+	pbResp, err := s.intrClient.UpdateIntersection(ctx, id, req.Name, req.Details)
+	if err != nil {
+		return model.Intersection{}, err
+	}
+
+	resp := util.RPCIntersectionToIntersection(pbResp)
+	return resp, nil
 }
+
+// IntersectionServiceInterface creates stub for testing
+type IntersectionServiceInterface interface {
+	GetAllIntersections(ctx context.Context) (model.Intersections, error)
+	GetIntersectionByID(ctx context.Context, id string) (model.Intersection, error)
+	CreateIntersection(
+		ctx context.Context,
+		req model.CreateIntersectionRequest,
+	) (model.CreateIntersectionResponse, error)
+	UpdateIntersectionByID(
+		ctx context.Context,
+		id string,
+		req model.UpdateIntersectionRequest,
+	) (model.Intersection, error)
+}
+
+// Note: Asserts Interface Implementation
