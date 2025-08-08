@@ -25,6 +25,12 @@ jobs:
             make install-protoc
             make generate
 
+        - name: Generate Mockery Files
+          working-directory: ./user-service
+          run: |
+            go install github.com/vektra/mockery/v2@latest
+            mockery
+
         - name: golangci-lint
           uses: golangci/golangci-lint-action@v8
           with:
