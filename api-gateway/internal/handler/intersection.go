@@ -8,15 +8,18 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
+	"github.com/go-playground/validator/v10"
 )
 
 type IntersectionHandler struct {
-	service service.IntersectionServiceInterface
+	service   service.IntersectionServiceInterface
+	validator *validator.Validate
 }
 
 func NewIntersectionHandler(s service.IntersectionServiceInterface) *IntersectionHandler {
 	return &IntersectionHandler{
-		service: s,
+		service:   s,
+		validator: validator.New(),
 	}
 }
 
@@ -30,21 +33,25 @@ func NewIntersectionHandler(s service.IntersectionServiceInterface) *Intersectio
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections [get]
 func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http.Request) {
-	_, err := util.GetToken(r)
-	if err != nil {
-		util.SendErrorResponse(w, err)
-		return
-	}
+	logger := util.LoggerFromContext(r.Context()).With(
+		"handler", "intersection",
+		"action", "getAllIntersections",
+	)
+	logger.Info("processing getAllIntersections request")
 
 	// TODO: Implement User Verification
 	// ...
 
 	resp, err := h.service.GetAllIntersections(r.Context())
 	if err != nil {
+		logger.Error("request failed",
+			"error", err.Error(),
+		)
 		util.SendErrorResponse(w, err)
 		return
 	}
 
+	logger.Info("request successful")
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }
 
@@ -61,19 +68,29 @@ func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections/{id} [get]
 func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Request) {
-	_, err := util.GetToken(r)
-	if err != nil {
-		util.SendErrorResponse(w, err)
-		return
-	}
+	logger := util.LoggerFromContext(r.Context()).With(
+		"handler", "intersection",
+		"action", "getIntersection",
+	)
+	logger.Info("processing getIntersection request")
 
 	id := r.PathValue("id")
 
 	// TODO: Implement User Verification
 	// ...
 
-	resp, _ := h.service.GetIntersectionByID(r.Context(), id)
+	resp, err := h.service.GetIntersectionByID(r.Context(), id)
+	if err != nil {
+		logger.Error("request failed",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(w, err)
+		return
+	}
 
+	logger.Info("request successful",
+		"intersection_id", resp.ID,
+	)
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }
 
@@ -89,15 +106,33 @@ func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Req
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections [post]
 func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.Request) {
+	logger := util.LoggerFromContext(r.Context()).With(
+		"handler", "intersection",
+		"action", "createIntersection",
+	)
+	logger.Info("processing createIntersection request")
+
 	var req model.CreateIntersectionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		util.SendErrorResponse(w, err)
+		logger.Warn("failed to decode request body",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(
+			w,
+			errs.NewValidationError("Invalid request payload", map[string]any{}),
+		)
 		return
 	}
 
-	_, err := util.GetToken(r)
-	if err != nil {
-		util.SendErrorResponse(w, err)
+	logger.Debug("validating request")
+	if err := h.validator.Struct(req); err != nil {
+		logger.Warn("validation failed",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(
+			w,
+			errs.NewValidationError("name, density, and parameters are required", map[string]any{}),
+		)
 		return
 	}
 
@@ -106,10 +141,16 @@ func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.
 
 	resp, err := h.service.CreateIntersection(r.Context(), req)
 	if err != nil {
+		logger.Error("request failed",
+			"error", err.Error(),
+		)
 		util.SendErrorResponse(w, err)
 		return
 	}
 
+	logger.Info("request successful",
+		"intersection_id", resp.Id,
+	)
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }
 
@@ -127,14 +168,52 @@ func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections/{id} [patch]
 func (h *IntersectionHandler) UpdateIntersection(w http.ResponseWriter, r *http.Request) {
-	authHeader := r.Header.Get("Authorization")
-	if authHeader == "" {
+	logger := util.LoggerFromContext(r.Context()).With(
+		"handler", "intersection",
+		"action", "updateIntersection",
+	)
+	logger.Info("processing updateIntersection request")
+
+	var req model.UpdateIntersectionRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		logger.Warn("failed to decode request body",
+			"error", err.Error(),
+		)
 		util.SendErrorResponse(
 			w,
-			errs.NewUnauthorizedError("Authorization token is missing", map[string]any{}),
+			errs.NewValidationError("Invalid request payload", map[string]any{}),
 		)
 		return
 	}
 
-	util.SendJSONResponse(w, http.StatusOK, model.Intersection{})
+	logger.Debug("validating request")
+	if err := h.validator.Struct(req); err != nil {
+		logger.Warn("validation failed",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(
+			w,
+			errs.NewValidationError("validation failed", map[string]any{}),
+		)
+		return
+	}
+
+	// TODO: Implement User Verification
+	// ...
+
+	id := r.PathValue("id")
+
+	resp, err := h.service.UpdateIntersectionByID(r.Context(), id, req)
+	if err != nil {
+		logger.Error("request failed",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(w, err)
+		return
+	}
+
+	logger.Info("request successful",
+		"intersection_id", resp.ID,
+	)
+	util.SendJSONResponse(w, http.StatusOK, resp)
 }
