@@ -12,26 +12,19 @@ permissions:
 
 jobs:
   golangci:
-    # - name: Install Protobuf Compiler
-    #   run: | 
-    #     sudo apt-get update && sudo apt-get install -y protobuf-compiler
-    #     go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.0
-    #     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
-    #     echo "${HOME}/go/bin" >> $GITHUB_PATH
-
-    - name: Generate Proto Files
-      working-directory: ./protos
-      run: |
-        make install-protoc
-        make generate
-
-    - name: lint
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v4
         - uses: actions/setup-go@v5
           with:
             go-version: stable
+
+        - name: Generate Proto Files
+          working-directory: ./protos
+          run: |
+            make install-protoc
+            make generate
+
         - name: golangci-lint
           uses: golangci/golangci-lint-action@v8
           with:
