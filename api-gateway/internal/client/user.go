@@ -54,7 +54,11 @@ func (uc *UserClient) LoginUser(
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.LoginUser(ctx, req)
+	resp, err := uc.client.LoginUser(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) LogoutUser(ctx context.Context, userID string) (*emptypb.Empty, error) {
@@ -64,7 +68,11 @@ func (uc *UserClient) LogoutUser(ctx context.Context, userID string) (*emptypb.E
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.LogoutUser(ctx, req)
+	resp, err := uc.client.LogoutUser(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) GetUserByID(
@@ -77,7 +85,11 @@ func (uc *UserClient) GetUserByID(
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.GetUserByID(ctx, req)
+	resp, err := uc.client.GetUserByID(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) GetUserByEmail(
@@ -90,7 +102,11 @@ func (uc *UserClient) GetUserByEmail(
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.GetUserByEmail(ctx, req)
+	resp, err := uc.client.GetUserByEmail(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) GetAllUsers(
@@ -104,7 +120,11 @@ func (uc *UserClient) GetAllUsers(
 		Filter:   filter,
 	}
 
-	return uc.client.GetAllUsers(ctx, req)
+	resp, err := uc.client.GetAllUsers(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) UpdateUser(
@@ -119,7 +139,11 @@ func (uc *UserClient) UpdateUser(
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.UpdateUser(ctx, req)
+	resp, err := uc.client.UpdateUser(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) DeleteUser(ctx context.Context, userID string) (*emptypb.Empty, error) {
@@ -129,7 +153,11 @@ func (uc *UserClient) DeleteUser(ctx context.Context, userID string) (*emptypb.E
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.DeleteUser(ctx, req)
+	resp, err := uc.client.DeleteUser(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) GetUserIntersectionIDs(
@@ -140,7 +168,11 @@ func (uc *UserClient) GetUserIntersectionIDs(
 		UserId: userID,
 	}
 
-	return uc.client.GetUserIntersectionIDs(ctx, req)
+	resp, err := uc.client.GetUserIntersectionIDs(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) AddIntersectionID(
@@ -155,7 +187,11 @@ func (uc *UserClient) AddIntersectionID(
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.AddIntersectionID(ctx, req)
+	resp, err := uc.client.AddIntersectionID(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 // Remove a single intersection ID
@@ -164,7 +200,11 @@ func (uc *UserClient) RemoveIntersectionID(
 	userID string,
 	intersectionID string,
 ) (*emptypb.Empty, error) {
-	return uc.RemoveIntersectionIDs(ctx, userID, []string{intersectionID})
+	resp, err := uc.RemoveIntersectionIDs(ctx, userID, []string{intersectionID})
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 // Remove multiple intersection IDs
@@ -179,7 +219,11 @@ func (uc *UserClient) RemoveIntersectionIDs(
 	}
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	return uc.client.RemoveIntersectionIDs(ctx, req)
+	resp, err := uc.client.RemoveIntersectionIDs(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) ChangePassword(
@@ -194,7 +238,11 @@ func (uc *UserClient) ChangePassword(
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.ChangePassword(ctx, req)
+	resp, err := uc.client.ChangePassword(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) ResetPassword(ctx context.Context, email string) (*emptypb.Empty, error) {
@@ -204,7 +252,11 @@ func (uc *UserClient) ResetPassword(ctx context.Context, email string) (*emptypb
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.ResetPassword(ctx, req)
+	resp, err := uc.client.ResetPassword(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) MakeAdmin(
@@ -218,7 +270,11 @@ func (uc *UserClient) MakeAdmin(
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.MakeAdmin(ctx, req)
+	resp, err := uc.client.MakeAdmin(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (uc *UserClient) RemoveAdmin(
@@ -232,7 +288,11 @@ func (uc *UserClient) RemoveAdmin(
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 
-	return uc.client.RemoveAdmin(ctx, req)
+	resp, err := uc.client.RemoveAdmin(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 // NOTE: Creates stub for testing
