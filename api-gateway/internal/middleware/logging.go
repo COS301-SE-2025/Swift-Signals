@@ -19,6 +19,19 @@ func (w *wrappedWriter) WriteHeader(statusCode int) {
 	w.statusCode = statusCode
 }
 
+type ctxKey struct{}
+
+var loggerKey = ctxKey{}
+
+func SetLogger(ctx context.Context, logger *slog.Logger) context.Context {
+	return context.WithValue(ctx, loggerKey, logger)
+}
+
+func LoggerFromContext(ctx context.Context) (*slog.Logger, bool) {
+	logger, ok := ctx.Value(loggerKey).(*slog.Logger)
+	return logger, ok
+}
+
 func Logging(baseLogger *slog.Logger) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +51,7 @@ func Logging(baseLogger *slog.Logger) Middleware {
 
 			requestLogger.Info("request started")
 
-			ctx := context.WithValue(r.Context(), "logger", requestLogger)
+			ctx := SetLogger(r.Context(), requestLogger)
 			r = r.WithContext(ctx)
 
 			wrapped := &wrappedWriter{

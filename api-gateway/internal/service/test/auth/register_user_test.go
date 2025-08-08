@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
@@ -29,7 +28,7 @@ func (suite *TestSuite) TestRegisterUser_Success() {
 	ctx := context.Background()
 	result, err := suite.service.RegisterUser(ctx, expectedRequest)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.Equal(expectedResponse, result)
 
 	suite.client.AssertExpectations(suite.T())
@@ -43,21 +42,18 @@ func (suite *TestSuite) TestRegisterUser_Failure() {
 	}
 
 	suite.client.Mock.On("RegisterUser", mock.Anything, "Valid Name", "valid@gmail.com", "8characters").
-		Return(nil, errors.New("internal error caused"))
+		Return(nil, errs.NewAlreadyExistsError("user already exists", map[string]any{}))
 
 	ctx := context.Background()
 	_, err := suite.service.RegisterUser(ctx, expectedRequest)
 
+	suite.Require().Error(err)
+
 	svcError, ok := err.(*errs.ServiceError)
-
 	suite.True(ok)
-	suite.Equal(errs.ErrInternal, svcError.Code)
+	suite.Equal(errs.ErrAlreadyExists, svcError.Code)
+	suite.Equal("user already exists", svcError.Message)
 
-	expectedMessage := "unable to register"
-	suite.Equal(expectedMessage, svcError.Message)
-
-	expectedErrorMessage := "internal error caused"
-	suite.Equal(expectedErrorMessage, svcError.Cause.Error())
 	suite.client.AssertExpectations(suite.T())
 }
 

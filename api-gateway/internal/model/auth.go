@@ -1,8 +1,8 @@
 package model
 
 type LoginRequest struct {
-	Email    string `json:"email"    example:"user@example.com"  binding:"required"`
-	Password string `json:"password" example:"StrongPassword123" binding:"required"`
+	Email    string `json:"email"    example:"user@example.com"  binding:"required" validate:"required,email"`
+	Password string `json:"password" example:"StrongPassword123" binding:"required" validate:"required"`
 }
 
 type LoginResponse struct {

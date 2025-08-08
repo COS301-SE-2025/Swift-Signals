@@ -6,9 +6,9 @@ linters:
     - ineffassign
     - staticcheck
     - unused
-    - exhaustive
+    # - exhaustive
     - loggercheck
-    # - testifylint
+    - testifylint
 formatters:
   enable:
     - gci

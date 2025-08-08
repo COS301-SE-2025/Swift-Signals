@@ -2,12 +2,10 @@ package service
 
 import (
 	"context"
-	"errors"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
-	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 )
 
 type AuthService struct {
@@ -33,12 +31,12 @@ func (s *AuthService) RegisterUser(
 	)
 	registerResp, err := s.userClient.RegisterUser(ctx, req.Username, req.Email, req.Password)
 	if err != nil {
-		return model.RegisterResponse{}, errs.NewInternalError("unable to register", err, nil)
+		return model.RegisterResponse{}, err
 	}
+
 	resp := model.RegisterResponse{
 		UserID: registerResp.Id,
 	}
-
 	return resp, nil
 }
 
@@ -46,10 +44,16 @@ func (s *AuthService) LoginUser(
 	ctx context.Context,
 	req model.LoginRequest,
 ) (model.LoginResponse, error) {
+	logger := util.LoggerFromContext(ctx).With(
+		"service", "auth",
+	)
+
+	logger.Debug("calling user client to login user")
 	loginResp, err := s.userClient.LoginUser(ctx, req.Email, req.Password)
 	if err != nil {
-		return model.LoginResponse{}, errors.New("unable to login user")
+		return model.LoginResponse{}, err
 	}
+
 	resp := model.LoginResponse{
 		Message: "Login Successful",
 		Token:   loginResp.Token,
@@ -58,10 +62,18 @@ func (s *AuthService) LoginUser(
 }
 
 func (s *AuthService) LogoutUser(ctx context.Context, token string) (model.LogoutResponse, error) {
+	logger := util.LoggerFromContext(ctx).With(
+		"service", "auth",
+	)
+
+	logger.Debug("calling user client to logout user",
+		"token", token,
+	)
 	_, err := s.userClient.LogoutUser(ctx, token)
 	if err != nil {
-		return model.LogoutResponse{}, errors.New("unable to logout user")
+		return model.LogoutResponse{}, err
 	}
+
 	resp := model.LogoutResponse{
 		Message: "Logout Successful",
 	}

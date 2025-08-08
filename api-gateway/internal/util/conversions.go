@@ -4,7 +4,6 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

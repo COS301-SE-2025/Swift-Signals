@@ -129,7 +129,10 @@ func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.
 func (h *IntersectionHandler) UpdateIntersection(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		util.SendErrorResponse(w, errs.NewUnauthorizedError("Authorization token is missing", map[string]any{}))
+		util.SendErrorResponse(
+			w,
+			errs.NewUnauthorizedError("Authorization token is missing", map[string]any{}),
+		)
 		return
 	}
 
