@@ -148,7 +148,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	logger := util.LoggerFromContext(r.Context()).With(
 		"handler", "auth",
-		"action", "login",
+		"action", "logout",
 	)
 	logger.Info("processing logout request")
 
