@@ -219,24 +219,34 @@ func (r *PostgresUserRepo) GetIntersectionsByUserID(
 	ctx context.Context,
 	userID string,
 ) ([]string, error) {
-	query := `SELECT intersection_id 
-	          FROM user_intersections 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Selecting intersection_id from user_intersections")
+	query := `SELECT intersection_id
+	          FROM user_intersections
 	          WHERE user_id = $1`
 	rows, err := r.db.QueryContext(ctx, query, userID)
 	if err != nil {
-		return nil, err
+		return nil, HandleDatabaseError(
+			err,
+			ErrorContext{Operation: OpRead, Table: "user_intersections"},
+		)
 	}
 	defer func() {
 		if err := rows.Close(); err != nil {
-			log.Printf("Failed to close rows: %v", err)
+			logger.Warn("Failed to close rows", "Error", err)
 		}
 	}()
 
+	logger.Debug("Populating ids slice with users intersection ids")
 	var ids []string
 	for rows.Next() {
 		var id string
 		if err := rows.Scan(&id); err != nil {
-			return nil, err
+			return nil, HandleDatabaseError(
+				err,
+				ErrorContext{Operation: OpRead, Table: "user_intersections"},
+			)
 		}
 		ids = append(ids, id)
 	}
