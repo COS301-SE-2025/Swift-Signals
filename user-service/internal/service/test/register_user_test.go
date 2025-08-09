@@ -29,7 +29,7 @@ func (suite *TestSuite) TestRegisterUser_Success() {
 
 	result, err := suite.service.RegisterUser(ctx, name, email, plainPassword)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.NotNil(result)
 	suite.Equal(name, result.Name)
 	suite.Equal(email, result.Email)
