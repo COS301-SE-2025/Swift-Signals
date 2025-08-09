@@ -56,27 +56,33 @@ func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id string) (*model.U
 		&user.UpdatedAt,
 	)
 	if err != nil {
-		return nil, err
+		return nil, HandleDatabaseError(err, ErrorContext{Operation: OpRead, Table: "users"})
 	}
 
-	// Get intersection IDs
+	logger.Debug("populating user struct with intersection ids")
 	intIDs, err := r.GetIntersectionsByUserID(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, errs.NewDatabaseError(
+			"failed to get intersections by user id",
+			err,
+			map[string]any{"id": id},
+		)
 	}
-
-	// Populate User IDs
 	user.IntersectionIDs = intIDs
 
 	return user, nil
 }
 
 func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
-	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at 
-	          FROM users 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Selecting from users table")
+	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at
+	          FROM users
 	          WHERE email = $1`
 	row := r.db.QueryRowContext(ctx, query, email)
 
+	logger.Debug("populating user struct with target info")
 	user := &model.User{}
 	err := row.Scan(
 		&user.ID,
@@ -89,19 +95,21 @@ func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*m
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			// No user found with that email
+			// NOTE: this is the expected behaviour in registerUser and loginUser
 			return nil, nil
 		}
-		return nil, err
+		return nil, HandleDatabaseError(err, ErrorContext{Operation: OpRead, Table: "users"})
 	}
 
-	// Get intersection IDs
+	logger.Debug("populating user struct with intersection ids")
 	intIDs, err := r.GetIntersectionsByUserID(ctx, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, errs.NewDatabaseError(
+			"failed to get intersections by user id",
+			err,
+			map[string]any{"userID": user.ID},
+		)
 	}
-
-	// Populate User IDs
 	user.IntersectionIDs = intIDs
 
 	return user, nil

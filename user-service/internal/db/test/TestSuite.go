@@ -68,6 +68,9 @@ var testUsers = []*model.User{
 var testIntersectionIDs = []string{"int-1", "int-2", "int-3"}
 
 var (
+	getUserByEmailQuery = `SELECT uuid, name, email, password, is_admin, created_at, updated_at
+FROM users
+WHERE email = \$1`
 	getUserByIDQuery = `SELECT uuid, name, email, password, is_admin, created_at, updated_at
 	          FROM users
 	          WHERE uuid = \$1`
