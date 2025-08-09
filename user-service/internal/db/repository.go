@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/util"
 )
@@ -35,11 +36,15 @@ func (r *PostgresUserRepo) CreateUser(ctx context.Context, u *model.User) (*mode
 }
 
 func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id string) (*model.User, error) {
-	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at 
-	          FROM users 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Selecting from users table")
+	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at
+	          FROM users
 	          WHERE uuid = $1`
 	row := r.db.QueryRowContext(ctx, query, id)
 
+	logger.Debug("populating user struct with target info")
 	user := &model.User{}
 	err := row.Scan(
 		&user.ID,

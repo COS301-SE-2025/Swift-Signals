@@ -68,6 +68,11 @@ var testUsers = []*model.User{
 var testIntersectionIDs = []string{"int-1", "int-2", "int-3"}
 
 var (
+	getUserByIDQuery = `SELECT uuid, name, email, password, is_admin, created_at, updated_at
+	          FROM users
+	          WHERE uuid = \$1`
+
 	insertUserQuery = `INSERT INTO users \(uuid, name, email, password, is_admin, created_at, updated_at\)
 	VALUES \(\$1, \$2, \$3, \$4, \$5, NOW\(\), NOW\(\)\)`
+	getIntersectionIDQuery = `SELECT intersection_id FROM user_intersections WHERE user_id = \$1`
 )
