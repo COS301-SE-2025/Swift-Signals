@@ -116,12 +116,15 @@ func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*m
 }
 
 func (r *PostgresUserRepo) UpdateUser(ctx context.Context, u *model.User) (*model.User, error) {
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("updating user in users table")
 	query := `UPDATE users
 	          SET name = $1, email = $2, password = $3, is_admin = $4, updated_at = NOW()
 	          WHERE uuid = $5`
 	_, err := r.db.ExecContext(ctx, query, u.Name, u.Email, u.Password, u.IsAdmin, u.ID)
 	if err != nil {
-		return nil, err
+		return nil, HandleDatabaseError(err, ErrorContext{Operation: OpUpdate, Table: "users"})
 	}
 	return u, nil
 }

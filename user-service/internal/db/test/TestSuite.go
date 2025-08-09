@@ -78,4 +78,7 @@ WHERE email = \$1`
 	insertUserQuery = `INSERT INTO users \(uuid, name, email, password, is_admin, created_at, updated_at\)
 	VALUES \(\$1, \$2, \$3, \$4, \$5, NOW\(\), NOW\(\)\)`
 	getIntersectionIDQuery = `SELECT intersection_id FROM user_intersections WHERE user_id = \$1`
+	updateUserQuery        = `UPDATE users
+	          SET name = \$1, email = \$2, password = \$3, is_admin = \$4, updated_at = NOW\(\)
+	          WHERE uuid = \$5`
 )
