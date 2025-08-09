@@ -38,7 +38,7 @@ func (suite *TestSuite) TestRegisterUser_Success() {
 
 	result, err := suite.handler.RegisterUser(ctx, req)
 
-	suite.Nil(err)
+	suite.Require().NoError(err)
 	suite.Equal(expectedUser.ID, result.GetId())
 	suite.Equal(expectedUser.Name, result.GetName())
 	suite.Equal(expectedUser.Email, result.GetEmail())
@@ -61,7 +61,7 @@ func (suite *TestSuite) TestRegisterUser_Failure() {
 	result, err := suite.handler.RegisterUser(ctx, req)
 
 	suite.Nil(result)
-	suite.Error(err)
+	suite.Require().Error(err)
 
 	st, ok := status.FromError(err)
 	suite.True(ok)
