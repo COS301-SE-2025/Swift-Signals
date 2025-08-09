@@ -146,19 +146,23 @@ func (r *PostgresUserRepo) ListUsers(
 	ctx context.Context,
 	limit, offset int,
 ) ([]*model.User, error) {
-	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at 
-	          FROM users 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Selecting all users from user table")
+	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at
+	          FROM users
 	          ORDER BY uuid LIMIT $1 OFFSET $2`
 	rows, err := r.db.QueryContext(ctx, query, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, HandleDatabaseError(err, ErrorContext{Operation: OpRead, Table: "users"})
 	}
 	defer func() {
 		if err := rows.Close(); err != nil {
-			log.Printf("Failed to close rows: %v", err)
+			logger.Warn("Failed to close rows", "Error", err)
 		}
 	}()
 
+	logger.Debug("populating users slice with users")
 	var users []*model.User
 	for rows.Next() {
 		user := &model.User{}
@@ -172,16 +176,17 @@ func (r *PostgresUserRepo) ListUsers(
 			&user.UpdatedAt,
 		)
 		if err != nil {
-			return nil, err
+			return nil, HandleDatabaseError(err, ErrorContext{Operation: OpRead, Table: "users"})
 		}
 
-		// Get intersection IDs
+		logger.Debug("Fetching intersection ids", "userID", user.ID)
 		intIDs, err := r.GetIntersectionsByUserID(ctx, user.ID)
 		if err != nil {
-			return nil, err
+			return nil, errs.NewDatabaseError("failed to get intersections by user id",
+				err,
+				map[string]any{"userID": user.ID})
 		}
 
-		// Populate User IDs
 		user.IntersectionIDs = intIDs
 
 		users = append(users, user)

@@ -83,4 +83,7 @@ WHERE email = \$1`
 	          WHERE uuid = \$5`
 	deleteUserQuery = `DELETE FROM users
 	          WHERE uuid = \$1`
+	listUsersQuery = `SELECT uuid, name, email, password, is_admin, created_at, updated_at
+	          FROM users
+	          ORDER BY uuid LIMIT \$1 OFFSET \$2`
 )
