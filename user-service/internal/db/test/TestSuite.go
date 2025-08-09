@@ -3,9 +3,12 @@ package test
 import (
 	"database/sql"
 	"log"
+	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -25,7 +28,46 @@ func (suite *TestSuite) SetupTest() {
 }
 
 func (suite *TestSuite) TearDownTest() {
+	suite.mock.ExpectClose()
 	if err := suite.db.Close(); err != nil {
 		log.Printf("Failed to close suite: %v", err)
 	}
 }
+
+var testUser = &model.User{
+	ID:        uuid.NewString(),
+	Name:      "Test Name",
+	Email:     "test@gmail.com",
+	Password:  "8characters",
+	IsAdmin:   false,
+	CreatedAt: time.Now(),
+	UpdatedAt: time.Now(),
+}
+
+var testUsers = []*model.User{
+	{
+		ID:        "test_user-1",
+		Name:      "Test Name 1",
+		Email:     "test1@gmail.com",
+		Password:  "8characters",
+		IsAdmin:   false,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	},
+	{
+		ID:        "test_user-2",
+		Name:      "Test Name 2",
+		Email:     "test2@gmail.com",
+		Password:  "8characters",
+		IsAdmin:   true,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	},
+}
+
+var testIntersectionIDs = []string{"int-1", "int-2", "int-3"}
+
+var (
+	insertUserQuery = `INSERT INTO users \(uuid, name, email, password, is_admin, created_at, updated_at\)
+	VALUES \(\$1, \$2, \$3, \$4, \$5, NOW\(\), NOW\(\)\)`
+)

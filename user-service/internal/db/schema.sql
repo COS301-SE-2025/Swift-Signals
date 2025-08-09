@@ -1,8 +1,6 @@
--- Drop existing tables if they exist (for reruns during development)
 DROP TABLE IF EXISTS user_intersections;
 DROP TABLE IF EXISTS users;
 
--- Create users table with UUID primary key (assigned by Go)
 CREATE TABLE users (
     uuid UUID PRIMARY KEY, 
     name TEXT NOT NULL,
@@ -13,14 +11,12 @@ CREATE TABLE users (
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Create user_intersections table referencing UUIDs
 CREATE TABLE user_intersections (
     user_id UUID REFERENCES users(uuid) ON DELETE CASCADE,
-    intersection_id UUID NOT NULL,             -- Assuming intersections also use UUID
+    intersection_id UUID NOT NULL,
     PRIMARY KEY (user_id, intersection_id)
 );
 
--- Insert test data into users (UUIDs must be valid)
 INSERT INTO users (uuid, name, email, password, is_admin)
 VALUES
     ('9b9b1c5c-2e57-4e18-a15c-e3219be9dc01', 'Alice Smith', 'alice@example.com', 'password123', false),

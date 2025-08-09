@@ -3,9 +3,9 @@ package db
 import (
 	"context"
 	"database/sql"
-	"log"
 
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/util"
 )
 
 type PostgresUserRepo struct {
@@ -17,7 +17,10 @@ func NewPostgresUserRepo(db *sql.DB) UserRepository {
 }
 
 func (r *PostgresUserRepo) CreateUser(ctx context.Context, u *model.User) (*model.User, error) {
-	query := `INSERT INTO users (uuid, name, email, password, is_admin, created_at, updated_at) 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Inserting into users table")
+	query := `INSERT INTO users (uuid, name, email, password, is_admin, created_at, updated_at)
 	          VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`
 
 	_, err := r.db.ExecContext(ctx, query, u.ID, u.Name, u.Email, u.Password, u.IsAdmin)
