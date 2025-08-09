@@ -203,7 +203,7 @@ const Users = () => {
     <div className="userBody min-h-screen bg-gray-100">
       <Navbar />
       <div className="user-main-content flex-grow">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="usersDisp max-w-6xl mx-auto px-4 py-8">
           <UsersTable
             users={currentUsers}
             onEdit={handleEdit}

@@ -22,3 +22,165 @@
     margin-top: 0px;
   }
 }
+
+/* Extra large screens (≥ 1600px) */
+@media screen and (min-width: 1600px) {
+  /* Add your styles for very large desktop screens here */
+
+}
+
+/* Large desktops (1400px – 1599px) */
+@media screen and (max-width: 1599px) and (min-width: 1400px) {
+  /* Add your styles for large desktops here */
+}
+
+/* Standard desktops (1200px – 1399px) */
+@media screen and (max-width: 1399px) and (min-width: 1200px) {
+  .usersPaging {
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+    margin-bottom: 100px;
+  }
+
+  .usersPaging button,
+  .usersPaging span {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .userBody .user-main-content {
+    height: 100%;
+  }
+}
+
+/* Small desktops & large tablets (992px – 1199px) */
+@media screen and (max-width: 1199px) and (min-width: 992px) {
+  .usersPaging {
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+    margin-bottom: 100px;
+  }
+
+  .usersPaging button,
+  .usersPaging span {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .userBody .user-main-content {
+    height: 100%;
+  }
+}
+
+/* Tablets (768px – 991px) */
+@media screen and (max-width: 991px) and (min-width: 768px) {
+  .usersPaging {
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+    margin-bottom: 100px;
+  }
+
+  .usersPaging button,
+  .usersPaging span {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .userBody .user-main-content {
+    height: 100%;
+  }
+}
+
+/* Large phones / small tablets (576px – 767px) */
+@media screen and (max-width: 767px) and (min-width: 576px) {
+  .usersPaging {
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+    margin-bottom: 100px;
+  }
+
+  .usersPaging button,
+  .usersPaging span {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .userBody .user-main-content {
+    height: 100%;
+  }
+}
+
+/* Phones (≤ 575px) */
+@media screen and (max-width: 575px) {
+  .usersPaging {
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+    margin-bottom: 100px;
+  }
+
+  .usersPaging button,
+  .usersPaging span {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .userBody .user-main-content {
+    height: 100%;
+  }
+}
+
+/* Very small devices (≤ 400px) */
+@media screen and (max-width: 400px) {
+  /* Add your styles for very small devices here */
+}
+
+/* Pagination responsive fix */
+.usersPaging {
+  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+}
+
+@media screen and (max-width: 767px) {
+  .usersPaging {
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.5rem;
+  }
+
+  .usersPaging button,
+  .usersPaging span {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.85rem;
+  }
+
+  .userBody .user-main-content {
+    position: relative; /* Prevent fixed clipping */
+    min-height: calc(100vh - 80px);
+    height: auto;
+    align-items: stretch; /* Ensure content fills width */
+  }
+}
+
+/* Very small devices */
+@media screen and (max-width: 400px) {
+  .usersPaging {
+    overflow-x: auto; /* Allow horizontal scroll if needed */
+    white-space: nowrap;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+
+  .usersPaging::-webkit-scrollbar {
+    display: none;
+  }
+}
