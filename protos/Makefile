@@ -15,6 +15,9 @@ generate: user.proto intersection.proto simulation.proto
 	protoc --go_out=./gen/simulation/ --go_opt=paths=source_relative \
 				 --go-grpc_out=./gen/simulation/ --go-grpc_opt=paths=source_relative \
 				 simulation.proto
+	protoc --go_out=./gen/optimisation/ --go_opt=paths=source_relative \
+				 --go-grpc_out=./gen/optimisation/ --go-grpc_opt=paths=source_relative \
+				 optimisation.proto
 	cd gen/ && go mod init github.com/COS301-SE-2025/Swift-Signals/protos/gen && go mod tidy
 
 install-protoc:

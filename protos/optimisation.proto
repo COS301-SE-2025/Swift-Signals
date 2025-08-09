@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "protos/gen/intersection";
+option go_package = "protos/gen/optimisation";
 
 service OptimisationService {
   rpc RunOptimisation(OptimisationParameters) returns (OptimisationParameters);
