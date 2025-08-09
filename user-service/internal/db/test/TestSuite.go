@@ -81,4 +81,6 @@ WHERE email = \$1`
 	updateUserQuery        = `UPDATE users
 	          SET name = \$1, email = \$2, password = \$3, is_admin = \$4, updated_at = NOW\(\)
 	          WHERE uuid = \$5`
+	deleteUserQuery = `DELETE FROM users
+	          WHERE uuid = \$1`
 )

@@ -130,10 +130,16 @@ func (r *PostgresUserRepo) UpdateUser(ctx context.Context, u *model.User) (*mode
 }
 
 func (r *PostgresUserRepo) DeleteUser(ctx context.Context, id string) error {
-	query := `DELETE FROM users 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("deleting user from users table")
+	query := `DELETE FROM users
 	          WHERE uuid = $1`
 	_, err := r.db.ExecContext(ctx, query, id)
-	return err
+	if err != nil {
+		return HandleDatabaseError(err, ErrorContext{Operation: OpDelete, Table: "users"})
+	}
+	return nil
 }
 
 func (r *PostgresUserRepo) ListUsers(
