@@ -86,4 +86,7 @@ WHERE email = \$1`
 	listUsersQuery = `SELECT uuid, name, email, password, is_admin, created_at, updated_at
 	          FROM users
 	          ORDER BY uuid LIMIT \$1 OFFSET \$2`
+	addIntersectionIDQuery = `INSERT INTO user_intersections \(user_id, intersection_id\)
+	          VALUES \(\$1, \$2\)
+	          ON CONFLICT DO NOTHING`
 )

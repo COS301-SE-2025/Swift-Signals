@@ -199,10 +199,19 @@ func (r *PostgresUserRepo) AddIntersectionID(
 	userID string,
 	intID string,
 ) error {
-	query := `INSERT INTO user_intersections (user_id, intersection_id) 
-	          VALUES ($1, $2) 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Inserting into user_intersections")
+	query := `INSERT INTO user_intersections (user_id, intersection_id)
+	          VALUES ($1, $2)
 	          ON CONFLICT DO NOTHING`
 	_, err := r.db.ExecContext(ctx, query, userID, intID)
+	if err != nil {
+		return HandleDatabaseError(
+			err,
+			ErrorContext{Operation: OpCreate, Table: "user_intersections"},
+		)
+	}
 	return err
 }
 
