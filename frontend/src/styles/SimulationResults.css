@@ -249,3 +249,175 @@
 .simulation-section:hover {
   box-shadow: 0 0 40px 12px rgba(59, 130, 246, 0.45);
 }
+
+/* Extra large screens (≥ 1600px) */
+@media screen and (min-width: 1600px) {
+  /* Add your styles for very large desktop screens here */
+
+}
+
+/* Large desktops (1400px – 1599px) */
+@media screen and (max-width: 1599px) and (min-width: 1400px) {
+  /* Add your styles for large desktops here */
+}
+
+/* Standard desktops (1200px – 1399px) */
+@media screen and (max-width: 1399px) and (min-width: 1200px) {
+  .simulation-results-page .results {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+    margin-right: 0px;
+    justify-content: center;
+  }
+
+  .visSection {
+    height: 100%;
+    max-height: 1200px;
+  }
+
+  .visSection .statGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    justify-items: center;
+  }
+
+  .visSection .graphGrid {
+    display: grid;
+    gap: 20px;
+    padding: 2rem;
+  }
+}
+
+/* Small desktops & large tablets (992px – 1199px) */
+@media screen and (max-width: 1199px) and (min-width: 992px) {
+  .simulation-results-page .results {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+    margin-right: 0px;
+    justify-content: center;
+  }
+
+  .visSection {
+    height: 100%;
+    max-height: 1200px;
+  }
+
+  .visSection .statGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    justify-items: center;
+  }
+
+  .visSection .graphGrid {
+    display: grid;
+    gap: 20px;
+    padding: 2rem;
+  }
+}
+
+/* Tablets (768px – 991px) */
+@media screen and (max-width: 991px) and (min-width: 768px) {
+  .simulation-results-page .results {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+    margin-right: 0px;
+    justify-content: center;
+  }
+
+  .visSection {
+    height: 100%;
+    max-height: 2000px;
+  }
+
+  .visSection .statGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    justify-items: center;
+  }
+
+  .visSection .graphGrid {
+    display: grid;
+    gap: 20px;
+    padding: 2rem;
+  }
+}
+
+/* Large phones / small tablets (576px – 767px) */
+@media screen and (max-width: 767px) and (min-width: 576px) {
+  .simulation-results-page .results {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+    margin-right: 0px;
+    justify-content: center;
+  }
+
+  .visSection {
+    height: 100%;
+    max-height: 1200px;
+  }
+
+  .visSection .statGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    justify-items: center;
+  }
+
+  .visSection .graphGrid {
+    display: grid;
+    gap: 20px;
+    padding: 2rem;
+  }
+}
+
+/* Phones (≤ 575px) */
+@media screen and (max-width: 575px) {
+  .simulation-results-page .results {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 50px;
+    margin-right: 0px;
+    justify-content: center;
+  }
+
+  .visSection {
+    height: 100%;
+    max-height: 2500px;
+  }
+
+  .visSection .statGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 1.6rem;
+    justify-items: center;
+  }
+
+  .visSection .graphGrid {
+    display: grid;
+    gap: 20px;
+    padding: 2rem;
+  }
+}
+
+/* Very small devices (≤ 400px) */
+@media screen and (max-width: 400px) {
+  /* Add your styles for very small devices here */
+}

@@ -696,7 +696,7 @@ const SimulationResults: React.FC = () => {
               )}
             </h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-2 mb-8 justify-items-center">
+            <div className="statGrid grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-2 mb-8 justify-items-center">
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
                   Average Speed
@@ -805,7 +805,7 @@ const SimulationResults: React.FC = () => {
             </div>
 
             {/* Graphs grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="graphGrid grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-80 w-full flex items-center justify-center">
                 <canvas ref={chartRefs.avgSpeedRef} className="w-full h-full" />
               </div>
