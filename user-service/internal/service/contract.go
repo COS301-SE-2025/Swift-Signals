@@ -42,6 +42,12 @@ type UpdateUserRequest struct {
 	Email  string `validate:"required,email,max=255" json:"email"`
 }
 
+type ChangePasswordRequest struct {
+	UserID          string `validate:"required,uuid4"         json:"user_id"`
+	CurrentPassword string `validate:"required,min=1"         json:"current_password"`
+	NewPassword     string `validate:"required,min=8,max=128" json:"new_password"`
+}
+
 type GetUserByIDRequest struct {
 	UserID string `validate:"required,uuid4" json:"user_id"`
 }

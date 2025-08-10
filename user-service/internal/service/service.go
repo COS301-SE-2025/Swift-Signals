@@ -621,18 +621,77 @@ func (s *Service) RemoveIntersectionIDs(
 	return nil
 }
 
-// ChangePassword updates a user's password
 func (s *Service) ChangePassword(
 	ctx context.Context,
 	userID, currentPassword, newPassword string,
 ) error {
-	// TODO: Implement password change
-	// - Validate user ID and passwords
-	// - Check if user exists
-	// - Verify current password
-	// - Validate new password strength
-	// - Hash new password
-	// - Update password in database
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input parameters")
+	req := ChangePasswordRequest{
+		UserID:          strings.TrimSpace(userID),
+		CurrentPassword: currentPassword,
+		NewPassword:     newPassword,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+
+	logger.Debug("checking if user exists")
+	existingUser, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+
+	logger.Debug("authorising current password")
+	err = checkPassword(currentPassword, existingUser.Password)
+	if err != nil {
+		return errs.NewUnauthorizedError(
+			"current password is incorrect",
+			map[string]any{"user": existingUser.PublicUser()},
+		)
+	}
+
+	logger.Debug("hashing new password")
+	newPasswordHashed, err := hashPassword(newPassword)
+	if err != nil {
+		return errs.NewExternalError("failed to hash password", err, nil)
+	}
+
+	logger.Debug("updating user in database")
+	updatedUserData := &model.User{
+		ID:              existingUser.ID,
+		Name:            existingUser.Name,
+		Email:           existingUser.Email,
+		Password:        string(newPasswordHashed),
+		IsAdmin:         existingUser.IsAdmin,
+		IntersectionIDs: existingUser.IntersectionIDs,
+		CreatedAt:       existingUser.CreatedAt,
+		UpdatedAt:       time.Now(),
+	}
+	_, err = s.repo.UpdateUser(ctx, updatedUserData)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to update user",
+			err,
+			map[string]any{
+				"userID": req.UserID,
+			},
+		)
+	}
+
 	return nil
 }
 
