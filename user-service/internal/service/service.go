@@ -695,14 +695,8 @@ func (s *Service) ChangePassword(
 	return nil
 }
 
-// ResetPassword initiates password reset process
 func (s *Service) ResetPassword(ctx context.Context, email string) error {
 	// TODO: Implement password reset
-	// - Validate email format
-	// - Check if user exists with this email
-	// - Generate password reset token
-	// - Send password reset email
-	// - Store reset token with expiration
 	return nil
 }
 

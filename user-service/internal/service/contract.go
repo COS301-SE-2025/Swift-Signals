@@ -48,6 +48,10 @@ type ChangePasswordRequest struct {
 	NewPassword     string `validate:"required,min=8,max=128" json:"new_password"`
 }
 
+type ResetPasswordRequest struct {
+	Email string `validate:"required,email,max=255" json:"email"`
+}
+
 type GetUserByIDRequest struct {
 	UserID string `validate:"required,uuid4" json:"user_id"`
 }
