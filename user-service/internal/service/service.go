@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"errors"
-	"regexp"
 	"strings"
 	"time"
 
@@ -12,42 +11,40 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/util"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Service struct {
-	repo db.UserRepository
+	repo      db.UserRepository
+	validator *validator.Validate
 }
 
 func NewUserService(r db.UserRepository) UserService {
-	return &Service{repo: r}
+	return &Service{
+		repo:      r,
+		validator: validator.New(),
+	}
 }
 
-// emailRegex is a simple regex for basic email validation
-var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
-
-func normalizeEmail(email string) string {
-	return strings.ToLower(strings.TrimSpace(email))
-}
-
-// RegisterUser creates a new user with proper validation and password hashing
 func (s *Service) RegisterUser(
 	ctx context.Context,
 	name, email, password string,
 ) (*model.User, error) {
 	logger := util.LoggerFromContext(ctx)
 
-	// Validate input before using db resources
 	logger.Debug("validating input")
-	email = normalizeEmail(email)
-	if err := s.validateUserInput(name, email, password); err != nil {
-		return nil, err
+	req := RegisterUserRequest{
+		Name:     strings.TrimSpace(name),
+		Email:    strings.TrimSpace(email),
+		Password: password,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
 	}
 
-	// Check if user already exists
 	logger.Debug("checking if email already exists")
-	existingUser, err := s.repo.GetUserByEmail(ctx, email)
+	existingUser, err := s.repo.GetUserByEmail(ctx, normalizeEmail(email))
 	// NOTE: Logic is dependent on GetUserByEmail returning nil if user does not exist
 	//       If this returns an error instead, we need to handle it differently
 	//       This is a limitation of the current implementation
@@ -67,20 +64,18 @@ func (s *Service) RegisterUser(
 		)
 	}
 
-	// Hash password
 	logger.Debug("hashing password")
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPassword, err := hashPassword(password)
 	if err != nil {
-		return nil, errs.NewInternalError("failed to hash password", err, nil)
+		return nil, errs.NewExternalError("failed to hash password", err, nil)
 	}
 
-	// Create user
 	logger.Debug("creating user")
 	id := uuid.New().String()
 	user := &model.User{
 		ID:       id,
-		Name:     strings.TrimSpace(name),
-		Email:    strings.ToLower(strings.TrimSpace(email)),
+		Name:     req.Name,
+		Email:    req.Email,
 		Password: string(hashedPassword),
 	}
 
@@ -95,32 +90,6 @@ func (s *Service) RegisterUser(
 	return createdUser, nil
 }
 
-// validateUserInput validates the input parameters for user registration
-func (s *Service) validateUserInput(name, email, password string) error {
-	var validationErrors []string
-
-	if strings.TrimSpace(name) == "" {
-		validationErrors = append(validationErrors, "name is required")
-	}
-	if email == "" || !emailRegex.MatchString(email) {
-		validationErrors = append(validationErrors, "email is invalid")
-	}
-	if len(password) < 8 {
-		validationErrors = append(validationErrors, "password is too short")
-	}
-
-	if len(validationErrors) > 0 {
-		combinedErrors := strings.Join(validationErrors, "; ")
-		return errs.NewValidationError(combinedErrors, map[string]any{"email": email})
-	}
-	return nil
-}
-
-func checkPassword(inputPassword, storedHashedPassword string) error {
-	return bcrypt.CompareHashAndPassword([]byte(storedHashedPassword), []byte(inputPassword))
-}
-
-// LoginUser authenticates a user and returns auth token
 func (s *Service) LoginUser(
 	ctx context.Context,
 	email, password string,

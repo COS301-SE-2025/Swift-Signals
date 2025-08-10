@@ -24,3 +24,9 @@ type UserService interface {
 	MakeAdmin(ctx context.Context, userID, adminUserID string) error
 	RemoveAdmin(ctx context.Context, userID, adminUserID string) error
 }
+
+type RegisterUserRequest struct {
+	Name     string `validate:"required,min=2,max=100" json:"name"`
+	Email    string `validate:"required,email,max=255" json:"email"`
+	Password string `validate:"required,min=8,max=128" json:"password"`
+}
