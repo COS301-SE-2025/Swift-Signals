@@ -23,17 +23,9 @@ jobs:
         - name: Check Go version
           run: go version
 
-        - name: Install dependencies and tools
-          working-directory: ./user-service
-          run: make deps tools
-      
         - name: Generate Proto Files
           working-directory: ./user-service
           run: make proto
-        
-        - name: Generate Mockery Files
-          working-directory: ./user-service
-          run: make mocks
         
         - name: Run golangci-lint
           working-directory: ./user-service
