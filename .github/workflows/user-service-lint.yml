@@ -23,21 +23,18 @@ jobs:
         - name: Check Go version
           run: go version
 
+        - name: Install dependencies and tools
+          working-directory: ./user-service
+          run: make deps tools
+      
         - name: Generate Proto Files
-          working-directory: ./protos
-          run: |
-            make install-protoc
-            make generate
-
+          working-directory: ./user-service
+          run: make proto
+        
         - name: Generate Mockery Files
           working-directory: ./user-service
-          run: |
-            go install github.com/vektra/mockery/v2@latest
-            mockery
-
-        - name: golangci-lint
-          uses: golangci/golangci-lint-action@v8
-          with:
-            version: v2.40.1
-            working-directory: ./user-service
-            args: --go=local
+          run: make mocks
+        
+        - name: Run golangci-lint
+          working-directory: ./user-service
+          run: make lint

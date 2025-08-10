@@ -24,20 +24,18 @@ jobs:
       - name: Check Go version
         run: go version
 
+      - name: Install dependencies and tools
+        working-directory: ./user-service
+        run: make deps tools
+        
       - name: Generate Proto Files
-        working-directory: ./protos
-        run: |
-          make install-protoc
-          make generate
-
+        working-directory: ./user-service
+        run: make proto
+        
       - name: Generate Mockery Files
         working-directory: ./user-service
-        run: |
-          go install github.com/vektra/mockery/v2@latest
-          mockery
-
-      - name: Run unit tests in user-service
-        working-directory: ./user-service  
-        run: |
-          go mod tidy
-          go test -v ./internal/db/test ./internal/service/test ./internal/handler/test
+        run: make mocks
+        
+      - name: Run unit tests
+        working-directory: ./user-service
+        run: make test
