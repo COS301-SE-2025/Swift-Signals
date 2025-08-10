@@ -56,10 +56,16 @@ func (suite *TestSuite) TestRegisterUser_Invalid_Input() {
 	suite.True(ok)
 	suite.Equal(errs.ErrValidation, svcError.Code)
 
-	expectedMessage := "name is required; email is invalid; password is too short"
+	expectedMessage := "invalid input"
 	suite.Equal(expectedMessage, svcError.Message)
 
-	suite.Equal(map[string]any{"email": "noatsign"}, svcError.Context)
+	expectedErrors := map[string]string{
+		"email":    "Invalid email format",
+		"name":     "Name is required",
+		"password": "Password must be at least 8 characters long",
+	}
+
+	suite.Equal(map[string]any{"validation errors": expectedErrors}, svcError.Context)
 
 	suite.repo.AssertExpectations(suite.T())
 }
