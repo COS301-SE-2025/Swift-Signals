@@ -94,25 +94,43 @@ func (s *Service) LoginUser(
 	ctx context.Context,
 	email, password string,
 ) (string, time.Time, error) {
-	// TODO: Implement user login
-	// - Validate input parameters
+	logger := util.LoggerFromContext(ctx)
 
-	// Find user by email
+	logger.Debug("validating input")
+	req := LoginUserRequest{
+		Email:    strings.TrimSpace(email),
+		Password: password,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return "", time.Time{}, handleValidationError(err)
+	}
+
+	logger.Debug("checking if email already exists")
 	user, err := s.repo.GetUserByEmail(ctx, normalizeEmail(email))
 	if err != nil {
-		return "", time.Time{}, err
+		return "", time.Time{}, errs.NewInternalError(
+			"failed to check existing user",
+			err,
+			map[string]any{"email": email})
 	}
 	if user == nil {
-		return "", time.Time{}, errors.New("user does not exist")
+		return "", time.Time{}, errs.NewInternalError(
+			"user does not exist",
+			err,
+			map[string]any{"email": email},
+		)
 	}
 
-	// Verify password
+	logger.Debug("checking if password is correct")
 	err = checkPassword(password, user.Password)
 	if err != nil {
-		return "", time.Time{}, errors.New("invalid credentials")
+		return "", time.Time{}, errs.NewUnauthorizedError(
+			"password is incorrect",
+			map[string]any{"user": user.PublicUser()},
+		)
 	}
 
-	// Generate JWT token
+	logger.Debug("generating token")
 	role := "regular"
 	if user.IsAdmin {
 		role = "admin"
@@ -120,7 +138,11 @@ func (s *Service) LoginUser(
 	expiryDate := time.Now().Add(time.Hour * 72)
 	token, err := jwt.GenerateToken(user.ID, role, time.Hour*72)
 	if err != nil {
-		return "", time.Time{}, err
+		return "", time.Time{}, errs.NewInternalError(
+			"failed to generated token",
+			err,
+			map[string]any{"user": user.PublicUser()},
+		)
 	}
 
 	return token, expiryDate, nil
