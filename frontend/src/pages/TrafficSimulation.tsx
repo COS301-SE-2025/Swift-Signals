@@ -384,6 +384,24 @@ interface TrafficSimulationProps {
   isExpanded: boolean;
 }
 
+// Hook to detect mobile screen size
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth <= 767);
+    };
+
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
+  return isMobile;
+};
+
 const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpanded }) => {
   const [simulationData, setSimulationData] = useState<SimulationData | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -391,6 +409,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
   const [simulationTime, setSimulationTime] = useState(0);
   const [restartKey, setRestartKey] = useState(0);
   const [trafficLightStates, setTrafficLightStates] = useState<{ [key: string]: string }>({});
+  const isMobile = useIsMobile();
 
   const roadDirections: { [key: string]: string } = useMemo(() => ({
     in_n2_1: "North", in_n3_1: "South", in_n4_1: "West", in_n5_1: "East",
@@ -531,7 +550,8 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
     );
   }
 
-  const canvasContainerWidth = isExpanded ? '100%' : '50%';
+  const canvasContainerWidth = isExpanded ? '100%' : (isMobile ? '100%' : '50%');
+  const uiScale = isMobile ? 0.4 : (scale || 1);
 
   return (
     <div className="traffic-simulation-root" style={{ position: "relative", height: "100vh", backgroundColor: "#3d3d3d", border: "none", boxShadow: "none", }}>
@@ -539,7 +559,16 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
         <Canvas shadows>
           <ambientLight intensity={0.6} />
           <directionalLight castShadow position={[100, 100, 50]} intensity={1.5} shadow-mapSize-width={2048} shadow-mapSize-height={2048} />
-          <MapControls enablePan={false} enableRotate={false}/>
+          <MapControls 
+            enablePan={false} 
+            enableRotate={false}
+            enableZoom={!isMobile}
+            enableDamping={false}
+            touches={{ 
+              ONE: isMobile ? undefined : THREE.TOUCH.ROTATE,
+              TWO: isMobile ? undefined : THREE.TOUCH.DOLLY_PAN 
+            }}
+          />
           
           <OrthographicCamera
             makeDefault
@@ -574,7 +603,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
         avgSpeed={metrics.avgSpeed}
         progress={metrics.progress}
         totalSimTime={metrics.totalSimTime}
-        scale={scale}
+        scale={uiScale}
       />
     </div>
   );

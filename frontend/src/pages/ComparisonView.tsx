@@ -209,39 +209,109 @@ const ComparisonView: React.FC = () => {
 
   return (
     <>
-      <div style={containerStyle}>
+      <style>
+        {`
+            /* Mobile responsiveness - stack views vertically on screens smaller than 768px */
+            @media (max-width: 767px) {
+              body {
+                overflow-y: auto !important;
+                touch-action: pan-y !important;
+              }
+              
+              .comparison-container {
+                flex-direction: column !important;
+                height: 200vh !important; /* Double height to accommodate both views */
+                overflow-y: auto !important;
+              }
+            
+            .comparison-view {
+              height: 100vh !important; /* Each view takes full viewport height */
+              flex: 1 1 50% !important; /* Equal distribution */
+              width: 100% !important; /* Ensure full width */
+            }
+            
+            .comparison-divider {
+              width: 100% !important;
+              height: 2px !important;
+            }
+            
+            .comparison-label {
+              bottom: 60px !important; /* Move up to avoid overlap with controls */
+            }
+            
+            .comparison-exit-button {
+              position: fixed !important;
+              bottom: 20px !important;
+              left: 50% !important;
+              transform: translateX(-50%) !important;
+            }
+            
+            .comparison-button {
+              top: 10px !important;
+              font-size: 12px !important;
+              padding: 8px 12px !important;
+              min-width: 100px !important;
+            }
+            
+            /* Fix canvas container width on mobile */
+            .traffic-simulation-root > div:first-child {
+              width: 100% !important;
+            }
+            
+            /* Prevent zoom/pan interference with page scrolling on mobile */
+            .traffic-simulation-root canvas {
+              touch-action: pan-y !important;
+            }
+          }
+          
+          /* Tablet adjustments */
+          @media (max-width: 1024px) and (min-width: 768px) {
+            .comparison-button {
+              font-size: 12px !important;
+              padding: 10px 16px !important;
+              min-width: 120px !important;
+            }
+          }
+        `}
+      </style>
+      
+      <div style={containerStyle} className="comparison-container">
         <ExitButton />
 
         {/* Left side: Original Simulation */}
-        <div style={getDynamicStyles('left')}>
+        <div style={getDynamicStyles('left')} className="comparison-view">
           <TrafficSimulation
             dataUrl={originalDataUrl}
             scale={expanded === 'left' ? 1.0 : 0.65}
             isExpanded={expanded === 'left'}
           />
-          <div style={labelStyle}>Original Simulation</div>
-          <ModernButton 
-            side="left" 
-            onClick={toggleLeft}
-            position="right"
-          />
+          <div style={labelStyle} className="comparison-label">Original Simulation</div>
+          <div className="comparison-button">
+            <ModernButton 
+              side="left" 
+              onClick={toggleLeft}
+              position="right"
+            />
+          </div>
         </div>
 
-        <div style={{ ...dividerStyle, width: expanded === 'none' ? '2px' : '0px' }} />
+        <div style={{ ...dividerStyle, width: expanded === 'none' ? '2px' : '0px' }} className="comparison-divider" />
 
         {/* Right side: Optimized Simulation */}
-        <div style={getDynamicStyles('right')}>
+        <div style={getDynamicStyles('right')} className="comparison-view">
           <TrafficSimulation
             dataUrl={optimizedDataUrl}
             scale={expanded === 'right' ? 1.0 : 0.65}
             isExpanded={expanded === 'right'}
           />
-          <div style={labelStyle}>Optimized Simulation</div>
-          <ModernButton 
-            side="right" 
-            onClick={toggleRight}
-            position="right"
-          />
+          <div style={labelStyle} className="comparison-label">Optimized Simulation</div>
+          <div className="comparison-button">
+            <ModernButton 
+              side="right" 
+              onClick={toggleRight}
+              position="right"
+            />
+          </div>
         </div>
         
         <HelpMenu />
