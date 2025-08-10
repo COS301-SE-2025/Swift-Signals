@@ -36,6 +36,11 @@ type LoginUserRequest struct {
 	Password string `validate:"required,min=8"         json:"password"`
 }
 
+type UpdateUserRequest struct {
+	UserID string `validate:"required,uuid4"         json:"user_id"`
+	Name   string `validate:"required,min=2,max=100" json:"name"`
+	Email  string `validate:"required,email,max=255" json:"email"`
+}
 
 type GetUserByIDRequest struct {
 	UserID string `validate:"required,uuid4" json:"user_id"`

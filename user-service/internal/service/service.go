@@ -277,15 +277,87 @@ func (s *Service) GetAllUsers(
 	return users, nil
 }
 
-// UpdateUser updates user information
 func (s *Service) UpdateUser(ctx context.Context, userID, name, email string) (*model.User, error) {
-	// TODO: Implement user update
-	// - Validate input parameters
-	// - Check if user exists
-	// - Check if email is already taken by another user
-	// - Update user in database
-	// - Return updated user model
-	return nil, nil
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input parameters")
+	req := UpdateUserRequest{
+		UserID: strings.TrimSpace(userID),
+		Name:   strings.TrimSpace(name),
+		Email:  strings.TrimSpace(email),
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
+	}
+
+	logger.Debug("checking if user exists")
+	existingUser, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": req.UserID},
+		)
+	}
+
+	logger.Debug("checking if email is being changed")
+	normalizedEmail := normalizeEmail(req.Email)
+	if existingUser.Email != normalizedEmail {
+		logger.Debug("checking if new email is already taken")
+		userWithEmail, err := s.repo.GetUserByEmail(ctx, normalizedEmail)
+		if err != nil {
+			var svcErr *errs.ServiceError
+			if errors.As(err, &svcErr) {
+				return nil, err
+			}
+			return nil, errs.NewInternalError(
+				"failed to find user",
+				err,
+				map[string]any{"email": email},
+			)
+		}
+
+		if userWithEmail != nil && userWithEmail.ID != req.UserID {
+			return nil, errs.NewAlreadyExistsError(
+				"email already taken by another user",
+				map[string]any{"email": req.Email},
+			)
+		}
+	}
+
+	logger.Debug("updating user in database")
+	updatedUserData := &model.User{
+		ID:              existingUser.ID,
+		Name:            req.Name,
+		Email:           req.Email,
+		Password:        existingUser.Password,
+		IsAdmin:         existingUser.IsAdmin,
+		IntersectionIDs: existingUser.IntersectionIDs,
+		CreatedAt:       existingUser.CreatedAt,
+		UpdatedAt:       time.Now(),
+	}
+	updatedUser, err := s.repo.UpdateUser(ctx, updatedUserData)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to update user",
+			err,
+			map[string]any{
+				"userID": req.UserID,
+				"name":   req.Name,
+				"email":  req.Email,
+			},
+		)
+	}
+
+	return updatedUser, nil
 }
 
 // DeleteUser removes a user from the system
