@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
@@ -33,16 +34,27 @@ func NewIntersectionHandler(s service.IntersectionServiceInterface) *Intersectio
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections [get]
 func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http.Request) {
-	logger := util.LoggerFromContext(r.Context()).With(
+	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "intersection",
 		"action", "getAllIntersections",
 	)
 	logger.Info("processing getAllIntersections request")
 
-	// TODO: Implement User Verification
-	// ...
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		logger.Error("user ID missing inside of handler")
+		util.SendErrorResponse(
+			w,
+			errs.NewInternalError(
+				"user ID missing inside of handler",
+				nil,
+				map[string]any{},
+			),
+		)
+		return
+	}
 
-	resp, err := h.service.GetAllIntersections(r.Context())
+	resp, err := h.service.GetAllIntersections(r.Context(), userID)
 	if err != nil {
 		logger.Error("request failed",
 			"error", err.Error(),
@@ -68,18 +80,29 @@ func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections/{id} [get]
 func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Request) {
-	logger := util.LoggerFromContext(r.Context()).With(
+	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "intersection",
 		"action", "getIntersection",
 	)
 	logger.Info("processing getIntersection request")
 
-	id := r.PathValue("id")
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		logger.Error("user ID missing inside of handler")
+		util.SendErrorResponse(
+			w,
+			errs.NewInternalError(
+				"user ID missing inside of handler",
+				nil,
+				map[string]any{},
+			),
+		)
+		return
+	}
 
-	// TODO: Implement User Verification
-	// ...
+	intersectionID := r.PathValue("id")
 
-	resp, err := h.service.GetIntersectionByID(r.Context(), id)
+	resp, err := h.service.GetIntersectionByID(r.Context(), userID, intersectionID)
 	if err != nil {
 		logger.Error("request failed",
 			"error", err.Error(),
@@ -106,7 +129,7 @@ func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Req
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections [post]
 func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.Request) {
-	logger := util.LoggerFromContext(r.Context()).With(
+	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "intersection",
 		"action", "createIntersection",
 	)
@@ -136,10 +159,21 @@ func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.
 		return
 	}
 
-	// TODO: Implement User Verification
-	// ...
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		logger.Error("user ID missing inside of handler")
+		util.SendErrorResponse(
+			w,
+			errs.NewInternalError(
+				"user ID missing inside of handler",
+				nil,
+				map[string]any{},
+			),
+		)
+		return
+	}
 
-	resp, err := h.service.CreateIntersection(r.Context(), req)
+	resp, err := h.service.CreateIntersection(r.Context(), userID, req)
 	if err != nil {
 		logger.Error("request failed",
 			"error", err.Error(),
@@ -168,7 +202,7 @@ func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections/{id} [patch]
 func (h *IntersectionHandler) UpdateIntersection(w http.ResponseWriter, r *http.Request) {
-	logger := util.LoggerFromContext(r.Context()).With(
+	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "intersection",
 		"action", "updateIntersection",
 	)
@@ -198,12 +232,23 @@ func (h *IntersectionHandler) UpdateIntersection(w http.ResponseWriter, r *http.
 		return
 	}
 
-	// TODO: Implement User Verification
-	// ...
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		logger.Error("user ID missing inside of handler")
+		util.SendErrorResponse(
+			w,
+			errs.NewInternalError(
+				"user ID missing inside of handler",
+				nil,
+				map[string]any{},
+			),
+		)
+		return
+	}
 
-	id := r.PathValue("id")
+	intersectionID := r.PathValue("id")
 
-	resp, err := h.service.UpdateIntersectionByID(r.Context(), id, req)
+	resp, err := h.service.UpdateIntersectionByID(r.Context(), userID, intersectionID, req)
 	if err != nil {
 		logger.Error("request failed",
 			"error", err.Error(),
@@ -231,7 +276,7 @@ func (h *IntersectionHandler) UpdateIntersection(w http.ResponseWriter, r *http.
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /intersections/{id} [delete]
 func (h *IntersectionHandler) DeleteIntersection(w http.ResponseWriter, r *http.Request) {
-	logger := util.LoggerFromContext(r.Context()).With(
+	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "intersection",
 		"action", "deleteIntersection",
 	)
@@ -239,10 +284,23 @@ func (h *IntersectionHandler) DeleteIntersection(w http.ResponseWriter, r *http.
 
 	// TODO: Implement User Verification
 	// ...
+	userID, ok := middleware.GetUserID(r)
+	if !ok {
+		logger.Error("user ID missing inside of handler")
+		util.SendErrorResponse(
+			w,
+			errs.NewInternalError(
+				"user ID missing inside of handler",
+				nil,
+				map[string]any{},
+			),
+		)
+		return
+	}
 
-	id := r.PathValue("id")
+	intersectionID := r.PathValue("id")
 
-	err := h.service.DeleteIntersectionByID(r.Context(), id)
+	err := h.service.DeleteIntersectionByID(r.Context(), userID, intersectionID)
 	if err != nil {
 		logger.Error("request failed",
 			"error", err.Error(),
@@ -252,7 +310,7 @@ func (h *IntersectionHandler) DeleteIntersection(w http.ResponseWriter, r *http.
 	}
 
 	logger.Info("request successful",
-		"intersection_id", id,
+		"intersection_id", intersectionID,
 	)
 	w.WriteHeader(http.StatusNoContent)
 }
