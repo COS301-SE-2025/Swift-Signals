@@ -360,13 +360,51 @@ func (s *Service) UpdateUser(ctx context.Context, userID, name, email string) (*
 	return updatedUser, nil
 }
 
-// DeleteUser removes a user from the system
 func (s *Service) DeleteUser(ctx context.Context, userID string) error {
-	// TODO: Implement user deletion
-	// - Validate user ID
-	// - Check if user exists
-	// - Perform soft delete or hard delete based on business rules
-	// - Clean up related data if necessary
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input parameters")
+	req := DeleteUserRequest{
+		UserID: strings.TrimSpace(userID),
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+
+	logger.Debug("checking if user exists")
+	existingUser, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+
+	if existingUser.IsAdmin {
+		logger.Warn("deleting admin user")
+	}
+
+	logger.Debug("deleting user in database")
+	err = s.repo.DeleteUser(ctx, userID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to delete user",
+			err,
+			map[string]any{
+				"userID": req.UserID,
+			},
+		)
+	}
+
 	return nil
 }
 

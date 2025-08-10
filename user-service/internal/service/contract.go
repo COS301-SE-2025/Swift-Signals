@@ -56,6 +56,10 @@ type GetAllUsersRequest struct {
 	Filter   string `validate:"max=255"       json:"filter"`
 }
 
+type DeleteUserRequest struct {
+	UserID string `validate:"required,uuid4" json:"user_id"`
+}
+
 type LogoutUserRequest struct {
 	UserID string `validate:"required,uuid4" json:"user_id"`
 }
