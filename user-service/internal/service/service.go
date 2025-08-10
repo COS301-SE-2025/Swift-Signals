@@ -408,26 +408,45 @@ func (s *Service) DeleteUser(ctx context.Context, userID string) error {
 	return nil
 }
 
-// GetUserIntersectionIDs retrieves all intersection IDs for a user
 func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]string, error) {
-	// TODO: Validate user ID
+	logger := util.LoggerFromContext(ctx)
 
-	// Check if user exists
-	user, err := s.repo.GetUserByID(ctx, userID)
+	logger.Debug("validating input")
+	req := GetUserIntersectionIDsRequest{
+		UserID: userID,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
+	}
+
+	logger.Debug("getting user")
+	_, err := s.repo.GetUserByID(ctx, userID)
 	if err != nil {
-		return nil, err
-	}
-	if user == nil {
-		return nil, errors.New("user not found")
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
 	}
 
-	// Query database for user's intersection IDs
+	logger.Debug("getting user's intersection IDs")
 	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, userID)
 	if err != nil {
-		return nil, err
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to fetch user's intersection IDs",
+			err,
+			map[string]any{"userID": userID},
+		)
 	}
 
-	// - Return slice of intersection IDs
 	return intIDs, nil
 }
 
