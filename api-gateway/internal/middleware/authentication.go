@@ -62,12 +62,16 @@ func AuthMiddleware(secret string, paths ...string) Middleware {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), userIDKey, userID)
+			ctx := SetUserID(r.Context(), userID)
 			r = r.WithContext(ctx)
 
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+func SetUserID(ctx context.Context, userID string) context.Context {
+	return context.WithValue(ctx, userIDKey, userID)
 }
 
 type PathSet map[string]struct{}
