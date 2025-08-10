@@ -92,3 +92,8 @@ type MakeAdminRequest struct {
 	UserID      string `validate:"required,uuid4" json:"user_id"`
 	AdminUserID string `validate:"required,uuid4" json:"admin_user_id"`
 }
+
+type RemoveAdminRequest struct {
+	UserID      string `validate:"required,uuid4" json:"user_id"`
+	AdminUserID string `validate:"required,uuid4" json:"admin_user_id"`
+}
