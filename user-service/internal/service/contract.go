@@ -36,6 +36,12 @@ type LoginUserRequest struct {
 	Password string `validate:"required,min=8"         json:"password"`
 }
 
+
+type GetUserByIDRequest struct {
+	UserID string `validate:"required,uuid4" json:"user_id"`
+}
+
 type LogoutUserRequest struct {
 	UserID string `validate:"required,uuid4" json:"user_id"`
 }
+

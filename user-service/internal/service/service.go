@@ -172,17 +172,31 @@ func (s *Service) LogoutUser(ctx context.Context, userID string) error {
 	return nil
 }
 
-// GetUserByID retrieves a user by their ID
 func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.User, error) {
-	// TODO: Validate user ID
+	logger := util.LoggerFromContext(ctx)
 
-	// Query database for user
-	user, err := s.repo.GetUserByID(ctx, userID)
-	if err != nil {
-		return nil, err
+	logger.Debug("validating input")
+	req := GetUserByIDRequest{
+		UserID: userID,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
 	}
 
-	// Return user model or not found error
+	logger.Debug("query database for user")
+	user, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+
 	return user, nil
 }
 
