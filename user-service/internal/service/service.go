@@ -232,18 +232,49 @@ func (s *Service) GetUserByEmail(ctx context.Context, email string) (*model.User
 	return user, nil
 }
 
-// GetAllUsers retrieves all users with pagination and filtering
 func (s *Service) GetAllUsers(
 	ctx context.Context,
 	page, pageSize int32,
 	filter string,
 ) ([]*model.User, error) {
-	// TODO: Implement get all users
-	// - Validate pagination parameters
-	// - Apply filters if provided
-	// - Query database with pagination
-	// - Return slice of user model
-	return nil, nil
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating pagination parameters")
+	req := GetAllUsersRequest{
+		Page:     page,
+		PageSize: pageSize,
+		Filter:   filter,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
+	}
+
+	logger.Debug("preparing filter parameters")
+	normalizedFilter := strings.TrimSpace(filter)
+	offset := (page - 1) * pageSize
+	limit := pageSize
+
+	logger.Debug("querying database with pagination",
+		"page", page,
+		"pageSize", pageSize,
+		"offset", offset,
+		"filter", normalizedFilter,
+	)
+	// NOTE: ListUsers does not support filtering at the moment
+	users, err := s.repo.ListUsers(ctx, int(limit), int(offset))
+	if err != nil {
+		return nil, errs.NewInternalError(
+			"failed to retrieve users",
+			err,
+			map[string]any{
+				"page":     page,
+				"pageSize": pageSize,
+				"filter":   normalizedFilter,
+			},
+		)
+	}
+
+	return users, nil
 }
 
 // UpdateUser updates user information

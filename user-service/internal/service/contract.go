@@ -45,6 +45,12 @@ type GetUserByEmailRequest struct {
 	Email string `validate:"required,email,max=255" json:"email"`
 }
 
+type GetAllUsersRequest struct {
+	Page     int32  `validate:"min=1"         json:"page"`
+	PageSize int32  `validate:"min=1,max=100" json:"page_size"`
+	Filter   string `validate:"max=255"       json:"filter"`
+}
+
 type LogoutUserRequest struct {
 	UserID string `validate:"required,uuid4" json:"user_id"`
 }
