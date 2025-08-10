@@ -25,9 +25,9 @@ func (suite *TestSuite) TestGetUserIntersectionIDs_Success() {
 	}
 
 	ctx := context.Background()
-	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[*userpb.IntersectionIDResponse](
-		suite.T(),
-	)
+	constructor := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[*userpb.IntersectionIDResponse]
+	mockStream := constructor(suite.T())
+
 	mockStream.On("Context").Return(ctx)
 
 	suite.service.On("GetUserIntersectionIDs", ctx, req.UserId).
@@ -55,9 +55,10 @@ func (suite *TestSuite) TestGetUserIntersectionIDs_ServiceFailure() {
 	}
 
 	ctx := context.Background()
-	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[*userpb.IntersectionIDResponse](
-		suite.T(),
-	)
+
+	constructor := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[*userpb.IntersectionIDResponse]
+	mockStream := constructor(suite.T())
+
 	mockStream.On("Context").Return(ctx)
 
 	suite.service.On("GetUserIntersectionIDs", ctx, req.UserId).
@@ -83,9 +84,10 @@ func (suite *TestSuite) TestGetUserIntersectionIDs_StreamSendFailure() {
 	expectedIntersectionIDs := []string{"intersection1"}
 
 	ctx := context.Background()
-	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[*userpb.IntersectionIDResponse](
-		suite.T(),
-	)
+
+	constructor := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[*userpb.IntersectionIDResponse]
+	mockStream := constructor(suite.T())
+
 	mockStream.On("Context").Return(ctx)
 
 	suite.service.On("GetUserIntersectionIDs", ctx, req.UserId).
@@ -113,9 +115,10 @@ func (suite *TestSuite) TestGetUserIntersectionIDs_EmptyList() {
 	expectedIntersectionIDs := []string{}
 
 	ctx := context.Background()
-	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[*userpb.IntersectionIDResponse](
-		suite.T(),
-	)
+
+	constructor := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[*userpb.IntersectionIDResponse]
+	mockStream := constructor(suite.T())
+
 	mockStream.On("Context").Return(ctx)
 
 	suite.service.On("GetUserIntersectionIDs", ctx, req.UserId).
