@@ -87,3 +87,8 @@ type RemoveIntersectionIDsRequest struct {
 	UserID          string   `validate:"required,uuid4"                             json:"user_id"`
 	IntersectionIDs []string `validate:"required,min=1,dive,required,min=1,max=100" json:"intersection_ids"`
 }
+
+type MakeAdminRequest struct {
+	UserID      string `validate:"required,uuid4" json:"user_id"`
+	AdminUserID string `validate:"required,uuid4" json:"admin_user_id"`
+}

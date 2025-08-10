@@ -700,14 +700,83 @@ func (s *Service) ResetPassword(ctx context.Context, email string) error {
 	return nil
 }
 
-// MakeAdmin grants admin privileges to a user
 func (s *Service) MakeAdmin(ctx context.Context, userID, adminUserID string) error {
-	// TODO: Implement make admin
-	// - Validate user IDs
-	// - Check if admin user has permission to grant admin rights
-	// - Check if target user exists
-	// - Update user's admin status in database
-	// - Log admin privilege change
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input parameters")
+	req := MakeAdminRequest{
+		UserID:      strings.TrimSpace(userID),
+		AdminUserID: strings.TrimSpace(adminUserID),
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+	logger.Debug("fetching admin user")
+	adminUser, err := s.repo.GetUserByID(ctx, req.AdminUserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to find admin user",
+			err,
+			map[string]any{"adminUserID": req.AdminUserID},
+		)
+	}
+
+	logger.Debug("verifying admin user has admin privileges")
+	if !adminUser.IsAdmin {
+		return errs.NewForbiddenError(
+			"admin user does not have admin privileges",
+			map[string]any{"adminUserID": adminUserID},
+		)
+	}
+
+	logger.Debug("fetching user to make admin")
+	existingUser, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userId": req.UserID},
+		)
+	}
+	if existingUser.IsAdmin {
+		logger.Warn("user is already an admin")
+		return nil
+	}
+
+	logger.Debug("giving user admin privileges")
+	updatedUserData := &model.User{
+		ID:              existingUser.ID,
+		Name:            existingUser.Name,
+		Email:           existingUser.Email,
+		Password:        existingUser.Password,
+		IsAdmin:         true,
+		IntersectionIDs: existingUser.IntersectionIDs,
+		CreatedAt:       existingUser.CreatedAt,
+		UpdatedAt:       time.Now(),
+	}
+	_, err = s.repo.UpdateUser(ctx, updatedUserData)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to update user",
+			err,
+			map[string]any{
+				"userID": req.UserID,
+			},
+		)
+	}
+
 	return nil
 }
 
