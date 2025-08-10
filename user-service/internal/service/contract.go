@@ -72,3 +72,8 @@ type AddIntersectionIDRequest struct {
 	UserID         string `validate:"required,uuid4"         json:"user_id"`
 	IntersectionID string `validate:"required,min=1,max=100" json:"intersection_id"`
 }
+
+type RemoveIntersectionIDsRequest struct {
+	UserID          string   `validate:"required,uuid4"                             json:"user_id"`
+	IntersectionIDs []string `validate:"required,min=1,dive,required,min=1,max=100" json:"intersection_ids"`
+}

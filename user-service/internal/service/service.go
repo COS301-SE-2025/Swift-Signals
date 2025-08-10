@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"maps"
 	"slices"
 	"strings"
 	"time"
@@ -516,17 +517,107 @@ func (s *Service) AddIntersectionID(
 	return nil
 }
 
-// RemoveIntersectionID removes an intersection ID from a user's list
 func (s *Service) RemoveIntersectionIDs(
 	ctx context.Context,
 	userID string,
 	intersectionID []string,
 ) error {
-	// TODO: Implement remove intersection ID
-	// - Validate user ID and intersection ID
-	// - Check if user exists
-	// - Remove intersection ID from user's list
-	// - Update database
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input parameters")
+	req := RemoveIntersectionIDsRequest{
+		UserID:          strings.TrimSpace(userID),
+		IntersectionIDs: intersectionID,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+
+	logger.Debug("checking if user exists")
+	existingUser, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+
+	logger.Debug("fetching current intersections")
+	currentIntersectionIDs, err := s.repo.GetIntersectionsByUserID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to fetch current intersections",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+
+	logger.Debug("removing requested intersection ids")
+	currentSet := make(map[string]struct{}, len(currentIntersectionIDs))
+	for _, id := range currentIntersectionIDs {
+		currentSet[id] = struct{}{}
+	}
+	invalidSet := make(map[string]struct{})
+	for _, id := range req.IntersectionIDs {
+		if _, exists := currentSet[id]; !exists {
+			invalidSet[id] = struct{}{}
+		}
+	}
+	if len(invalidSet) > 0 {
+		logger.Warn(
+			"attempting to remove intersection IDs that are not in the current user's list",
+			"invalidIDs", maps.Keys(invalidSet),
+		)
+	}
+	requestedSet := make(map[string]struct{}, len(req.IntersectionIDs))
+	for _, id := range req.IntersectionIDs {
+		if _, isInvalid := invalidSet[id]; isInvalid {
+			continue
+		}
+		requestedSet[id] = struct{}{}
+	}
+	var updatedIntersections []string
+	for _, id := range currentIntersectionIDs {
+		if _, remove := requestedSet[id]; !remove {
+			updatedIntersections = append(updatedIntersections, id)
+		}
+	}
+
+	logger.Debug("updating user in database")
+	updatedUser := &model.User{
+		ID:              existingUser.ID,
+		Name:            existingUser.Name,
+		Email:           existingUser.Email,
+		Password:        existingUser.Password,
+		IsAdmin:         existingUser.IsAdmin,
+		IntersectionIDs: updatedIntersections,
+		CreatedAt:       existingUser.CreatedAt,
+		UpdatedAt:       time.Now(),
+	}
+	_, err = s.repo.UpdateUser(ctx, updatedUser)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to update user",
+			err,
+			map[string]any{
+				"userID": req.UserID,
+			},
+		)
+	}
+
 	return nil
 }
 
