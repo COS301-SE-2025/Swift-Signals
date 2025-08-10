@@ -41,6 +41,10 @@ type GetUserByIDRequest struct {
 	UserID string `validate:"required,uuid4" json:"user_id"`
 }
 
+type GetUserByEmailRequest struct {
+	Email string `validate:"required,email,max=255" json:"email"`
+}
+
 type LogoutUserRequest struct {
 	UserID string `validate:"required,uuid4" json:"user_id"`
 }

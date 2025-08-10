@@ -200,13 +200,36 @@ func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.User, 
 	return user, nil
 }
 
-// GetUserByEmail retrieves a user by their email address
 func (s *Service) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
-	// TODO: Implement get user by email
-	// - Validate email format
-	// - Query database for user by email
-	// - Return user model or not found error
-	return nil, nil
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input")
+	req := GetUserByEmailRequest{
+		Email: email,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
+	}
+
+	logger.Debug("query database for user")
+	user, err := s.repo.GetUserByEmail(ctx, normalizeEmail(email))
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"email": email},
+		)
+	}
+
+	if user == nil {
+		return nil, nil
+	}
+
+	return user, nil
 }
 
 // GetAllUsers retrieves all users with pagination and filtering
