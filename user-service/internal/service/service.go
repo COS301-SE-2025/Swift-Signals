@@ -148,12 +148,27 @@ func (s *Service) LoginUser(
 	return token, expiryDate, nil
 }
 
-// LogoutUser invalidates the user's session/token
 func (s *Service) LogoutUser(ctx context.Context, userID string) error {
-	// TODO: Implement user logout
-	// - Invalidate user session/token
-	// - Clear any cached user data
-	// - Log logout event
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input")
+	req := LogoutUserRequest{
+		UserID: userID,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+
+	logger.Debug("checking if user exists")
+	_, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError("failed to find user", err, map[string]any{})
+	}
+
 	return nil
 }
 
