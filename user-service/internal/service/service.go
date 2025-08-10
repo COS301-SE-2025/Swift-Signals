@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"slices"
 	"strings"
 	"time"
 
@@ -450,38 +451,66 @@ func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]
 	return intIDs, nil
 }
 
-// AddIntersectionID adds an intersection ID to a user's list
 func (s *Service) AddIntersectionID(
 	ctx context.Context,
 	userID string,
 	intersectionID string,
 ) error {
-	// TODO: Validate user ID and intersection ID
+	logger := util.LoggerFromContext(ctx)
 
-	// Check if user exists
-	user, err := s.repo.GetUserByID(ctx, userID)
-	if err != nil {
-		return err
+	logger.Debug("validating input")
+	req := AddIntersectionIDRequest{
+		UserID:         strings.TrimSpace(userID),
+		IntersectionID: strings.TrimSpace(intersectionID),
 	}
-	if user == nil {
-		return errors.New("user not found")
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
 	}
 
-	// Check if intersection ID already exists for user
-	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, userID)
+	logger.Debug("getting user")
+	_, err := s.repo.GetUserByID(ctx, req.UserID)
 	if err != nil {
-		return err
-	}
-	for _, intID := range intIDs {
-		if intID == intersectionID {
-			return errors.New("intersection already exists")
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
 		}
+		return errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
 	}
 
-	// Add intersection ID to user's list
-	err = s.repo.AddIntersectionID(ctx, userID, intersectionID)
+	logger.Debug("checking if intersection ID already exists")
+	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, req.UserID)
 	if err != nil {
-		return err
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to check existing intersection IDs",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+	if slices.Contains(intIDs, req.IntersectionID) {
+		logger.Warn("intersection ID already exists in user's list")
+		return nil
+	}
+
+	logger.Debug("Add intersection ID to user's list")
+	err = s.repo.AddIntersectionID(ctx, userID, req.IntersectionID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to add intersection ID",
+			err,
+			map[string]any{"userID": userID},
+		)
 	}
 
 	return nil

@@ -67,3 +67,8 @@ type LogoutUserRequest struct {
 type GetUserIntersectionIDsRequest struct {
 	UserID string `validate:"required,uuid4" json:"user_id"`
 }
+
+type AddIntersectionIDRequest struct {
+	UserID         string `validate:"required,uuid4"         json:"user_id"`
+	IntersectionID string `validate:"required,min=1,max=100" json:"intersection_id"`
+}
