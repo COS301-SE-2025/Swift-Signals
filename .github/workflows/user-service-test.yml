@@ -21,6 +21,9 @@ jobs:
           go-version: '1.24.x'  
           cache: true
 
+      - name: Check Go version
+        run: go version
+
       - name: Generate Proto Files
         working-directory: ./protos
         run: |
