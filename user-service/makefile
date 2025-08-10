@@ -12,8 +12,8 @@ deps:
 
 tools:
 	@echo "Installing tools..."
-	go get github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
-	go get github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
+	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
 
 proto:
 	@echo "Generating proto files..."
@@ -26,12 +26,12 @@ mocks: tools
 	rm -rf internal/mocks
 	mkdir -p internal/mocks/{db,service,grpc}
 	@echo "Generating mocks..."
-	go run github.com/vektra/mockery/v2@$(MOCKERY_VERSION) --version
-	go run github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
+	mockery --version
+	mockery
 
-lint: tools mocks
+lint: tools
 	@echo "Running golangci-lint $(GOLANGCI_LINT_VERSION)..."
-	go run github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION) run
+	golangci-lint run
 
 test: mocks
 	@echo "Running tests..."
@@ -50,3 +50,4 @@ clean:
 build:
 	@echo "Building..."
 	go build -o bin/user-service ./cmd/
+
