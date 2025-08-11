@@ -39,7 +39,10 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onDelete }) => {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id} className="border-b hover:bg-gray-50 dark:border-[#30363D]">
+            <tr
+              key={user.id}
+              className="border-b hover:bg-gray-50 dark:border-[#30363D]"
+            >
               <td className="px-4 py-3 text-black text-center">{user.id}</td>
               <td className="px-4 py-3 text-black">{user.name}</td>
               <td className="px-4 py-3 text-black">{user.email}</td>

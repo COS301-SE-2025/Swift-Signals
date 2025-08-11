@@ -34,7 +34,7 @@ body {
 }
 
 .dark .sim-main-content {
-  background-color: #0D1117;
+  background-color: #0d1117;
 }
 
 .table-fixed-height {
@@ -47,13 +47,13 @@ body {
 
 .viewBtn {
   border-radius: 50px;
-  background-color: #0F5BA7;
+  background-color: #0f5ba7;
   color: #ffffff;
   width: 50px;
 }
 
 .dark .viewBtn {
-  background-color: #388BFD;
+  background-color: #388bfd;
   color: #ffffff;
 }
 
@@ -65,7 +65,7 @@ body {
 }
 
 .dark .deleteBtn {
-  background-color: #DA3633;
+  background-color: #da3633;
   color: #ffffff;
 }
 
@@ -101,7 +101,7 @@ body {
 }
 
 .dark .intersection-pill {
-  background-color: #388BFD;
+  background-color: #388bfd;
   color: #ffffff;
 }
 
@@ -112,7 +112,7 @@ body {
   cursor: pointer;
   font-size: 0.75rem;
   line-height: 1;
-  color: #0F5BA7;
+  color: #0f5ba7;
   padding: 0;
 }
 
@@ -193,7 +193,7 @@ body {
   }
 
   /* Modal adjustments */
-  .fixed.inset-0>div {
+  .fixed.inset-0 > div {
     max-width: 400px;
     max-height: 90vh;
     overflow-y: auto;
@@ -267,7 +267,7 @@ body {
     padding: 12px;
   }
 
-  .fixed.inset-0>div {
+  .fixed.inset-0 > div {
     max-width: 360px;
     max-height: 85vh;
     overflow-y: auto;
@@ -318,7 +318,7 @@ body {
     padding-right: 6px;
   }
 
-  .simGrid>div>div.flex {
+  .simGrid > div > div.flex {
     flex-direction: row;
     gap: 8px;
     flex-wrap: wrap;
@@ -570,7 +570,7 @@ body {
     padding-right: 8px;
   }
 
-  .simGrid>div>div.flex {
+  .simGrid > div > div.flex {
     flex-direction: column;
     gap: 10px;
     align-items: stretch;
@@ -607,7 +607,6 @@ body {
     justify-content: center;
     margin: 2px auto;
   }
-
 }
 
 @media screen and (max-width: 430px) and (min-width: 415px) {
@@ -680,7 +679,6 @@ body {
 
 /* Pixel 7 and similar Android devices (412px) */
 @media screen and (max-width: 412px) and (min-width: 390px) {
-
   .simTableHead th:nth-child(1),
   .simTable tbody td:nth-child(1) {
     width: 55px;
@@ -845,7 +843,7 @@ body {
     padding: 4px;
   }
 
-  .fixed.inset-0>div {
+  .fixed.inset-0 > div {
     max-width: 400px;
     max-height: 90vh;
     overflow-y: auto;
@@ -936,7 +934,7 @@ body {
     padding: 12px;
   }
 
-  .fixed.inset-0>div {
+  .fixed.inset-0 > div {
     max-width: 360px;
     max-height: 85vh;
     overflow-y: auto;
@@ -987,7 +985,7 @@ body {
     padding-right: 6px;
   }
 
-  .simGrid>div>div.flex {
+  .simGrid > div > div.flex {
     flex-direction: row;
     gap: 8px;
     flex-wrap: wrap;

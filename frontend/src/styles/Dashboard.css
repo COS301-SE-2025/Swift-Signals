@@ -33,7 +33,7 @@ body:has(.dashboard-screen) {
 }
 
 .dark .main-content {
-  background-color: #0D1117;
+  background-color: #0d1117;
 }
 
 .Dashboard-h1 {
@@ -68,7 +68,7 @@ body:has(.dashboard-screen) {
 }
 
 .dark .card {
-  background-color: #161B22;
+  background-color: #161b22;
   /* color: #E6EDF3; */
 }
 
@@ -84,30 +84,30 @@ body:has(.dashboard-screen) {
 }
 
 .card-icon-1 {
-  color: #0F5BA7;
+  color: #0f5ba7;
   background-color: #d4e9f9;
 }
 
 .dark .card-icon-1 {
-  color: #58A6FF;
+  color: #58a6ff;
   background-color: rgba(88, 166, 255, 0.2);
 }
 
 .card-icon-2 {
-  color: #0F5BA7;
+  color: #0f5ba7;
   background-color: #d4e9f9;
 }
 .dark .card-icon-2 {
-  color: #58A6FF;
+  color: #58a6ff;
   background-color: rgba(88, 166, 255, 0.2);
 }
 
 .card-icon-3 {
-  color: #0F5BA7;
+  color: #0f5ba7;
   background-color: #d4e9f9;
 }
 .dark .card-icon-3 {
-  color: #58A6FF;
+  color: #58a6ff;
   background-color: rgba(88, 166, 255, 0.2);
 }
 
@@ -124,7 +124,7 @@ body:has(.dashboard-screen) {
 }
 
 .dark .card-h3 {
-  color: #8B949E;
+  color: #8b949e;
 }
 
 .card-p {
@@ -135,7 +135,7 @@ body:has(.dashboard-screen) {
 }
 
 .dark .card-p {
-  color: #E6EDF3;
+  color: #e6edf3;
 }
 
 .dashboard-main-grid {
@@ -181,7 +181,7 @@ body:has(.dashboard-screen) {
 }
 
 .dark .recent-simulations-tab {
-  background-color: #161B22;
+  background-color: #161b22;
 }
 
 .recent-simulations-tab h2 {
@@ -204,11 +204,11 @@ body:has(.dashboard-screen) {
 }
 
 .dark .recent-simulations-tab td {
-  color: #F0F6FC !important;
+  color: #f0f6fc !important;
 }
 
 .dark .recent-simulations-tab th {
-  color: #C9D1D9 !important;
+  color: #c9d1d9 !important;
 }
 
 .status {
@@ -240,7 +240,7 @@ body:has(.dashboard-screen) {
 }
 .dark .graph-card,
 .dark .inter-card {
-  background-color: #161B22;
+  background-color: #161b22;
 }
 
 .graph-card-header {
@@ -254,7 +254,7 @@ body:has(.dashboard-screen) {
 .view-report-button {
   background: none;
   border: none;
-  color: #0F5BA7;
+  color: #0f5ba7;
   font-weight: 500;
   font-size: 0.9em;
   cursor: pointer;
@@ -265,15 +265,15 @@ body:has(.dashboard-screen) {
 }
 
 .view-report-button:hover {
-  color: #0F5BA7;
+  color: #0f5ba7;
 }
 
 .dark .view-report-button {
-  color: #388BFD;
+  color: #388bfd;
 }
 
 .dark .view-report-button:hover {
-  color: #388BFD;
+  color: #388bfd;
 }
 
 .traffic-chart-container {
@@ -311,7 +311,7 @@ body:has(.dashboard-screen) {
   font-weight: 500;
 }
 .dark .intersection-name {
-  color: #F0F6FC;
+  color: #f0f6fc;
 }
 
 .intersection-volume {
@@ -319,7 +319,7 @@ body:has(.dashboard-screen) {
   font-size: 0.9em;
 }
 .dark .intersection-volume {
-  color: #C9D1D9;
+  color: #c9d1d9;
 }
 
 .progress-bar-container {
@@ -330,13 +330,13 @@ body:has(.dashboard-screen) {
   overflow: hidden;
 }
 .dark .progress-bar-container {
-  background-color: #0D1117;
+  background-color: #0d1117;
 }
 
 .progress-bar {
   height: 100%;
   border-radius: 4px;
-  background: linear-gradient(90deg, #3DAEF0, #0F5BA7);
+  background: linear-gradient(90deg, #3daef0, #0f5ba7);
   transition: width 0.5s ease-in-out;
 }
 
@@ -347,11 +347,11 @@ body:has(.dashboard-screen) {
   display: flex;
   justify-content: space-between;
   color: #4b5563;
-  font-size: 1.0em;
+  font-size: 1em;
 }
 .dark .inter-card-footer {
   border-top-color: #374151;
-  color: #E6EDF3;
+  color: #e6edf3;
 }
 
 canvas {

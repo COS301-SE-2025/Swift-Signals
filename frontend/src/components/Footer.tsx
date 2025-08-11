@@ -7,11 +7,7 @@ const Footer: React.FC = () => {
       <div className="container mx-auto flex items-center justify-between px-4">
         {/* Logo Section */}
         <div className="footer-logo flex items-center">
-          <img
-            src="/src/assets/scs-logo.png"
-            alt="Logo"
-            className="h-6 mr-2"
-          />
+          <img src="/src/assets/scs-logo.png" alt="Logo" className="h-6 mr-2" />
           <span className="footerText text-sm font-medium">
             A Southern Cross Solutions Product
           </span>

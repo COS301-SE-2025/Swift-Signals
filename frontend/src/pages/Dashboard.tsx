@@ -196,7 +196,7 @@ const Dashboard: React.FC = () => {
             latitude: intr.details.latitude ?? -25.7479 + 0.01 * idx,
             longitude: intr.details.longitude ?? 28.2293 + 0.01 * idx,
           },
-        })
+        }),
       );
       setMapIntersections(intersectionsWithCoords);
     } catch (err: unknown) {

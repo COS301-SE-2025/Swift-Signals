@@ -37,7 +37,7 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
 
   useEffect(() => {
     const checkDarkMode = () => {
-      setIsDark(document.documentElement.classList.contains('dark'));
+      setIsDark(document.documentElement.classList.contains("dark"));
     };
 
     checkDarkMode();
@@ -45,7 +45,7 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
     const observer = new MutationObserver(checkDarkMode);
     observer.observe(document.documentElement, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ["class"],
     });
 
     return () => observer.disconnect();
@@ -62,7 +62,7 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
     if (!currentStep?.autoAdvance) return;
 
     let timeoutId: NodeJS.Timeout;
-    
+
     const checkForAdvance = () => {
       if (currentStep.waitFor) {
         const element = document.querySelector(currentStep.waitFor);
@@ -207,8 +207,12 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
   if (!currentStep) return null;
 
   const overlayColor = isDark ? "rgba(0, 0, 0, 0.85)" : "rgba(0, 0, 0, 0.65)";
-  const glowColor = isDark ? "rgba(56, 139, 253, 0.9)" : "rgba(78, 140, 255, 0.6)";
-  const glowBorderColor = isDark ? "rgba(147, 197, 253, 0.6)" : "rgba(255, 255, 255, 0.3)";
+  const glowColor = isDark
+    ? "rgba(56, 139, 253, 0.9)"
+    : "rgba(78, 140, 255, 0.6)";
+  const glowBorderColor = isDark
+    ? "rgba(147, 197, 253, 0.6)"
+    : "rgba(255, 255, 255, 0.3)";
 
   return (
     <div className="fixed inset-0 z-[10000]">
@@ -228,11 +232,11 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
             )}
           </mask>
         </defs>
-        <rect 
-          x="0" 
-          y="0" 
-          width="100%" 
-          height="100%" 
+        <rect
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
           fill={overlayColor}
           mask="url(#tutorial-mask)"
           className="pointer-events-auto"
@@ -240,99 +244,110 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
       </svg>
 
       {position && !position.isError && highlightRect && (
-        <div 
+        <div
           className="absolute pointer-events-none transition-all duration-400 ease-out"
           style={{
             ...position.highlight,
-            boxShadow: isDark 
+            boxShadow: isDark
               ? `0 0 0 6px ${glowBorderColor}, 0 0 32px 12px ${glowColor}, inset 0 0 20px 4px rgba(56, 139, 253, 0.2)`
               : `0 0 0 4px ${glowBorderColor}, 0 0 24px 8px ${glowColor}`,
-            borderRadius: '8px',
+            borderRadius: "8px",
           }}
         />
       )}
 
       {position && (
-        <div 
+        <div
           className={`absolute rounded-lg p-6 shadow-lg transition-all duration-400 ease-out border ${
-            isDark 
-              ? 'bg-gray-800 text-gray-100 border-gray-700' 
-              : 'bg-white text-gray-800 border-gray-200'
+            isDark
+              ? "bg-gray-800 text-gray-100 border-gray-700"
+              : "bg-white text-gray-800 border-gray-200"
           }`}
           style={{
             ...position.popover,
-            width: '320px',
-            maxWidth: 'calc(100vw - 40px)',
+            width: "320px",
+            maxWidth: "calc(100vw - 40px)",
             zIndex: 10002,
           }}
         >
           {position.isError ? (
             <>
-              <h4 className={`text-xl font-semibold mb-3 ${
-                isDark ? 'text-blue-400' : 'text-blue-600'
-              }`}>
+              <h4
+                className={`text-xl font-semibold mb-3 ${
+                  isDark ? "text-blue-400" : "text-blue-600"
+                }`}
+              >
                 Element Not Found
               </h4>
               <p className="text-sm leading-relaxed mb-6">
                 Could not find the element for this step.
                 <br />
-                Required selector: <code className={`px-2 py-1 rounded font-mono text-xs ${
-                  isDark 
-                    ? 'bg-gray-700 text-red-400' 
-                    : 'bg-gray-100 text-red-600'
-                }`}>
+                Required selector:{" "}
+                <code
+                  className={`px-2 py-1 rounded font-mono text-xs ${
+                    isDark
+                      ? "bg-gray-700 text-red-400"
+                      : "bg-gray-100 text-red-600"
+                  }`}
+                >
                   {currentStep.selector}
                 </code>
               </p>
             </>
           ) : (
             <>
-              <h4 className={`text-xl font-semibold mb-3 ${
-                isDark ? 'text-blue-400' : 'text-blue-600'
-              }`}>
+              <h4
+                className={`text-xl font-semibold mb-3 ${
+                  isDark ? "text-blue-400" : "text-blue-600"
+                }`}
+              >
                 {currentStep.title}
               </h4>
               <p className="text-sm leading-relaxed mb-6">{currentStep.text}</p>
             </>
           )}
-          <div className={`flex justify-between items-center border-t pt-4 mt-4 ${
-            isDark ? 'border-gray-700' : 'border-gray-200'
-          }`}>
-            <span className={`text-sm ${
-              isDark ? 'text-gray-400' : 'text-gray-600'
-            }`}>
+          <div
+            className={`flex justify-between items-center border-t pt-4 mt-4 ${
+              isDark ? "border-gray-700" : "border-gray-200"
+            }`}
+          >
+            <span
+              className={`text-sm ${
+                isDark ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
               {stepIndex + 1} / {steps.length}
             </span>
             <div className="flex gap-2">
               {stepIndex > 0 && (
-                <button 
+                <button
                   onClick={handlePrev}
                   className={`px-4 py-2 rounded-md font-medium transition-colors ${
                     isDark
-                      ? 'bg-gray-700 text-gray-100 border border-gray-600 hover:bg-gray-600'
-                      : 'bg-gray-100 text-gray-800 border border-gray-300 hover:bg-gray-200'
+                      ? "bg-gray-700 text-gray-100 border border-gray-600 hover:bg-gray-600"
+                      : "bg-gray-100 text-gray-800 border border-gray-300 hover:bg-gray-200"
                   }`}
                 >
                   Previous
                 </button>
               )}
-              <button 
+              <button
                 onClick={handleNext}
                 className={`px-4 py-2 rounded-md font-medium transition-colors ${
                   isDark
-                    ? 'bg-green-600 text-white hover:bg-green-700'
-                    : 'bg-green-600 text-white hover:bg-green-700'
+                    ? "bg-green-600 text-white hover:bg-green-700"
+                    : "bg-green-600 text-white hover:bg-green-700"
                 }`}
               >
                 {stepIndex === steps.length - 1 ? "Finish" : "Next"}
               </button>
             </div>
           </div>
-          <button 
+          <button
             className={`absolute top-3 right-3 p-2 rounded-full transition-colors ${
               isDark
-                ? 'text-gray-400 hover:bg-gray-700 hover:text-gray-100'
-                : 'bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-800 shadow-sm border border-gray-200'
+                ? "text-gray-400 hover:bg-gray-700 hover:text-gray-100"
+                : "bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-800 shadow-sm border border-gray-200"
             }`}
             onClick={onClose}
           >

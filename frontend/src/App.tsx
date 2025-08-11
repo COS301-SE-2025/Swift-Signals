@@ -12,7 +12,7 @@ import Users from "./pages/Users";
 import SimulationResults from "./pages/SimulationResults";
 import ErrorBoundary from "./components/ErrorBoundary";
 import WelcomePage from "./pages/WelcomePage";
-import ComparisonView from './pages/ComparisonView';
+import ComparisonView from "./pages/ComparisonView";
 //import reactLogo from './assets/react.svg';
 //import viteLogo from '/vite.svg';
 import "./App.css";

@@ -93,7 +93,7 @@ const Roads: FC<{ edges: Edge[]; nodes: Node[]; center: THREE.Vector2 }> = ({
 
         const start = new THREE.Vector2(
           fromNode.x - center.x,
-          fromNode.y - center.y
+          fromNode.y - center.y,
         );
         const end = new THREE.Vector2(toNode.x - center.x, toNode.y - center.y);
         const length = start.distanceTo(end);
@@ -103,7 +103,7 @@ const Roads: FC<{ edges: Edge[]; nodes: Node[]; center: THREE.Vector2 }> = ({
         const position = new THREE.Vector3(
           (start.x + end.x) / 2,
           0,
-          (start.y + end.y) / 2
+          (start.y + end.y) / 2,
         );
 
         return (
@@ -130,11 +130,11 @@ const Roads: FC<{ edges: Edge[]; nodes: Node[]; center: THREE.Vector2 }> = ({
                           <planeGeometry args={[4, 0.2]} />
                           <meshStandardMaterial color={0xffffff} />
                         </mesh>
-                      )
+                      ),
                     )}
                   </group>
                 );
-              }
+              },
             )}
           </group>
         );
@@ -182,7 +182,7 @@ const Vehicle: FC<{
         vehicleRef.current.lookAt(
           nextPos.x - offset.x,
           0,
-          nextPos.y - offset.y
+          nextPos.y - offset.y,
         );
       }
     } else {
@@ -225,7 +225,14 @@ const TrafficLightVisual: FC<{ state: string }> = ({ state }) => {
             <sphereGeometry args={[0.3, 32, 32]} />
             <meshBasicMaterial color={redColor} toneMapped={false} />
           </mesh>
-          <pointLight position={[0, 2.7, 0.5]} color={redColor} intensity={5} distance={4} decay={2} renderOrder={2} />
+          <pointLight
+            position={[0, 2.7, 0.5]}
+            color={redColor}
+            intensity={5}
+            distance={4}
+            decay={2}
+            renderOrder={2}
+          />
         </>
       )}
       {(s === "y" || s === "u") && (
@@ -234,7 +241,14 @@ const TrafficLightVisual: FC<{ state: string }> = ({ state }) => {
             <sphereGeometry args={[0.3, 32, 32]} />
             <meshBasicMaterial color={yellowColor} toneMapped={false} />
           </mesh>
-          <pointLight position={[0, 2.0, 0.5]} color={yellowColor} intensity={5} distance={4} decay={2} renderOrder={2} />
+          <pointLight
+            position={[0, 2.0, 0.5]}
+            color={yellowColor}
+            intensity={5}
+            distance={4}
+            decay={2}
+            renderOrder={2}
+          />
         </>
       )}
       {s === "g" && (
@@ -243,7 +257,14 @@ const TrafficLightVisual: FC<{ state: string }> = ({ state }) => {
             <sphereGeometry args={[0.3, 32, 32]} />
             <meshBasicMaterial color={greenColor} toneMapped={false} />
           </mesh>
-          <pointLight position={[0, 1.3, 0.5]} color={greenColor} intensity={5} distance={4} decay={2} renderOrder={2} />
+          <pointLight
+            position={[0, 1.3, 0.5]}
+            color={greenColor}
+            intensity={5}
+            distance={4}
+            decay={2}
+            renderOrder={2}
+          />
         </>
       )}
     </group>
@@ -259,12 +280,27 @@ const TrafficLightController: FC<{
   simulationTime: number;
   roadDirections: { [key: string]: string };
   onStateUpdate: (states: { [key: string]: string }) => void;
-}> = ({ lightData, nodes, edges, connections, center, simulationTime, roadDirections, onStateUpdate }) => {
+}> = ({
+  lightData,
+  nodes,
+  edges,
+  connections,
+  center,
+  simulationTime,
+  roadDirections,
+  onStateUpdate,
+}) => {
   const currentStateString = useMemo(() => {
-    if (!lightData.states || !Array.isArray(lightData.states) || lightData.states.length === 0) return "";
+    if (
+      !lightData.states ||
+      !Array.isArray(lightData.states) ||
+      lightData.states.length === 0
+    )
+      return "";
     let activeState = lightData.states[0].state;
     for (const state of lightData.states) {
-      if (simulationTime >= state.time) activeState = state.state; else break;
+      if (simulationTime >= state.time) activeState = state.state;
+      else break;
     }
     return activeState;
   }, [simulationTime, lightData.states]);
@@ -272,19 +308,27 @@ const TrafficLightController: FC<{
   const lightInfoByRoad = useMemo(() => {
     const roadMap = new Map<string, { stateChar: string; edge: Edge }>();
     if (!currentStateString || !connections || !edges) return roadMap;
-    const relevantConnections = connections.filter((c) => c.from.indexOf(":") === -1);
-    const connectionsByRoad = relevantConnections.reduce((acc, conn) => {
+    const relevantConnections = connections.filter(
+      (c) => c.from.indexOf(":") === -1,
+    );
+    const connectionsByRoad = relevantConnections.reduce(
+      (acc, conn) => {
         if (!acc[conn.from]) acc[conn.from] = [];
         acc[conn.from].push(conn);
         return acc;
-      }, {} as Record<string, Connection[]>);
+      },
+      {} as Record<string, Connection[]>,
+    );
 
     for (const roadId in connectionsByRoad) {
       const roadConnections = connectionsByRoad[roadId];
-      const roadStates = roadConnections.map((conn) => (currentStateString[parseInt(conn.tl, 10)] || "r").toLowerCase());
+      const roadStates = roadConnections.map((conn) =>
+        (currentStateString[parseInt(conn.tl, 10)] || "r").toLowerCase(),
+      );
       let finalStateChar = "r";
       if (roadStates.includes("g")) finalStateChar = "g";
-      else if (roadStates.includes("y") || roadStates.includes("u")) finalStateChar = "y";
+      else if (roadStates.includes("y") || roadStates.includes("u"))
+        finalStateChar = "y";
       const edge = edges.find((e) => e.id === roadId);
       if (edge) roadMap.set(roadId, { stateChar: finalStateChar, edge });
     }
@@ -304,27 +348,49 @@ const TrafficLightController: FC<{
 
   return (
     <group>
-      {Array.from(lightInfoByRoad.entries()).map(([roadId, { stateChar, edge }]) => {
-        const fromNode = findNodeById(nodes, edge.from);
-        const toNode = findNodeById(nodes, edge.to);
-        if (!fromNode || !toNode) return null;
+      {Array.from(lightInfoByRoad.entries()).map(
+        ([roadId, { stateChar, edge }]) => {
+          const fromNode = findNodeById(nodes, edge.from);
+          const toNode = findNodeById(nodes, edge.to);
+          if (!fromNode || !toNode) return null;
 
-        const start = new THREE.Vector2(fromNode.x - center.x, fromNode.y - center.y);
-        const end = new THREE.Vector2(toNode.x - center.x, toNode.y - center.y);
-        const dir = end.clone().sub(start).normalize();
-        const angle = Math.atan2(dir.y, dir.x);
-        const perp = new THREE.Vector2(-dir.y, dir.x);
-        const roadLaneWidth = 3.5;
-        const offsetDistance = (edge.lanes * roadLaneWidth) / 2 + 1;
-        const lightPos = new THREE.Vector3(end.x - dir.x * 5, 0, end.y - dir.y * 5).add(new THREE.Vector3(perp.x * offsetDistance, 0, perp.y * offsetDistance));
-        const lightRotationY = -angle + Math.PI / 2;
+          const start = new THREE.Vector2(
+            fromNode.x - center.x,
+            fromNode.y - center.y,
+          );
+          const end = new THREE.Vector2(
+            toNode.x - center.x,
+            toNode.y - center.y,
+          );
+          const dir = end.clone().sub(start).normalize();
+          const angle = Math.atan2(dir.y, dir.x);
+          const perp = new THREE.Vector2(-dir.y, dir.x);
+          const roadLaneWidth = 3.5;
+          const offsetDistance = (edge.lanes * roadLaneWidth) / 2 + 1;
+          const lightPos = new THREE.Vector3(
+            end.x - dir.x * 5,
+            0,
+            end.y - dir.y * 5,
+          ).add(
+            new THREE.Vector3(
+              perp.x * offsetDistance,
+              0,
+              perp.y * offsetDistance,
+            ),
+          );
+          const lightRotationY = -angle + Math.PI / 2;
 
-        return (
-          <group key={roadId} position={lightPos} rotation={[0, lightRotationY, 0]}>
-            <TrafficLightVisual state={stateChar} />
-          </group>
-        );
-      })}
+          return (
+            <group
+              key={roadId}
+              position={lightPos}
+              rotation={[0, lightRotationY, 0]}
+            >
+              <TrafficLightVisual state={stateChar} />
+            </group>
+          );
+        },
+      )}
     </group>
   );
 };
@@ -338,10 +404,30 @@ const SimulationController: FC<{
   onTimeUpdate: (time: number) => void;
   roadDirections: { [key: string]: string };
   onTrafficLightStateUpdate: (states: { [key: string]: string }) => void;
-}> = ({ simulationData, isPlaying, speed, offset, roadCenter, onTimeUpdate, roadDirections, onTrafficLightStateUpdate }) => {
+}> = ({
+  simulationData,
+  isPlaying,
+  speed,
+  offset,
+  roadCenter,
+  onTimeUpdate,
+  roadDirections,
+  onTrafficLightStateUpdate,
+}) => {
   const [simulationTime, setSimulationTime] = useState(0);
-  const vehicleColors = useMemo(() => simulationData.vehicles.map(() => getRandomCarColor()), [simulationData.vehicles]);
-  const totalTime = useMemo(() => simulationData.vehicles.reduce((max, v) => Math.max(max, v.positions[v.positions.length - 1]?.time ?? 0), 0), [simulationData]);
+  const vehicleColors = useMemo(
+    () => simulationData.vehicles.map(() => getRandomCarColor()),
+    [simulationData.vehicles],
+  );
+  const totalTime = useMemo(
+    () =>
+      simulationData.vehicles.reduce(
+        (max, v) =>
+          Math.max(max, v.positions[v.positions.length - 1]?.time ?? 0),
+        0,
+      ),
+    [simulationData],
+  );
 
   useFrame((_, delta) => {
     if (isPlaying && totalTime > 0) {
@@ -354,12 +440,25 @@ const SimulationController: FC<{
   return (
     <>
       <GroundPlane />
-      <Roads edges={simulationData.intersection.edges} nodes={simulationData.intersection.nodes} center={roadCenter} />
+      <Roads
+        edges={simulationData.intersection.edges}
+        nodes={simulationData.intersection.nodes}
+        center={roadCenter}
+      />
       {simulationData.vehicles.map((vehicle, index) => (
-        <Vehicle key={vehicle.id} vehicleData={vehicle} simulationTime={simulationTime} offset={offset} color={vehicleColors[index]} />
+        <Vehicle
+          key={vehicle.id}
+          vehicleData={vehicle}
+          simulationTime={simulationTime}
+          offset={offset}
+          color={vehicleColors[index]}
+        />
       ))}
       {simulationData.intersection.trafficLights?.map((lightData) => {
-        const totalLoopTime = lightData.states && lightData.states.length > 1 ? lightData.states[lightData.states.length - 1].time : 1;
+        const totalLoopTime =
+          lightData.states && lightData.states.length > 1
+            ? lightData.states[lightData.states.length - 1].time
+            : 1;
         return (
           <TrafficLightController
             key={lightData.id}
@@ -394,31 +493,57 @@ const useIsMobile = () => {
     };
 
     checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
+    window.addEventListener("resize", checkIsMobile);
 
-    return () => window.removeEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
   return isMobile;
 };
 
-const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpanded }) => {
-  const [simulationData, setSimulationData] = useState<SimulationData | null>(null);
+const TrafficSimulation: FC<TrafficSimulationProps> = ({
+  dataUrl,
+  scale,
+  isExpanded,
+}) => {
+  const [simulationData, setSimulationData] = useState<SimulationData | null>(
+    null,
+  );
   const [isPlaying, setIsPlaying] = useState(true);
   const [speed, setSpeed] = useState(5);
   const [simulationTime, setSimulationTime] = useState(0);
   const [restartKey, setRestartKey] = useState(0);
-  const [trafficLightStates, setTrafficLightStates] = useState<{ [key: string]: string }>({});
+  const [trafficLightStates, setTrafficLightStates] = useState<{
+    [key: string]: string;
+  }>({});
   const isMobile = useIsMobile();
 
-  const roadDirections: { [key: string]: string } = useMemo(() => ({
-    in_n2_1: "North", in_n3_1: "South", in_n4_1: "West", in_n5_1: "East",
-  }), []);
+  const roadDirections: { [key: string]: string } = useMemo(
+    () => ({
+      in_n2_1: "North",
+      in_n3_1: "South",
+      in_n4_1: "West",
+      in_n5_1: "East",
+    }),
+    [],
+  );
 
   const metrics = useMemo(() => {
-    if (!simulationData) return { activeVehicles: 0, completedVehicles: 0, avgSpeed: 0, progress: 0, totalVehicles: 0, totalSimTime: 0 };
+    if (!simulationData)
+      return {
+        activeVehicles: 0,
+        completedVehicles: 0,
+        avgSpeed: 0,
+        progress: 0,
+        totalVehicles: 0,
+        totalSimTime: 0,
+      };
     const totalVehicles = simulationData.vehicles.length;
-    let activeVehicles = 0, completedVehicles = 0, speedSum = 0, speedCount = 0, maxTime = 0;
+    let activeVehicles = 0,
+      completedVehicles = 0,
+      speedSum = 0,
+      speedCount = 0,
+      maxTime = 0;
     simulationData.vehicles.forEach((vehicle) => {
       const positions = vehicle.positions;
       if (positions.length === 0) return;
@@ -427,7 +552,8 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
       if (simulationTime >= firstTime && simulationTime <= lastTime) {
         activeVehicles++;
         let idx = positions.findIndex((p) => p.time > simulationTime);
-        if (idx === -1) idx = positions.length - 1; else if (idx > 0) idx = idx - 1;
+        if (idx === -1) idx = positions.length - 1;
+        else if (idx > 0) idx = idx - 1;
         speedSum += positions[idx].speed;
         speedCount++;
       } else if (simulationTime > lastTime) {
@@ -437,7 +563,14 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
     });
     const avgSpeed = speedCount > 0 ? speedSum / speedCount : 0;
     const progress = maxTime > 0 ? Math.min(simulationTime / maxTime, 1) : 0;
-    return { activeVehicles, completedVehicles, avgSpeed, progress, totalVehicles, totalSimTime: maxTime };
+    return {
+      activeVehicles,
+      completedVehicles,
+      avgSpeed,
+      progress,
+      totalVehicles,
+      totalSimTime: maxTime,
+    };
   }, [simulationData, simulationTime]);
 
   useEffect(() => {
@@ -445,41 +578,78 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
       .then((res) => (res.ok ? res.json() : Promise.reject(res)))
       .then((data: SimulationData) => {
         if (data.intersection.trafficLights) {
-          const directionToSignalIndices: { [key: string]: number[] } = { North: [], South: [], East: [], West: [] };
+          const directionToSignalIndices: { [key: string]: number[] } = {
+            North: [],
+            South: [],
+            East: [],
+            West: [],
+          };
           const allConnectionIndices = new Set<number>();
           data.intersection.connections.forEach((conn) => {
             if (conn.from.indexOf(":") === -1) {
               const direction = roadDirections[conn.from];
               const signalIndex = parseInt(conn.tl, 10);
-              if (direction && !directionToSignalIndices[direction].includes(signalIndex)) {
+              if (
+                direction &&
+                !directionToSignalIndices[direction].includes(signalIndex)
+              ) {
                 directionToSignalIndices[direction].push(signalIndex);
               }
               allConnectionIndices.add(signalIndex);
             }
           });
           const maxSignalIndex = Math.max(...Array.from(allConnectionIndices));
-          const stateArrayLength = maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
+          const stateArrayLength =
+            maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
           const newPhases: TrafficLightPhase[] = [];
           const nsGreenDuration = 30;
           const nsGreenState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["North"].forEach((index) => { nsGreenState[index] = "G"; });
-          directionToSignalIndices["South"].forEach((index) => { nsGreenState[index] = "G"; });
-          newPhases.push({ duration: nsGreenDuration, state: nsGreenState.join("") });
+          directionToSignalIndices["North"].forEach((index) => {
+            nsGreenState[index] = "G";
+          });
+          directionToSignalIndices["South"].forEach((index) => {
+            nsGreenState[index] = "G";
+          });
+          newPhases.push({
+            duration: nsGreenDuration,
+            state: nsGreenState.join(""),
+          });
           const nsYellowDuration = 5;
           const nsYellowState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["North"].forEach((index) => { nsYellowState[index] = "y"; });
-          directionToSignalIndices["South"].forEach((index) => { nsYellowState[index] = "y"; });
-          newPhases.push({ duration: nsYellowDuration, state: nsYellowState.join("") });
+          directionToSignalIndices["North"].forEach((index) => {
+            nsYellowState[index] = "y";
+          });
+          directionToSignalIndices["South"].forEach((index) => {
+            nsYellowState[index] = "y";
+          });
+          newPhases.push({
+            duration: nsYellowDuration,
+            state: nsYellowState.join(""),
+          });
           const ewGreenDuration = 30;
           const ewGreenState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["East"].forEach((index) => { ewGreenState[index] = "G"; });
-          directionToSignalIndices["West"].forEach((index) => { ewGreenState[index] = "G"; });
-          newPhases.push({ duration: ewGreenDuration, state: ewGreenState.join("") });
+          directionToSignalIndices["East"].forEach((index) => {
+            ewGreenState[index] = "G";
+          });
+          directionToSignalIndices["West"].forEach((index) => {
+            ewGreenState[index] = "G";
+          });
+          newPhases.push({
+            duration: ewGreenDuration,
+            state: ewGreenState.join(""),
+          });
           const ewYellowDuration = 5;
           const ewYellowState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["East"].forEach((index) => { ewYellowState[index] = "y"; });
-          directionToSignalIndices["West"].forEach((index) => { ewYellowState[index] = "y"; });
-          newPhases.push({ duration: ewYellowDuration, state: ewYellowState.join("") });
+          directionToSignalIndices["East"].forEach((index) => {
+            ewYellowState[index] = "y";
+          });
+          directionToSignalIndices["West"].forEach((index) => {
+            ewYellowState[index] = "y";
+          });
+          newPhases.push({
+            duration: ewYellowDuration,
+            state: ewYellowState.join(""),
+          });
           const processedTrafficLights = data.intersection.trafficLights.map(
             (light) => {
               let time = 0;
@@ -490,15 +660,23 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
               });
               newStates.push({ time: time, state: newPhases[0].state });
               return { ...light, phases: newPhases, states: newStates };
-            }
+            },
           );
-          const newSimData = { ...data, intersection: { ...data.intersection, trafficLights: processedTrafficLights } };
+          const newSimData = {
+            ...data,
+            intersection: {
+              ...data.intersection,
+              trafficLights: processedTrafficLights,
+            },
+          };
           setSimulationData(newSimData);
         } else {
           setSimulationData(data);
         }
       })
-      .catch((error) => console.error(`Error loading simulation data from ${dataUrl}:`, error));
+      .catch((error) =>
+        console.error(`Error loading simulation data from ${dataUrl}:`, error),
+      );
   }, [dataUrl, roadDirections]);
 
   const { roadCenter, offset } = useMemo(() => {
@@ -509,8 +687,18 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
       };
     }
     const bounds = {
-      road: { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity },
-      vehicle: { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity },
+      road: {
+        minX: Infinity,
+        maxX: -Infinity,
+        minY: Infinity,
+        maxY: -Infinity,
+      },
+      vehicle: {
+        minX: Infinity,
+        maxX: -Infinity,
+        minY: Infinity,
+        maxY: -Infinity,
+      },
     };
     simulationData.intersection.nodes.forEach((n) => {
       bounds.road.minX = Math.min(bounds.road.minX, n.x);
@@ -524,15 +712,15 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
         bounds.vehicle.maxX = Math.max(bounds.vehicle.maxX, p.x);
         bounds.vehicle.minY = Math.min(bounds.vehicle.minY, p.y);
         bounds.vehicle.maxY = Math.max(bounds.vehicle.maxY, p.y);
-      })
+      }),
     );
     const roadCenter = new THREE.Vector2(
       (bounds.road.minX + bounds.road.maxX) / 2,
-      (bounds.road.minY + bounds.road.maxY) / 2
+      (bounds.road.minY + bounds.road.maxY) / 2,
     );
     const vehicleCenter = new THREE.Vector2(
       (bounds.vehicle.minX + bounds.vehicle.maxX) / 2,
-      (bounds.vehicle.minY + bounds.vehicle.maxY) / 2
+      (bounds.vehicle.minY + bounds.vehicle.maxY) / 2,
     );
     return { roadCenter, offset: vehicleCenter };
   }, [simulationData]);
@@ -544,38 +732,71 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
 
   if (!simulationData) {
     return (
-      <div style={{ height: "100vh", display: "grid", placeContent: "center", backgroundColor: "#3d3d3d", color: "white", }}>
+      <div
+        style={{
+          height: "100vh",
+          display: "grid",
+          placeContent: "center",
+          backgroundColor: "#3d3d3d",
+          color: "white",
+        }}
+      >
         Loading Simulation from {dataUrl}...
       </div>
     );
   }
 
-  const canvasContainerWidth = isExpanded ? '100%' : (isMobile ? '100%' : '50%');
-  const uiScale = isMobile ? 0.4 : (scale || 1);
+  const canvasContainerWidth = isExpanded ? "100%" : isMobile ? "100%" : "50%";
+  const uiScale = isMobile ? 0.4 : scale || 1;
 
   return (
-    <div className="traffic-simulation-root" style={{ position: "relative", height: "100vh", backgroundColor: "#3d3d3d", border: "none", boxShadow: "none", }}>
-      <div style={{ position: "absolute", top: 0, left: 0, width: canvasContainerWidth, height: "100%", zIndex: 0, transition: 'width 0.5s ease-in-out',}}>
+    <div
+      className="traffic-simulation-root"
+      style={{
+        position: "relative",
+        height: "100vh",
+        backgroundColor: "#3d3d3d",
+        border: "none",
+        boxShadow: "none",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: canvasContainerWidth,
+          height: "100%",
+          zIndex: 0,
+          transition: "width 0.5s ease-in-out",
+        }}
+      >
         <Canvas shadows>
           <ambientLight intensity={0.6} />
-          <directionalLight castShadow position={[100, 100, 50]} intensity={1.5} shadow-mapSize-width={2048} shadow-mapSize-height={2048} />
-          <MapControls 
-            enablePan={false} 
+          <directionalLight
+            castShadow
+            position={[100, 100, 50]}
+            intensity={1.5}
+            shadow-mapSize-width={2048}
+            shadow-mapSize-height={2048}
+          />
+          <MapControls
+            enablePan={false}
             enableRotate={false}
             enableZoom={!isMobile}
             enableDamping={false}
-            touches={{ 
+            touches={{
               ONE: isMobile ? undefined : THREE.TOUCH.ROTATE,
-              TWO: isMobile ? undefined : THREE.TOUCH.DOLLY_PAN 
+              TWO: isMobile ? undefined : THREE.TOUCH.DOLLY_PAN,
             }}
           />
-          
+
           <OrthographicCamera
             makeDefault
             position={[roadCenter.x, 100, roadCenter.y]}
             zoom={4}
           />
-          
+
           <SimulationController
             key={restartKey}
             simulationData={simulationData}

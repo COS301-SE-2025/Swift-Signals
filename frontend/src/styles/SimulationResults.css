@@ -20,7 +20,7 @@
 }
 
 .dark .simulation-results-page .simRes-main-content {
-  background-color: #0D1117;
+  background-color: #0d1117;
 }
 
 .simulation-results-page .visualization-box {
@@ -74,7 +74,7 @@
 }
 
 .dark .simulation-results-page .visSection {
-  background-color: #161B22;
+  background-color: #161b22;
 }
 
 .simulation-results-page .grid {
@@ -162,7 +162,9 @@
 }
 
 .simulation-results-page .stat-cube {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   min-height: 90px;
   display: flex;
   flex-direction: column;
@@ -179,7 +181,7 @@
     width: 92vw;
     padding: 6px;
   }
-  
+
   .simulation-results-page .simRes-main-content {
     padding: 20px 0;
   }
@@ -196,11 +198,11 @@
     width: 88vw;
     padding: 4px;
   }
-  
+
   .simulation-results-page .simRes-main-content {
     padding: 20px 0;
   }
-  
+
   .simulation-results-page .stat-cube {
     min-height: 80px;
     padding: 3px !important;
@@ -253,7 +255,6 @@
 /* Extra large screens (≥ 1600px) */
 @media screen and (min-width: 1600px) {
   /* Add your styles for very large desktop screens here */
-
 }
 
 /* Large desktops (1400px – 1599px) */

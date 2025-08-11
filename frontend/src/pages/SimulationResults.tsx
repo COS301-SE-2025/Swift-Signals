@@ -65,14 +65,14 @@ function computeStats(vehicles: Vehicle[]) {
 function getAllTimes(vehicles: Vehicle[]): number[] {
   const timeSet = new Set<number>();
   vehicles.forEach((veh) =>
-    veh.positions.forEach((pos) => timeSet.add(pos.time))
+    veh.positions.forEach((pos) => timeSet.add(pos.time)),
   );
   return Array.from(timeSet).sort((a, b) => a - b);
 }
 
 function getAverageSpeedOverTime(
   vehicles: Vehicle[],
-  allTimes: number[]
+  allTimes: number[],
 ): number[] {
   return allTimes.map((t) => {
     let sum = 0,
@@ -90,7 +90,7 @@ function getAverageSpeedOverTime(
 
 function getVehicleCountOverTime(
   vehicles: Vehicle[],
-  allTimes: number[]
+  allTimes: number[],
 ): number[] {
   return allTimes.map((t) => {
     let count = 0;
@@ -122,7 +122,7 @@ function getTotalDistancePerVehicle(vehicles: Vehicle[]): number[] {
 function getHistogramData(
   data: number[],
   binSize: number,
-  maxVal: number
+  maxVal: number,
 ): { counts: number[]; labels: string[] } {
   const bins = Math.ceil(maxVal / binSize);
   const counts: number[] = Array(bins).fill(0);
@@ -137,7 +137,7 @@ function getHistogramData(
 
   for (let i = 0; i < bins; i++) {
     labels.push(
-      `${(i * binSize).toFixed(0)}-${((i + 1) * binSize).toFixed(0)}`
+      `${(i * binSize).toFixed(0)}-${((i + 1) * binSize).toFixed(0)}`,
     );
   }
 
@@ -147,7 +147,7 @@ function getHistogramData(
 function downsampleData<TLabel, TData>(
   labels: TLabel[],
   data: TData[],
-  maxPoints: number
+  maxPoints: number,
 ): { downsampledLabels: TLabel[]; downsampledData: TData[] } {
   if (labels.length <= maxPoints) {
     return { downsampledLabels: labels, downsampledData: data };
@@ -168,7 +168,7 @@ function downsampleData<TLabel, TData>(
 const SimulationResults: React.FC = () => {
   const [simData, setSimData] = useState<SimulationData | null>(null);
   const [optimizedData, setOptimizedData] = useState<SimulationData | null>(
-    null
+    null,
   );
   const [showOptimized, setShowOptimized] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -207,7 +207,7 @@ const SimulationResults: React.FC = () => {
       })
       .catch((err) => {
         setError(
-          "Failed to load simulation data. Please check the file path and format."
+          "Failed to load simulation data. Please check the file path and format.",
         );
         setLoading(false);
         console.error(err);
@@ -240,7 +240,7 @@ const SimulationResults: React.FC = () => {
   const handleOptimize = () => {
     if (!optimizedDataExists) {
       setError(
-        "No optimized data available. Please run the optimization first."
+        "No optimized data available. Please run the optimization first.",
       );
       return;
     }
@@ -272,7 +272,7 @@ const SimulationResults: React.FC = () => {
       })
       .catch((err) => {
         setError(
-          "Failed to load optimized data. Please check if the optimization has been run."
+          "Failed to load optimized data. Please check if the optimization has been run.",
         );
         setOptimizing(false);
         console.error(err);
@@ -294,11 +294,11 @@ const SimulationResults: React.FC = () => {
     const allTimes = getAllTimes(simData.vehicles);
     const avgSpeedOverTime = getAverageSpeedOverTime(
       simData.vehicles,
-      allTimes
+      allTimes,
     );
     const vehCountOverTime = getVehicleCountOverTime(
       simData.vehicles,
-      allTimes
+      allTimes,
     );
     const totalDistPerVeh = getTotalDistancePerVehicle(simData.vehicles);
 
@@ -323,17 +323,17 @@ const SimulationResults: React.FC = () => {
     const { downsampledData: downsampledVehCount } = downsampleData(
       allTimes,
       vehCountOverTime,
-      MAX_TIME_POINTS
+      MAX_TIME_POINTS,
     );
     const { downsampledData: downsampledOptAvgSpeed } = downsampleData(
       allTimes,
       optAvgSpeedOverTime,
-      MAX_TIME_POINTS
+      MAX_TIME_POINTS,
     );
     const { downsampledData: downsampledOptVehCount } = downsampleData(
       allTimes,
       optVehCountOverTime,
-      MAX_TIME_POINTS
+      MAX_TIME_POINTS,
     );
 
     const { counts: finalSpeedHist, labels: finalSpeedHistLabels } =
@@ -351,7 +351,7 @@ const SimulationResults: React.FC = () => {
         ? getHistogramData(
             optTotalDistPerVeh,
             50,
-            Math.ceil(Math.max(...optTotalDistPerVeh) / 50) * 50
+            Math.ceil(Math.max(...optTotalDistPerVeh) / 50) * 50,
           )
         : null;
 
@@ -391,7 +391,7 @@ const SimulationResults: React.FC = () => {
 
     const createChart = (
       ref: React.RefObject<HTMLCanvasElement | null>,
-      config: ChartConfiguration
+      config: ChartConfiguration,
     ) => {
       if (ref.current) {
         const chart = new Chart(ref.current, config);
@@ -625,7 +625,7 @@ const SimulationResults: React.FC = () => {
         numPhases: simData.intersection.trafficLights[0].phases.length,
         totalCycle: simData.intersection.trafficLights[0].phases.reduce(
           (sum: number, p: { duration?: number }) => sum + (p.duration ?? 0),
-          0
+          0,
         ),
       }
     : { numPhases: 0, totalCycle: 0 };

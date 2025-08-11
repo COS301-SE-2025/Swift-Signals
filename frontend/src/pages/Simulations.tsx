@@ -184,7 +184,7 @@ const LocationMarker: React.FC<{
   // Function to find nearest intersection using Overpass API
   const findNearestIntersection = async (
     lat: number,
-    lon: number
+    lon: number,
   ): Promise<Intersection | null> => {
     try {
       setIsSnapping?.(true);
@@ -221,10 +221,10 @@ const LocationMarker: React.FC<{
       }
 
       const ways = data.elements.filter(
-        (el: OverpassElement) => el.type === "way" && el.tags?.name
+        (el: OverpassElement) => el.type === "way" && el.tags?.name,
       );
       const nodes = data.elements.filter(
-        (el: OverpassElement) => el.type === "node"
+        (el: OverpassElement) => el.type === "node",
       );
 
       if (ways.length < 2) {
@@ -259,7 +259,7 @@ const LocationMarker: React.FC<{
             ...new Set(
               nodeWays
                 .map((way) => way.tags?.name)
-                .filter((name): name is string => !!name)
+                .filter((name): name is string => !!name),
             ),
           ];
 
@@ -268,7 +268,7 @@ const LocationMarker: React.FC<{
             if (nodeCoords) {
               const distance = Math.sqrt(
                 Math.pow(nodeCoords.lat - lat, 2) +
-                  Math.pow(nodeCoords.lon - lon, 2)
+                  Math.pow(nodeCoords.lon - lon, 2),
               );
 
               intersections.push({
@@ -311,7 +311,7 @@ const LocationMarker: React.FC<{
         // Try to find nearest intersection
         const nearestIntersection = await findNearestIntersection(
           e.latlng.lat,
-          e.latlng.lng
+          e.latlng.lng,
         );
 
         if (nearestIntersection) {
@@ -324,12 +324,12 @@ const LocationMarker: React.FC<{
           setPosition(snappedPosition);
           setSelectedLocation(nearestIntersection.intersection);
           setCoordinates(
-            `${nearestIntersection.lat.toFixed(6)}, ${nearestIntersection.lon.toFixed(6)}`
+            `${nearestIntersection.lat.toFixed(6)}, ${nearestIntersection.lon.toFixed(6)}`,
           );
 
           console.log(
             "Snapped to intersection:",
-            nearestIntersection.intersection
+            nearestIntersection.intersection,
           );
         } else {
           // Fallback to clicked coordinates if no intersection found
@@ -381,7 +381,7 @@ const StreetSearchComponent: React.FC<{
   const [isLoadingFirst, setIsLoadingFirst] = useState(false);
   const [isLoadingSecond, setIsLoadingSecond] = useState(false);
   const [selectedFirstStreet, setSelectedFirstStreet] = useState<Street | null>(
-    null
+    null,
   );
 
   const firstStreetRef = useRef<HTMLDivElement>(null);
@@ -406,7 +406,7 @@ const StreetSearchComponent: React.FC<{
         () => {
           const hasStreetSuffix =
             /\b(street|road|avenue|drive|lane|way|boulevard|crescent)\b/i.test(
-              cleanQuery
+              cleanQuery,
             );
           if (!hasStreetSuffix) {
             return searchNominatimStreets(cleanQuery + " road", "road");
@@ -436,7 +436,7 @@ const StreetSearchComponent: React.FC<{
   // Nominatim search function
   const searchNominatimStreets = async (
     query: string,
-    type: string = "road"
+    type: string = "road",
   ): Promise<Street[]> => {
     try {
       const params = new URLSearchParams({
@@ -493,7 +493,7 @@ const StreetSearchComponent: React.FC<{
           item.type === "road" ||
           item.address?.road ||
           /\b(street|road|avenue|drive|lane|way|boulevard|crescent|highway)\b/i.test(
-            item.display_name
+            item.display_name,
           );
 
         // Filter out non-road types
@@ -534,8 +534,8 @@ const StreetSearchComponent: React.FC<{
           self.findIndex(
             (s) =>
               s.name.toLowerCase() === street.name.toLowerCase() &&
-              s.city?.toLowerCase() === street.city?.toLowerCase()
-          ) === index
+              s.city?.toLowerCase() === street.city?.toLowerCase(),
+          ) === index,
       )
       .slice(0, 15);
 
@@ -580,7 +580,7 @@ const StreetSearchComponent: React.FC<{
 
   // Get coordinates with fallback
   const getCoordinates = (
-    item: NominatimResult
+    item: NominatimResult,
   ): { lat: number | null; lon: number | null } => {
     const lat = parseFloat(item.lat);
     const lon = parseFloat(item.lon);
@@ -618,12 +618,12 @@ const StreetSearchComponent: React.FC<{
         const coordResults = await findIntersectionsAtCoordinates(
           street.lat,
           street.lon,
-          street.name
+          street.name,
         );
         if (coordResults.length > 0) {
           console.log(
             "Found intersections via coordinates:",
-            coordResults.length
+            coordResults.length,
           );
           return coordResults;
         }
@@ -634,7 +634,7 @@ const StreetSearchComponent: React.FC<{
       if (overpassResults.length > 0) {
         console.log(
           "Found intersections via Overpass:",
-          overpassResults.length
+          overpassResults.length,
         );
         return overpassResults;
       }
@@ -642,12 +642,12 @@ const StreetSearchComponent: React.FC<{
       // Strategy 3: Search Nominatim for intersection mentions
       const nominatimResults = await searchIntersectionMentions(
         street.name,
-        street.city
+        street.city,
       );
       if (nominatimResults.length > 0) {
         console.log(
           "Found intersections via Nominatim search:",
-          nominatimResults.length
+          nominatimResults.length,
         );
         return nominatimResults;
       }
@@ -664,11 +664,11 @@ const StreetSearchComponent: React.FC<{
   const findIntersectionsAtCoordinates = async (
     lat: number,
     lon: number,
-    streetName: string
+    streetName: string,
   ): Promise<Street[]> => {
     try {
       console.log(
-        `Finding intersections at coordinates: ${lat}, ${lon} for ${streetName}`
+        `Finding intersections at coordinates: ${lat}, ${lon} for ${streetName}`,
       );
 
       // Create Overpass query to find intersections at specific coordinates
@@ -705,7 +705,7 @@ const StreetSearchComponent: React.FC<{
 
   // Overpass API intersection finding
   const findIntersectionsViaOverpass = async (
-    street: Street
+    street: Street,
   ): Promise<Street[]> => {
     try {
       const searchArea =
@@ -757,7 +757,7 @@ const StreetSearchComponent: React.FC<{
   // Find all ways that intersect with the target street ways
   const findAllIntersectingWays = async (
     targetWays: OverpassElement[],
-    streetName: string
+    streetName: string,
   ): Promise<Street[]> => {
     try {
       const targetNodeIds = new Set<number>();
@@ -813,7 +813,7 @@ const StreetSearchComponent: React.FC<{
   // Extract and process intersection data from Overpass results
   const extractIntersectionsFromOverpassData = (
     elements: OverpassElement[],
-    originalStreet: string
+    originalStreet: string,
   ): Street[] => {
     if (!Array.isArray(elements)) return [];
 
@@ -828,11 +828,11 @@ const StreetSearchComponent: React.FC<{
         el.tags.name &&
         el.tags.highway &&
         !el.tags.name.toLowerCase().includes(originalStreetLower) &&
-        !originalStreetLower.includes(el.tags.name.toLowerCase())
+        !originalStreetLower.includes(el.tags.name.toLowerCase()),
     );
 
     console.log(
-      `Found ${intersectingWays.length} potentially intersecting ways`
+      `Found ${intersectingWays.length} potentially intersecting ways`,
     );
 
     intersectingWays.forEach((way) => {
@@ -859,8 +859,8 @@ const StreetSearchComponent: React.FC<{
       .filter(
         (street, index, self) =>
           self.findIndex(
-            (s) => s.name.toLowerCase() === street.name.toLowerCase()
-          ) === index
+            (s) => s.name.toLowerCase() === street.name.toLowerCase(),
+          ) === index,
       )
       .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -871,7 +871,7 @@ const StreetSearchComponent: React.FC<{
   // Search for explicit intersection mentions in Nominatim
   const searchIntersectionMentions = async (
     streetName: string,
-    city?: string
+    city?: string,
   ): Promise<Street[]> => {
     try {
       const searchQueries = [
@@ -899,7 +899,7 @@ const StreetSearchComponent: React.FC<{
           const data: NominatimResult[] = await response.json();
           const intersections = extractIntersectionsFromDisplayNames(
             data,
-            streetName
+            streetName,
           );
           if (intersections.length > 0) {
             return intersections;
@@ -920,7 +920,7 @@ const StreetSearchComponent: React.FC<{
   // Extract intersections from Nominatim display names
   const extractIntersectionsFromDisplayNames = (
     data: NominatimResult[],
-    originalStreet: string
+    originalStreet: string,
   ): Street[] => {
     if (!Array.isArray(data)) return [];
 
@@ -972,8 +972,8 @@ const StreetSearchComponent: React.FC<{
     const uniqueStreets = intersectingStreets.filter(
       (street, index, self) =>
         self.findIndex(
-          (s) => s.name.toLowerCase() === street.name.toLowerCase()
-        ) === index
+          (s) => s.name.toLowerCase() === street.name.toLowerCase(),
+        ) === index,
     );
 
     return uniqueStreets.slice(0, 15);
@@ -998,7 +998,7 @@ const StreetSearchComponent: React.FC<{
   const toTitleCase = (str: string): string => {
     return str.replace(
       /\w\S*/g,
-      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
     );
   };
 
@@ -1134,7 +1134,7 @@ const StreetSearchComponent: React.FC<{
     ];
 
     const filtered = commonStreets.filter((street) =>
-      street.name.toLowerCase().includes(query.toLowerCase())
+      street.name.toLowerCase().includes(query.toLowerCase()),
     );
 
     return filtered.length > 0 ? filtered : commonStreets.slice(0, 10);
@@ -1270,7 +1270,7 @@ const StreetSearchComponent: React.FC<{
 
     // Check for known intersections
     for (const [knownStreet, intersections] of Object.entries(
-      knownIntersections
+      knownIntersections,
     )) {
       if (
         streetName.includes(knownStreet) ||
@@ -1313,7 +1313,7 @@ const StreetSearchComponent: React.FC<{
     ];
 
     return genericIntersections.filter(
-      (s) => s.name.toLowerCase() !== streetName
+      (s) => s.name.toLowerCase() !== streetName,
     );
   };
 
@@ -1471,7 +1471,7 @@ const StreetSearchComponent: React.FC<{
               value={secondStreet}
               onChange={(e) => {
                 const selectedStreet = secondStreetSuggestions.find(
-                  (s) => s.name === e.target.value
+                  (s) => s.name === e.target.value,
                 );
                 if (selectedStreet) {
                   handleSecondStreetSelect(selectedStreet);
@@ -1564,7 +1564,7 @@ const NewSimulationModal: React.FC<{
   const [simulationName, setSimulationName] = useState("");
   const [simulationDescription, setSimulationDescription] = useState("");
   const [selectedIntersections, setSelectedIntersections] = useState<string[]>(
-    []
+    [],
   );
   const [activeTab, setActiveTab] = useState<"List" | "Search" | "Map">("List");
   const [coordinates, setCoordinates] = useState<string | null>(null);
@@ -1578,7 +1578,7 @@ const NewSimulationModal: React.FC<{
 
   const handleRemoveIntersection = (intersection: string) => {
     setSelectedIntersections(
-      selectedIntersections.filter((item) => item !== intersection)
+      selectedIntersections.filter((item) => item !== intersection),
     );
   };
 
@@ -1591,7 +1591,7 @@ const NewSimulationModal: React.FC<{
   const handleSubmit = () => {
     if (!simulationName || selectedIntersections.length === 0) {
       alert(
-        "Please provide a simulation name and select at least one intersection."
+        "Please provide a simulation name and select at least one intersection.",
       );
       return;
     }
@@ -1967,7 +1967,7 @@ const Simulations: React.FC = () => {
   const [page2, setPage2] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<"simulations" | "optimizations">(
-    "simulations"
+    "simulations",
   );
 
   const filteredSimulations1 =
@@ -1981,9 +1981,9 @@ const Simulations: React.FC = () => {
   const allIntersections = Array.from(
     new Set(
       [...simulationsTable1, ...simulationsTable2].map(
-        (sim) => sim.intersection
-      )
-    )
+        (sim) => sim.intersection,
+      ),
+    ),
   );
 
   const handleNewSimulation = (type: "simulations" | "optimizations") => {
@@ -1998,7 +1998,7 @@ const Simulations: React.FC = () => {
   }) => {
     console.log(
       `New ${modalType === "simulations" ? "Simulation" : "Optimization"} Created:`,
-      data
+      data,
     );
     setIsModalOpen(false);
   };
@@ -2031,7 +2031,7 @@ const Simulations: React.FC = () => {
                   {[
                     "All Intersections",
                     ...new Set(
-                      simulationsTable1.map((sim) => sim.intersection)
+                      simulationsTable1.map((sim) => sim.intersection),
                     ),
                   ].map((intersection) => (
                     <option key={intersection} value={intersection}>
@@ -2064,7 +2064,7 @@ const Simulations: React.FC = () => {
                   {[
                     "All Intersections",
                     ...new Set(
-                      simulationsTable2.map((sim) => sim.intersection)
+                      simulationsTable2.map((sim) => sim.intersection),
                     ),
                   ].map((intersection) => (
                     <option key={intersection} value={intersection}>

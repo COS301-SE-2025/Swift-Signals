@@ -333,11 +333,13 @@ const simulationsTutorialSteps: TutorialStep[] = [
   },
   {
     selector: ".intersection-tabs button:nth-child(2)",
-    title: "Search Tab", 
+    title: "Search Tab",
     text: "The Search tab allows you to find intersections by searching for street names. Click this tab to explore street search.",
     position: "bottom",
     action: () => {
-      const searchButton = document.querySelector('.intersection-tabs button:nth-child(2)') as HTMLElement;
+      const searchButton = document.querySelector(
+        ".intersection-tabs button:nth-child(2)",
+      ) as HTMLElement;
       if (searchButton) searchButton.click();
     },
   },
@@ -353,7 +355,9 @@ const simulationsTutorialSteps: TutorialStep[] = [
     text: "The Map tab lets you visually select intersections by clicking on a map. Click this tab to explore map selection.",
     position: "bottom",
     action: () => {
-      const mapButton = document.querySelector('.intersection-tabs button:nth-child(3)') as HTMLElement;
+      const mapButton = document.querySelector(
+        ".intersection-tabs button:nth-child(3)",
+      ) as HTMLElement;
       if (mapButton) mapButton.click();
     },
   },
@@ -388,10 +392,12 @@ const simulationsTutorialSteps: TutorialStep[] = [
         closeButton.click();
       } else {
         // Try alternative close method
-        const modalOverlay = document.querySelector(".fixed.inset-0.z-50") as HTMLElement;
+        const modalOverlay = document.querySelector(
+          ".fixed.inset-0.z-50",
+        ) as HTMLElement;
         if (modalOverlay) {
           // Click outside the modal to close
-          const event = new MouseEvent('click', { bubbles: true });
+          const event = new MouseEvent("click", { bubbles: true });
           modalOverlay.dispatchEvent(event);
         }
       }
@@ -539,7 +545,8 @@ const comparisonViewTutorialSteps: TutorialStep[] = [
     position: "left",
   },
   {
-    selector: "div[style*='position: absolute'][style*='top: 24px'][style*='left: 24px']",
+    selector:
+      "div[style*='position: absolute'][style*='top: 24px'][style*='left: 24px']",
     title: "Simulation Control Panel",
     text: "This panel controls both simulations simultaneously. You can play/pause, restart, adjust speed, and monitor real-time statistics for the active simulation.",
     position: "right",
@@ -581,13 +588,15 @@ const comparisonViewTutorialSteps: TutorialStep[] = [
     position: "top",
   },
   {
-    selector: "button[title*='original']:first-of-type, button[title*='View left']:first-of-type",
+    selector:
+      "button[title*='original']:first-of-type, button[title*='View left']:first-of-type",
     title: "Left Panel Fullscreen",
     text: "Click this button to expand the original simulation to fullscreen for detailed analysis. Click again to return to side-by-side view.",
     position: "bottom",
   },
   {
-    selector: "button[title*='optimized']:last-of-type, button[title*='View right']:last-of-type",
+    selector:
+      "button[title*='optimized']:last-of-type, button[title*='View right']:last-of-type",
     title: "Right Panel Fullscreen",
     text: "Click this button to expand the optimized simulation to fullscreen for detailed analysis. Click again to return to side-by-side view.",
     position: "bottom",
@@ -810,8 +819,14 @@ const HelpMenu: React.FC = () => {
       simulations: { path: "/simulations", name: "Simulations" },
       users: { path: "/users", name: "Users" },
       navigation: { path: "", name: "Navigation" },
-      "simulation-results": { path: "/simulation-results", name: "Simulation Results" },
-      "comparison-view": { path: "/comparison-rendering", name: "3D Comparison View" },
+      "simulation-results": {
+        path: "/simulation-results",
+        name: "Simulation Results",
+      },
+      "comparison-view": {
+        path: "/comparison-rendering",
+        name: "3D Comparison View",
+      },
     };
 
     const config = tutorialConfig[tutorialType];
@@ -1061,13 +1076,19 @@ const HelpMenu: React.FC = () => {
                   <div className="accordion-item tutorial-launcher">
                     <button onClick={() => startTutorial("simulation-results")}>
                       <h4>Simulation Results Tutorial</h4>
-                      <p>Learn how to analyze simulation data, charts, and statistics.</p>
+                      <p>
+                        Learn how to analyze simulation data, charts, and
+                        statistics.
+                      </p>
                     </button>
                   </div>
                   <div className="accordion-item tutorial-launcher">
                     <button onClick={() => startTutorial("comparison-view")}>
                       <h4>3D Comparison View Tutorial</h4>
-                      <p>Learn how to compare original vs optimized simulations in 3D.</p>
+                      <p>
+                        Learn how to compare original vs optimized simulations
+                        in 3D.
+                      </p>
                     </button>
                   </div>
                 </div>

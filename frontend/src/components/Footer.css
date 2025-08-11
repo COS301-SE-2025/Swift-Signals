@@ -14,7 +14,7 @@
 }
 
 .dark .footer {
-  background-color: #0D1117;
+  background-color: #0d1117;
   color: #e6edf3;
   border-top: 1px solid #30363d;
 }
@@ -62,7 +62,7 @@
   .footer-copyright {
     display: none;
   }
-  
+
   .footer .container {
     justify-content: space-between;
     padding: 0 0.75rem;
@@ -74,12 +74,12 @@
     font-size: 0.75rem;
     font-weight: 600;
   }
-  
+
   .footer-logo img {
     height: 20px;
     margin-right: 0.25rem;
   }
-  
+
   .footer {
     height: 45px;
     padding: 0.25rem 0;

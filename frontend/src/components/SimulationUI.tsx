@@ -1,5 +1,5 @@
-import React from 'react';
-import type { FC } from 'react';
+import React from "react";
+import type { FC } from "react";
 
 interface SimulationUIProps {
   time: number;
@@ -20,111 +20,111 @@ interface SimulationUIProps {
 
 const styles: { [key: string]: React.CSSProperties } = {
   uiPanel: {
-    position: 'absolute',
-    top: '24px',
-    left: '24px',
-    background: 'rgba(28, 32, 38, 0.98)',
-    color: '#f3f6fa',
-    padding: '28px 28px 20px 28px',
-    borderRadius: '10px',
+    position: "absolute",
+    top: "24px",
+    left: "24px",
+    background: "rgba(28, 32, 38, 0.98)",
+    color: "#f3f6fa",
+    padding: "28px 28px 20px 28px",
+    borderRadius: "10px",
     fontFamily: '"Inter", "Segoe UI", Arial, sans-serif',
-    width: '320px',
-    boxShadow: '0 4px 24px 0 rgba(0,0,0,0.18)',
-    border: '1px solid #23272f',
-    backdropFilter: 'blur(2px)',
-    WebkitBackdropFilter: 'blur(2px)',
-    transition: 'transform 0.2s ease-in-out',
-    transformOrigin: 'top left',
+    width: "320px",
+    boxShadow: "0 4px 24px 0 rgba(0,0,0,0.18)",
+    border: "1px solid #23272f",
+    backdropFilter: "blur(2px)",
+    WebkitBackdropFilter: "blur(2px)",
+    transition: "transform 0.2s ease-in-out",
+    transformOrigin: "top left",
   },
   title: {
-    margin: '0 0 18px 0',
-    fontSize: '1.25em',
-    borderBottom: '1px solid #23272f',
-    paddingBottom: '12px',
-    letterSpacing: '0.5px',
+    margin: "0 0 18px 0",
+    fontSize: "1.25em",
+    borderBottom: "1px solid #23272f",
+    paddingBottom: "12px",
+    letterSpacing: "0.5px",
     fontWeight: 600,
   },
   dataRow: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '10px',
-    fontSize: '1em',
-    alignItems: 'center',
+    display: "flex",
+    justifyContent: "space-between",
+    marginBottom: "10px",
+    fontSize: "1em",
+    alignItems: "center",
   },
   label: {
-    color: '#b0b8c1',
+    color: "#b0b8c1",
     fontWeight: 400,
-    letterSpacing: '0.1px',
+    letterSpacing: "0.1px",
   },
   controls: {
-    display: 'flex',
-    gap: '10px',
-    marginTop: '18px',
+    display: "flex",
+    gap: "10px",
+    marginTop: "18px",
   },
   button: {
     flexGrow: 1,
-    padding: '10px 0',
-    cursor: 'pointer',
-    border: 'none',
-    borderRadius: '5px',
-    background: '#23272f',
-    color: '#f3f6fa',
+    padding: "10px 0",
+    cursor: "pointer",
+    border: "none",
+    borderRadius: "5px",
+    background: "#23272f",
+    color: "#f3f6fa",
     fontWeight: 500,
-    fontSize: '1em',
-    boxShadow: 'none',
-    borderBottom: '2px solid #353a45',
-    transition: 'background 0.15s, color 0.15s',
+    fontSize: "1em",
+    boxShadow: "none",
+    borderBottom: "2px solid #353a45",
+    transition: "background 0.15s, color 0.15s",
   },
   buttonHover: {
-    background: '#353a45',
-    color: '#fff',
+    background: "#353a45",
+    color: "#fff",
   },
   sliderContainer: {
-    marginTop: '16px',
+    marginTop: "16px",
   },
   lightIndicator: {
-    width: '12px',
-    height: '12px',
-    borderRadius: '50%',
-    display: 'inline-block',
-    marginLeft: 'auto',
-    boxShadow: '0 0 4px currentColor',
-    border: '1px solid #353a45',
+    width: "12px",
+    height: "12px",
+    borderRadius: "50%",
+    display: "inline-block",
+    marginLeft: "auto",
+    boxShadow: "0 0 4px currentColor",
+    border: "1px solid #353a45",
   },
   lightsContainer: {
-    borderTop: '1px solid #23272f',
-    marginTop: '14px',
-    paddingTop: '12px',
+    borderTop: "1px solid #23272f",
+    marginTop: "14px",
+    paddingTop: "12px",
   },
   progressBarContainer: {
-    margin: '16px 0 8px 0',
-    height: '6px',
-    background: '#23272f',
-    borderRadius: '3px',
-    overflow: 'hidden',
-    boxShadow: 'none',
+    margin: "16px 0 8px 0",
+    height: "6px",
+    background: "#23272f",
+    borderRadius: "3px",
+    overflow: "hidden",
+    boxShadow: "none",
   },
   progressBar: {
-    height: '100%',
-    background: 'linear-gradient(90deg, #4e8cff 0%, #7ed6df 100%)',
-    transition: 'width 0.3s',
+    height: "100%",
+    background: "linear-gradient(90deg, #4e8cff 0%, #7ed6df 100%)",
+    transition: "width 0.3s",
   },
   sectionHeader: {
-    color: '#f3f6fa',
+    color: "#f3f6fa",
     fontWeight: 500,
-    fontSize: '1.05em',
-    margin: '18px 0 8px 0',
-    letterSpacing: '0.2px',
-    borderBottom: '1px solid #23272f',
-    paddingBottom: '4px',
-    display: 'block',
+    fontSize: "1.05em",
+    margin: "18px 0 8px 0",
+    letterSpacing: "0.2px",
+    borderBottom: "1px solid #23272f",
+    paddingBottom: "4px",
+    display: "block",
   },
 };
 
 const lightColorMap: { [key: string]: string } = {
-  g: '#28a745',
-  y: '#ffc107',
-  r: '#dc3545',
+  g: "#28a745",
+  y: "#ffc107",
+  r: "#dc3545",
 };
 
 export const SimulationUI: FC<SimulationUIProps> = ({
@@ -155,7 +155,12 @@ export const SimulationUI: FC<SimulationUIProps> = ({
     <div style={panelStyle}>
       <h3 style={styles.title}>Simulation</h3>
       <div style={styles.progressBarContainer}>
-        <div style={{ ...styles.progressBar, width: `${Math.round(progress * 100)}%` }} />
+        <div
+          style={{
+            ...styles.progressBar,
+            width: `${Math.round(progress * 100)}%`,
+          }}
+        />
       </div>
       <div style={{ ...styles.dataRow, marginBottom: 0 }}>
         <span style={styles.label}>Progress</span>
@@ -163,7 +168,9 @@ export const SimulationUI: FC<SimulationUIProps> = ({
       </div>
       <div style={styles.dataRow}>
         <span style={styles.label}>Time</span>
-        <span>{time.toFixed(1)} / {totalSimTime.toFixed(1)} s</span>
+        <span>
+          {time.toFixed(1)} / {totalSimTime.toFixed(1)} s
+        </span>
       </div>
       <div style={styles.sectionHeader}>Vehicles</div>
       <div style={styles.dataRow}>
@@ -184,27 +191,41 @@ export const SimulationUI: FC<SimulationUIProps> = ({
       </div>
       <div style={styles.sectionHeader}>Traffic Lights</div>
       <div style={styles.lightsContainer}>
-        {Object.entries(trafficLightStates).sort().map(([direction, state]) => (
-          <div key={direction} style={styles.dataRow}>
-            <span style={styles.label}>{direction}</span>
-            <span style={{ ...styles.lightIndicator, backgroundColor: lightColorMap[state] || '#bbb', color: lightColorMap[state] || '#bbb' }}></span>
-          </div>
-        ))}
+        {Object.entries(trafficLightStates)
+          .sort()
+          .map(([direction, state]) => (
+            <div key={direction} style={styles.dataRow}>
+              <span style={styles.label}>{direction}</span>
+              <span
+                style={{
+                  ...styles.lightIndicator,
+                  backgroundColor: lightColorMap[state] || "#bbb",
+                  color: lightColorMap[state] || "#bbb",
+                }}
+              ></span>
+            </div>
+          ))}
       </div>
       <div style={styles.sectionHeader}>Controls</div>
       <div style={styles.controls}>
         <button
-          style={{ ...styles.button, ...(hoveredBtn === 'playpause' ? styles.buttonHover : {}), }}
+          style={{
+            ...styles.button,
+            ...(hoveredBtn === "playpause" ? styles.buttonHover : {}),
+          }}
           onClick={onPlayPause}
-          onMouseEnter={() => setHoveredBtn('playpause')}
+          onMouseEnter={() => setHoveredBtn("playpause")}
           onMouseLeave={() => setHoveredBtn(null)}
         >
-          {isPlaying ? 'Pause' : 'Play'}
+          {isPlaying ? "Pause" : "Play"}
         </button>
         <button
-          style={{ ...styles.button, ...(hoveredBtn === 'restart' ? styles.buttonHover : {}), }}
+          style={{
+            ...styles.button,
+            ...(hoveredBtn === "restart" ? styles.buttonHover : {}),
+          }}
           onClick={onRestart}
-          onMouseEnter={() => setHoveredBtn('restart')}
+          onMouseEnter={() => setHoveredBtn("restart")}
           onMouseLeave={() => setHoveredBtn(null)}
         >
           Restart
@@ -222,7 +243,7 @@ export const SimulationUI: FC<SimulationUIProps> = ({
           step="1"
           value={speed}
           onChange={(e) => onSpeedChange(Number(e.target.value))}
-          style={{ width: '100%' }}
+          style={{ width: "100%" }}
         />
       </div>
     </div>

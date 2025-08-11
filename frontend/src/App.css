@@ -15,7 +15,7 @@
 }
 
 .dark #root:has(.simulation-results-page .simRes-main-content) {
-  background-color: #0D1117;
+  background-color: #0d1117;
   max-width: none;
   padding-top: 2rem;
   padding-left: 0;
@@ -80,7 +80,8 @@
   color: #888;
 }
 
-canvas, div {
+canvas,
+div {
   border: none !important;
   box-shadow: none !important;
 }

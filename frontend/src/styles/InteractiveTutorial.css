@@ -14,9 +14,9 @@
   position: absolute;
   border-radius: 8px;
   box-shadow:
-    0 0 0 9999px rgba(0,0,0,0.65), /* darken everything except highlight */
-    0 0 24px 8px #4e8cff,           /* blue glow around highlight */
-    0 0 0 2px #fff;                 /* white border for emphasis */
+    0 0 0 9999px rgba(0, 0, 0, 0.65),
+    /* darken everything except highlight */ 0 0 24px 8px #4e8cff,
+    /* blue glow around highlight */ 0 0 0 2px #fff; /* white border for emphasis */
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   pointer-events: none; /* Allows clicks to go through to the popover */
 }

@@ -14,7 +14,7 @@
 }
 
 .dark .user-main-content {
-  background-color: #0D1117;
+  background-color: #0d1117;
 }
 
 @media screen and (max-width: 1400px) and (max-height: 800px) {
@@ -26,7 +26,6 @@
 /* Extra large screens (≥ 1600px) */
 @media screen and (min-width: 1600px) {
   /* Add your styles for very large desktop screens here */
-
 }
 
 /* Large desktops (1400px – 1599px) */

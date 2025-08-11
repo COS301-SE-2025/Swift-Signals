@@ -4748,9 +4748,7 @@
       "version": "0.0.9",
       "resolved": "https://registry.npmjs.org/ansi-html/-/ansi-html-0.0.9.tgz",
       "integrity": "sha512-ozbS3LuenHVxNRh/wdnN16QapUHzauqSomAl1jwwJRRsGwFwtj644lIhxfWu0Fy0acCij2+AEgHvjscq3dlVXg==",
-      "engines": [
-        "node >= 0.8.0"
-      ],
+      "engines": ["node >= 0.8.0"],
       "license": "Apache-2.0",
       "bin": {
         "ansi-html": "bin/ansi-html"
@@ -4760,9 +4758,7 @@
       "version": "0.0.8",
       "resolved": "https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz",
       "integrity": "sha512-1APHAyr3+PCamwNw3bXCPp4HFLONZt/yIH0sZp0/469KWNTEy+qN5jQ3GVX6DMZ1UXAi34yVwtTeaG/HpBuuzw==",
-      "engines": [
-        "node >= 0.8.0"
-      ],
+      "engines": ["node >= 0.8.0"],
       "license": "Apache-2.0",
       "bin": {
         "ansi-html": "bin/ansi-html"
@@ -8744,9 +8740,7 @@
       "hasInstallScript": true,
       "license": "MIT",
       "optional": true,
-      "os": [
-        "darwin"
-      ],
+      "os": ["darwin"],
       "engines": {
         "node": "^8.16.0 || ^10.6.0 || >=11.0.0"
       }
