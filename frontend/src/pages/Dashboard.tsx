@@ -18,6 +18,27 @@ import {
 
 Chart.register(...registerables);
 
+interface Intersection {
+  id: string;
+  name: string;
+  details: {
+    address: string;
+    city: string;
+    province: string;
+    latitude: number;
+    longitude: number;
+  };
+}
+
+interface ApiIntersection {
+  details: {
+    latitude?: number;
+    longitude?: number;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
 const simulations = [
   {
     id: "#1234",
@@ -59,7 +80,7 @@ const Dashboard: React.FC = () => {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
-  const [mapIntersections, setMapIntersections] = useState<any[]>([]);
+  const [mapIntersections, setMapIntersections] = useState<Intersection[]>([]);
   const [isLoadingMap, setIsLoadingMap] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
@@ -71,15 +92,15 @@ const Dashboard: React.FC = () => {
       const ctx = chartRef.current.getContext("2d");
       if (!ctx) return;
 
-      const isDarkMode = document.documentElement.classList.contains('dark');
-      
+      const isDarkMode = document.documentElement.classList.contains("dark");
+
       const gradient = ctx.createLinearGradient(0, 0, 0, 200);
       gradient.addColorStop(0, "rgba(15, 91, 167, 0.4)");
       gradient.addColorStop(1, "rgba(15, 91, 167, 0)");
 
       const labelColor = isDarkMode ? "#F0F6FC" : "#6B7280";
       const gridColor = isDarkMode ? "#30363D" : "#E5E7EB";
-      
+
       chartInstanceRef.current = new Chart(ctx, {
         type: "line",
         data: {
@@ -167,17 +188,20 @@ const Dashboard: React.FC = () => {
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");
       const data = await response.json();
-      const intersectionsWithCoords = (data.intersections || []).map((intr: any, idx: number) => ({
-        ...intr,
-        details: {
-          ...intr.details,
-          latitude: intr.details.latitude ?? (-25.7479 + 0.01 * idx),
-          longitude: intr.details.longitude ?? (28.2293 + 0.01 * idx),
-        },
-      }));
+      const intersectionsWithCoords = (data.intersections || []).map(
+        (intr: ApiIntersection, idx: number) => ({
+          ...intr,
+          details: {
+            ...intr.details,
+            latitude: intr.details.latitude ?? -25.7479 + 0.01 * idx,
+            longitude: intr.details.longitude ?? 28.2293 + 0.01 * idx,
+          },
+        })
+      );
       setMapIntersections(intersectionsWithCoords);
-    } catch (err: any) {
-      setMapError(err.message || "Unknown error");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      setMapError(errorMessage);
       setMapIntersections([]);
     } finally {
       setIsLoadingMap(false);
@@ -238,7 +262,10 @@ const Dashboard: React.FC = () => {
               <button className="runSim quick-action-button bg-[#2B9348] dark:bg-[#2DA44E] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2">
                 <FaPlay /> Run Simulation
               </button>
-              <button className="viewMap quick-action-button border-2 border-[#0F5BA7] dark:border-[#388BFD] text-[#0F5BA7] dark:text-[#388BFD] bg-white dark:bg-[#0D1117] hover:bg-[#e6f1fa] transition flex items-center justify-center gap-2 col-span-2 xl:col-span-1" onClick={handleOpenMapModal}>
+              <button
+                className="viewMap quick-action-button border-2 border-[#0F5BA7] dark:border-[#388BFD] text-[#0F5BA7] dark:text-[#388BFD] bg-white dark:bg-[#0D1117] hover:bg-[#e6f1fa] transition flex items-center justify-center gap-2 col-span-2 xl:col-span-1"
+                onClick={handleOpenMapModal}
+              >
                 <FaMap /> View Map
               </button>
             </div>
@@ -343,15 +370,23 @@ const Dashboard: React.FC = () => {
       </main>
       <Footer />
       <HelpMenu />
-      <MapModal isOpen={isMapModalOpen} onClose={handleCloseMapModal} intersections={mapIntersections} />
+      <MapModal
+        isOpen={isMapModalOpen}
+        onClose={handleCloseMapModal}
+        intersections={mapIntersections}
+      />
       {isLoadingMap && isMapModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded shadow text-center">Loading map data...</div>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded shadow text-center">
+            Loading map data...
+          </div>
         </div>
       )}
       {mapError && isMapModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded shadow text-center text-red-600">{mapError}</div>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded shadow text-center text-red-600">
+            {mapError}
+          </div>
         </div>
       )}
     </div>

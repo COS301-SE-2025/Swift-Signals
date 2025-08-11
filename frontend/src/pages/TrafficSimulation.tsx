@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useMemo } from "react";
 import type { FC } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { MapControls, OrthographicCamera, Text } from "@react-three/drei";
+import { MapControls, OrthographicCamera } from "@react-three/drei";
 import * as THREE from "three";
 import { SimulationUI } from "../components/SimulationUI";
 
@@ -461,22 +461,22 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({ dataUrl, scale, isExpan
           const stateArrayLength = maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
           const newPhases: TrafficLightPhase[] = [];
           const nsGreenDuration = 30;
-          let nsGreenState = Array(stateArrayLength).fill("r");
+          const nsGreenState = Array(stateArrayLength).fill("r");
           directionToSignalIndices["North"].forEach((index) => { nsGreenState[index] = "G"; });
           directionToSignalIndices["South"].forEach((index) => { nsGreenState[index] = "G"; });
           newPhases.push({ duration: nsGreenDuration, state: nsGreenState.join("") });
           const nsYellowDuration = 5;
-          let nsYellowState = Array(stateArrayLength).fill("r");
+          const nsYellowState = Array(stateArrayLength).fill("r");
           directionToSignalIndices["North"].forEach((index) => { nsYellowState[index] = "y"; });
           directionToSignalIndices["South"].forEach((index) => { nsYellowState[index] = "y"; });
           newPhases.push({ duration: nsYellowDuration, state: nsYellowState.join("") });
           const ewGreenDuration = 30;
-          let ewGreenState = Array(stateArrayLength).fill("r");
+          const ewGreenState = Array(stateArrayLength).fill("r");
           directionToSignalIndices["East"].forEach((index) => { ewGreenState[index] = "G"; });
           directionToSignalIndices["West"].forEach((index) => { ewGreenState[index] = "G"; });
           newPhases.push({ duration: ewGreenDuration, state: ewGreenState.join("") });
           const ewYellowDuration = 5;
-          let ewYellowState = Array(stateArrayLength).fill("r");
+          const ewYellowState = Array(stateArrayLength).fill("r");
           directionToSignalIndices["East"].forEach((index) => { ewYellowState[index] = "y"; });
           directionToSignalIndices["West"].forEach((index) => { ewYellowState[index] = "y"; });
           newPhases.push({ duration: ewYellowDuration, state: ewYellowState.join("") });

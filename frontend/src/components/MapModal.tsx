@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -10,7 +10,8 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 // --- FIX for default icon issue with webpack ---
 // Deletes the default icon's image paths and resets them after the component is loaded.
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)
+  ._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: markerIcon2x,
   iconUrl: markerIcon,
@@ -37,7 +38,11 @@ interface MapModalProps {
   intersections: Intersection[];
 }
 
-const MapModal: React.FC<MapModalProps> = ({ isOpen, onClose, intersections }) => {
+const MapModal: React.FC<MapModalProps> = ({
+  isOpen,
+  onClose,
+  intersections,
+}) => {
   if (!isOpen) return null;
 
   // Center map on Pretoria by default

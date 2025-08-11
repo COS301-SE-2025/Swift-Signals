@@ -5,11 +5,23 @@ import "../styles/SimulationResults.css";
 import HelpMenu from "../components/HelpMenu";
 import { Chart, registerables } from "chart.js";
 import { useLocation } from "react-router-dom";
+import type { ChartConfiguration } from "chart.js";
 
 Chart.register(...registerables);
 
 type Position = { time: number; x: number; y: number; speed: number };
 type Vehicle = { id: string; positions: Position[] };
+type SimulationData = {
+  name?: string;
+  description?: string;
+  intersections?: string[];
+  vehicles: Vehicle[];
+  intersection?: {
+    trafficLights?: {
+      phases: { duration?: number }[];
+    }[];
+  };
+};
 
 function computeStats(vehicles: Vehicle[]) {
   let totalSpeed = 0,
@@ -132,13 +144,17 @@ function getHistogramData(
   return { counts, labels };
 }
 
-function downsampleData(labels: any[], data: any[], maxPoints: number) {
+function downsampleData<TLabel, TData>(
+  labels: TLabel[],
+  data: TData[],
+  maxPoints: number
+): { downsampledLabels: TLabel[]; downsampledData: TData[] } {
   if (labels.length <= maxPoints) {
     return { downsampledLabels: labels, downsampledData: data };
   }
 
-  const downsampledLabels = [];
-  const downsampledData = [];
+  const downsampledLabels: TLabel[] = [];
+  const downsampledData: TData[] = [];
   const step = Math.ceil(labels.length / maxPoints);
 
   for (let i = 0; i < labels.length; i += step) {
@@ -150,8 +166,10 @@ function downsampleData(labels: any[], data: any[], maxPoints: number) {
 }
 
 const SimulationResults: React.FC = () => {
-  const [simData, setSimData] = useState<any>(null);
-  const [optimizedData, setOptimizedData] = useState<any>(null);
+  const [simData, setSimData] = useState<SimulationData | null>(null);
+  const [optimizedData, setOptimizedData] = useState<SimulationData | null>(
+    null
+  );
   const [showOptimized, setShowOptimized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [optimizing, setOptimizing] = useState(false);
@@ -221,7 +239,9 @@ const SimulationResults: React.FC = () => {
 
   const handleOptimize = () => {
     if (!optimizedDataExists) {
-      setError("No optimized data available. Please run the optimization first.");
+      setError(
+        "No optimized data available. Please run the optimization first."
+      );
       return;
     }
 
@@ -251,7 +271,9 @@ const SimulationResults: React.FC = () => {
         setOptimizing(false);
       })
       .catch((err) => {
-        setError("Failed to load optimized data. Please check if the optimization has been run.");
+        setError(
+          "Failed to load optimized data. Please check if the optimization has been run."
+        );
         setOptimizing(false);
         console.error(err);
       });
@@ -369,7 +391,7 @@ const SimulationResults: React.FC = () => {
 
     const createChart = (
       ref: React.RefObject<HTMLCanvasElement | null>,
-      config: any
+      config: ChartConfiguration
     ) => {
       if (ref.current) {
         const chart = new Chart(ref.current, config);
@@ -602,7 +624,7 @@ const SimulationResults: React.FC = () => {
     ? {
         numPhases: simData.intersection.trafficLights[0].phases.length,
         totalCycle: simData.intersection.trafficLights[0].phases.reduce(
-          (sum: number, p: any) => sum + (p.duration || 0),
+          (sum: number, p: { duration?: number }) => sum + (p.duration ?? 0),
           0
         ),
       }
@@ -656,8 +678,8 @@ const SimulationResults: React.FC = () => {
                   optimizing
                     ? "bg-gray-500 cursor-not-allowed"
                     : !optimizedDataExists
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : "bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:scale-105 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : "bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:scale-105 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
                 }`}
               >
                 {optimizing ? (
