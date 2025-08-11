@@ -4,13 +4,21 @@ import { IoIosLogOut } from "react-icons/io";
 import { useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoClose } from "react-icons/io5";
+import { useLocation } from "react-router-dom";
 
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  interface IsActiveFn {
+    (path: string): boolean;
+  }
+
+  const isActive: IsActiveFn = (path) => location.pathname === path;
 
   return (
     <nav className="navbar">
@@ -30,22 +38,38 @@ function Navbar() {
       <div className={`navbar-center ${isMobileMenuOpen ? "active" : ""}`}>
         <ul className="nav-links">
           <li>
-            <a href="/dashboard" onClick={toggleMobileMenu}>
+            <a
+              href="/dashboard"
+              className={isActive("/dashboard") ? "active" : ""}
+              onClick={toggleMobileMenu}
+            >
               Dashboard
             </a>
           </li>
           <li>
-            <a href="/intersections" onClick={toggleMobileMenu}>
+            <a
+              href="/intersections"
+              className={isActive("/intersections") ? "active" : ""}
+              onClick={toggleMobileMenu}
+            >
               Intersections
             </a>
           </li>
           <li>
-            <a href="/simulations" onClick={toggleMobileMenu}>
+            <a
+              href="/simulations"
+              className={isActive("/simulations") ? "active" : ""}
+              onClick={toggleMobileMenu}
+            >
               Simulations
             </a>
           </li>
           <li>
-            <a href="/users" onClick={toggleMobileMenu}>
+            <a
+              href="/users"
+              className={isActive("/users") ? "active" : ""}
+              onClick={toggleMobileMenu}
+            >
               Users
             </a>
           </li>
