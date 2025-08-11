@@ -52,7 +52,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
       red: 5,
       speed: 60,
       seed: Math.floor(Math.random() * 10000000000),
-      intersection_type: "4-way",
+      intersection_type: "traffic light",
     },
   });
 
@@ -235,7 +235,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   );
 };
 
-const API_BASE_URL = "http://localhost:9090";
+const API_BASE_URL = "/api";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");
@@ -402,7 +402,7 @@ const Intersections = () => {
                 filteredIntersections.map((intersection) => (
                   <IntersectionCard
                     key={intersection.id}
-                    id={Number(intersection.id)}
+                    id={intersection.id}
                     name={intersection.name}
                     location={`${intersection.details.address}`}
                     lanes={intersection.default_parameters.intersection_type}

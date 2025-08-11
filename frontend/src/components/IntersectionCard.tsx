@@ -3,7 +3,7 @@ import React from "react";
 import "../styles/IntersectionCard.css";
 
 interface IntersectionCardProps {
-  id: number;
+  id: string;
   name: string;
   location: string;
   lanes: string;

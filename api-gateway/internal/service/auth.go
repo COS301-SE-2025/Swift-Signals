@@ -2,39 +2,58 @@ package service
 
 import (
 	"context"
-	"errors"
 
-	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 )
 
 type AuthService struct {
-	userClient *client.UserClient
+	userClient client.UserClientInterface
 }
 
-func NewAuthService(uc *client.UserClient) *AuthService {
+func NewAuthService(uc client.UserClientInterface) AuthServiceInterface {
 	return &AuthService{
 		userClient: uc,
 	}
 }
 
-func (s *AuthService) RegisterUser(ctx context.Context, req model.RegisterRequest) (model.RegisterResponse, error) {
+func (s *AuthService) RegisterUser(
+	ctx context.Context,
+	req model.RegisterRequest,
+) (model.RegisterResponse, error) {
+	logger := util.LoggerFromContext(ctx).With(
+		"service", "auth",
+	)
+
+	logger.Debug("calling user client to register user",
+		"username", req.Username,
+	)
 	registerResp, err := s.userClient.RegisterUser(ctx, req.Username, req.Email, req.Password)
 	if err != nil {
-		return model.RegisterResponse{}, errors.New("unable to register user")
+		return model.RegisterResponse{}, err
 	}
+
 	resp := model.RegisterResponse{
 		UserID: registerResp.Id,
 	}
-
 	return resp, nil
 }
 
-func (s *AuthService) LoginUser(ctx context.Context, req model.LoginRequest) (model.LoginResponse, error) {
+func (s *AuthService) LoginUser(
+	ctx context.Context,
+	req model.LoginRequest,
+) (model.LoginResponse, error) {
+	logger := util.LoggerFromContext(ctx).With(
+		"service", "auth",
+	)
+
+	logger.Debug("calling user client to login user")
 	loginResp, err := s.userClient.LoginUser(ctx, req.Email, req.Password)
 	if err != nil {
-		return model.LoginResponse{}, errors.New("unable to login user")
+		return model.LoginResponse{}, err
 	}
+
 	resp := model.LoginResponse{
 		Message: "Login Successful",
 		Token:   loginResp.Token,
@@ -43,12 +62,30 @@ func (s *AuthService) LoginUser(ctx context.Context, req model.LoginRequest) (mo
 }
 
 func (s *AuthService) LogoutUser(ctx context.Context, token string) (model.LogoutResponse, error) {
+	logger := util.LoggerFromContext(ctx).With(
+		"service", "auth",
+	)
+
+	logger.Debug("calling user client to logout user",
+		"token", token,
+	)
 	_, err := s.userClient.LogoutUser(ctx, token)
 	if err != nil {
-		return model.LogoutResponse{}, errors.New("unable to logout user")
+		return model.LogoutResponse{}, err
 	}
+
 	resp := model.LogoutResponse{
 		Message: "Logout Successful",
 	}
 	return resp, nil
 }
+
+// AuthServiceInterface creates stub for testing
+type AuthServiceInterface interface {
+	RegisterUser(ctx context.Context, req model.RegisterRequest) (model.RegisterResponse, error)
+	LoginUser(ctx context.Context, req model.LoginRequest) (model.LoginResponse, error)
+	LogoutUser(ctx context.Context, token string) (model.LogoutResponse, error)
+}
+
+// Note: Asserts Interface Implementation
+var _ AuthServiceInterface = (*AuthService)(nil)

@@ -7,13 +7,14 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 )
 
 type IntersectionHandler struct {
-	service *service.IntersectionService
+	service service.IntersectionServiceInterface
 }
 
-func NewIntersectionHandler(s *service.IntersectionService) *IntersectionHandler {
+func NewIntersectionHandler(s service.IntersectionServiceInterface) *IntersectionHandler {
 	return &IntersectionHandler{
 		service: s,
 	}
@@ -31,7 +32,7 @@ func NewIntersectionHandler(s *service.IntersectionService) *IntersectionHandler
 func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http.Request) {
 	_, err := util.GetToken(r)
 	if err != nil {
-		util.SendErrorResponse(w, http.StatusUnauthorized, "Authorization token is missing")
+		util.SendErrorResponse(w, err)
 		return
 	}
 
@@ -40,7 +41,7 @@ func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http
 
 	resp, err := h.service.GetAllIntersections(r.Context())
 	if err != nil {
-		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		util.SendErrorResponse(w, err)
 		return
 	}
 
@@ -62,7 +63,7 @@ func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http
 func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Request) {
 	_, err := util.GetToken(r)
 	if err != nil {
-		util.SendErrorResponse(w, http.StatusUnauthorized, "Authorization token is missing")
+		util.SendErrorResponse(w, err)
 		return
 	}
 
@@ -71,7 +72,7 @@ func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Req
 	// TODO: Implement User Verification
 	// ...
 
-	resp, err := h.service.GetIntersectionByID(r.Context(), id)
+	resp, _ := h.service.GetIntersectionByID(r.Context(), id)
 
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }
@@ -90,13 +91,13 @@ func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Req
 func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.Request) {
 	var req model.CreateIntersectionRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		util.SendErrorResponse(w, http.StatusBadRequest, "Invalid request payload")
+		util.SendErrorResponse(w, err)
 		return
 	}
 
 	_, err := util.GetToken(r)
 	if err != nil {
-		util.SendErrorResponse(w, http.StatusUnauthorized, "Authorization token is missing")
+		util.SendErrorResponse(w, err)
 		return
 	}
 
@@ -105,7 +106,7 @@ func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.
 
 	resp, err := h.service.CreateIntersection(r.Context(), req)
 	if err != nil {
-		util.SendErrorResponse(w, http.StatusInternalServerError, err.Error())
+		util.SendErrorResponse(w, err)
 		return
 	}
 
@@ -128,7 +129,10 @@ func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.
 func (h *IntersectionHandler) UpdateIntersection(w http.ResponseWriter, r *http.Request) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
-		util.SendErrorResponse(w, http.StatusUnauthorized, "Authorization token is missing")
+		util.SendErrorResponse(
+			w,
+			errs.NewUnauthorizedError("Authorization token is missing", map[string]any{}),
+		)
 		return
 	}
 
