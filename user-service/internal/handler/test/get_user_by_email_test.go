@@ -14,51 +14,49 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (suite *TestSuite) TestRegisterUser_Success() {
-	req := &userpb.RegisterUserRequest{
-		Name:     "Valid User",
-		Email:    "valid@gmail.com",
-		Password: "8characters",
+func (suite *TestSuite) TestGetUserByEmail_Success() {
+	req := &userpb.GetUserByEmailRequest{
+		Email: "john@example.com",
 	}
 
 	expectedUser := &model.User{
-		ID:              "generated id",
-		Name:            "Valid User",
-		Email:           "valid@gmail.com",
-		IsAdmin:         false,
-		IntersectionIDs: nil,
+		ID:              "user-id-123",
+		Name:            "John Doe",
+		Email:           "john@example.com",
+		IsAdmin:         true,
+		IntersectionIDs: []string{"intersection1", "intersection2"},
 		CreatedAt:       time.Now(),
 		UpdatedAt:       time.Now(),
 	}
 
 	ctx := context.Background()
 
-	suite.service.On("RegisterUser", ctx, req.Name, req.Email, req.Password).
+	suite.service.On("GetUserByEmail", ctx, req.Email).
 		Return(expectedUser, nil)
 
-	result, err := suite.handler.RegisterUser(ctx, req)
+	result, err := suite.handler.GetUserByEmail(ctx, req)
 
 	suite.Require().NoError(err)
 	suite.Equal(expectedUser.ID, result.GetId())
 	suite.Equal(expectedUser.Name, result.GetName())
 	suite.Equal(expectedUser.Email, result.GetEmail())
+	suite.Equal(expectedUser.IsAdmin, result.GetIsAdmin())
+	suite.Equal(expectedUser.IntersectionIDs, result.GetIntersectionIds())
 
 	suite.service.AssertExpectations(suite.T())
 }
 
-func (suite *TestSuite) TestRegisterUser_Failure() {
-	req := &userpb.RegisterUserRequest{
-		Name:     "Invalid",
-		Email:    "fail@example.com",
-		Password: "weak",
+func (suite *TestSuite) TestGetUserByEmail_Failure() {
+	req := &userpb.GetUserByEmailRequest{
+		Email: "nonexistent@example.com",
 	}
 
-	suite.service.On("RegisterUser", mock.Anything, req.GetName(), req.GetEmail(), req.GetPassword()).
-		Return(nil, errors.New("any error"))
+	suite.service.On("GetUserByEmail", mock.Anything, req.GetEmail()).
+		Return(nil, errors.New("user not found"))
 
 	ctx := context.Background()
 
-	result, err := suite.handler.RegisterUser(ctx, req)
+	result, err := suite.handler.GetUserByEmail(ctx, req)
 
 	suite.Nil(result)
 	suite.Require().Error(err)
@@ -71,6 +69,6 @@ func (suite *TestSuite) TestRegisterUser_Failure() {
 	suite.service.AssertExpectations(suite.T())
 }
 
-func TestHandlerRegisterUser(t *testing.T) {
+func TestHandlerGetUserByEmail(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }

@@ -3,9 +3,10 @@ package db
 import (
 	"context"
 	"database/sql"
-	"log"
 
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
+	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/util"
 )
 
 type PostgresUserRepo struct {
@@ -17,7 +18,10 @@ func NewPostgresUserRepo(db *sql.DB) UserRepository {
 }
 
 func (r *PostgresUserRepo) CreateUser(ctx context.Context, u *model.User) (*model.User, error) {
-	query := `INSERT INTO users (uuid, name, email, password, is_admin, created_at, updated_at) 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Inserting into users table")
+	query := `INSERT INTO users (uuid, name, email, password, is_admin, created_at, updated_at)
 	          VALUES ($1, $2, $3, $4, $5, NOW(), NOW())`
 
 	_, err := r.db.ExecContext(ctx, query, u.ID, u.Name, u.Email, u.Password, u.IsAdmin)
@@ -32,11 +36,15 @@ func (r *PostgresUserRepo) CreateUser(ctx context.Context, u *model.User) (*mode
 }
 
 func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id string) (*model.User, error) {
-	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at 
-	          FROM users 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Selecting from users table")
+	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at
+	          FROM users
 	          WHERE uuid = $1`
 	row := r.db.QueryRowContext(ctx, query, id)
 
+	logger.Debug("populating user struct with target info")
 	user := &model.User{}
 	err := row.Scan(
 		&user.ID,
@@ -48,27 +56,33 @@ func (r *PostgresUserRepo) GetUserByID(ctx context.Context, id string) (*model.U
 		&user.UpdatedAt,
 	)
 	if err != nil {
-		return nil, err
+		return nil, HandleDatabaseError(err, ErrorContext{Operation: OpRead, Table: "users"})
 	}
 
-	// Get intersection IDs
+	logger.Debug("populating user struct with intersection ids")
 	intIDs, err := r.GetIntersectionsByUserID(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, errs.NewDatabaseError(
+			"failed to get intersections by user id",
+			err,
+			map[string]any{"id": id},
+		)
 	}
-
-	// Populate User IDs
 	user.IntersectionIDs = intIDs
 
 	return user, nil
 }
 
 func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
-	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at 
-	          FROM users 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Selecting from users table")
+	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at
+	          FROM users
 	          WHERE email = $1`
 	row := r.db.QueryRowContext(ctx, query, email)
 
+	logger.Debug("populating user struct with target info")
 	user := &model.User{}
 	err := row.Scan(
 		&user.ID,
@@ -81,59 +95,74 @@ func (r *PostgresUserRepo) GetUserByEmail(ctx context.Context, email string) (*m
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			// No user found with that email
+			// NOTE: this is the expected behaviour in registerUser and loginUser
 			return nil, nil
 		}
-		return nil, err
+		return nil, HandleDatabaseError(err, ErrorContext{Operation: OpRead, Table: "users"})
 	}
 
-	// Get intersection IDs
+	logger.Debug("populating user struct with intersection ids")
 	intIDs, err := r.GetIntersectionsByUserID(ctx, user.ID)
 	if err != nil {
-		return nil, err
+		return nil, errs.NewDatabaseError(
+			"failed to get intersections by user id",
+			err,
+			map[string]any{"userID": user.ID},
+		)
 	}
-
-	// Populate User IDs
 	user.IntersectionIDs = intIDs
 
 	return user, nil
 }
 
 func (r *PostgresUserRepo) UpdateUser(ctx context.Context, u *model.User) (*model.User, error) {
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("updating user in users table")
 	query := `UPDATE users
 	          SET name = $1, email = $2, password = $3, is_admin = $4, updated_at = NOW()
 	          WHERE uuid = $5`
 	_, err := r.db.ExecContext(ctx, query, u.Name, u.Email, u.Password, u.IsAdmin, u.ID)
 	if err != nil {
-		return nil, err
+		return nil, HandleDatabaseError(err, ErrorContext{Operation: OpUpdate, Table: "users"})
 	}
 	return u, nil
 }
 
 func (r *PostgresUserRepo) DeleteUser(ctx context.Context, id string) error {
-	query := `DELETE FROM users 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("deleting user from users table")
+	query := `DELETE FROM users
 	          WHERE uuid = $1`
 	_, err := r.db.ExecContext(ctx, query, id)
-	return err
+	if err != nil {
+		return HandleDatabaseError(err, ErrorContext{Operation: OpDelete, Table: "users"})
+	}
+	return nil
 }
 
 func (r *PostgresUserRepo) ListUsers(
 	ctx context.Context,
 	limit, offset int,
 ) ([]*model.User, error) {
-	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at 
-	          FROM users 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Selecting all users from user table")
+	query := `SELECT uuid, name, email, password, is_admin, created_at, updated_at
+	          FROM users
 	          ORDER BY uuid LIMIT $1 OFFSET $2`
 	rows, err := r.db.QueryContext(ctx, query, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, HandleDatabaseError(err, ErrorContext{Operation: OpRead, Table: "users"})
 	}
 	defer func() {
 		if err := rows.Close(); err != nil {
-			log.Printf("Failed to close rows: %v", err)
+			logger.Warn("Failed to close rows", "Error", err)
 		}
 	}()
 
+	logger.Debug("populating users slice with users")
 	var users []*model.User
 	for rows.Next() {
 		user := &model.User{}
@@ -147,16 +176,17 @@ func (r *PostgresUserRepo) ListUsers(
 			&user.UpdatedAt,
 		)
 		if err != nil {
-			return nil, err
+			return nil, HandleDatabaseError(err, ErrorContext{Operation: OpRead, Table: "users"})
 		}
 
-		// Get intersection IDs
+		logger.Debug("Fetching intersection ids", "userID", user.ID)
 		intIDs, err := r.GetIntersectionsByUserID(ctx, user.ID)
 		if err != nil {
-			return nil, err
+			return nil, errs.NewDatabaseError("failed to get intersections by user id",
+				err,
+				map[string]any{"userID": user.ID})
 		}
 
-		// Populate User IDs
 		user.IntersectionIDs = intIDs
 
 		users = append(users, user)
@@ -169,10 +199,19 @@ func (r *PostgresUserRepo) AddIntersectionID(
 	userID string,
 	intID string,
 ) error {
-	query := `INSERT INTO user_intersections (user_id, intersection_id) 
-	          VALUES ($1, $2) 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Inserting into user_intersections")
+	query := `INSERT INTO user_intersections (user_id, intersection_id)
+	          VALUES ($1, $2)
 	          ON CONFLICT DO NOTHING`
 	_, err := r.db.ExecContext(ctx, query, userID, intID)
+	if err != nil {
+		return HandleDatabaseError(
+			err,
+			ErrorContext{Operation: OpCreate, Table: "user_intersections"},
+		)
+	}
 	return err
 }
 
@@ -180,24 +219,34 @@ func (r *PostgresUserRepo) GetIntersectionsByUserID(
 	ctx context.Context,
 	userID string,
 ) ([]string, error) {
-	query := `SELECT intersection_id 
-	          FROM user_intersections 
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("Selecting intersection_id from user_intersections")
+	query := `SELECT intersection_id
+	          FROM user_intersections
 	          WHERE user_id = $1`
 	rows, err := r.db.QueryContext(ctx, query, userID)
 	if err != nil {
-		return nil, err
+		return nil, HandleDatabaseError(
+			err,
+			ErrorContext{Operation: OpRead, Table: "user_intersections"},
+		)
 	}
 	defer func() {
 		if err := rows.Close(); err != nil {
-			log.Printf("Failed to close rows: %v", err)
+			logger.Warn("Failed to close rows", "Error", err)
 		}
 	}()
 
+	logger.Debug("Populating ids slice with users intersection ids")
 	var ids []string
 	for rows.Next() {
 		var id string
 		if err := rows.Scan(&id); err != nil {
-			return nil, err
+			return nil, HandleDatabaseError(
+				err,
+				ErrorContext{Operation: OpRead, Table: "user_intersections"},
+			)
 		}
 		ids = append(ids, id)
 	}

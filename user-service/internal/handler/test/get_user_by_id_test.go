@@ -14,51 +14,49 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (suite *TestSuite) TestRegisterUser_Success() {
-	req := &userpb.RegisterUserRequest{
-		Name:     "Valid User",
-		Email:    "valid@gmail.com",
-		Password: "8characters",
+func (suite *TestSuite) TestGetUserByID_Success() {
+	req := &userpb.UserIDRequest{
+		UserId: "valid-user-id",
 	}
 
 	expectedUser := &model.User{
-		ID:              "generated id",
-		Name:            "Valid User",
-		Email:           "valid@gmail.com",
+		ID:              "valid-user-id",
+		Name:            "John Doe",
+		Email:           "john@example.com",
 		IsAdmin:         false,
-		IntersectionIDs: nil,
+		IntersectionIDs: []string{"intersection1", "intersection2"},
 		CreatedAt:       time.Now(),
 		UpdatedAt:       time.Now(),
 	}
 
 	ctx := context.Background()
 
-	suite.service.On("RegisterUser", ctx, req.Name, req.Email, req.Password).
+	suite.service.On("GetUserByID", ctx, req.UserId).
 		Return(expectedUser, nil)
 
-	result, err := suite.handler.RegisterUser(ctx, req)
+	result, err := suite.handler.GetUserByID(ctx, req)
 
 	suite.Require().NoError(err)
 	suite.Equal(expectedUser.ID, result.GetId())
 	suite.Equal(expectedUser.Name, result.GetName())
 	suite.Equal(expectedUser.Email, result.GetEmail())
+	suite.Equal(expectedUser.IsAdmin, result.GetIsAdmin())
+	suite.Equal(expectedUser.IntersectionIDs, result.GetIntersectionIds())
 
 	suite.service.AssertExpectations(suite.T())
 }
 
-func (suite *TestSuite) TestRegisterUser_Failure() {
-	req := &userpb.RegisterUserRequest{
-		Name:     "Invalid",
-		Email:    "fail@example.com",
-		Password: "weak",
+func (suite *TestSuite) TestGetUserByID_Failure() {
+	req := &userpb.UserIDRequest{
+		UserId: "invalid-user-id",
 	}
 
-	suite.service.On("RegisterUser", mock.Anything, req.GetName(), req.GetEmail(), req.GetPassword()).
-		Return(nil, errors.New("any error"))
+	suite.service.On("GetUserByID", mock.Anything, req.GetUserId()).
+		Return(nil, errors.New("user not found"))
 
 	ctx := context.Background()
 
-	result, err := suite.handler.RegisterUser(ctx, req)
+	result, err := suite.handler.GetUserByID(ctx, req)
 
 	suite.Nil(result)
 	suite.Require().Error(err)
@@ -71,6 +69,6 @@ func (suite *TestSuite) TestRegisterUser_Failure() {
 	suite.service.AssertExpectations(suite.T())
 }
 
-func TestHandlerRegisterUser(t *testing.T) {
+func TestHandlerGetUserByID(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }
