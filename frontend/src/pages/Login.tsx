@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import Footer from "../components/Footer";
+import logo from "../../src/assets/logo.png"
 
 const API_BASE_URL = "/api";
 
@@ -193,7 +194,7 @@ const Login = () => {
         style={{ minWidth: 350 }}
       >
         <img
-          src="/src/assets/logo.png"
+          src={logo}
           alt="Swift Signals Logo"
           className="loginLogo h-20 w-20 object-contain drop-shadow-lg"
         />

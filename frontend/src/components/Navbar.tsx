@@ -5,6 +5,7 @@ import { useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoClose } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
+import logo from "../../src/assets/logo.png"
 
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -23,7 +24,7 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <img src="/src/assets/logo.png" alt="Logo" className="logo-image" />
+        <img src={logo} alt="Logo" className="logo-image" />
         <div className="logo">Swift Signals</div>
       </div>
 
