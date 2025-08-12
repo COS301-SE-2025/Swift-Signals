@@ -16,6 +16,13 @@ python -m grpc_tools.protoc -I . \
        simulation.proto
 ```
 
+```bash
+python -m grpc_tools.protoc -I . \
+       --python_out=./gen/optimisation/ \
+       --pyi_out=./gen/optimisation/ \
+       --grpc_python_out=./gen/optimisation/ \
+       optimisation.proto
+```
 
 ### To update user.proto generated code
 ```bash
@@ -23,7 +30,6 @@ protoc --go_out=./gen/user/ --go_opt=paths=source_relative \
        --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative \
        user.proto
 ```
-
 
 ### To update intersection.proto generated code
 ```bash
