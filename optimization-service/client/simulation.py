@@ -4,7 +4,12 @@ from google.protobuf.json_format import MessageToDict
 import simulation_pb2 as pb
 import simulation_pb2_grpc as pb_grpc
 
-channel = grpc.insecure_channel("localhost:50053")
+import os
+import simulation_pb2 as pb
+import simulation_pb2_grpc as pb_grpc
+
+server_address = os.environ.get("SIMULATION_SERVER_ADDRESS", "localhost:50053")
+channel = grpc.insecure_channel(server_address)
 stub = pb_grpc.SimulationServiceStub(channel)
 
 
