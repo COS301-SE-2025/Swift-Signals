@@ -4,7 +4,7 @@ PROTOC_GEN_GO_GRPC_VERSION=v1.5.1
 
 .PHONY: install-protoc
 
-generate: user.proto intersection.proto simulation.proto
+generate: user.proto intersection.proto simulation.proto optimisation.proto
 	mkdir -p gen/user gen/intersection gen/simulation gen/optimisation
 	protoc --go_out=./gen/user/ --go_opt=paths=source_relative \
 				 --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative \
