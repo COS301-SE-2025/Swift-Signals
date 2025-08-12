@@ -8,9 +8,7 @@ channel = grpc.insecure_channel("localhost:50053")
 stub = pb_grpc.SimulationServiceStub(channel)
 
 
-def GetSimulationResults(
-    intr_type: int, green: int, yellow: int, red: int, speed: int, seed: int
-):
+def GetSimulationResults(green: int, yellow: int, red: int, speed: int, seed: int):
     results = stub.GetSimulationResults(
         pb.SimulationRequest(
             intersection_id="",
