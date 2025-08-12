@@ -31,6 +31,19 @@ describe("Welcome Page", () => {
       cy.get(".carousel-indicator").eq(0).should("have.class", "active");
     });
 
+    it("should auto-transition to the next slide", () => {
+      // default delay: 9000ms
+      cy.wait(9200); // Wait slightly longer than autoplayDelay
+
+      // Check that second indicator is now active
+      cy.get(".carousel-indicator").eq(1).should("have.class", "active");
+
+      // Optional: confirm second slide content
+      cy.get(".carousel-item").eq(1).within(() => {
+        cy.get(".carousel-item-title").should("contain.text", "Purpose & Impact");
+      });
+    });
+
   });
   
 });
