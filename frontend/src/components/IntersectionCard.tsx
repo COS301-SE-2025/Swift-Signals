@@ -8,9 +8,9 @@ interface IntersectionCardProps {
   location: string;
   lanes: string;
   image?: string;
-  onSimulate: (id: number) => void;
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
+  onSimulate: (id: string) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 const IntersectionCard: React.FC<IntersectionCardProps> = ({

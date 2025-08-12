@@ -234,7 +234,7 @@ const Login = () => {
                 e.preventDefault();
                 setUsername(e.target.value);
               }}
-              placeholder="Username or Email"
+              placeholder="Email"
               className="w-full px-4 py-3 border-2 border-[#388BFD] rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
               disabled={isLoading}
