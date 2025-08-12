@@ -694,9 +694,18 @@
         },
         "model.SimulationParameters": {
             "type": "object",
+            "required": [
+                "green",
+                "intersection_type",
+                "red",
+                "seed",
+                "speed",
+                "yellow"
+            ],
             "properties": {
                 "green": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 10
                 },
                 "intersection_type": {
@@ -705,6 +714,7 @@
                 },
                 "red": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 6
                 },
                 "seed": {
@@ -713,10 +723,12 @@
                 },
                 "speed": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 60
                 },
                 "yellow": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 2
                 }
             }

@@ -697,9 +697,18 @@ const docTemplate = `{
         },
         "model.SimulationParameters": {
             "type": "object",
+            "required": [
+                "green",
+                "intersection_type",
+                "red",
+                "seed",
+                "speed",
+                "yellow"
+            ],
             "properties": {
                 "green": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 10
                 },
                 "intersection_type": {
@@ -708,6 +717,7 @@ const docTemplate = `{
                 },
                 "red": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 6
                 },
                 "seed": {
@@ -716,10 +726,12 @@ const docTemplate = `{
                 },
                 "speed": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 60
                 },
                 "yellow": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 2
                 }
             }

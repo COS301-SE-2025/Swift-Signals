@@ -172,22 +172,33 @@ definitions:
     properties:
       green:
         example: 10
+        minimum: 1
         type: integer
       intersection_type:
         example: t-junction
         type: string
       red:
         example: 6
+        minimum: 1
         type: integer
       seed:
         example: 3247128304
         type: integer
       speed:
         example: 60
+        minimum: 1
         type: integer
       yellow:
         example: 2
+        minimum: 1
         type: integer
+    required:
+    - green
+    - intersection_type
+    - red
+    - seed
+    - speed
+    - yellow
     type: object
   model.UpdateIntersectionRequest:
     properties:
