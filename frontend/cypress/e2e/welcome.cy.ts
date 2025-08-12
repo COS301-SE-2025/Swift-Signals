@@ -1,6 +1,6 @@
 describe("Welcome Page", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:5173/"); // Or use env baseUrl
+    cy.visit("/"); // set in cypress.config.cjs
   });
 
   it("should display the heading and logo", () => {
@@ -17,5 +17,10 @@ describe("Welcome Page", () => {
     cy.contains("Register").click();
     cy.url().should("include", "/signup");
   });
+
+  describe("Carousel interaction", () => {
+
+  });
+  
 });
 
