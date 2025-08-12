@@ -27,6 +27,8 @@ describe("Welcome Page", () => {
         cy.get(".carousel-item-title").should("contain.text", "Overview");
       });
 
+      // First indicator should be active
+      cy.get(".carousel-indicator").eq(0).should("have.class", "active");
     });
 
   });
