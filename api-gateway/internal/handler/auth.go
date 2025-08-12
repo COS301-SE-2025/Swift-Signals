@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
@@ -34,7 +35,7 @@ func NewAuthHandler(s service.AuthServiceInterface) *AuthHandler {
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /register [post]
 func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
-	logger := util.LoggerFromContext(r.Context()).With(
+	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "auth",
 		"action", "register",
 	)
@@ -91,7 +92,7 @@ func (h *AuthHandler) Register(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /login [post]
 func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
-	logger := util.LoggerFromContext(r.Context()).With(
+	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "auth",
 		"action", "login",
 	)
@@ -145,7 +146,7 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /logout [post]
 func (h *AuthHandler) Logout(w http.ResponseWriter, r *http.Request) {
-	logger := util.LoggerFromContext(r.Context()).With(
+	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "auth",
 		"action", "logout",
 	)

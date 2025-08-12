@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -19,6 +20,14 @@ type IntersectionClient struct {
 func NewIntersectionClient(conn *grpc.ClientConn) *IntersectionClient {
 	return &IntersectionClient{
 		client: intersectionpb.NewIntersectionServiceClient(conn),
+	}
+}
+
+func NewIntersectionClientWithGrpcClient(
+	client intersectionpb.IntersectionServiceClient,
+) *IntersectionClient {
+	return &IntersectionClient{
+		client: client,
 	}
 }
 
@@ -35,7 +44,11 @@ func (ic *IntersectionClient) CreateIntersection(
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	return ic.client.CreateIntersection(ctx, req)
+	resp, err := ic.client.CreateIntersection(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (ic *IntersectionClient) GetIntersection(
@@ -48,7 +61,11 @@ func (ic *IntersectionClient) GetIntersection(
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	return ic.client.GetIntersection(ctx, req)
+	resp, err := ic.client.GetIntersection(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (ic *IntersectionClient) GetAllIntersections(
@@ -72,7 +89,11 @@ func (ic *IntersectionClient) UpdateIntersection(
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	return ic.client.UpdateIntersection(ctx, req)
+	resp, err := ic.client.UpdateIntersection(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (ic *IntersectionClient) DeleteIntersection(
@@ -85,7 +106,11 @@ func (ic *IntersectionClient) DeleteIntersection(
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	return ic.client.DeleteIntersection(ctx, req)
+	resp, err := ic.client.DeleteIntersection(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (ic *IntersectionClient) PutOptimisation(
@@ -98,7 +123,11 @@ func (ic *IntersectionClient) PutOptimisation(
 		Parameters: convertParametersToProto(parameters),
 	}
 
-	return ic.client.PutOptimisation(ctx, req)
+	resp, err := ic.client.PutOptimisation(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 // NOTE: Creates stub for testing

@@ -18,10 +18,14 @@ definitions:
         type: object
       name:
         example: My Intersection
+        maxLength: 256
         type: string
       traffic_density:
         example: high
         type: string
+    required:
+    - default_parameters
+    - name
     type: object
   model.CreateIntersectionResponse:
     properties:
@@ -44,10 +48,10 @@ definitions:
   model.ErrorResponse:
     properties:
       code:
-        example: BAD_REQUEST
-        type: string
+        example: 404
+        type: integer
       message:
-        example: ERROR_MSG
+        example: resource not found
         type: string
     type: object
   model.Intersection:
@@ -131,9 +135,13 @@ definitions:
         type: string
       password:
         example: VeryStrongPassword456
+        maxLength: 64
+        minLength: 8
         type: string
       username:
         example: johndoe
+        maxLength: 32
+        minLength: 3
         type: string
     required:
     - email
@@ -164,22 +172,33 @@ definitions:
     properties:
       green:
         example: 10
+        minimum: 1
         type: integer
       intersection_type:
         example: t-junction
         type: string
       red:
         example: 6
+        minimum: 1
         type: integer
       seed:
         example: 3247128304
         type: integer
       speed:
         example: 60
+        minimum: 1
         type: integer
       yellow:
         example: 2
+        minimum: 1
         type: integer
+    required:
+    - green
+    - intersection_type
+    - red
+    - seed
+    - speed
+    - yellow
     type: object
   model.UpdateIntersectionRequest:
     properties:
@@ -268,6 +287,40 @@ paths:
       tags:
       - Intersections
   /intersections/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes the intersection with the given ID.
+      parameters:
+      - description: Intersection ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: 'Bad Request: Invalid input'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: 'Not Found: Intersection does not exist'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Delete Intersection
+      tags:
+      - Intersections
     get:
       consumes:
       - application/json
