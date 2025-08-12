@@ -193,7 +193,7 @@ func (s *IntersectionService) DeleteIntersectionByID(
 		return err
 	}
 
-	logger.Debug("calling intersection client to update intersection")
+	logger.Debug("calling intersection client to delete intersection")
 	_, err = s.intrClient.DeleteIntersection(ctx, intersectionID)
 	return err
 }
