@@ -19,6 +19,15 @@ describe("Welcome Page", () => {
   });
 
   describe("Carousel interaction", () => {
+    it("should render the carousel and show the first item", () => {
+      cy.get(".carousel-container").should("be.visible");
+
+      // First slide (title: "Overview") should be visible
+      cy.get(".carousel-item").first().within(() => {
+        cy.get(".carousel-item-title").should("contain.text", "Overview");
+      });
+
+    });
 
   });
   
