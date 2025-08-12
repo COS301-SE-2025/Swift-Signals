@@ -49,3 +49,14 @@ func (oc *OptimisationClient) RunOptimisation(
 	}
 	return resp, nil
 }
+
+// NOTE: Creates stub for testing
+type OptimisationClientInterface interface {
+	RunOptimisation(
+		ctx context.Context,
+		params model.OptimisationParameters,
+	) (*optimisationpb.OptimisationParameters, error)
+}
+
+// NOTE: Asserts Interface Implementation
+var _ OptimisationClientInterface = (*OptimisationClient)(nil)

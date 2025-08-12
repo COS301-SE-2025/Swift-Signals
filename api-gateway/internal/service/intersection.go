@@ -13,15 +13,15 @@ import (
 )
 
 type IntersectionService struct {
-	intrClient *client.IntersectionClient
-	optiClient *client.OptimisationClient
-	userClient *client.UserClient
+	intrClient client.IntersectionClientInterface
+	optiClient client.OptimisationClientInterface
+	userClient client.UserClientInterface
 }
 
 func NewIntersectionService(
-	ic *client.IntersectionClient,
-	oc *client.OptimisationClient,
-	uc *client.UserClient,
+	ic client.IntersectionClientInterface,
+	oc client.OptimisationClientInterface,
+	uc client.UserClientInterface,
 ) IntersectionServiceInterface {
 	return &IntersectionService{
 		intrClient: ic,

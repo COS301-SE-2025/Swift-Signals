@@ -1,19 +1,10 @@
 with-expecter: true
 
-resolve-type-alias: false         
-disable-version-string: true     
-issue-845-fix: true             
+resolve-type-alias: false
+disable-version-string: true
+issue-845-fix: true
 
 packages:
-  github.com/COS301-SE-2025/Swift-Signals/protos/gen/user:
-    config:
-      dir: "internal/mocks/grpc_client"
-      filename: "{{.InterfaceName}}.go"
-      mockname: "Mock{{.InterfaceName}}"
-      outpkg: "mocks"
-    interfaces:
-      UserServiceClient:
-
   github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client:
     config:
       dir: "internal/mocks/client"
@@ -33,3 +24,21 @@ packages:
       AuthServiceInterface:
       IntersectionServiceInterface:
 
+  github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection:
+    config:
+      dir: "internal/mocks/grpc_client"
+      filename: "{{.InterfaceName}}.go"
+      mockname: "Mock{{.InterfaceName}}"
+      outpkg: "mocks"
+    interfaces:
+      IntersectionService_GetAllIntersectionsClient:
+
+  github.com/COS301-SE-2025/Swift-Signals/protos/gen/user:
+    config:
+      dir: "internal/mocks/grpc_client"
+      filename: "{{.InterfaceName}}.go"
+      mockname: "Mock{{.InterfaceName}}"
+      outpkg: "mocks"
+    interfaces:
+      UserServiceClient:
+      UserService_GetUserIntersectionIDsClient:

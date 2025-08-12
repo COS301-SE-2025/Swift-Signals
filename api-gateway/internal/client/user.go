@@ -313,6 +313,11 @@ type UserClientInterface interface {
 		ctx context.Context,
 		userID string,
 	) (userpb.UserService_GetUserIntersectionIDsClient, error)
+	AddIntersectionID(
+		ctx context.Context,
+		userID string,
+		intersection_id string,
+	) (*emptypb.Empty, error)
 	RemoveIntersectionID(
 		ctx context.Context,
 		userID string,

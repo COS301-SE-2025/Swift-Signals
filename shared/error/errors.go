@@ -39,6 +39,8 @@ const (
 	ErrAlreadyExists ErrorCode = "ALREADY_EXISTS"
 	ErrUnauthorized  ErrorCode = "UNAUTHORIZED"
 	ErrForbidden     ErrorCode = "FORBIDDEN"
+	ErrConflict      ErrorCode = "CONFLICT_ERROR"
+	ErrUnavailable   ErrorCode = "UNAVAILABLE_ERROR"
 	ErrDatabase      ErrorCode = "DB_ERROR"
 	ErrInternal      ErrorCode = "INTERNAL_ERROR"
 	ErrExternal      ErrorCode = "EXTERNAL_ERROR"
@@ -119,6 +121,24 @@ func NewExternalError(message string, cause error, context map[string]any) *Serv
 	}
 }
 
+// NewConflictError creates a new conflict error
+func NewConflictError(message string, context map[string]any) *ServiceError {
+	return &ServiceError{
+		Code:    ErrConflict,
+		Message: message,
+		Context: context,
+	}
+}
+
+// NewUnavailableError creates a new unavailable error
+func NewUnavailableError(message string, context map[string]any) *ServiceError {
+	return &ServiceError{
+		Code:    ErrUnavailable,
+		Message: message,
+		Context: context,
+	}
+}
+
 // HandleServiceError converts service errors to appropriate gRPC status errors
 func HandleServiceError(err error) error {
 	if err == nil {
@@ -138,6 +158,10 @@ func HandleServiceError(err error) error {
 			return status.Error(codes.Unauthenticated, svcErr.Message)
 		case ErrForbidden:
 			return status.Error(codes.PermissionDenied, svcErr.Message)
+		case ErrConflict:
+			return status.Error(codes.FailedPrecondition, svcErr.Message)
+		case ErrUnavailable:
+			return status.Error(codes.Unavailable, svcErr.Message)
 		case ErrDatabase, ErrInternal, ErrExternal:
 			return status.Error(codes.Internal, "internal server error")
 		}
