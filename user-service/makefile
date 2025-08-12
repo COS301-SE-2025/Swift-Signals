@@ -15,11 +15,6 @@ tools:
 	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
 
-proto:
-	@echo "Generating proto files..."
-	cd ../protos && make install-protoc
-	cd ../protos && make generate
-
 mocks: tools
 	@echo "Generating mocks with mockery $(MOCKERY_VERSION)..."
 	@echo "Cleaning existing mocks..."
