@@ -30,8 +30,10 @@ jobs:
             sudo unzip -o protoc-27.2-linux-x86_64.zip -d /usr/local
 
         - name: Generate Proto Files
-          working-directory: ./user-service
-          run: make proto
+          working-directory: ./protos
+          run: |
+            make install-protoc
+            make generate
 
         - name: Generate Mocks
           working-directory: ./user-service

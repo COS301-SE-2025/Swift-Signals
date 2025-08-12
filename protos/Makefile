@@ -1,11 +1,11 @@
 PROTOC_VERSION=29.3
-PROTOC_GEN_GO_VERSION=v1.36.0
-PROTOC_GEN_GO_GRPC_VERSION=v1.3.0
+PROTOC_GEN_GO_VERSION=v1.36.7
+PROTOC_GEN_GO_GRPC_VERSION=v1.5.1
 
 .PHONY: install-protoc
 
 generate: user.proto intersection.proto simulation.proto
-	mkdir -p gen/user gen/intersection gen/simulation
+	mkdir -p gen/user gen/intersection gen/simulation gen/optimisation
 	protoc --go_out=./gen/user/ --go_opt=paths=source_relative \
 				 --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative \
 				 user.proto
@@ -15,6 +15,9 @@ generate: user.proto intersection.proto simulation.proto
 	protoc --go_out=./gen/simulation/ --go_opt=paths=source_relative \
 				 --go-grpc_out=./gen/simulation/ --go-grpc_opt=paths=source_relative \
 				 simulation.proto
+	protoc --go_out=./gen/optimisation/ --go_opt=paths=source_relative \
+				 --go-grpc_out=./gen/optimisation/ --go-grpc_opt=paths=source_relative \
+				 optimisation.proto
 	cd gen/ && go mod init github.com/COS301-SE-2025/Swift-Signals/protos/gen && go mod tidy
 
 install-protoc:

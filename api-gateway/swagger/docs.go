@@ -160,6 +160,57 @@ const docTemplate = `{
                     }
                 }
             },
+            "delete": {
+                "description": "Deletes the intersection with the given ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Intersections"
+                ],
+                "summary": "Delete Intersection",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "patch": {
                 "description": "Partially updates fields of an existing intersection by ID.",
                 "consumes": [
@@ -406,6 +457,10 @@ const docTemplate = `{
     "definitions": {
         "model.CreateIntersectionRequest": {
             "type": "object",
+            "required": [
+                "default_parameters",
+                "name"
+            ],
             "properties": {
                 "default_parameters": {
                     "$ref": "#/definitions/model.SimulationParameters"
@@ -429,6 +484,7 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string",
+                    "maxLength": 256,
                     "example": "My Intersection"
                 },
                 "traffic_density": {
@@ -467,12 +523,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "code": {
-                    "type": "string",
-                    "example": "BAD_REQUEST"
+                    "type": "integer",
+                    "example": 404
                 },
                 "message": {
                     "type": "string",
-                    "example": "ERROR_MSG"
+                    "example": "resource not found"
                 }
             }
         },
@@ -597,10 +653,14 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string",
+                    "maxLength": 64,
+                    "minLength": 8,
                     "example": "VeryStrongPassword456"
                 },
                 "username": {
                     "type": "string",
+                    "maxLength": 32,
+                    "minLength": 3,
                     "example": "johndoe"
                 }
             }
@@ -637,9 +697,18 @@ const docTemplate = `{
         },
         "model.SimulationParameters": {
             "type": "object",
+            "required": [
+                "green",
+                "intersection_type",
+                "red",
+                "seed",
+                "speed",
+                "yellow"
+            ],
             "properties": {
                 "green": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 10
                 },
                 "intersection_type": {
@@ -648,6 +717,7 @@ const docTemplate = `{
                 },
                 "red": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 6
                 },
                 "seed": {
@@ -656,10 +726,12 @@ const docTemplate = `{
                 },
                 "speed": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 60
                 },
                 "yellow": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 2
                 }
             }

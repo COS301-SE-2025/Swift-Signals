@@ -45,7 +45,7 @@ func (suite *TestSuite) TestGetAllUsers_Success() {
 
 	ctx := context.Background()
 
-	mockStream := grpcmocks.NewMockUserService_GetAllUsersServer(suite.T())
+	mockStream := grpcmocks.NewMockUserService_GetAllUsersServer[userpb.UserResponse](suite.T())
 
 	mockStream.On("Context").Return(ctx)
 
@@ -86,7 +86,7 @@ func (suite *TestSuite) TestGetAllUsers_ServiceFailure() {
 
 	ctx := context.Background()
 
-	mockStream := grpcmocks.NewMockUserService_GetAllUsersServer(suite.T())
+	mockStream := grpcmocks.NewMockUserService_GetAllUsersServer[userpb.UserResponse](suite.T())
 
 	mockStream.On("Context").Return(ctx)
 
@@ -127,7 +127,7 @@ func (suite *TestSuite) TestGetAllUsers_StreamSendFailure() {
 
 	ctx := context.Background()
 
-	mockStream := grpcmocks.NewMockUserService_GetAllUsersServer(suite.T())
+	mockStream := grpcmocks.NewMockUserService_GetAllUsersServer[userpb.UserResponse](suite.T())
 
 	mockStream.On("Context").Return(ctx)
 
