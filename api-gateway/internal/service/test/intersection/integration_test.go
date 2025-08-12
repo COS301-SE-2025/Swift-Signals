@@ -3,9 +3,8 @@ package intersection
 import (
 	"context"
 	"io"
-	"testing"
-
 	"log/slog"
+	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
@@ -101,12 +100,15 @@ func (suite *TestIntegrationSuite) TestCompleteIntersectionLifecycle() {
 	// Mock user intersection IDs stream for GetIntersectionByID
 	mockUserStreamGet := suite.NewMockUserIntersectionIDsStream()
 	for _, id := range expectedIntersectionIDs {
-		mockUserStreamGet.On("Recv").Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).Once()
+		mockUserStreamGet.On("Recv").
+			Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).
+			Once()
 	}
 	mockUserStreamGet.On("Recv").Return(nil, io.EOF).Once()
 
 	suite.userClient.On("GetUserIntersectionIDs", ctx, userID).Return(mockUserStreamGet, nil).Once()
-	suite.intrClient.On("GetIntersection", ctx, createdIntersectionID).Return(getIntersectionResponse, nil)
+	suite.intrClient.On("GetIntersection", ctx, createdIntersectionID).
+		Return(getIntersectionResponse, nil)
 
 	getResult, err := suite.service.GetIntersectionByID(ctx, userID, createdIntersectionID)
 	suite.Require().NoError(err)
@@ -141,18 +143,28 @@ func (suite *TestIntegrationSuite) TestCompleteIntersectionLifecycle() {
 	// Mock user intersection IDs stream for UpdateIntersectionByID
 	mockUserStreamUpdate := suite.NewMockUserIntersectionIDsStream()
 	for _, id := range expectedIntersectionIDs {
-		mockUserStreamUpdate.On("Recv").Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).Once()
+		mockUserStreamUpdate.On("Recv").
+			Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).
+			Once()
 	}
 	mockUserStreamUpdate.On("Recv").Return(nil, io.EOF).Once()
 
-	suite.userClient.On("GetUserIntersectionIDs", ctx, userID).Return(mockUserStreamUpdate, nil).Once()
+	suite.userClient.On("GetUserIntersectionIDs", ctx, userID).
+		Return(mockUserStreamUpdate, nil).
+		Once()
 	suite.intrClient.On("UpdateIntersection", ctx, createdIntersectionID, "Updated Integration Intersection", model.Details{
 		Address:  "456 Updated Street",
 		City:     "Johannesburg",
 		Province: "Gauteng",
-	}).Return(updatedIntersection, nil)
+	}).
+		Return(updatedIntersection, nil)
 
-	updateResult, err := suite.service.UpdateIntersectionByID(ctx, userID, createdIntersectionID, updateRequest)
+	updateResult, err := suite.service.UpdateIntersectionByID(
+		ctx,
+		userID,
+		createdIntersectionID,
+		updateRequest,
+	)
 	suite.Require().NoError(err)
 	suite.Equal("Updated Integration Intersection", updateResult.Name)
 	suite.Equal("456 Updated Street", updateResult.Details.Address)
@@ -160,14 +172,19 @@ func (suite *TestIntegrationSuite) TestCompleteIntersectionLifecycle() {
 	// Step 4: Optimise intersection
 	mockUserStreamOptimise := suite.NewMockUserIntersectionIDsStream()
 	for _, id := range expectedIntersectionIDs {
-		mockUserStreamOptimise.On("Recv").Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).Once()
+		mockUserStreamOptimise.On("Recv").
+			Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).
+			Once()
 	}
 	mockUserStreamOptimise.On("Recv").Return(nil, io.EOF).Once()
 
-	suite.userClient.On("GetUserIntersectionIDs", ctx, userID).Return(mockUserStreamOptimise, nil).Once()
+	suite.userClient.On("GetUserIntersectionIDs", ctx, userID).
+		Return(mockUserStreamOptimise, nil).
+		Once()
 
 	// Mock the intersection retrieval for optimisation
-	suite.intrClient.On("GetIntersection", ctx, createdIntersectionID).Return(getIntersectionResponse, nil)
+	suite.intrClient.On("GetIntersection", ctx, createdIntersectionID).
+		Return(getIntersectionResponse, nil)
 
 	// Mock the optimisation service call
 	suite.optiClient.On("RunOptimisation", ctx, mock.AnythingOfType("model.OptimisationParameters")).
@@ -193,11 +210,15 @@ func (suite *TestIntegrationSuite) TestCompleteIntersectionLifecycle() {
 	// Step 5: Delete intersection
 	mockUserStreamDelete := suite.NewMockUserIntersectionIDsStream()
 	for _, id := range expectedIntersectionIDs {
-		mockUserStreamDelete.On("Recv").Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).Once()
+		mockUserStreamDelete.On("Recv").
+			Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).
+			Once()
 	}
 	mockUserStreamDelete.On("Recv").Return(nil, io.EOF).Once()
 
-	suite.userClient.On("GetUserIntersectionIDs", ctx, userID).Return(mockUserStreamDelete, nil).Once()
+	suite.userClient.On("GetUserIntersectionIDs", ctx, userID).
+		Return(mockUserStreamDelete, nil).
+		Once()
 	suite.userClient.On("RemoveIntersectionID", ctx, userID, createdIntersectionID).Return(nil, nil)
 	suite.intrClient.On("DeleteIntersection", ctx, createdIntersectionID).Return(nil, nil)
 
@@ -343,10 +364,14 @@ func (suite *TestIntegrationSuite) TestPermissionConsistencyAcrossOperations() {
 	for i := 0; i < 4; i++ {
 		mockUserStream := suite.NewMockUserIntersectionIDsStream()
 		for _, id := range userIntersectionIDs {
-			mockUserStream.On("Recv").Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).Once()
+			mockUserStream.On("Recv").
+				Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).
+				Once()
 		}
 		mockUserStream.On("Recv").Return(nil, io.EOF).Once()
-		suite.userClient.On("GetUserIntersectionIDs", ctx, userID).Return(mockUserStream, nil).Once()
+		suite.userClient.On("GetUserIntersectionIDs", ctx, userID).
+			Return(mockUserStream, nil).
+			Once()
 	}
 
 	// Test GetIntersectionByID - should be forbidden

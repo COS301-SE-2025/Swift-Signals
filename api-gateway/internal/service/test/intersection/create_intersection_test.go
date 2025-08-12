@@ -2,9 +2,8 @@ package intersection
 
 import (
 	"context"
-	"testing"
-
 	"log/slog"
+	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"

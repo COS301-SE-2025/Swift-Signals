@@ -23,6 +23,14 @@ func NewIntersectionClient(conn *grpc.ClientConn) *IntersectionClient {
 	}
 }
 
+func NewIntersectionClientWithGrpcClient(
+	client intersectionpb.IntersectionServiceClient,
+) *IntersectionClient {
+	return &IntersectionClient{
+		client: client,
+	}
+}
+
 func (ic *IntersectionClient) CreateIntersection(
 	ctx context.Context,
 	intersection model.Intersection,

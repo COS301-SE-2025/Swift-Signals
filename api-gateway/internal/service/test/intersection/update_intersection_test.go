@@ -3,9 +3,8 @@ package intersection
 import (
 	"context"
 	"io"
-	"testing"
-
 	"log/slog"
+	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
@@ -51,7 +50,9 @@ func (suite *TestSuite) TestUpdateIntersectionByID_Success() {
 	// Mock user intersection IDs stream
 	mockUserStream := suite.NewMockUserIntersectionIDsStream()
 	for _, id := range expectedIntersectionIDs {
-		mockUserStream.On("Recv").Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).Once()
+		mockUserStream.On("Recv").
+			Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).
+			Once()
 	}
 	mockUserStream.On("Recv").Return(nil, io.EOF).Once()
 
@@ -60,7 +61,8 @@ func (suite *TestSuite) TestUpdateIntersectionByID_Success() {
 		Address:  "456 Updated Street",
 		City:     "Johannesburg",
 		Province: "Gauteng",
-	}).Return(expectedUpdatedIntersection, nil)
+	}).
+		Return(expectedUpdatedIntersection, nil)
 
 	result, err := suite.service.UpdateIntersectionByID(ctx, userID, intersectionID, request)
 
@@ -101,7 +103,9 @@ func (suite *TestSuite) TestUpdateIntersectionByID_Forbidden() {
 	// Mock user intersection IDs stream
 	mockUserStream := suite.NewMockUserIntersectionIDsStream()
 	for _, id := range expectedIntersectionIDs {
-		mockUserStream.On("Recv").Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).Once()
+		mockUserStream.On("Recv").
+			Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).
+			Once()
 	}
 	mockUserStream.On("Recv").Return(nil, io.EOF).Once()
 
@@ -180,7 +184,9 @@ func (suite *TestSuite) TestUpdateIntersectionByID_IntersectionServiceError() {
 	// Mock user intersection IDs stream
 	mockUserStream := suite.NewMockUserIntersectionIDsStream()
 	for _, id := range expectedIntersectionIDs {
-		mockUserStream.On("Recv").Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).Once()
+		mockUserStream.On("Recv").
+			Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).
+			Once()
 	}
 	mockUserStream.On("Recv").Return(nil, io.EOF).Once()
 
@@ -189,7 +195,8 @@ func (suite *TestSuite) TestUpdateIntersectionByID_IntersectionServiceError() {
 		Address:  "456 Updated Street",
 		City:     "Johannesburg",
 		Province: "Gauteng",
-	}).Return(nil, errs.NewInternalError("database connection failed", nil, map[string]any{}))
+	}).
+		Return(nil, errs.NewInternalError("database connection failed", nil, map[string]any{}))
 
 	_, err := suite.service.UpdateIntersectionByID(ctx, userID, intersectionID, request)
 
@@ -230,7 +237,9 @@ func (suite *TestSuite) TestUpdateIntersectionByID_IntersectionNotFound() {
 	// Mock user intersection IDs stream
 	mockUserStream := suite.NewMockUserIntersectionIDsStream()
 	for _, id := range expectedIntersectionIDs {
-		mockUserStream.On("Recv").Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).Once()
+		mockUserStream.On("Recv").
+			Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).
+			Once()
 	}
 	mockUserStream.On("Recv").Return(nil, io.EOF).Once()
 
@@ -239,7 +248,8 @@ func (suite *TestSuite) TestUpdateIntersectionByID_IntersectionNotFound() {
 		Address:  "456 Updated Street",
 		City:     "Johannesburg",
 		Province: "Gauteng",
-	}).Return(nil, errs.NewNotFoundError("intersection not found", map[string]any{}))
+	}).
+		Return(nil, errs.NewNotFoundError("intersection not found", map[string]any{}))
 
 	_, err := suite.service.UpdateIntersectionByID(ctx, userID, intersectionID, request)
 
@@ -280,7 +290,9 @@ func (suite *TestSuite) TestUpdateIntersectionByID_ValidationError() {
 	// Mock user intersection IDs stream
 	mockUserStream := suite.NewMockUserIntersectionIDsStream()
 	for _, id := range expectedIntersectionIDs {
-		mockUserStream.On("Recv").Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).Once()
+		mockUserStream.On("Recv").
+			Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).
+			Once()
 	}
 	mockUserStream.On("Recv").Return(nil, io.EOF).Once()
 
@@ -365,7 +377,9 @@ func (suite *TestSuite) TestUpdateIntersectionByID_EmptyIntersectionID() {
 	// Mock user intersection IDs stream
 	mockUserStream := suite.NewMockUserIntersectionIDsStream()
 	for _, id := range expectedIntersectionIDs {
-		mockUserStream.On("Recv").Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).Once()
+		mockUserStream.On("Recv").
+			Return(&userpb.IntersectionIDResponse{IntersectionId: id}, nil).
+			Once()
 	}
 	mockUserStream.On("Recv").Return(nil, io.EOF).Once()
 

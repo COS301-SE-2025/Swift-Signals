@@ -41,7 +41,11 @@ func (suite *TestSuite) TestUpdateIntersection_Success() {
 		Return(expectedResponse, nil)
 
 	body, _ := json.Marshal(expectedRequest)
-	req := httptest.NewRequest(http.MethodPatch, "/intersections/test-intersection-id", bytes.NewBuffer(body))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/intersections/test-intersection-id",
+		bytes.NewBuffer(body),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "test-intersection-id")
 	req = req.WithContext(suite.ctx)
@@ -90,7 +94,11 @@ func (suite *TestSuite) TestUpdateIntersection_MissingUserID() {
 	requestBody.Details.Province = "Western Cape"
 
 	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodPatch, "/intersections/test-intersection-id", bytes.NewBuffer(body))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/intersections/test-intersection-id",
+		bytes.NewBuffer(body),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "test-intersection-id")
 	// Don't set context with user ID
@@ -117,7 +125,11 @@ func (suite *TestSuite) TestUpdateIntersection_NotFound() {
 		Return(emptyResponse, errs.NewNotFoundError("intersection not found", map[string]any{}))
 
 	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodPatch, "/intersections/nonexistent-id", bytes.NewBuffer(body))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/intersections/nonexistent-id",
+		bytes.NewBuffer(body),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "nonexistent-id")
 	req = req.WithContext(suite.ctx)
@@ -144,7 +156,11 @@ func (suite *TestSuite) TestUpdateIntersection_Forbidden() {
 		Return(emptyResponse, errs.NewForbiddenError("intersection not in user's intersection list", map[string]any{}))
 
 	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodPatch, "/intersections/forbidden-id", bytes.NewBuffer(body))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/intersections/forbidden-id",
+		bytes.NewBuffer(body),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "forbidden-id")
 	req = req.WithContext(suite.ctx)
@@ -171,7 +187,11 @@ func (suite *TestSuite) TestUpdateIntersection_ValidationError() {
 		Return(emptyResponse, errs.NewValidationError("intersection name too long", map[string]any{}))
 
 	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodPatch, "/intersections/test-intersection-id", bytes.NewBuffer(body))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/intersections/test-intersection-id",
+		bytes.NewBuffer(body),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "test-intersection-id")
 	req = req.WithContext(suite.ctx)
@@ -198,7 +218,11 @@ func (suite *TestSuite) TestUpdateIntersection_InternalError() {
 		Return(emptyResponse, errs.NewInternalError("database connection failed", nil, map[string]any{}))
 
 	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodPatch, "/intersections/test-intersection-id", bytes.NewBuffer(body))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/intersections/test-intersection-id",
+		bytes.NewBuffer(body),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "test-intersection-id")
 	req = req.WithContext(suite.ctx)
@@ -213,7 +237,11 @@ func (suite *TestSuite) TestUpdateIntersection_InternalError() {
 }
 
 func (suite *TestSuite) TestUpdateIntersection_EmptyBody() {
-	req := httptest.NewRequest(http.MethodPatch, "/intersections/test-intersection-id", bytes.NewReader([]byte{}))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/intersections/test-intersection-id",
+		bytes.NewReader([]byte{}),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "test-intersection-id")
 	req = req.WithContext(suite.ctx)
@@ -266,7 +294,11 @@ func (suite *TestSuite) TestUpdateIntersection_PartialUpdate_NameOnly() {
 		Return(expectedResponse, nil)
 
 	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodPatch, "/intersections/test-intersection-id", bytes.NewBuffer(body))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/intersections/test-intersection-id",
+		bytes.NewBuffer(body),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "test-intersection-id")
 	req = req.WithContext(suite.ctx)
@@ -310,7 +342,11 @@ func (suite *TestSuite) TestUpdateIntersection_PartialUpdate_DetailsOnly() {
 		Return(expectedResponse, nil)
 
 	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodPatch, "/intersections/test-intersection-id", bytes.NewBuffer(body))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/intersections/test-intersection-id",
+		bytes.NewBuffer(body),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "test-intersection-id")
 	req = req.WithContext(suite.ctx)
@@ -341,7 +377,11 @@ func (suite *TestSuite) TestUpdateIntersection_UnauthorizedError() {
 		Return(emptyResponse, errs.NewUnauthorizedError("token expired", map[string]any{}))
 
 	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodPatch, "/intersections/test-intersection-id", bytes.NewBuffer(body))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/intersections/test-intersection-id",
+		bytes.NewBuffer(body),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "test-intersection-id")
 	req = req.WithContext(suite.ctx)

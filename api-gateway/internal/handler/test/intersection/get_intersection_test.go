@@ -173,7 +173,7 @@ func (suite *TestSuite) TestGetIntersection_EmptyPathValue() {
 	var response model.Intersection
 	err := json.Unmarshal(w.Body.Bytes(), &response)
 	suite.Require().NoError(err)
-	suite.Equal("", response.ID)
+	suite.Empty(response.ID)
 	suite.Equal("Empty ID Test", response.Name)
 
 	suite.service.AssertExpectations(suite.T())

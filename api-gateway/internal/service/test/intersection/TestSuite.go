@@ -24,16 +24,24 @@ func (suite *TestSuite) SetupTest() {
 	suite.intrClient = new(mocks.MockIntersectionClientInterface)
 	suite.userClient = new(mocks.MockUserClientInterface)
 	suite.optiClient = new(mocks.MockOptimisationClientInterface)
-	suite.service = service.NewIntersectionService(suite.intrClient, suite.optiClient, suite.userClient)
+	suite.service = service.NewIntersectionService(
+		suite.intrClient,
+		suite.optiClient,
+		suite.userClient,
+	)
 }
 
 // Helper method to create mock streams for testing
 func (suite *TestSuite) NewMockIntersectionStream() *grpcmocks.MockIntersectionService_GetAllIntersectionsClient[intersectionpb.IntersectionResponse] {
-	return grpcmocks.NewMockIntersectionService_GetAllIntersectionsClient[intersectionpb.IntersectionResponse](suite.T())
+	return grpcmocks.NewMockIntersectionService_GetAllIntersectionsClient[intersectionpb.IntersectionResponse](
+		suite.T(),
+	)
 }
 
 func (suite *TestSuite) NewMockUserIntersectionIDsStream() *grpcmocks.MockUserService_GetUserIntersectionIDsClient[userpb.IntersectionIDResponse] {
-	return grpcmocks.NewMockUserService_GetUserIntersectionIDsClient[userpb.IntersectionIDResponse](suite.T())
+	return grpcmocks.NewMockUserService_GetUserIntersectionIDsClient[userpb.IntersectionIDResponse](
+		suite.T(),
+	)
 }
 
 // createTestIntersection creates a test intersection protobuf object

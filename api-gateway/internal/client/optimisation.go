@@ -30,9 +30,12 @@ func (oc *OptimisationClient) RunOptimisation(
 ) (*optimisationpb.OptimisationParameters, error) {
 	req := &optimisationpb.OptimisationParameters{
 		OptimisationType: optimisationpb.OptimisationType(
-			optimisationpb.IntersectionType_value[params.OptimisationType],
+			optimisationpb.OptimisationType_value[params.OptimisationType],
 		),
 		Parameters: &optimisationpb.SimulationParameters{
+			IntersectionType: optimisationpb.IntersectionType(
+				optimisationpb.IntersectionType_value[params.SimulationParameters.IntersectionType],
+			),
 			Green:  int32(params.SimulationParameters.Green),
 			Yellow: int32(params.SimulationParameters.Yellow),
 			Red:    int32(params.SimulationParameters.Red),
