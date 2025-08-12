@@ -44,6 +44,19 @@ describe("Welcome Page", () => {
       });
     });
 
+    it("should change slides when clicking indicators", () => {
+      // Click third indicator
+      cy.get(".carousel-indicator").eq(2).click();
+
+      // Verify third slide is active
+      cy.get(".carousel-indicator").eq(2).should("have.class", "active");
+
+      // Verify title of slide 3
+      cy.get(".carousel-item").eq(2).within(() => {
+        cy.get(".carousel-item-title").should("contain.text", "Intelligent Optimization");
+      });
+    });
+
   });
   
 });
