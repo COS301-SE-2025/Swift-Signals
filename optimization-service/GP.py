@@ -60,6 +60,7 @@ def custom_mutate(individual, indpb=0.2, min_speed=40):
         individual[3] = random.choice(allowed_speeds)
     return (individual,)
 
+
 toolbox.register("mutate", custom_mutate)
 
 
