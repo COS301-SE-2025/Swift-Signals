@@ -62,6 +62,7 @@ def custom_mutate(individual, indpb=0.2, min_speed=40):
 
 toolbox.register("mutate", custom_mutate)
 
+
 def run_simulation(individual):
     green, yellow, red, speed, seed = individual
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
@@ -103,6 +104,7 @@ def run_simulation(individual):
     except:
         return None
 
+
 def evaluate_waiting_and_travel(individual):
     result = run_simulation(individual)
     if result is None:
@@ -110,6 +112,7 @@ def evaluate_waiting_and_travel(individual):
     waiting = result.get("Total Waiting Time", 1e6)
     travel = result.get("Total Travel Time", 1e6)
     return 0.9 * waiting + 0.3 * travel,  # Weighted objective
+
 
 def evaluate_safety_given_waiting(individual):
     if individual[3] < 60:
@@ -132,11 +135,13 @@ def evaluate_safety_given_waiting(individual):
     )
     return fitness,
 
+
 def log_individual_to_file(individual, generation, ind_id):
     os.makedirs("ga_results", exist_ok=True)
     with open(ALL_RESULTS_CSV, "a") as f:
         f.write(f"{generation},{ind_id},{individual[0]},{individual[1]},{individual[2]},"
                 f"{individual[3]},{individual[4]},{individual.fitness.values[0]}\n")
+
 
 def run_ga(pop, hof, ngen, cxpb, mutpb, label="GA"):
     stats = tools.Statistics(lambda ind: ind.fitness.values[0])
@@ -176,6 +181,7 @@ def run_ga(pop, hof, ngen, cxpb, mutpb, label="GA"):
         hof.update(pop)
         record = stats.compile(pop)
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
+
 
 def run_final_simulation_and_compare(best_params):
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
@@ -223,12 +229,14 @@ def run_final_simulation_and_compare(best_params):
         ref = reference_results.get(metric, "N/A")
         print(f"{metric:<25}{str(opt):>15}{str(ref):>15}")
 
+
 def cleanup_files():
     for fpath in generated_param_files + generated_result_files:
         try:
             os.remove(fpath)
         except Exception:
             pass
+
 
 def main():
     random.seed(1408)
