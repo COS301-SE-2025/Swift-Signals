@@ -197,7 +197,7 @@ def run_final_simulation_and_compare(best_params):
                 "Yellow": best_params["Yellow"],
                 "Red": best_params["Red"],
                 "Speed": best_params["Speed"],
-                "seed": best_params["Seed"]
+                "seed": best_params["Seed"],
             },
             "output_path": final_result_file
         }
