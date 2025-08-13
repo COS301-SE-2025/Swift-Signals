@@ -52,13 +52,13 @@ def custom_mutate(individual, indpb=0.2, min_speed=40):
     if random.random() < indpb:
         individual[0] = random.randint(10, 60)  # Green
     if random.random() < indpb:
-        individual[1] = random.randint(3, 8)    # Yellow
+        individual[1] = random.randint(3, 8)  # Yellow
     if random.random() < indpb:
         individual[2] = random.randint(10, 60)  # Red
     if random.random() < indpb:
         allowed_speeds = [s for s in [40, 60, 80, 100] if s >= min_speed]
         individual[3] = random.choice(allowed_speeds)
-    return individual,
+    return (individual,)
 
 toolbox.register("mutate", custom_mutate)
 
