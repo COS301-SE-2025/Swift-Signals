@@ -129,13 +129,8 @@ def evaluate_safety_given_waiting(individual):
     collisions = result.get("Near collisions", 0)
     waiting = result.get("Total Waiting Time", 0)
 
-    fitness = (
-        1000 * brakes +
-        1000 * stops +
-        20000 * collisions +
-        0.9 * waiting
-    )
-    return fitness,
+    fitness = 1000 * brakes + 1000 * stops + 20000 * collisions + 0.9 * waiting
+    return (fitness,)
 
 
 def log_individual_to_file(individual, generation, ind_id):
