@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
@@ -85,8 +86,12 @@ func NewPathSet(paths ...string) PathSet {
 }
 
 func (ps PathSet) Contains(path string) bool {
-	_, exists := ps[path]
-	return exists
+	for p := range ps {
+		if strings.HasPrefix(path, p) {
+			return true
+		}
+	}
+	return false
 }
 
 func GetUserID(r *http.Request) (string, bool) {

@@ -282,7 +282,6 @@ func (h *IntersectionHandler) DeleteIntersection(w http.ResponseWriter, r *http.
 	)
 	logger.Info("processing deleteIntersection request")
 
-	// TODO: Implement User Verification
 	userID, ok := middleware.GetUserID(r)
 	if !ok {
 		logger.Error("user ID missing inside of handler")
