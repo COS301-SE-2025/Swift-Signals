@@ -110,6 +110,7 @@ def evaluate_waiting_and_travel(individual):
     result = run_simulation(individual)
     if result is None:
         return (1e6,)
+
     waiting = result.get("Total Waiting Time", 1e6)
     travel = result.get("Total Travel Time", 1e6)
     return (0.9 * waiting + 0.3 * travel,)  # Weighted objective
@@ -121,7 +122,7 @@ def evaluate_safety_given_waiting(individual):
 
     result = run_simulation(individual)
     if result is None:
-        return 1e6,
+        return (1e6,)
 
     brakes = result.get("Emergency Brakes", 0)
     stops = result.get("Emergency Stops", 0)
