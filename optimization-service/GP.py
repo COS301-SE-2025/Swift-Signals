@@ -31,8 +31,13 @@ toolbox.register("yellow", random.randint, 3, 8)
 toolbox.register("red", random.randint, 10, 60)
 toolbox.register("speed", lambda: random.choice([40, 60, 80, 100]))
 toolbox.register("seed", lambda: 1408)
-toolbox.register("individual", tools.initCycle, creator.Individual,
-                 (toolbox.green, toolbox.yellow, toolbox.red, toolbox.speed, toolbox.seed), n=1)
+toolbox.register(
+    "individual",
+    tools.initCycle,
+    creator.Individual,
+    (toolbox.green, toolbox.yellow, toolbox.red, toolbox.speed, toolbox.seed),
+    n=1,
+)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("select", tools.selTournament, tournsize=3)
