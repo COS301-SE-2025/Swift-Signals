@@ -112,7 +112,7 @@ def evaluate_waiting_and_travel(individual):
         return (1e6,)
     waiting = result.get("Total Waiting Time", 1e6)
     travel = result.get("Total Travel Time", 1e6)
-    return 0.9 * waiting + 0.3 * travel,  # Weighted objective
+    return (0.9 * waiting + 0.3 * travel,)  # Weighted objective
 
 
 def evaluate_safety_given_waiting(individual):
