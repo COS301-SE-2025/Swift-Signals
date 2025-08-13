@@ -86,8 +86,6 @@ func NewPathSet(paths ...string) PathSet {
 }
 
 func (ps PathSet) Contains(path string) bool {
-	// _, exists := ps[path]
-	// return exists
 	for p := range ps {
 		if strings.HasPrefix(path, p) {
 			return true
