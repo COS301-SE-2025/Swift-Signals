@@ -185,7 +185,10 @@ def run_ga(pop, hof, ngen, cxpb, mutpb, label="GA"):
 def run_final_simulation_and_compare(best_params):
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     final_param_file = os.path.join(PARAMS_FOLDER, f"final_params_{timestamp}.json")
-    final_result_file = os.path.join(RESULTS_FOLDER, f"final_simulation_result_{timestamp}.json")
+    final_result_file = os.path.join(
+        RESULTS_FOLDER,
+        f"final_simulation_result_{timestamp}.json",
+    )
 
     params = {
         "intersection": {
@@ -199,7 +202,7 @@ def run_final_simulation_and_compare(best_params):
                 "Speed": best_params["Speed"],
                 "seed": best_params["Seed"],
             },
-            "output_path": final_result_file
+            "output_path": final_result_file,
         }
     }
 
