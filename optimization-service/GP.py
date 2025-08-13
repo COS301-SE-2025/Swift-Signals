@@ -83,7 +83,7 @@ def run_simulation(individual):
                 "Yellow": yellow,
                 "Red": red,
                 "Speed": speed,
-                "seed": seed
+                "seed": seed,
             },
             "output_path": result_file
         }
