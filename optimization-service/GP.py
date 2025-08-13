@@ -117,7 +117,7 @@ def evaluate_waiting_and_travel(individual):
 
 def evaluate_safety_given_waiting(individual):
     if individual[3] < 60:
-        return 1e6,  # Penalize unsafe speeds below 60
+        return (1e6,)  # Penalize unsafe speeds below 60
 
     result = run_simulation(individual)
     if result is None:
