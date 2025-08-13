@@ -210,7 +210,9 @@ def run_final_simulation_and_compare(best_params):
         json.dump(params, f)
 
     try:
-        subprocess.run(["python3", SIM_SCRIPT, "--params", final_param_file], check=True)
+        subprocess.run(
+            ["python3", SIM_SCRIPT, "--params", final_param_file], check=True
+        )
     except subprocess.CalledProcessError as e:
         print(f"Final simulation failed: {e}")
         return
