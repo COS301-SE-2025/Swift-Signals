@@ -284,7 +284,7 @@ def main():
         "Red": best[2],
         "Speed": best[3],
         "Seed": best[4],
-        "Fitness": best.fitness.values[0]
+        "Fitness": best.fitness.values[0],
     }
     with open(BEST_PARAM_OUTPUT, "w") as f:
         json.dump(best_params, f, indent=2)
