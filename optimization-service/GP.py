@@ -38,7 +38,12 @@ toolbox.register(
     (toolbox.green, toolbox.yellow, toolbox.red, toolbox.speed, toolbox.seed),
     n=1,
 )
-toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+toolbox.register(
+    "population",
+    tools.initRepeat,
+    list,
+    toolbox.individual,
+)
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
@@ -100,7 +105,7 @@ def run_simulation(individual):
 def evaluate_waiting_and_travel(individual):
     result = run_simulation(individual)
     if result is None:
-        return 1e6,
+        return (1e6,)
     waiting = result.get("Total Waiting Time", 1e6)
     travel = result.get("Total Travel Time", 1e6)
     return 0.9 * waiting + 0.3 * travel,  # Weighted objective
