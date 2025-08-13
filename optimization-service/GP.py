@@ -44,11 +44,9 @@ toolbox.register(
     list,
     toolbox.individual,
 )
-toolbox.register(
-    "mate",
-    tools.cxTwoPoint
-)
+toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("select", tools.selTournament, tournsize=3)
+
 
 def custom_mutate(individual, indpb=0.2, min_speed=40):
     if random.random() < indpb:
