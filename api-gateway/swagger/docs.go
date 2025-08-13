@@ -22,6 +22,11 @@ const docTemplate = `{
     "paths": {
         "/intersections": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves all the intersections associated with the user.",
                 "consumes": [
                     "application/json"
@@ -55,6 +60,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new intersection with the given arguments",
                 "consumes": [
                     "application/json"
@@ -107,6 +117,11 @@ const docTemplate = `{
         },
         "/intersections/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves a single intersection by its unique identifier.",
                 "consumes": [
                     "application/json"
@@ -161,6 +176,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes the intersection with the given ID.",
                 "consumes": [
                     "application/json"
@@ -212,6 +232,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Partially updates fields of an existing intersection by ID.",
                 "consumes": [
                     "application/json"

@@ -29,6 +29,7 @@ func NewIntersectionHandler(s service.IntersectionServiceInterface) *Intersectio
 // @Tags Intersections
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {object} model.Intersections "Successful intersections retrieval"
 // @Failure 401 {object} model.ErrorResponse "Unauthorized: Token missing or invalid"
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
@@ -72,6 +73,7 @@ func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http
 // @Tags Intersections
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path string true "Intersection ID"
 // @Success 200 {object} model.Intersection "Successful intersection retrieval"
 // @Failure 400 {object} model.ErrorResponse "Bad Request: Invalid or missing ID parameter"
@@ -122,6 +124,7 @@ func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Req
 // @Tags Intersections
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param createIntersectionRequest body model.CreateIntersectionRequest true "Intersection information"
 // @Success 201 {object} model.CreateIntersectionResponse "Intersection successfully created"
 // @Failure 400 {object} model.ErrorResponse "Invalid request payload or missing fields"
@@ -193,6 +196,7 @@ func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.
 // @Tags Intersections
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path string true "Intersection ID"
 // @Param body body model.UpdateIntersectionRequest true "Fields to update"
 // @Success 200 {object} model.Intersection "Successful update"
@@ -268,6 +272,7 @@ func (h *IntersectionHandler) UpdateIntersection(w http.ResponseWriter, r *http.
 // @Tags Intersections
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param id path string true "Intersection ID"
 // @Success 204 "No Content"
 // @Failure 400 {object} model.ErrorResponse "Bad Request: Invalid input"

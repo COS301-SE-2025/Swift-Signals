@@ -1,15 +1,18 @@
 FROM golang:1.24.6-alpine
 
-WORKDIR /app
-COPY protos/ protos/
-
-WORKDIR /app/protos/
+# Install tools
 RUN apk add --no-cache protobuf protobuf-dev && \
     rm -rf /var/cache/apk/* && \
     go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
     go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest && \
-    mkdir -p /app/protos/gen/user /app/protos/gen/intersection /app/protos/gen/simulation /app/protos/gen/optimisation
-RUN protoc --go_out=./gen/user/ --go_opt=paths=source_relative \
+    go install github.com/vektra/mockery/v2@latest
+
+WORKDIR /app
+COPY protos/ protos/
+
+WORKDIR /app/protos/
+RUN mkdir -p /app/protos/gen/user /app/protos/gen/intersection /app/protos/gen/simulation /app/protos/gen/optimisation && \
+    protoc --go_out=./gen/user/ --go_opt=paths=source_relative \
            --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative \
            user.proto && \
     protoc --go_out=./gen/intersection/ --go_opt=paths=source_relative \
@@ -30,11 +33,9 @@ WORKDIR /app
 COPY shared/ shared/
 COPY api-gateway/ api-gateway/
 
-
 WORKDIR /app/api-gateway/
-RUN go install github.com/vektra/mockery/v2@latest && \
-    mockery
-RUN go mod tidy && \
+RUN mockery && \
+    go mod tidy && \
     go mod download
 
 WORKDIR cmd/
