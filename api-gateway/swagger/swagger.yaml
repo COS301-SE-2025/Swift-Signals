@@ -250,6 +250,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get All Intersections
       tags:
       - Intersections
@@ -283,6 +285,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create Intersection
       tags:
       - Intersections
@@ -318,6 +322,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Delete Intersection
       tags:
       - Intersections
@@ -354,6 +360,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get Intersection by ID
       tags:
       - Intersections
@@ -396,6 +404,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update Intersection
       tags:
       - Intersections

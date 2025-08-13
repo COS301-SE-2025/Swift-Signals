@@ -24,7 +24,7 @@ import (
 
 type Config struct {
 	Port             int    `env:"PORT"           envDefault:"9090"`
-	JwtSecret        string `env:"JWT_SECRET"     envDefault:"jwt-test-secret"`
+	JwtSecret        string `env:"JWT_SECRET"     envDefault:"a-string-secret-at-least-256-bits-long"`
 	UserServiceAddr  string `env:"USER_GRPC_ADDR" envDefault:"localhost:50051"` // TODO: Change to proper address
 	IntersectionAddr string `env:"INTR_GRPC_ADDR" envDefault:"localhost:50052"` // TODO: Change to proper address
 	OptimisationAddr string `env:"OPTI_GRPC_ADDR" envDefault:"localhost:50054"` // TODO: Change to proper address
