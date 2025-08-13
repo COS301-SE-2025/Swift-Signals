@@ -136,8 +136,10 @@ def evaluate_safety_given_waiting(individual):
 def log_individual_to_file(individual, generation, ind_id):
     os.makedirs("ga_results", exist_ok=True)
     with open(ALL_RESULTS_CSV, "a") as f:
-        f.write(f"{generation},{ind_id},{individual[0]},{individual[1]},{individual[2]},"
-                f"{individual[3]},{individual[4]},{individual.fitness.values[0]}\n")
+        f.write(
+            f"{generation},{ind_id},{individual[0]},{individual[1]},{individual[2]},"
+            f"{individual[3]},{individual[4]},{individual.fitness.values[0]}\n"
+        )
 
 
 def run_ga(pop, hof, ngen, cxpb, mutpb, label="GA"):
