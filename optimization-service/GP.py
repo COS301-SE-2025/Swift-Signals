@@ -85,7 +85,7 @@ def run_simulation(individual):
                 "Speed": speed,
                 "seed": seed,
             },
-            "output_path": result_file
+            "output_path": result_file,
         }
     }
 
