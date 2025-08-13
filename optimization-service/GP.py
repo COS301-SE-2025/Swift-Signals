@@ -222,7 +222,7 @@ def cleanup_files():
 def main():
     random.seed(1408)
     ngen_waiting = 30
-    ngen_safety = 15
+    ngen_safety = 10
     pop_size = 30
     cxpb = 0.5
     mutpb = 0.3
