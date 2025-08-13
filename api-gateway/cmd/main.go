@@ -141,8 +141,17 @@ func setupRoutes(
 	return middleware.CreateStack(
 		middleware.Logging(logger),
 		middleware.CORS,
-		middleware.AuthMiddleware(JwtSecret, "/login", "/register", "/reset-password"),
-	)(mux)
+		middleware.AuthMiddleware(
+			JwtSecret,
+			"/login",
+			"/register",
+			"/reset-password",
+			"/docs",
+			"/favicon.ico",
+		),
+	)(
+		mux,
+	)
 }
 
 func createServer(port int, handler http.Handler) *http.Server {

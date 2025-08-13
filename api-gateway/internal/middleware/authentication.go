@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
@@ -18,6 +19,13 @@ func AuthMiddleware(secret string, paths ...string) Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			excluded := NewPathSet(paths...)
+			fmt.Println("==========================")
+			for path := range excluded {
+				fmt.Println(path)
+			}
+			fmt.Println("==========================")
+			fmt.Println(r.URL.Path)
+			fmt.Println("==========================")
 			if excluded.Contains(r.URL.Path) {
 				next.ServeHTTP(w, r)
 				return
@@ -85,8 +93,14 @@ func NewPathSet(paths ...string) PathSet {
 }
 
 func (ps PathSet) Contains(path string) bool {
-	_, exists := ps[path]
-	return exists
+	// _, exists := ps[path]
+	// return exists
+	for p := range ps {
+		if strings.HasPrefix(path, p) {
+			return true
+		}
+	}
+	return false
 }
 
 func GetUserID(r *http.Request) (string, bool) {
