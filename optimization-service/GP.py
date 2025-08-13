@@ -223,7 +223,13 @@ def run_final_simulation_and_compare(best_params):
 
     print("\n--- Final Comparison ---")
     print(f"{'Metric':<25}{'Optimized':>15}{'Reference':>15}")
-    for metric in ["Total Waiting Time", "Total Travel Time", "Emergency Brakes", "Emergency Stops", "Near collisions"]:
+    for metric in [
+        "Total Waiting Time",
+        "Total Travel Time",
+        "Emergency Brakes",
+        "Emergency Stops",
+        "Near collisions",
+    ]:
         opt = final_results.get(metric, "N/A")
         ref = reference_results.get(metric, "N/A")
         print(f"{metric:<25}{str(opt):>15}{str(ref):>15}")
