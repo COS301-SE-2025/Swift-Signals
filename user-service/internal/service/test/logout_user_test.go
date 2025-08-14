@@ -3,12 +3,10 @@ package test
 import (
 	"context"
 	"errors"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestLogoutUser_Success() {
@@ -117,8 +115,4 @@ func (suite *TestSuite) TestLogoutUser_ServiceErrorPropagation() {
 	suite.Equal("user not found", svcError.Message)
 
 	suite.repo.AssertExpectations(suite.T())
-}
-
-func TestServiceLogoutUser(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

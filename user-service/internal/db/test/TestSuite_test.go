@@ -3,6 +3,7 @@ package test
 import (
 	"database/sql"
 	"log"
+	"testing"
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
@@ -25,6 +26,10 @@ func (suite *TestSuite) SetupTest() {
 	suite.Require().NoError(err)
 
 	suite.repo = db.NewPostgresUserRepo(suite.db)
+}
+
+func TestDB(t *testing.T) {
+	suite.Run(t, new(TestSuite))
 }
 
 func (suite *TestSuite) TearDownTest() {

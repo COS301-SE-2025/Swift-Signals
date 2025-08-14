@@ -2,12 +2,10 @@ package test
 
 import (
 	"context"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/lib/pq"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestDeleteUser_Success() {
@@ -82,8 +80,4 @@ func (suite *TestSuite) TestDeleteUser_InvalidParameterFormat() {
 	suite.Equal(map[string]any{"detail": "invalid input syntax for type uuid"}, svcError.Context)
 
 	suite.NoError(suite.mock.ExpectationsWereMet())
-}
-
-func TestDBDeleteUser(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

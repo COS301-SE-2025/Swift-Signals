@@ -3,12 +3,10 @@ package test
 import (
 	"context"
 	"errors"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestMakeAdmin_Success() {
@@ -448,8 +446,4 @@ func (suite *TestSuite) TestMakeAdmin_UserIDTrimming() {
 	suite.Require().NoError(err)
 
 	suite.repo.AssertExpectations(suite.T())
-}
-
-func TestServiceMakeAdmin(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

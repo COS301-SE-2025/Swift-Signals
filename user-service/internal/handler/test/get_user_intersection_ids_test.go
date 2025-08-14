@@ -3,12 +3,10 @@ package test
 import (
 	"context"
 	"errors"
-	"testing"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	grpcmocks "github.com/COS301-SE-2025/Swift-Signals/user-service/internal/mocks/grpc"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -134,8 +132,4 @@ func (suite *TestSuite) TestGetUserIntersectionIDs_EmptyList() {
 	suite.Require().NoError(err)
 
 	suite.service.AssertExpectations(suite.T())
-}
-
-func TestHandlerGetUserIntersectionIDs(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

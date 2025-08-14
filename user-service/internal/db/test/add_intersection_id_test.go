@@ -3,10 +3,8 @@ package test
 import (
 	"context"
 	"database/sql"
-	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestAddIntersectionID_Success() {
@@ -31,8 +29,4 @@ func (suite *TestSuite) TestAddIntersectionID_DatabaseError() {
 
 	suite.Require().Error(err)
 	suite.NoError(suite.mock.ExpectationsWereMet())
-}
-
-func TestDBAddIntersectionID(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }
