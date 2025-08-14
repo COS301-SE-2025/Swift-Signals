@@ -133,6 +133,13 @@ func setupRoutes(
 	mux.HandleFunc("GET /intersections/simple", NotImplemented)
 	log.Println("Initialized Intersection Handlers.")
 
+	// Profile routes
+	profileService := service.NewProfileService(userClient)
+	profileHandler := handler.NewProfileHandler(profileService)
+	mux.HandleFunc("GET /me", profileHandler.GetProfile)
+	mux.HandleFunc("PATCH /me", profileHandler.UpdateProfile)
+	mux.HandleFunc("DELETE /me", profileHandler.DeleteProfile)
+
 	// User (Admin Only) routes
 	adminService := service.NewAdminService(userClient)
 	adminHandler := handler.NewAdminHandler(adminService)
