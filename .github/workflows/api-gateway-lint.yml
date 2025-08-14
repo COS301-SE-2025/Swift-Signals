@@ -30,6 +30,7 @@ jobs:
           run: |
             go install github.com/vektra/mockery/v2@latest
             mockery
+            go mod tidy
 
         - name: golangci-lint
           uses: golangci/golangci-lint-action@v8
