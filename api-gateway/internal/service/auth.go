@@ -87,5 +87,5 @@ type AuthServiceInterface interface {
 	LogoutUser(ctx context.Context, token string) (model.LogoutResponse, error)
 }
 
-// Note: Asserts Interface Implementation
+// NOTE: Asserts Interface Implementation
 var _ AuthServiceInterface = (*AuthService)(nil)

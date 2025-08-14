@@ -133,6 +133,14 @@ func setupRoutes(
 	mux.HandleFunc("GET /intersections/simple", NotImplemented)
 	log.Println("Initialized Intersection Handlers.")
 
+	// User (Admin Only) routes
+	adminService := service.NewAdminService(userClient)
+	adminHandler := handler.NewAdminHandler(adminService)
+	mux.HandleFunc("GET /users", adminHandler.GetAllUsers)
+	mux.HandleFunc("GET /users/{id}", adminHandler.GetUserByID)
+	mux.HandleFunc("PATCH /users/{id}", adminHandler.UpdateUserByID)
+	mux.HandleFunc("DELETE /users/{id}", adminHandler.DeleteUserByID)
+
 	// Swagger
 	mux.Handle("/docs/", httpSwagger.WrapHandler)
 	log.Println("Swagger UI available at http://localhost:9090/docs/index.html")
