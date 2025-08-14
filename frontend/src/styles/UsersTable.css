@@ -1,27 +1,117 @@
 .usersTablePage {
-  width: calc(100vw - 100px);
+  width: calc(100vw - 200px);
   justify-self: center;
   border-radius: 25px;
+  overflow-x: auto;
+}
+
+.usersTable {
+  min-width: 600px;
+}
+
+.usersTable th,
+.usersTable td {
+  white-space: nowrap;
 }
 
 .dark .usersTable th {
-  background-color: #2a2a2a;
-  color: #fff;
+  background-color: #161b22;
+  color: #8b949e;
 }
 
 .dark .usersTable td {
-  background-color: #2a2a2a;
-  color: #fff;
+  background-color: #161b22;
+  color: #e6edf3;
 }
 
+/* Medium/small desktops */
 @media screen and (max-width: 1400px) and (max-height: 800px) {
   .usersTablePage {
     width: calc(100vw - 100px);
-    justify-self: center;
-    border-radius: 25px;
   }
-
   .user-main-content {
     margin-top: 0px;
+  }
+}
+
+/* Tablets and below */
+@media screen and (max-width: 991px) {
+  .usersTablePage {
+    width: 100%;
+    border-radius: 15px;
+    overflow-x: auto;
+  }
+
+  .usersTable {
+    min-width: 500px;
+  }
+
+  .usersTable th,
+  .usersTable td {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Phones */
+@media screen and (max-width: 575px) {
+  .usersTablePage {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  .usersTable {
+    width: 100%;
+    min-width: unset !important;
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+
+  .usersTable th,
+  .usersTable td {
+    padding: 0.25rem;
+    font-size: 0.75rem;
+    white-space: normal;
+    word-break: break-word;
+    text-align: center;
+  }
+
+  .usersTable th:nth-child(5),
+  .usersTable td:nth-child(5) {
+    display: none;
+  }
+
+  .usersTable th:nth-child(1),
+  .usersTable td:nth-child(1) {
+    width: 10%;
+  }
+  .usersTable th:nth-child(2),
+  .usersTable td:nth-child(2) {
+    width: 30%;
+  }
+  .usersTable th:nth-child(3),
+  .usersTable td:nth-child(3) {
+    width: 55%;
+  }
+  .usersTable th:nth-child(4),
+  .usersTable td:nth-child(4) {
+    width: 30%;
+  }
+  .usersTable th:nth-child(6),
+  .usersTable td:nth-child(6) {
+    width: 25%;
+  }
+
+  .usersTable td:last-child .flex {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .usersTable td:last-child button {
+    width: 100%;
+    justify-content: center;
+    padding: 0.3rem;
   }
 }

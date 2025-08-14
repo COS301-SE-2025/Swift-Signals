@@ -1,5 +1,3 @@
-/* === HELP MENU & CHATBOT STYLES === */
-
 .help-container {
   position: fixed;
   top: 0;
@@ -9,7 +7,6 @@
   pointer-events: none;
 }
 
-/* New modern help button design */
 .help-button {
   position: absolute;
   top: 50%;
@@ -17,7 +14,7 @@
   width: 45px;
   height: 120px;
   transform: translateY(-50%);
-  background: linear-gradient(135deg, #a8201c, #80100c);
+  background: linear-gradient(135deg, #3daef0, #0f5ba7);
   color: white;
   border: none;
   border-radius: 22px 0 0 22px;
@@ -26,7 +23,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 15px; /* Space between arrow and text */
+  gap: 15px;
   cursor: pointer;
   box-shadow: -3px 3px 12px rgba(0, 0, 0, 0.25);
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -50,18 +47,16 @@
   font-size: 18px;
 }
 
-/* How the button looks when the menu is OPEN */
 .help-container.open .help-button {
   width: 50px;
   height: 50px;
   border-radius: 50%;
   transform: translate(-380px, -50%);
-  background: #7a1410;
+  background: #0f5ba7;
   font-size: 22px;
-  gap: 0; /* Remove gap when it's a circle */
+  gap: 0;
 }
 
-/* Sliding Menu Panel */
 .help-menu {
   position: absolute;
   top: 0;
@@ -87,7 +82,6 @@
   transform: translateX(0);
 }
 
-/* Menu Header and Tabs */
 .help-menu-header {
   display: flex;
   align-items: center;
@@ -160,23 +154,21 @@
   background-color: #3a3a3a;
 }
 .help-tab-button.active {
-  color: #991915;
-  background-color: #fce8e7;
+  color: #0f5ba7;
+  background-color: #e8f1fa;
 }
 .dark .help-tab-button.active {
   color: white;
-  background-color: #7a1410;
+  background-color: #0f5ba7;
 }
 
-/* --- REVISED General Help Content & NEW Accordion Styles --- */
 .general-help-container {
-  padding: 1rem 1.5rem; /* Adjusted padding */
+  padding: 1rem 1.5rem;
   overflow-y: auto;
   flex-grow: 1;
   min-height: 0;
 }
 
-/* Custom scrollbar for the help container */
 .general-help-container::-webkit-scrollbar {
   width: 8px;
 }
@@ -231,7 +223,7 @@
 }
 
 .accordion-header:hover {
-  color: #991915;
+  color: #0f5ba7;
 }
 .dark .accordion-header:hover {
   color: #e8c2c1;
@@ -264,7 +256,7 @@
 .accordion-item h4 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #991915;
+  color: #0f5ba7;
   margin-bottom: 0.5rem;
 }
 
@@ -328,7 +320,7 @@
   text-align: left;
 }
 .message-wrapper.user .chat-message p {
-  background-color: #991915;
+  background-color: #0f5ba7;
   color: white;
   border-bottom-right-radius: 5px;
 }
@@ -350,8 +342,8 @@
 }
 .quick-replies button {
   background-color: transparent;
-  border: 1px solid #991915;
-  color: #991915;
+  border: 1px solid #0f5ba7;
+  color: #0f5ba7;
   padding: 8px 15px;
   border-radius: 20px;
   cursor: pointer;
@@ -359,15 +351,15 @@
   transition: all 0.2s ease;
 }
 .dark .quick-replies button {
-  border-color: #b05a57;
-  color: #b05a57;
+  border-color: #406283;
+  color: #406283;
 }
 .quick-replies button:hover {
-  background-color: #991915;
+  background-color: #0f5ba7;
   color: white;
 }
 .dark .quick-replies button:hover {
-  background-color: #b05a57;
+  background-color: #406283;
   color: white;
 }
 .chatbot-input {
@@ -393,12 +385,12 @@
 }
 .chatbot-input input:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(153, 25, 21, 0.3);
+  box-shadow: 0 0 0 2px rgba(21, 78, 153, 0.3);
 }
 .chatbot-input button {
   background: none;
   border: none;
-  color: #991915;
+  color: #0f5ba7;
   font-size: 22px;
   margin-left: 12px;
   cursor: pointer;
@@ -407,7 +399,7 @@
   transition: color 0.2s;
 }
 .chatbot-input button:hover {
-  color: #7a1410;
+  color: #0f5ba7;
 }
 .dark .chatbot-input button:hover {
   color: #b05a57;
@@ -590,12 +582,12 @@
 
 /* 'Yes' button */
 .confirmation-buttons button:last-of-type {
-  background-color: #991915;
+  background-color: #0f5ba7;
   color: white;
 }
 
 .confirmation-buttons button:last-of-type:hover {
-  background-color: #7a1410;
+  background-color: #0f5ba7;
 }
 
 .confirmation-buttons button:active {
@@ -640,7 +632,7 @@
 }
 
 .faq-question:hover {
-  color: #991915;
+  color: #0f5ba7;
 }
 .dark .faq-question:hover {
   color: #e8c2c1;

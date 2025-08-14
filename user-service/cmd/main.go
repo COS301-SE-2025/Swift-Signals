@@ -9,6 +9,7 @@ import (
 	"os"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	"github.com/COS301-SE-2025/Swift-Signals/shared/jwt"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/service"
@@ -17,6 +18,9 @@ import (
 )
 
 func main() {
+	jwtSecret := "a-string-secret-at-least-256-bits-long"
+	jwt.Init([]byte(jwtSecret))
+
 	// Postgresql Connection
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")

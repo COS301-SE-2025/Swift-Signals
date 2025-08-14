@@ -24,8 +24,10 @@ import (
 
 type Config struct {
 	Port             int    `env:"PORT"           envDefault:"9090"`
+	JwtSecret        string `env:"JWT_SECRET"     envDefault:"a-string-secret-at-least-256-bits-long"`
 	UserServiceAddr  string `env:"USER_GRPC_ADDR" envDefault:"localhost:50051"` // TODO: Change to proper address
 	IntersectionAddr string `env:"INTR_GRPC_ADDR" envDefault:"localhost:50052"` // TODO: Change to proper address
+	OptimisationAddr string `env:"OPTI_GRPC_ADDR" envDefault:"localhost:50054"` // TODO: Change to proper address
 }
 
 // @title Authentication API Gateway
@@ -53,12 +55,13 @@ func main() {
 
 	userClient := mustConnectUserService(cfg.UserServiceAddr)
 	intrClient := mustConnectIntersectionService(cfg.IntersectionAddr)
+	optiClient := mustConnectOptimisationService(cfg.OptimisationAddr)
 
 	baseLogger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
 		Level: slog.LevelInfo,
 	}))
 
-	mux := setupRoutes(baseLogger, userClient, intrClient)
+	mux := setupRoutes(baseLogger, cfg.JwtSecret, userClient, intrClient, optiClient)
 
 	server := createServer(cfg.Port, mux)
 	runServer(server)
@@ -88,10 +91,24 @@ func mustConnectIntersectionService(address string) *client.IntersectionClient {
 	return client.NewIntersectionClient(conn)
 }
 
+func mustConnectOptimisationService(address string) *client.OptimisationClient {
+	conn, err := grpc.NewClient(
+		address,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	) // TODO: Add TLS
+	if err != nil {
+		log.Fatalf("failed to connect to Optimisation gRPC server: %v", err)
+	}
+	log.Println("Connected to Optimisation-Service")
+	return client.NewOptimisationClientFromConn(conn)
+}
+
 func setupRoutes(
 	logger *slog.Logger,
+	JwtSecret string,
 	userClient *client.UserClient,
 	intrClient *client.IntersectionClient,
+	optiClient *client.OptimisationClient,
 ) http.Handler {
 	mux := http.NewServeMux()
 
@@ -105,13 +122,13 @@ func setupRoutes(
 	log.Println("Initialized Auth Handlers.")
 
 	// Intersection routes
-	intersectionService := service.NewIntersectionService(intrClient)
+	intersectionService := service.NewIntersectionService(intrClient, optiClient, userClient)
 	intersectionHandler := handler.NewIntersectionHandler(intersectionService)
 	mux.HandleFunc("GET /intersections", intersectionHandler.GetAllIntersections)
 	mux.HandleFunc("GET /intersections/{id}", intersectionHandler.GetIntersection)
 	mux.HandleFunc("POST /intersections", intersectionHandler.CreateIntersection)
 	mux.HandleFunc("PATCH /intersections/{id}", intersectionHandler.UpdateIntersection)
-	mux.HandleFunc("DELETE /intersections/{id}", NotImplemented)
+	mux.HandleFunc("DELETE /intersections/{id}", intersectionHandler.DeleteIntersection)
 	mux.HandleFunc("POST /intersections/{id}/optimise", NotImplemented)
 	mux.HandleFunc("GET /intersections/simple", NotImplemented)
 	log.Println("Initialized Intersection Handlers.")
@@ -124,7 +141,17 @@ func setupRoutes(
 	return middleware.CreateStack(
 		middleware.Logging(logger),
 		middleware.CORS,
-	)(mux)
+		middleware.AuthMiddleware(
+			JwtSecret,
+			"/login",
+			"/register",
+			"/reset-password",
+			"/docs",
+			"/favicon.ico",
+		),
+	)(
+		mux,
+	)
 }
 
 func createServer(port int, handler http.Handler) *http.Server {

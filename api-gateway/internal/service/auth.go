@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
-	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 )
 
 type AuthService struct {
@@ -22,7 +22,7 @@ func (s *AuthService) RegisterUser(
 	ctx context.Context,
 	req model.RegisterRequest,
 ) (model.RegisterResponse, error) {
-	logger := util.LoggerFromContext(ctx).With(
+	logger := middleware.LoggerFromContext(ctx).With(
 		"service", "auth",
 	)
 
@@ -44,7 +44,7 @@ func (s *AuthService) LoginUser(
 	ctx context.Context,
 	req model.LoginRequest,
 ) (model.LoginResponse, error) {
-	logger := util.LoggerFromContext(ctx).With(
+	logger := middleware.LoggerFromContext(ctx).With(
 		"service", "auth",
 	)
 
@@ -62,7 +62,7 @@ func (s *AuthService) LoginUser(
 }
 
 func (s *AuthService) LogoutUser(ctx context.Context, token string) (model.LogoutResponse, error) {
-	logger := util.LoggerFromContext(ctx).With(
+	logger := middleware.LoggerFromContext(ctx).With(
 		"service", "auth",
 	)
 
