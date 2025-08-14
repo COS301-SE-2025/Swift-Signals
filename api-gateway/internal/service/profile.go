@@ -6,7 +6,6 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
-	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 )
 
 type ProfileService struct {
@@ -23,15 +22,6 @@ func (s *ProfileService) GetProfile(ctx context.Context, userID string) (model.U
 	logger := middleware.LoggerFromContext(ctx).With(
 		"service", "profile",
 	)
-
-	userID, ok := middleware.GetUserID(ctx)
-	if !ok {
-		return model.User{}, errs.NewInternalError(
-			"user ID missing inside of handler",
-			nil,
-			map[string]any{},
-		)
-	}
 
 	logger.Debug("calling user client to get user profile")
 	rpcUser, err := s.userClient.GetUserByID(ctx, userID)
@@ -57,15 +47,6 @@ func (s *ProfileService) UpdateProfile(
 		"service", "profile",
 	)
 
-	userID, ok := middleware.GetUserID(ctx)
-	if !ok {
-		return model.User{}, errs.NewInternalError(
-			"user ID missing inside of handler",
-			nil,
-			map[string]any{},
-		)
-	}
-
 	logger.Debug("calling user client to update user profile")
 	rpcUser, err := s.userClient.UpdateUser(ctx, userID, req.Username, req.Email)
 	if err != nil {
@@ -85,15 +66,6 @@ func (s *ProfileService) DeleteProfile(ctx context.Context, userID string) error
 	logger := middleware.LoggerFromContext(ctx).With(
 		"service", "profile",
 	)
-
-	userID, ok := middleware.GetUserID(ctx)
-	if !ok {
-		return errs.NewInternalError(
-			"user ID missing inside of handler",
-			nil,
-			map[string]any{},
-		)
-	}
 
 	logger.Debug("calling user client to delete user profile")
 	_, err := s.userClient.DeleteUser(ctx, userID)

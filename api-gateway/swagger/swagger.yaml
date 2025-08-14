@@ -646,6 +646,78 @@ paths:
       summary: User Logout
       tags:
       - Authentication
+  /me:
+    delete:
+      description: Deletes the profile of the currently authenticated user.
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized access
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Delete User Profile
+      tags:
+      - Profile
+    get:
+      description: Retrieves the profile of the currently authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile retrieved successfully
+          schema:
+            $ref: '#/definitions/model.User'
+        "401":
+          description: Unauthorized access
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get User Profile
+      tags:
+      - Profile
+    patch:
+      consumes:
+      - application/json
+      description: Updates the profile of the currently authenticated user.
+      parameters:
+      - description: User profile data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile updated successfully
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: 'Bad request: Validation error'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized access
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Update User Profile
+      tags:
+      - Profile
   /register:
     post:
       consumes:
