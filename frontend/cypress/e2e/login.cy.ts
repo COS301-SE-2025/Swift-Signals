@@ -17,6 +17,25 @@ describe("Login Page", () => {
     cy.contains("Please fill in all fields.").should("exist");
   });
 
+  it("submits form successfully with valid credentials", () => {
+    // Stub backend response
+    cy.intercept("POST", "http://localhost:9090/login", {
+      statusCode: 200,
+      body: {
+        token: "mock-token",
+        message: "Login successful",
+      },
+    }).as("loginRequest");
+
+    cy.get("input[name='username']").type("testuser@example.com");
+    cy.get("input[name='password']").type("securepassword");
+    cy.contains("Log Me In").click();
+
+    // Wait for mock request and confirm redirect
+    cy.wait("@loginRequest");
+    cy.url().should("include", "/dashboard");
+  });
+
   
 });
 
