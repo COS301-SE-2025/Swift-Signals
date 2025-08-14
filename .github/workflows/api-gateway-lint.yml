@@ -15,9 +15,9 @@ jobs:
       runs-on: ubuntu-latest
       steps:
         - uses: actions/checkout@v4
-        - uses: actions/setup-go@v5
+        - uses: actions/setup-go@v4
           with:
-            go-version: stable
+            go-version: '1.24.3'
 
         - name: Generate Proto Files
           working-directory: ./protos
@@ -30,6 +30,7 @@ jobs:
           run: |
             go install github.com/vektra/mockery/v2@latest
             mockery
+            go mod tidy
 
         - name: golangci-lint
           uses: golangci/golangci-lint-action@v8
