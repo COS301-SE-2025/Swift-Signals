@@ -46,7 +46,7 @@ func (s *Service) CreateIntersection(
 		return nil, handleValidationError(err)
 	}
 
-	logger.Debug("creating insersection")
+	logger.Debug("creating intersection")
 	id := uuid.New().String()
 	createdAt := time.Now()
 	lastRunAt := time.Now()
