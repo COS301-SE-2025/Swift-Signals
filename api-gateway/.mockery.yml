@@ -25,6 +25,7 @@ packages:
     interfaces:
       AuthServiceInterface:
       IntersectionServiceInterface:
+      AdminServiceInterface:
 
   github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection:
     config:
