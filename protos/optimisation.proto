@@ -11,7 +11,6 @@ message OptimisationParameters {
   SimulationParameters parameters = 2;
 }
 
-// Traffic light timing parameters
 message SimulationParameters {
   IntersectionType intersection_type = 2;
   int32 green = 3;
@@ -21,7 +20,6 @@ message SimulationParameters {
   int32 seed = 7;
 }
 
-// Enums for different types and statuses
 enum IntersectionStatus {
   INTERSECTION_STATUS_UNSPECIFIED = 0;
   INTERSECTION_STATUS_UNOPTIMISED = 1;
@@ -39,8 +37,9 @@ enum TrafficDensity {
 
 enum OptimisationType {
   OPTIMISATION_TYPE_UNSPECIFIED = 0;
-  OPTIMISATION_TYPE_GRIDSEARCH = 1;
-  OPTIMISATION_TYPE_GENETIC_EVALUATION = 2;
+  OPTIMISATION_TYPE_NONE = 1;
+  OPTIMISATION_TYPE_GRIDSEARCH = 2;
+  OPTIMISATION_TYPE_GENETIC_EVALUATION = 3;
 }
 
 enum IntersectionType {
