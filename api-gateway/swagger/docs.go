@@ -35,16 +35,13 @@ const docTemplate = `{
                 "summary": "Get All Users",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Page number",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Number of users per page",
-                        "name": "page_size",
-                        "in": "query"
+                        "description": "Pagination options",
+                        "name": "getAllUsersRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.GetAllUsersRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -72,7 +69,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/users/{user_id}": {
+        "/admin/users/{id}": {
             "get": {
                 "description": "Retrieves a user by their ID. Only accessible by admins.",
                 "consumes": [
@@ -89,7 +86,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "User ID",
-                        "name": "user_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -137,7 +134,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "User ID",
-                        "name": "user_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     }
@@ -182,7 +179,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "User ID",
-                        "name": "user_id",
+                        "name": "id",
                         "in": "path",
                         "required": true
                     },
@@ -761,6 +758,26 @@ const docTemplate = `{
                 }
             }
         },
+        "model.GetAllUsersRequest": {
+            "type": "object",
+            "required": [
+                "page",
+                "page_size"
+            ],
+            "properties": {
+                "page": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 1
+                },
+                "page_size": {
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 1,
+                    "example": 10
+                }
+            }
+        },
         "model.Intersection": {
             "type": "object",
             "properties": {
@@ -826,11 +843,11 @@ const docTemplate = `{
             "properties": {
                 "email": {
                     "type": "string",
-                    "example": "user@example.com"
+                    "example": "testuser@example.com"
                 },
                 "password": {
                     "type": "string",
-                    "example": "StrongPassword123"
+                    "example": "testpass1234"
                 }
             }
         },
@@ -843,7 +860,7 @@ const docTemplate = `{
                 },
                 "token": {
                     "type": "string",
-                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                    "example": "header.payload.signature"
                 }
             }
         },
@@ -878,19 +895,19 @@ const docTemplate = `{
             "properties": {
                 "email": {
                     "type": "string",
-                    "example": "newuser@example.com"
+                    "example": "testuser@example.com"
                 },
                 "password": {
                     "type": "string",
                     "maxLength": 64,
                     "minLength": 8,
-                    "example": "VeryStrongPassword456"
+                    "example": "testpass1234"
                 },
                 "username": {
                     "type": "string",
                     "maxLength": 32,
                     "minLength": 3,
-                    "example": "johndoe"
+                    "example": "tester"
                 }
             }
         },

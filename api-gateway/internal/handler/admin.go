@@ -29,8 +29,7 @@ func NewAdminHandler(s service.AdminServiceInterface) *AdminHandler {
 // @Tags Admin
 // @Accept json
 // @Produce json
-// @Param page query int false "Page number"
-// @Param page_size query int false "Number of users per page"
+// @Param getAllUsersRequest body model.GetAllUsersRequest true "Pagination options"
 // @Success 200 {array} model.User "List of users"
 // @Failure 403 {object} model.ErrorResponse "Forbidden - Only admins can access this endpoint"
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
@@ -89,12 +88,12 @@ func (h *AdminHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 // @Tags Admin
 // @Accept json
 // @Produce json
-// @Param user_id path string true "User ID"
+// @Param id path string true "User ID"
 // @Success 200 {object} model.User "User details"
 // @Failure 403 {object} model.ErrorResponse "Forbidden - Only admins can access this endpoint"
 // @Failure 404 {object} model.ErrorResponse "User not found"
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
-// @Router /admin/users/{user_id} [get]
+// @Router /admin/users/{id} [get]
 func (h *AdminHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "admin",
@@ -135,13 +134,13 @@ func (h *AdminHandler) GetUserByID(w http.ResponseWriter, r *http.Request) {
 // @Tags Admin
 // @Accept json
 // @Produce json
-// @Param user_id path string true "User ID"
+// @Param id path string true "User ID"
 // @Param updateUserRequest body model.UpdateUserRequest true "Updated user details"
 // @Success 200 {object} model.User "Updated user details"
 // @Failure 403 {object} model.ErrorResponse "Forbidden - Only admins can access this endpoint"
 // @Failure 404 {object} model.ErrorResponse "User not found"
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
-// @Router /admin/users/{user_id} [patch]
+// @Router /admin/users/{id} [patch]
 func (h *AdminHandler) UpdateUserByID(w http.ResponseWriter, r *http.Request) {
 	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "admin",
@@ -206,12 +205,12 @@ func (h *AdminHandler) UpdateUserByID(w http.ResponseWriter, r *http.Request) {
 // @Tags Admin
 // @Accept json
 // @Produce json
-// @Param user_id path string true "User ID"
+// @Param id path string true "User ID"
 // @Success 204 "User deleted successfully"
 // @Failure 403 {object} model.ErrorResponse "Forbidden - Only admins can access this endpoint"
 // @Failure 404 {object} model.ErrorResponse "User not found"
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
-// @Router /admin/users/{user_id} [delete]
+// @Router /admin/users/{id} [delete]
 func (h *AdminHandler) DeleteUserByID(w http.ResponseWriter, r *http.Request) {
 	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "admin",
