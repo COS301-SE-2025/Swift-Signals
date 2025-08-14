@@ -22,6 +22,11 @@ const docTemplate = `{
     "paths": {
         "/admin/users": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves a paginated list of all users. Only accessible by admins.",
                 "consumes": [
                     "application/json"
@@ -71,6 +76,11 @@ const docTemplate = `{
         },
         "/admin/users/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves a user by their ID. Only accessible by admins.",
                 "consumes": [
                     "application/json"
@@ -119,6 +129,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes a user by their ID. Only accessible by admins.",
                 "consumes": [
                     "application/json"
@@ -164,6 +179,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Updates a user's details by their ID. Only accessible by admins.",
                 "consumes": [
                     "application/json"
@@ -589,6 +609,11 @@ const docTemplate = `{
         },
         "/me": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves the profile of the currently authenticated user.",
                 "produces": [
                     "application/json"
@@ -619,6 +644,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Deletes the profile of the currently authenticated user.",
                 "produces": [
                     "application/json"
@@ -646,6 +676,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Updates the profile of the currently authenticated user.",
                 "consumes": [
                     "application/json"
