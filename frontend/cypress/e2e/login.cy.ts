@@ -12,6 +12,11 @@ describe("Login Page", () => {
     cy.contains("Log Me In").should("exist");
   });
 
+  it("shows validation error on empty form submit", () => {
+    cy.contains("Log Me In").click();
+    cy.contains("Please fill in all fields.").should("exist");
+  });
+
   
 });
 
