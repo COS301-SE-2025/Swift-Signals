@@ -222,7 +222,10 @@ func (suite *TestSuite) TestProfileOperationsWithDifferentUserTypes() {
 	result, err = suite.service.GetProfile(ctx2, adminUserID)
 	suite.Require().NoError(err)
 	suite.True(result.IsAdmin)
-	suite.Equal([]string{"intersection-1", "intersection-2", "intersection-3"}, result.IntersectionIDs)
+	suite.Equal(
+		[]string{"intersection-1", "intersection-2", "intersection-3"},
+		result.IntersectionIDs,
+	)
 
 	// Test 3: User with no intersections
 	noIntersectionUserID := "no-intersection-user"
@@ -314,9 +317,12 @@ func (suite *TestSuite) TestProfileDeletionScenarios() {
 			expectError: true,
 		},
 		{
-			name:        "User with active intersections",
-			userID:      "active-user",
-			setupError:  errs.NewForbiddenError("cannot delete user with active intersections", map[string]any{}),
+			name:   "User with active intersections",
+			userID: "active-user",
+			setupError: errs.NewForbiddenError(
+				"cannot delete user with active intersections",
+				map[string]any{},
+			),
 			expectError: true,
 		},
 		{
@@ -423,7 +429,10 @@ func (suite *TestSuite) TestProfileServiceResilience() {
 		{
 			name:      "Service unavailable",
 			operation: "get",
-			error:     errs.NewUnavailableError("service temporarily unavailable", map[string]any{}),
+			error: errs.NewUnavailableError(
+				"service temporarily unavailable",
+				map[string]any{},
+			),
 		},
 		{
 			name:      "Timeout error",
