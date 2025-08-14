@@ -6,12 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestGetAllUsers_Success() {
@@ -336,8 +334,4 @@ func (suite *TestSuite) TestGetAllUsers_ResponseHeadersSet() {
 	suite.Equal("application/json", w.Header().Get("Content-Type"))
 
 	suite.service.AssertExpectations(suite.T())
-}
-
-func TestHandlerGetAllUsers(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }
