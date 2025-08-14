@@ -113,7 +113,7 @@ func (h *Handler) mapToIntersection(
 			intersectionpb.IntersectionStatus_value[string(intersection.Status)]),
 		RunCount: int32(intersection.RunCount),
 		TrafficDensity: intersectionpb.TrafficDensity(
-			intersectionpb.IntersectionStatus_value[string(intersection.TrafficDensity)]),
+			intersectionpb.TrafficDensity_value[string(intersection.TrafficDensity)]),
 		DefaultParameters: h.mapToProtoOptimisationParameters(intersection.DefaultParameters),
 		BestParameters:    h.mapToProtoOptimisationParameters(intersection.BestParameters),
 		CurrentParameters: h.mapToProtoOptimisationParameters(intersection.CurrentParameters),
