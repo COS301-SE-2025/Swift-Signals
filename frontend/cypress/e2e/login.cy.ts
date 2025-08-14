@@ -36,6 +36,20 @@ describe("Login Page", () => {
     cy.url().should("include", "/dashboard");
   });
 
+  it("shows login error on failed login", () => {
+    cy.intercept("POST", "http://localhost:9090/login", {
+      statusCode: 401,
+      body: { message: "Invalid credentials" },
+    }).as("loginFail");
+
+    cy.get("input[name='username']").type("wrong@example.com");
+    cy.get("input[name='password']").type("wrongpassword");
+    cy.contains("Log Me In").click();
+
+    cy.wait("@loginFail");
+    cy.contains('Login failed. Server says: "Invalid credentials"').should("exist");
+  });
+
   
 });
 
