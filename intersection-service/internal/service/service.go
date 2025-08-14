@@ -120,7 +120,9 @@ func (s *Service) GetAllIntersections(
 	}
 
 	logger.Debug("finding all intersections")
-	intersections, err := s.repo.GetAllIntersections(ctx, page, pageSize, filter)
+	offset := (page - 1) * pageSize
+	limit := pageSize
+	intersections, err := s.repo.GetAllIntersections(ctx, limit, offset, filter)
 	if err != nil {
 		var svcErr *errs.ServiceError
 		if errors.As(err, &svcErr) {
