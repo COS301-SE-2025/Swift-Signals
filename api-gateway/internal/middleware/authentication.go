@@ -13,7 +13,10 @@ import (
 
 type contextKey string
 
-const userIDKey contextKey = "userID"
+const (
+	userIDKey contextKey = "userID"
+	roleKey   contextKey = "role"
+)
 
 func AuthMiddleware(secret string, paths ...string) Middleware {
 	return func(next http.Handler) http.Handler {
@@ -64,15 +67,12 @@ func AuthMiddleware(secret string, paths ...string) Middleware {
 			}
 
 			ctx := SetUserID(r.Context(), userID)
+			ctx = SetRole(ctx, claims.Role)
 			r = r.WithContext(ctx)
 
 			next.ServeHTTP(w, r)
 		})
 	}
-}
-
-func SetUserID(ctx context.Context, userID string) context.Context {
-	return context.WithValue(ctx, userIDKey, userID)
 }
 
 type PathSet map[string]struct{}
@@ -94,7 +94,20 @@ func (ps PathSet) Contains(path string) bool {
 	return false
 }
 
-func GetUserID(r *http.Request) (string, bool) {
-	userID, ok := r.Context().Value(userIDKey).(string)
+func SetUserID(ctx context.Context, userID string) context.Context {
+	return context.WithValue(ctx, userIDKey, userID)
+}
+
+func SetRole(ctx context.Context, role string) context.Context {
+	return context.WithValue(ctx, roleKey, role)
+}
+
+func GetUserID(ctx context.Context) (string, bool) {
+	userID, ok := ctx.Value(userIDKey).(string)
 	return userID, ok
+}
+
+func GetRole(ctx context.Context) (string, bool) {
+	role, ok := ctx.Value(roleKey).(string)
+	return role, ok
 }

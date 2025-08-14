@@ -1,9 +1,10 @@
-package intersection
+package profile
 
 import (
 	"context"
 	"log/slog"
 	"os"
+	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
@@ -13,8 +14,8 @@ import (
 
 type TestSuite struct {
 	suite.Suite
-	service *mocks.MockIntersectionServiceInterface
-	handler *handler.IntersectionHandler
+	service *mocks.MockProfileServiceInterface
+	handler *handler.ProfileHandler
 	ctx     context.Context
 }
 
@@ -24,7 +25,11 @@ func (suite *TestSuite) SetupSuite() {
 }
 
 func (suite *TestSuite) SetupTest() {
-	suite.service = new(mocks.MockIntersectionServiceInterface)
-	suite.handler = handler.NewIntersectionHandler(suite.service)
+	suite.service = new(mocks.MockProfileServiceInterface)
+	suite.handler = handler.NewProfileHandler(suite.service)
 	suite.ctx = middleware.SetUserID(context.Background(), "test-user-id")
+}
+
+func TestHandler(t *testing.T) {
+	suite.Run(t, new(TestSuite))
 }

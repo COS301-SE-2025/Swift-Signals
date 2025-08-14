@@ -4,12 +4,10 @@ import (
 	"context"
 	"io"
 	"log/slog"
-	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestDeleteIntersectionByID_Success() {
@@ -325,8 +323,4 @@ func (suite *TestSuite) TestDeleteIntersectionByID_StreamError() {
 
 	suite.userClient.AssertExpectations(suite.T())
 	mockUserStream.AssertExpectations(suite.T())
-}
-
-func TestServiceDeleteIntersectionByID(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

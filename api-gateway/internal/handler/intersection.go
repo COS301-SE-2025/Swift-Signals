@@ -41,7 +41,7 @@ func (h *IntersectionHandler) GetAllIntersections(w http.ResponseWriter, r *http
 	)
 	logger.Info("processing getAllIntersections request")
 
-	userID, ok := middleware.GetUserID(r)
+	userID, ok := middleware.GetUserID(r.Context())
 	if !ok {
 		logger.Error("user ID missing inside of handler")
 		util.SendErrorResponse(
@@ -88,7 +88,7 @@ func (h *IntersectionHandler) GetIntersection(w http.ResponseWriter, r *http.Req
 	)
 	logger.Info("processing getIntersection request")
 
-	userID, ok := middleware.GetUserID(r)
+	userID, ok := middleware.GetUserID(r.Context())
 	if !ok {
 		logger.Error("user ID missing inside of handler")
 		util.SendErrorResponse(
@@ -162,7 +162,7 @@ func (h *IntersectionHandler) CreateIntersection(w http.ResponseWriter, r *http.
 		return
 	}
 
-	userID, ok := middleware.GetUserID(r)
+	userID, ok := middleware.GetUserID(r.Context())
 	if !ok {
 		logger.Error("user ID missing inside of handler")
 		util.SendErrorResponse(
@@ -236,7 +236,7 @@ func (h *IntersectionHandler) UpdateIntersection(w http.ResponseWriter, r *http.
 		return
 	}
 
-	userID, ok := middleware.GetUserID(r)
+	userID, ok := middleware.GetUserID(r.Context())
 	if !ok {
 		logger.Error("user ID missing inside of handler")
 		util.SendErrorResponse(
@@ -287,7 +287,7 @@ func (h *IntersectionHandler) DeleteIntersection(w http.ResponseWriter, r *http.
 	)
 	logger.Info("processing deleteIntersection request")
 
-	userID, ok := middleware.GetUserID(r)
+	userID, ok := middleware.GetUserID(r.Context())
 	if !ok {
 		logger.Error("user ID missing inside of handler")
 		util.SendErrorResponse(

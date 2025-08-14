@@ -4,13 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestGetAllIntersections_Success() {
@@ -253,8 +251,4 @@ func (suite *TestSuite) TestGetAllIntersections_ResponseHeadersSet() {
 	suite.Equal("application/json", w.Header().Get("Content-Type"))
 
 	suite.service.AssertExpectations(suite.T())
-}
-
-func TestHandlerGetAllIntersections(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }
