@@ -3,11 +3,9 @@ package test
 import (
 	"context"
 	"database/sql"
-	"testing"
 	"time"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestListUsers_Success() {
@@ -135,8 +133,4 @@ func (suite *TestSuite) TestListUsers_GetIntersectionsError() {
 	suite.Require().Error(err)
 	suite.Nil(result)
 	suite.NoError(suite.mock.ExpectationsWereMet())
-}
-
-func TestDBListUsers(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

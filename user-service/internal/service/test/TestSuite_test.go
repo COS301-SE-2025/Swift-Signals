@@ -1,6 +1,8 @@
 package test
 
 import (
+	"testing"
+
 	mocks "github.com/COS301-SE-2025/Swift-Signals/user-service/internal/mocks/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/service"
 	"github.com/stretchr/testify/suite"
@@ -15,4 +17,8 @@ type TestSuite struct {
 func (suite *TestSuite) SetupTest() {
 	suite.repo = new(mocks.MockUserRepository)
 	suite.service = service.NewUserService(suite.repo)
+}
+
+func TestService(t *testing.T) {
+	suite.Run(t, new(TestSuite))
 }

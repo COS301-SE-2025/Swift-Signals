@@ -3,13 +3,11 @@ package test
 import (
 	"context"
 	"errors"
-	"testing"
 	"time"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestUpdateUser_Success() {
@@ -535,8 +533,4 @@ func (suite *TestSuite) TestUpdateUser_NameTrimming() {
 	suite.Equal("Updated Name", result.Name)
 
 	suite.repo.AssertExpectations(suite.T())
-}
-
-func TestServiceUpdateUser(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

@@ -4,12 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/lib/pq"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestGetUserByEmail_Success() {
@@ -151,8 +149,4 @@ func (suite *TestSuite) TestGetUserByEmail_GetIntersectionsError() {
 	suite.Nil(result)
 	suite.Contains(err.Error(), "failed to get intersections by user id")
 	suite.NoError(suite.mock.ExpectationsWereMet())
-}
-
-func TestDBGetUserByEmail(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }
