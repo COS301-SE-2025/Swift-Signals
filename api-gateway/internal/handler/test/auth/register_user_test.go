@@ -5,12 +5,10 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestRegisterUser_Success() {
@@ -171,8 +169,4 @@ func (suite *TestSuite) TestRegister_NilBody() {
 
 	suite.Equal(http.StatusBadRequest, w.Code)
 	suite.Contains(w.Body.String(), "Invalid request payload")
-}
-
-func TestHandlerRegisterUser(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

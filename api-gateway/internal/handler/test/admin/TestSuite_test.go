@@ -1,9 +1,10 @@
-package intersection
+package admin
 
 import (
 	"context"
 	"log/slog"
 	"os"
+	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
@@ -13,8 +14,8 @@ import (
 
 type TestSuite struct {
 	suite.Suite
-	service *mocks.MockIntersectionServiceInterface
-	handler *handler.IntersectionHandler
+	service *mocks.MockAdminServiceInterface
+	handler *handler.AdminHandler
 	ctx     context.Context
 }
 
@@ -24,7 +25,11 @@ func (suite *TestSuite) SetupSuite() {
 }
 
 func (suite *TestSuite) SetupTest() {
-	suite.service = new(mocks.MockIntersectionServiceInterface)
-	suite.handler = handler.NewIntersectionHandler(suite.service)
-	suite.ctx = middleware.SetUserID(context.Background(), "test-user-id")
+	suite.service = new(mocks.MockAdminServiceInterface)
+	suite.handler = handler.NewAdminHandler(suite.service)
+	suite.ctx = middleware.SetRole(context.Background(), "admin")
+}
+
+func TestHandler(t *testing.T) {
+	suite.Run(t, new(TestSuite))
 }

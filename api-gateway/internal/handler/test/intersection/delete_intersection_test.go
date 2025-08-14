@@ -3,11 +3,9 @@ package intersection
 import (
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestDeleteIntersection_Success() {
@@ -219,8 +217,4 @@ func (suite *TestSuite) TestDeleteIntersection_SpecialCharactersInID() {
 	suite.Empty(w.Body.String())
 
 	suite.service.AssertExpectations(suite.T())
-}
-
-func TestHandlerDeleteIntersection(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

@@ -5,12 +5,10 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestCreateIntersection_Success() {
@@ -330,8 +328,4 @@ func (suite *TestSuite) TestCreateIntersection_MinimalValidRequest() {
 	suite.Equal(expectedResponse.Id, response.Id)
 
 	suite.service.AssertExpectations(suite.T())
-}
-
-func TestHandlerCreateIntersection(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

@@ -3,11 +3,9 @@ package admin
 import (
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestDeleteUserByID_Success() {
@@ -296,8 +294,4 @@ func (suite *TestSuite) TestDeleteUserByID_NoResponseHeaders() {
 	suite.Empty(w.Header().Get("Content-Type"))
 
 	suite.service.AssertExpectations(suite.T())
-}
-
-func TestHandlerDeleteUserByID(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }
