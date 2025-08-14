@@ -6,6 +6,6 @@ type GetAllUsersRequest struct {
 }
 
 type UpdateUserRequest struct {
-	Username string `json:"username" example:"newusername"      validate:"min=3,max=32"`
-	Email    string `json:"email"    example:"user@example.com" validate:"email"`
+	Username string `json:"username" example:"newusername"      validate:"omitempty,min=3,max=32"`
+	Email    string `json:"email"    example:"user@example.com" validate:"omitempty,email"`
 }
