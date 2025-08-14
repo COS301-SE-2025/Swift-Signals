@@ -71,7 +71,10 @@ func (ic *IntersectionClient) GetIntersection(
 func (ic *IntersectionClient) GetAllIntersections(
 	ctx context.Context,
 ) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error) {
-	req := &intersectionpb.GetAllIntersectionsRequest{}
+	req := &intersectionpb.GetAllIntersectionsRequest{
+		Page:     1,
+		PageSize: 100,
+	}
 
 	return ic.client.GetAllIntersections(ctx, req)
 }

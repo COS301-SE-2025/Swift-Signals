@@ -10,40 +10,28 @@ on:
 jobs:
   run-tests:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          go-version: '1.24.3'  
+          go-version: '1.24.0' 
+          cache: true
 
-      - name: Install Protobuf Compiler
-        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
-
-      - name: Install protoc-gen-go and protoc-gen-go-grpc
+      - name: Install tools
         run: |
+          go install github.com/vektra/mockery/v2@v2.53.4
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.62.2
           go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.0
           go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
-
-      - name: Add Go bin to PATH
-        run: echo "${HOME}/go/bin" >> $GITHUB_PATH
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v27.2/protoc-27.2-linux-x86_64.zip
+          sudo unzip -o protoc-27.2-linux-x86_64.zip -d /usr/local
 
       - name: Generate Proto Files
         working-directory: ./protos
         run: |
-          protoc --go_out=./gen/intersection/ --go_opt=paths=source_relative --go-grpc_out=./gen/intersection/ --go-grpc_opt=paths=source_relative intersection.proto
+          make install-protoc
+          make generate
 
-      - name: Generate Mockery Files
+      - name: Run unit tests
         working-directory: ./intersection-service
-        run: |
-          go install github.com/vektra/mockery/v2@latest
-          mockery
-
-      - name: Run unit tests in intersection-service
-        working-directory: ./intersection-service  
-        run: |
-          go mod tidy
-          go test -v ./.. 
+        run: make test

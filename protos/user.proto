@@ -18,9 +18,12 @@ service UserService {
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc DeleteUser(UserIDRequest) returns (google.protobuf.Empty);
 
-  rpc GetUserIntersectionIDs(UserIDRequest) returns (stream IntersectionIDResponse);
-  rpc AddIntersectionID(AddIntersectionIDRequest) returns (google.protobuf.Empty);
-  rpc RemoveIntersectionIDs(RemoveIntersectionIDRequest) returns (google.protobuf.Empty);
+  rpc GetUserIntersectionIDs(UserIDRequest)
+      returns (stream IntersectionIDResponse);
+  rpc AddIntersectionID(AddIntersectionIDRequest)
+      returns (google.protobuf.Empty);
+  rpc RemoveIntersectionIDs(RemoveIntersectionIDRequest)
+      returns (google.protobuf.Empty);
 
   rpc ChangePassword(ChangePasswordRequest) returns (google.protobuf.Empty);
   rpc ResetPassword(ResetPasswordRequest) returns (google.protobuf.Empty);
@@ -29,12 +32,8 @@ service UserService {
   rpc RemoveAdmin(AdminRequest) returns (google.protobuf.Empty);
 }
 
-// Common Messages
-message UserIDRequest {
-  string user_id = 1;
-}
+message UserIDRequest { string user_id = 1; }
 
-// Authentication Messages
 message RegisterUserRequest {
   string name = 1;
   string email = 2;
@@ -46,15 +45,12 @@ message LoginUserRequest {
   string password = 2;
 }
 
-// User CRUD Messages
-message GetUserByEmailRequest {
-  string email = 1;
-}
+message GetUserByEmailRequest { string email = 1; }
 
 message GetAllUsersRequest {
   int32 page = 1;
   int32 page_size = 2;
-  string filter = 3; // Optional filter criteria
+  string filter = 3;
 }
 
 message UpdateUserRequest {
@@ -63,10 +59,7 @@ message UpdateUserRequest {
   string email = 3;
 }
 
-// Intersection ID Messages
-message IntersectionIDResponse {
-  string intersection_id = 1;
-}
+message IntersectionIDResponse { string intersection_id = 1; }
 
 message AddIntersectionIDRequest {
   string user_id = 1;
@@ -78,24 +71,19 @@ message RemoveIntersectionIDRequest {
   repeated string intersection_id = 2;
 }
 
-// Password Management Messages
 message ChangePasswordRequest {
   string user_id = 1;
   string current_password = 2;
   string new_password = 3;
 }
 
-message ResetPasswordRequest {
-  string email = 1;
-}
+message ResetPasswordRequest { string email = 1; }
 
-// Admin Management Messages
 message AdminRequest {
   string user_id = 1;
-  string admin_user_id = 2; // ID of the user making the request
+  string admin_user_id = 2;
 }
 
-// Response Messages
 message UserResponse {
   string id = 1;
   string name = 2;
@@ -108,5 +96,5 @@ message UserResponse {
 
 message LoginUserResponse {
   string token = 1;
-  google.protobuf.Timestamp expires_at = 3; // Token expiration timestamp
+  google.protobuf.Timestamp expires_at = 3;
 }
