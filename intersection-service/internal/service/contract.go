@@ -15,7 +15,11 @@ type IntersectionService interface {
 		defaultParams model.OptimisationParameters,
 	) (*model.Intersection, error)
 	GetIntersection(ctx context.Context, id string) (*model.Intersection, error)
-	GetAllIntersections(ctx context.Context) ([]*model.Intersection, error)
+	GetAllIntersections(
+		ctx context.Context,
+		page, pageSize int,
+		filter string,
+	) ([]*model.Intersection, error)
 	UpdateIntersection(
 		ctx context.Context,
 		id string,

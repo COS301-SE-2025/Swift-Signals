@@ -12,7 +12,11 @@ type IntersectionRepository interface {
 		intersection *model.Intersection,
 	) (*model.Intersection, error)
 	GetIntersectionByID(ctx context.Context, id string) (*model.Intersection, error)
-	GetAllIntersections(ctx context.Context) ([]*model.Intersection, error)
+	GetAllIntersections(
+		ctx context.Context,
+		limit, offset int,
+		filter string,
+	) ([]*model.Intersection, error)
 	UpdateIntersection(
 		ctx context.Context,
 		id string,

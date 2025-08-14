@@ -72,8 +72,12 @@ func (s *Service) GetIntersection(ctx context.Context, id string) (*model.Inters
 	return intersection, nil
 }
 
-func (s *Service) GetAllIntersections(ctx context.Context) ([]*model.Intersection, error) {
-	intersections, err := s.repo.GetAllIntersections(ctx)
+func (s *Service) GetAllIntersections(
+	ctx context.Context,
+	page, pageSize int,
+	filter string,
+) ([]*model.Intersection, error) {
+	intersections, err := s.repo.GetAllIntersections(ctx, page, pageSize, filter)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch intersections: %w", err)
 	}

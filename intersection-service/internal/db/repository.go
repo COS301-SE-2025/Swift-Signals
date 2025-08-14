@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"log"
 
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/model"
 	"go.mongodb.org/mongo-driver/bson"
@@ -48,13 +49,17 @@ func (r *MongoIntersectionRepo) GetIntersectionByID(
 }
 
 func (r *MongoIntersectionRepo) GetAllIntersections(
-	ctx context.Context,
+	ctx context.Context, limit, offset int, filter string,
 ) ([]*model.Intersection, error) {
 	cursor, err := r.collection.Find(ctx, bson.M{})
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(ctx)
+	defer func() {
+		if err := cursor.Close(ctx); err != nil {
+			log.Printf("Failed to close cursor: %v", err)
+		}
+	}()
 
 	var intersections []*model.Intersection
 	for cursor.Next(ctx) {

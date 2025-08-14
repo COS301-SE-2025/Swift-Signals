@@ -2,6 +2,7 @@ package test
 
 import (
 	"context"
+	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/db"
 	"github.com/stretchr/testify/suite"
@@ -17,8 +18,13 @@ type TestSuite struct {
 
 func (suite *TestSuite) SetupTest() {
 	suite.ctx = context.Background()
-
 	suite.mt = mtest.New(suite.T(), mtest.NewOptions().ClientType(mtest.Mock))
-	collection := suite.mt.DB.Collection("intersections")
-	suite.repo = db.NewMongoIntersectionRepo(collection)
+
+	suite.mt.Run("setup", func(mt *mtest.T) {
+		suite.repo = db.NewMongoIntersectionRepo(mt.DB.Collection("intersections"))
+	})
+}
+
+func TestDB(t *testing.T) {
+	suite.Run(t, new(TestSuite))
 }

@@ -42,7 +42,9 @@ message CreateIntersectionRequest {
 }
 
 message GetAllIntersectionsRequest {
-  // Empty for now, but could add filtering parameters later
+  int32 page = 1;
+  int32 page_size = 2;
+  string filter = 3;
 }
 
 message UpdateIntersectionRequest {

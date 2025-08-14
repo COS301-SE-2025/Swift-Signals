@@ -69,7 +69,12 @@ func (h *Handler) GetAllIntersections(
 	// TODO: Add logger
 	ctx := stream.Context()
 
-	intersections, err := h.service.GetAllIntersections(ctx)
+	intersections, err := h.service.GetAllIntersections(
+		ctx,
+		int(req.GetPage()),
+		int(req.GetPageSize()),
+		req.GetFilter(),
+	)
 	// TODO: Add custom errors
 	if err != nil {
 		return err
