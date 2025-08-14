@@ -1,6 +1,6 @@
 package test
 
-func (suite *TestSuite) TestUpdateIntersection_Success() {
+func (suite *TestSuite) TestUpdateBestParams_Success() {
 	// TODO: Add test case implementation
 	suite.True(true)
 }

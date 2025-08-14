@@ -24,9 +24,14 @@ type IntersectionRepository interface {
 		details model.IntersectionDetails,
 	) (*model.Intersection, error)
 	DeleteIntersection(ctx context.Context, id string) error
-	PutOptimisation(
+	UpdateCurrentParams(
 		ctx context.Context,
 		id string,
 		params model.OptimisationParameters,
-	) (bool, error)
+	) error
+	UpdateBestParams(
+		ctx context.Context,
+		id string,
+		params model.OptimisationParameters,
+	) error
 }
