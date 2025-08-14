@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 	"log/slog"
-	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
@@ -13,7 +12,6 @@ import (
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 // TestIntegrationSuite tests the intersection service with integrated workflows
@@ -512,8 +510,4 @@ func (suite *TestIntegrationSuite) TestCreateIntersectionWithDifferentTrafficDen
 
 	suite.intrClient.AssertExpectations(suite.T())
 	suite.userClient.AssertExpectations(suite.T())
-}
-
-func TestIntersectionServiceIntegration(t *testing.T) {
-	suite.Run(t, new(TestIntegrationSuite))
 }

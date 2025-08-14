@@ -4,7 +4,6 @@ import (
 	"context"
 	"io"
 	"log/slog"
-	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
@@ -12,7 +11,6 @@ import (
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestOptimiseIntersectionByID_Success() {
@@ -476,8 +474,4 @@ func (suite *TestSuite) TestOptimiseIntersectionByID_ServiceUnavailable() {
 	suite.intrClient.AssertExpectations(suite.T())
 	suite.optiClient.AssertExpectations(suite.T())
 	mockUserStream.AssertExpectations(suite.T())
-}
-
-func TestServiceOptimiseIntersectionByID(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }
