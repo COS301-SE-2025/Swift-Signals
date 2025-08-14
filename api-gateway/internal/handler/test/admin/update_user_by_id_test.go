@@ -238,7 +238,11 @@ func (suite *TestSuite) TestUpdateUserByID_ServiceNotFound() {
 		Return(emptyResponse, errs.NewNotFoundError("user not found", map[string]any{}))
 
 	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodPatch, "/admin/users/nonexistent-id", bytes.NewBuffer(body))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/admin/users/nonexistent-id",
+		bytes.NewBuffer(body),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "nonexistent-id")
 	req = req.WithContext(suite.ctx)
@@ -378,7 +382,11 @@ func (suite *TestSuite) TestUpdateUserByID_ServiceUnauthorizedError() {
 }
 
 func (suite *TestSuite) TestUpdateUserByID_EmptyBody() {
-	req := httptest.NewRequest(http.MethodPatch, "/admin/users/test-user-id", bytes.NewReader([]byte{}))
+	req := httptest.NewRequest(
+		http.MethodPatch,
+		"/admin/users/test-user-id",
+		bytes.NewReader([]byte{}),
+	)
 	req.Header.Set("Content-Type", "application/json")
 	req.SetPathValue("id", "test-user-id")
 	req = req.WithContext(suite.ctx)
