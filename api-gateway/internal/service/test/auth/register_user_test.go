@@ -2,13 +2,11 @@ package auth
 
 import (
 	"context"
-	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestRegisterUser_Success() {
@@ -55,8 +53,4 @@ func (suite *TestSuite) TestRegisterUser_Failure() {
 	suite.Equal("user already exists", svcError.Message)
 
 	suite.client.AssertExpectations(suite.T())
-}
-
-func TestServiceRegisterUser(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

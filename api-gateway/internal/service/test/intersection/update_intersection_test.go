@@ -4,14 +4,12 @@ import (
 	"context"
 	"io"
 	"log/slog"
-	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestUpdateIntersectionByID_Success() {
@@ -396,8 +394,4 @@ func (suite *TestSuite) TestUpdateIntersectionByID_EmptyIntersectionID() {
 
 	suite.userClient.AssertExpectations(suite.T())
 	mockUserStream.AssertExpectations(suite.T())
-}
-
-func TestServiceUpdateIntersectionByID(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

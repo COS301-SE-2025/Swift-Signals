@@ -5,13 +5,11 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestUpdateIntersection_Success() {
@@ -393,8 +391,4 @@ func (suite *TestSuite) TestUpdateIntersection_UnauthorizedError() {
 	suite.Contains(w.Body.String(), "token expired")
 
 	suite.service.AssertExpectations(suite.T())
-}
-
-func TestHandlerUpdateIntersection(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }
