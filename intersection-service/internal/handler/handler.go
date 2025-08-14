@@ -5,9 +5,9 @@ import (
 
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/service"
+	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/util"
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -24,7 +24,8 @@ func (h *Handler) CreateIntersection(
 	ctx context.Context,
 	req *intersectionpb.CreateIntersectionRequest,
 ) (*intersectionpb.IntersectionResponse, error) {
-	// TODO: Add logger
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing CreateIntersection request")
 
 	intersectionDetails := h.mapIntersectionDetails(req.GetDetails())
 	trafficDensity := model.TrafficDensity(req.GetTrafficDensity())
@@ -37,11 +38,14 @@ func (h *Handler) CreateIntersection(
 		trafficDensity,
 		optimisationParams,
 	)
-	// TODO: Add custom errors
 	if err != nil {
-		return nil, err
+		logger.Error("failed to create intersection",
+			"error", err.Error(),
+		)
+		return nil, errs.HandleServiceError(err)
 	}
 
+	logger.Info("CreateIntersection successful")
 	return h.mapToIntersection(intersection), nil
 }
 
@@ -49,16 +53,21 @@ func (h *Handler) GetIntersection(
 	ctx context.Context,
 	req *intersectionpb.IntersectionIDRequest,
 ) (*intersectionpb.IntersectionResponse, error) {
-	// TODO: Add logger
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing GetIntersection request")
+
 	intersection, err := h.service.GetIntersection(
 		ctx,
 		req.GetId(),
 	)
-	// TODO: Add custom errors
 	if err != nil {
-		return nil, err
+		logger.Error("failed to find intersection",
+			"error", err.Error(),
+		)
+		return nil, errs.HandleServiceError(err)
 	}
 
+	logger.Info("GetIntersection successful")
 	return h.mapToIntersection(intersection), nil
 }
 
@@ -66,8 +75,9 @@ func (h *Handler) GetAllIntersections(
 	req *intersectionpb.GetAllIntersectionsRequest,
 	stream intersectionpb.IntersectionService_GetAllIntersectionsServer,
 ) error {
-	// TODO: Add logger
 	ctx := stream.Context()
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing GetAllIntersections request")
 
 	intersections, err := h.service.GetAllIntersections(
 		ctx,
@@ -75,9 +85,11 @@ func (h *Handler) GetAllIntersections(
 		int(req.GetPageSize()),
 		req.GetFilter(),
 	)
-	// TODO: Add custom errors
 	if err != nil {
-		return err
+		logger.Error("failed to find all intersections",
+			"error", err.Error(),
+		)
+		return errs.HandleServiceError(err)
 	}
 
 	for _, intersection := range intersections {
@@ -92,12 +104,15 @@ func (h *Handler) GetAllIntersections(
 			continue
 		}
 
-		// TODO: Add custom errors
 		if err := stream.Send(response); err != nil {
-			return status.Errorf(codes.Internal, "failed to send intersection: %v", err)
+			logger.Error("failed to send intersection",
+				"error", err.Error(),
+			)
+			return errs.HandleServiceError(err)
 		}
 	}
 
+	logger.Info("GetAllIntersections successful")
 	return nil
 }
 
@@ -105,7 +120,9 @@ func (h *Handler) UpdateIntersection(
 	ctx context.Context,
 	req *intersectionpb.UpdateIntersectionRequest,
 ) (*intersectionpb.IntersectionResponse, error) {
-	// TODO: Add logger
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing UpdateIntersection request")
+
 	intersectionDetails := h.mapIntersectionDetails(req.GetDetails())
 
 	intersection, err := h.service.UpdateIntersection(
@@ -114,11 +131,14 @@ func (h *Handler) UpdateIntersection(
 		req.GetName(),
 		intersectionDetails,
 	)
-	// TODO: Add custom errors
 	if err != nil {
-		return nil, err
+		logger.Error("failed to update intersection",
+			"error", err.Error(),
+		)
+		return nil, errs.HandleServiceError(err)
 	}
 
+	logger.Info("UpdateIntersection successful")
 	return h.mapToIntersection(intersection), nil
 }
 
@@ -126,13 +146,18 @@ func (h *Handler) DeleteIntersection(
 	ctx context.Context,
 	req *intersectionpb.IntersectionIDRequest,
 ) (*emptypb.Empty, error) {
-	// TODO: Add logger
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing DeleteIntersection request")
+
 	err := h.service.DeleteIntersection(ctx, req.GetId())
-	// TODO: Add custom errors
 	if err != nil {
-		return nil, err
+		logger.Error("failed to delete intersection",
+			"error", err.Error(),
+		)
+		return nil, errs.HandleServiceError(err)
 	}
 
+	logger.Info("DeleteIntersection successful")
 	return &emptypb.Empty{}, nil
 }
 
@@ -140,7 +165,9 @@ func (h *Handler) PutOptimisation(
 	ctx context.Context,
 	req *intersectionpb.PutOptimisationRequest,
 ) (*intersectionpb.PutOptimisationResponse, error) {
-	// TODO: Add logger
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing PutOptimisation request")
+
 	optimisationParams := h.mapOptimisationParameters(req.GetParameters())
 
 	optimisationResponse, err := h.service.PutOptimisation(
@@ -148,10 +175,13 @@ func (h *Handler) PutOptimisation(
 		req.GetId(),
 		optimisationParams,
 	)
-	// TODO: Add custom errors
 	if err != nil {
-		return nil, err
+		logger.Error("failed to update intersection optimisation params",
+			"error", err.Error(),
+		)
+		return nil, errs.HandleServiceError(err)
 	}
 
+	logger.Info("PutOptimisation successful")
 	return &intersectionpb.PutOptimisationResponse{Improved: optimisationResponse}, nil
 }
