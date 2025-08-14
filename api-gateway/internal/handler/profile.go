@@ -28,6 +28,7 @@ func NewProfileHandler(s service.ProfileServiceInterface) *ProfileHandler {
 // @Description Retrieves the profile of the currently authenticated user.
 // @Tags Profile
 // @Produce json
+// @Security BearerAuth
 // @Success 200 {object} model.User "User profile retrieved successfully"
 // @Failure 401 {object} model.ErrorResponse "Unauthorized access"
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
@@ -70,6 +71,7 @@ func (h *ProfileHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
 // @Tags Profile
 // @Accept json
 // @Produce json
+// @Security BearerAuth
 // @Param user body model.UpdateUserRequest true "User profile data"
 // @Success 200 {object} model.User "User profile updated successfully"
 // @Failure 400 {object} model.ErrorResponse "Bad request: Validation error"
@@ -141,6 +143,7 @@ func (h *ProfileHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 // @Description Deletes the profile of the currently authenticated user.
 // @Tags Profile
 // @Produce json
+// @Security BearerAuth
 // @Success 204 "No Content"
 // @Failure 401 {object} model.ErrorResponse "Unauthorized access"
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
