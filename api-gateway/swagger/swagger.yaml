@@ -54,6 +54,21 @@ definitions:
         example: resource not found
         type: string
     type: object
+  model.GetAllUsersRequest:
+    properties:
+      page:
+        example: 1
+        minimum: 1
+        type: integer
+      page_size:
+        example: 10
+        maximum: 100
+        minimum: 1
+        type: integer
+    required:
+    - page
+    - page_size
+    type: object
   model.Intersection:
     properties:
       best_parameters:
@@ -96,10 +111,10 @@ definitions:
   model.LoginRequest:
     properties:
       email:
-        example: user@example.com
+        example: testuser@example.com
         type: string
       password:
-        example: StrongPassword123
+        example: testpass1234
         type: string
     required:
     - email
@@ -111,7 +126,7 @@ definitions:
         example: Login successful
         type: string
       token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        example: header.payload.signature
         type: string
     type: object
   model.LogoutResponse:
@@ -131,15 +146,15 @@ definitions:
   model.RegisterRequest:
     properties:
       email:
-        example: newuser@example.com
+        example: testuser@example.com
         type: string
       password:
-        example: VeryStrongPassword456
+        example: testpass1234
         maxLength: 64
         minLength: 8
         type: string
       username:
-        example: johndoe
+        example: tester
         maxLength: 32
         minLength: 3
         type: string
@@ -270,14 +285,12 @@ paths:
       - application/json
       description: Retrieves a paginated list of all users. Only accessible by admins.
       parameters:
-      - description: Page number
-        in: query
-        name: page
-        type: integer
-      - description: Number of users per page
-        in: query
-        name: page_size
-        type: integer
+      - description: Pagination options
+        in: body
+        name: getAllUsersRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.GetAllUsersRequest'
       produces:
       - application/json
       responses:
@@ -298,7 +311,7 @@ paths:
       summary: Get All Users
       tags:
       - Admin
-  /admin/users/{user_id}:
+  /admin/users/{id}:
     delete:
       consumes:
       - application/json
@@ -306,7 +319,7 @@ paths:
       parameters:
       - description: User ID
         in: path
-        name: user_id
+        name: id
         required: true
         type: string
       produces:
@@ -336,7 +349,7 @@ paths:
       parameters:
       - description: User ID
         in: path
-        name: user_id
+        name: id
         required: true
         type: string
       produces:
@@ -368,7 +381,7 @@ paths:
       parameters:
       - description: User ID
         in: path
-        name: user_id
+        name: id
         required: true
         type: string
       - description: Updated user details

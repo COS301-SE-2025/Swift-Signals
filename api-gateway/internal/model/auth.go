@@ -1,19 +1,19 @@
 package model
 
 type LoginRequest struct {
-	Email    string `json:"email"    example:"user@example.com"  binding:"required" validate:"required,email"`
-	Password string `json:"password" example:"StrongPassword123" binding:"required" validate:"required"`
+	Email    string `json:"email"    example:"testuser@example.com" binding:"required" validate:"required,email"`
+	Password string `json:"password" example:"testpass1234"         binding:"required" validate:"required"`
 }
 
 type LoginResponse struct {
 	Message string `json:"message" example:"Login successful"`
-	Token   string `json:"token"   example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"`
+	Token   string `json:"token"   example:"header.payload.signature"`
 }
 
 type RegisterRequest struct {
-	Username string `json:"username" example:"johndoe"               binding:"required" validate:"required,min=3,max=32"`
-	Email    string `json:"email"    example:"newuser@example.com"   binding:"required" validate:"required,email"`
-	Password string `json:"password" example:"VeryStrongPassword456" binding:"required" validate:"required,min=8,max=64"`
+	Username string `json:"username" example:"tester"               binding:"required" validate:"required,min=3,max=32"`
+	Email    string `json:"email"    example:"testuser@example.com" binding:"required" validate:"required,email"`
+	Password string `json:"password" example:"testpass1234"         binding:"required" validate:"required,min=8,max=64"`
 }
 
 type RegisterResponse struct {
