@@ -55,3 +55,4 @@ packages:
     interfaces:
       UserServiceClient:
       UserService_GetUserIntersectionIDsClient:
+      UserService_GetAllUsersClient:

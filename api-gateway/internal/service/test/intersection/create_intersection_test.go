@@ -3,13 +3,11 @@ package intersection
 import (
 	"context"
 	"log/slog"
-	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestCreateIntersection_Success() {
@@ -463,8 +461,4 @@ func (suite *TestSuite) TestCreateIntersection_DuplicateName() {
 	suite.Equal("intersection with this name already exists", svcError.Message)
 
 	suite.intrClient.AssertExpectations(suite.T())
-}
-
-func TestServiceCreateIntersection(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

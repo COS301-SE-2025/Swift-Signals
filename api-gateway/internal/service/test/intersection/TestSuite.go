@@ -1,6 +1,7 @@
 package intersection
 
 import (
+	"testing"
 	"time"
 
 	mocks "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/mocks/client"
@@ -99,4 +100,8 @@ func createTestIntersection(
 			},
 		},
 	}
+}
+
+func TestService(t *testing.T) {
+	suite.Run(t, new(TestSuite))
 }
