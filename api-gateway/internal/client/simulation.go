@@ -2,11 +2,12 @@ package client
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
 	simulationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/simulation"
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"google.golang.org/grpc"
 )
 
@@ -28,7 +29,7 @@ func (sc *SimulationClient) GetSimulationResults(
 	intersection, ok := simulationpb.IntersectionType_value[simulation_parameters.IntersectionType]
 
 	if !ok {
-		return nil, errors.New("invalid intersection type")
+		return nil, errs.NewValidationError("invalid simulation parameters", map[string]any{})
 	}
 
 	req := &simulationpb.SimulationRequest{
@@ -41,7 +42,12 @@ func (sc *SimulationClient) GetSimulationResults(
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	return sc.client.GetSimulationResults(ctx, req)
+
+	resp, err := sc.client.GetSimulationResults(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 func (sc *SimulationClient) GetSimulationOutput(
@@ -52,7 +58,7 @@ func (sc *SimulationClient) GetSimulationOutput(
 	intersection, ok := simulationpb.IntersectionType_value[simulation_parameters.IntersectionType]
 
 	if !ok {
-		return nil, errors.New("invalid intersection type")
+		return nil, errs.NewValidationError("invalid simulation parameters", map[string]any{})
 	}
 
 	req := &simulationpb.SimulationRequest{
@@ -65,7 +71,12 @@ func (sc *SimulationClient) GetSimulationOutput(
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
-	return sc.client.GetSimulationOutput(ctx, req)
+
+	resp, err := sc.client.GetSimulationOutput(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
 }
 
 // NOTE: Creates stub for testing
