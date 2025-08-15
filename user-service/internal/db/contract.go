@@ -15,4 +15,5 @@ type UserRepository interface {
 	ListUsers(ctx context.Context, limit, offset int) ([]*model.User, error)
 	AddIntersectionID(ctx context.Context, userID string, intID string) error
 	GetIntersectionsByUserID(ctx context.Context, userID string) ([]string, error)
+	AdminExists(ctx context.Context) (bool, error)
 }

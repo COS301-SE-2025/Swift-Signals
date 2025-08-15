@@ -252,3 +252,22 @@ func (r *PostgresUserRepo) GetIntersectionsByUserID(
 	}
 	return ids, nil
 }
+
+func (r *PostgresUserRepo) AdminExists(ctx context.Context) (bool, error) {
+	logger := util.LoggerFromContext(ctx)
+	logger.Debug("checking if any user has admin privileges")
+
+	var exists bool
+	query := `
+        SELECT EXISTS (
+            SELECT 1 FROM users WHERE is_admin = true
+        )
+    `
+
+	err := r.db.QueryRow(query).Scan(&exists)
+	if err != nil {
+		return false, HandleDatabaseError(err, ErrorContext{Operation: OpRead, Table: "users"})
+	}
+
+	return exists, nil
+}
