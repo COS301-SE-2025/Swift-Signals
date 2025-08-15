@@ -27,9 +27,9 @@ describe("Users Page", () => {
   });
 
   it("paginates to the next page", () => {
-    cy.get("tbody tr").first().should("contain", "John Doe"); 
+    cy.get("tbody tr").first().should("contain", "John Doe"); // Page 1
     cy.get("button[aria-label='Next page']").click();
-    cy.get("tbody tr").first().should("not.contain", "John Doe");
+    cy.get("tbody tr").first().should("not.contain", "John Doe"); // Page 2
   });
 
   it("paginates back to the previous page", () => {
@@ -41,6 +41,11 @@ describe("Users Page", () => {
   it("displays ellipsis for long pagination", () => {
     cy.get(".usersPaging").should("contain", "...");
   });
-  
-});
 
+  it("navigates directly to a specific page", () => {
+    cy.get(".usersPaging button").contains("2").click();
+    cy.get("tbody tr").first().within(() => {
+      cy.get("td").eq(1).should("exist"); // Name cell exists
+    });
+  });
+});
