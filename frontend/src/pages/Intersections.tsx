@@ -23,12 +23,15 @@ export interface IntersectionFormData {
     intersection_type: string;
   };
 }
+
 interface CreateIntersectionModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: IntersectionFormData) => void;
   isLoading: boolean;
   error: string | null;
+  initialData?: IntersectionFormData | null;
+  isEditing: boolean;
 }
 
 const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
@@ -37,29 +40,35 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   onSubmit,
   isLoading,
   error,
+  initialData,
+  isEditing,
 }) => {
-  const [formData, setFormData] = useState<IntersectionFormData>({
-    name: "",
-    traffic_density: "low",
-    details: {
-      address: "",
-      city: "Pretoria",
-      province: "Gauteng",
-    },
-    default_parameters: {
-      green: 10,
-      yellow: 3,
-      red: 5,
-      speed: 60,
-      seed: Math.floor(Math.random() * 10000000000),
-      intersection_type: "traffic light",
-    },
-  });
+  const [formData, setFormData] = useState<IntersectionFormData>(
+    initialData || {
+      name: "",
+      traffic_density: "low",
+      details: { address: "", city: "Pretoria", province: "Gauteng" },
+      default_parameters: {
+        green: 10,
+        yellow: 3,
+        red: 5,
+        speed: 60,
+        seed: Math.floor(Math.random() * 10000000000),
+        intersection_type: "traffic light",
+      },
+    }
+  );
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
 
   if (!isOpen) return null;
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     const keys = name.split(".");
@@ -102,7 +111,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
           <X size={24} />
         </button>
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-[#E6EDF3]">
-          Create New Intersection
+          {isEditing ? "Edit Intersection" : "Create New Intersection"}
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -226,7 +235,13 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
               disabled={isLoading}
               className="px-4 py-2 bg-[#0F5BA7] dark:bg-[#388BFD] text-white rounded-md hover:bg-red-800 disabled:bg-red-400 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Creating..." : "Create Intersection"}
+              {isLoading
+                ? isEditing
+                  ? "Updating..."
+                  : "Creating..."
+                : isEditing
+                  ? "Update Intersection"
+                  : "Create Intersection"}
             </button>
           </div>
         </form>
@@ -260,67 +275,62 @@ const Intersections = () => {
   const [intersections, setIntersections] = useState<Intersection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedIntersectionId, setSelectedIntersectionId] = useState<
+    string | null
+  >(null);
+  const [editData, setEditData] = useState<IntersectionFormData | null>(null);
 
   const fetchIntersections = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/intersections`, {
+      const res = await fetch(`${API_BASE_URL}/intersections`, {
         headers: { Authorization: `Bearer ${getAuthToken()}` },
       });
-      if (!response.ok)
-        throw new Error(
-          `Failed to fetch intersections: ${response.statusText}`,
-        );
-      const data = await response.json();
+      if (!res.ok)
+        throw new Error(`Failed to fetch intersections: ${res.statusText}`);
+      const data = await res.json();
       setIntersections(data.intersections || []);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred.");
-      }
-      setIntersections([]);
+    } catch (err: any) {
+      setError(err.message || "Unexpected error");
     } finally {
       setIsLoading(false);
     }
   };
+
   const searchIntersectionById = async (id: string) => {
     setIsLoading(true);
-    setError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/intersections/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/intersections/${id}`, {
         headers: { Authorization: `Bearer ${getAuthToken()}` },
       });
-      if (response.status === 404) {
+      if (res.status === 404) {
         setIntersections([]);
         return;
       }
-      if (!response.ok)
-        throw new Error(
-          `Failed to find intersection with ID ${id}: ${response.statusText}`,
-        );
-      const data = await response.json();
+      if (!res.ok)
+        throw new Error(`Failed to find intersection: ${res.statusText}`);
+      const data = await res.json();
       setIntersections(data ? [data] : []);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred while searching.");
-      }
+    } catch (err: any) {
+      setError(err.message || "Unexpected error");
       setIntersections([]);
     } finally {
       setIsLoading(false);
     }
   };
+
   const handleCreateIntersection = async (formData: IntersectionFormData) => {
     setIsCreating(true);
     setCreateError(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/intersections`, {
+      const res = await fetch(`${API_BASE_URL}/intersections`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -328,25 +338,78 @@ const Intersections = () => {
         },
         body: JSON.stringify(formData),
       });
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!res.ok) {
+        const errorData = await res.json();
         throw new Error(errorData.message || "Failed to create intersection");
       }
       setIsModalOpen(false);
       fetchIntersections();
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setCreateError(err.message);
-      } else {
-        setCreateError("An unexpected error occurred during creation.");
-      }
+    } catch (err: any) {
+      setCreateError(err.message || "Unexpected error");
     } finally {
       setIsCreating(false);
     }
   };
+
+  const handleUpdateIntersection = async (formData: IntersectionFormData) => {
+    if (!selectedIntersectionId) return;
+    setIsCreating(true);
+    setCreateError(null);
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/intersections/${selectedIntersectionId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+          body: JSON.stringify({
+            name: formData.name,
+            details: formData.details,
+          }),
+        }
+      );
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to update intersection");
+      }
+      setIsModalOpen(false);
+      setIsEditing(false);
+      setSelectedIntersectionId(null);
+      fetchIntersections();
+    } catch (err: any) {
+      setCreateError(err.message || "Unexpected error");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleEditClick = (id: string) => {
+    const intersection = intersections.find((i) => i.id === id);
+    if (!intersection) return;
+    setEditData({
+      name: intersection.name,
+      traffic_density: "low",
+      details: intersection.details,
+      default_parameters: {
+        green: 10,
+        yellow: 3,
+        red: 5,
+        speed: 60,
+        seed: 1,
+        intersection_type: intersection.default_parameters.intersection_type,
+      },
+    });
+    setSelectedIntersectionId(id);
+    setIsEditing(true);
+    setIsModalOpen(true);
+  };
+
   useEffect(() => {
     fetchIntersections();
   }, []);
+
   useEffect(() => {
     const handler = setTimeout(() => {
       if (searchQuery.trim() === "") {
@@ -361,7 +424,7 @@ const Intersections = () => {
   const filteredIntersections =
     searchQuery && isNaN(Number(searchQuery))
       ? intersections.filter((intersection) =>
-          intersection.name.toLowerCase().includes(searchQuery.toLowerCase()),
+          intersection.name.toLowerCase().includes(searchQuery.toLowerCase())
         )
       : intersections;
 
@@ -385,7 +448,11 @@ const Intersections = () => {
                 </div>
               </div>
               <button
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditData(null);
+                  setIsModalOpen(true);
+                }}
                 className="addIntersectionBtn flex-shrink-0 bg-[#0F5BA7] dark:bg-[#388BFD] hover:bg-[#3DAEF0] text-white font-medium py-2 px-4 rounded-md"
               >
                 Add Intersection
@@ -407,7 +474,7 @@ const Intersections = () => {
                     location={`${intersection.details.address}`}
                     lanes={intersection.default_parameters.intersection_type}
                     onSimulate={(id) => console.log(`Simulate ${id}`)}
-                    onEdit={(id) => console.log(`Edit ${id}`)}
+                    onEdit={handleEditClick}
                     onDelete={(id) => console.log(`Delete ${id}`)}
                   />
                 ))
@@ -426,9 +493,13 @@ const Intersections = () => {
       <CreateIntersectionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleCreateIntersection}
+        onSubmit={
+          isEditing ? handleUpdateIntersection : handleCreateIntersection
+        }
         isLoading={isCreating}
         error={createError}
+        initialData={editData}
+        isEditing={isEditing}
       />
     </>
   );
