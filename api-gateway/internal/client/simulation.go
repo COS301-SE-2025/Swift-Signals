@@ -67,3 +67,20 @@ func (sc *SimulationClient) GetSimulationOutput(
 	defer cancel()
 	return sc.client.GetSimulationOutput(ctx, req)
 }
+
+// NOTE: Creates stub for testing
+type SimulationClientInterface interface {
+	GetSimulationResults(
+		ctx context.Context,
+		id string,
+		simulation_parameters model.SimulationParameters,
+	) (*simulationpb.SimulationResultsResponse, error)
+	GetSimulationOutput(
+		ctx context.Context,
+		id string,
+		simulation_parameters model.SimulationParameters,
+	) (*simulationpb.SimulationOutputResponse, error)
+}
+
+// NOTE: Asserts the SimulationClient implements the SimulationClientInterface
+var _ SimulationClientInterface = (*SimulationClient)(nil)

@@ -300,4 +300,5 @@ type IntersectionServiceInterface interface {
 	OptimiseIntersectionByID(ctx context.Context, userID string, intersectionID string) error
 }
 
-// Note: Asserts Interface Implementation
+// NOTE: Asserts Interface Implementation
+var _ IntersectionServiceInterface = (*IntersectionService)(nil)
