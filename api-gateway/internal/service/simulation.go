@@ -23,11 +23,13 @@ func NewSimulationService(
 	intrClient client.IntersectionClientInterface,
 	optiClient client.OptimisationClientInterface,
 	userClient client.UserClientInterface,
+	simClient client.SimulationClientInterface,
 ) SimulationServiceInterface {
 	return &SimulationService{
 		intrClient: intrClient,
 		optiClient: optiClient,
 		userClient: userClient,
+		simClient:  simClient,
 	}
 }
 

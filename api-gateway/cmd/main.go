@@ -27,6 +27,7 @@ type Config struct {
 	JwtSecret        string `env:"JWT_SECRET"     envDefault:"a-string-secret-at-least-256-bits-long"`
 	UserServiceAddr  string `env:"USER_GRPC_ADDR" envDefault:"localhost:50051"` // TODO: Change to proper address
 	IntersectionAddr string `env:"INTR_GRPC_ADDR" envDefault:"localhost:50052"` // TODO: Change to proper address
+	SimulationAddr   string `env:"SIMU_GRPC_ADDR" envDefault:"localhost:50053"` // TODO: Change to proper address
 	OptimisationAddr string `env:"OPTI_GRPC_ADDR" envDefault:"localhost:50054"` // TODO: Change to proper address
 }
 
@@ -55,13 +56,14 @@ func main() {
 
 	userClient := mustConnectUserService(cfg.UserServiceAddr)
 	intrClient := mustConnectIntersectionService(cfg.IntersectionAddr)
+	simClient := mustConnectSimulationService(cfg.SimulationAddr)
 	optiClient := mustConnectOptimisationService(cfg.OptimisationAddr)
 
 	baseLogger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level: slog.LevelInfo,
+		Level: slog.LevelDebug,
 	}))
 
-	mux := setupRoutes(baseLogger, cfg.JwtSecret, userClient, intrClient, optiClient)
+	mux := setupRoutes(baseLogger, cfg.JwtSecret, userClient, intrClient, simClient, optiClient)
 
 	server := createServer(cfg.Port, mux)
 	runServer(server)
@@ -103,11 +105,24 @@ func mustConnectOptimisationService(address string) *client.OptimisationClient {
 	return client.NewOptimisationClientFromConn(conn)
 }
 
+func mustConnectSimulationService(address string) *client.SimulationClient {
+	conn, err := grpc.NewClient(
+		address,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	) // TODO: Add TLS
+	if err != nil {
+		log.Fatalf("failed to connect to Simulation gRPC server: %v", err)
+	}
+	log.Println("Connected to Simulation-Service")
+	return client.NewSimulationClientFromConn(conn)
+}
+
 func setupRoutes(
 	logger *slog.Logger,
 	JwtSecret string,
 	userClient *client.UserClient,
 	intrClient *client.IntersectionClient,
+	simClient *client.SimulationClient,
 	optiClient *client.OptimisationClient,
 ) http.Handler {
 	mux := http.NewServeMux()
@@ -148,7 +163,7 @@ func setupRoutes(
 	log.Println("Initialized Intersection Handlers.")
 
 	// Simulation routes
-	simulationService := service.NewSimulationService(intrClient, optiClient, userClient)
+	simulationService := service.NewSimulationService(intrClient, optiClient, userClient, simClient)
 	simulationHandler := handler.NewSimulationHandler(simulationService)
 	mux.HandleFunc("GET /intersections/{id}/simulate", simulationHandler.GetSimulation)
 	mux.HandleFunc("GET /intersections/{id}/optimise", simulationHandler.GetOptimisedSimulation)
