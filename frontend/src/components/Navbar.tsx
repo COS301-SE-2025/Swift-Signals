@@ -27,7 +27,7 @@ function Navbar() {
         const token = localStorage.getItem("authToken");
         if (!token) return;
 
-        const res = await fetch("/api/me", {
+        const res = await fetch("http://localhost:9090/me", {
           headers: {
             "Authorization": `Bearer ${token}`,
           },

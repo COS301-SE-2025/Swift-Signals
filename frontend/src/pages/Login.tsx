@@ -4,7 +4,7 @@ import "../styles/Login.css";
 import Footer from "../components/Footer";
 import logo from "../../src/assets/logo.png"
 
-const API_BASE_URL = "/api";
+const API_BASE_URL = "http://localhost:9090";
 
 interface TrafficLightProps {
   redActive: boolean;
