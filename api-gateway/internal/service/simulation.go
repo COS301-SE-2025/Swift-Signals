@@ -171,7 +171,10 @@ func (s *SimulationService) GetUserIntersectionIDs(
 }
 
 // SimulationServiceInterface creates stub for testing
-type SimulationServiceInterface interface{}
+type SimulationServiceInterface interface {
+	GetSimulationData(ctx context.Context, intersectionID string) (model.SimulationResponse, error)
+	GetOptimisedData(ctx context.Context, intersectionID string) (model.SimulationResponse, error)
+}
 
 // NOTE: Asserts the SimulationService implements the SimulationServiceInterface
 var _ SimulationServiceInterface = (*SimulationService)(nil)
