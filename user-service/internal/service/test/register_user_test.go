@@ -3,12 +3,10 @@ package test
 import (
 	"context"
 	"errors"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestRegisterUser_Success() {
@@ -29,7 +27,7 @@ func (suite *TestSuite) TestRegisterUser_Success() {
 
 	result, err := suite.service.RegisterUser(ctx, name, email, plainPassword)
 
-	suite.NoError(err)
+	suite.Require().NoError(err)
 	suite.NotNil(result)
 	suite.Equal(name, result.Name)
 	suite.Equal(email, result.Email)
@@ -56,10 +54,16 @@ func (suite *TestSuite) TestRegisterUser_Invalid_Input() {
 	suite.True(ok)
 	suite.Equal(errs.ErrValidation, svcError.Code)
 
-	expectedMessage := "name is required; email is invalid; password is too short"
+	expectedMessage := "invalid input"
 	suite.Equal(expectedMessage, svcError.Message)
 
-	suite.Equal(map[string]any{"email": "noatsign"}, svcError.Context)
+	expectedErrors := map[string]string{
+		"email":    "Invalid email format",
+		"name":     "Name is required",
+		"password": "Password must be at least 8 characters long",
+	}
+
+	suite.Equal(map[string]any{"validation errors": expectedErrors}, svcError.Context)
 
 	suite.repo.AssertExpectations(suite.T())
 }
@@ -176,8 +180,4 @@ func (suite *TestSuite) TestRegisterUser_Fail_To_Create_User() {
 	suite.Equal(map[string]any{}, svcError.Context)
 
 	suite.repo.AssertExpectations(suite.T())
-}
-
-func TestServiceRegisterUser(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

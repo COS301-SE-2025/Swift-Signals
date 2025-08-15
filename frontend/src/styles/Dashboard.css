@@ -1,18 +1,39 @@
-/* General Layout & Theming */
 body {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body:has(.dashboard-screen) {
+  display: block !important;
+  place-items: unset !important;
+  align-items: unset !important;
+  justify-content: unset !important;
+}
+
+#root:has(.dashboard-screen) {
+  padding-top: 0 !important;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dashboard-screen {
+  width: 100%;
+  height: 100vh;
+  overflow-y: auto;
   overflow-x: hidden;
 }
 
 .dashboard-screen .main-content {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 140px);
   background-color: #f0f0f0;
-  padding: 2rem;
-  padding-top: 6rem;
+  padding: 4rem;
+  padding-top: 8rem;
+  padding-bottom: 140px;
 }
 
 .dark .main-content {
-  background-color: #000000;
+  background-color: #0d1117;
 }
 
 .Dashboard-h1 {
@@ -26,7 +47,6 @@ body {
   color: #fff;
 }
 
-/* Summary Cards Grid */
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -34,7 +54,6 @@ body {
   margin-bottom: 2rem;
 }
 
-/* Updated Card Layout */
 .card {
   background-color: #ffffff;
   border-radius: 16px;
@@ -49,8 +68,8 @@ body {
 }
 
 .dark .card {
-  background-color: #2a2a2a;
-  color: #f9fafb;
+  background-color: #161b22;
+  /* color: #E6EDF3; */
 }
 
 .card-icon-1,
@@ -65,18 +84,31 @@ body {
 }
 
 .card-icon-1 {
-  color: #3700ff;
-  background-color: #d0d3ff;
+  color: #0f5ba7;
+  background-color: #d4e9f9;
+}
+
+.dark .card-icon-1 {
+  color: #58a6ff;
+  background-color: rgba(88, 166, 255, 0.2);
 }
 
 .card-icon-2 {
-  color: #008b25;
-  background-color: #87ff95;
+  color: #0f5ba7;
+  background-color: #d4e9f9;
+}
+.dark .card-icon-2 {
+  color: #58a6ff;
+  background-color: rgba(88, 166, 255, 0.2);
 }
 
 .card-icon-3 {
-  color: #8600b3;
-  background-color: #ed96ff;
+  color: #0f5ba7;
+  background-color: #d4e9f9;
+}
+.dark .card-icon-3 {
+  color: #58a6ff;
+  background-color: rgba(88, 166, 255, 0.2);
 }
 
 .card-text {
@@ -92,7 +124,7 @@ body {
 }
 
 .dark .card-h3 {
-  color: #dadada;
+  color: #8b949e;
 }
 
 .card-p {
@@ -103,10 +135,9 @@ body {
 }
 
 .dark .card-p {
-  color: #ffffff;
+  color: #e6edf3;
 }
 
-/* Two-Column Main Layout */
 .dashboard-main-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -132,14 +163,13 @@ body {
   }
 }
 
-/* Recent Simulations Table */
 .recent-simulations-tab {
   border-radius: 16px;
   overflow: hidden;
 }
 
 .quick-action-button {
-  border: none;
+  /* border: none; */
   border-radius: 12px;
   padding: 0.75rem 1.5rem;
   font-size: 1em;
@@ -151,7 +181,7 @@ body {
 }
 
 .dark .recent-simulations-tab {
-  background-color: #2a2a2a;
+  background-color: #161b22;
 }
 
 .recent-simulations-tab h2 {
@@ -173,6 +203,14 @@ body {
   border-color: #374151;
 }
 
+.dark .recent-simulations-tab td {
+  color: #f0f6fc !important;
+}
+
+.dark .recent-simulations-tab th {
+  color: #c9d1d9 !important;
+}
+
 .status {
   font-weight: 600;
   padding: 0.25rem 0.75rem;
@@ -189,7 +227,6 @@ body {
   text-decoration: underline;
 }
 
-/* Base Card Structure */
 .graph-card,
 .inter-card {
   background-color: #ffffff;
@@ -203,10 +240,9 @@ body {
 }
 .dark .graph-card,
 .dark .inter-card {
-  background-color: #2a2a2a;
+  background-color: #161b22;
 }
 
-/* Graph Card Header */
 .graph-card-header {
   display: flex;
   justify-content: space-between;
@@ -218,7 +254,7 @@ body {
 .view-report-button {
   background: none;
   border: none;
-  color: #991915;
+  color: #0f5ba7;
   font-weight: 500;
   font-size: 0.9em;
   cursor: pointer;
@@ -229,15 +265,15 @@ body {
 }
 
 .view-report-button:hover {
-  color: #7a1410;
+  color: #0f5ba7;
 }
 
 .dark .view-report-button {
-  color: #e5e7eb;
+  color: #388bfd;
 }
 
 .dark .view-report-button:hover {
-  color: #fff;
+  color: #388bfd;
 }
 
 .traffic-chart-container {
@@ -275,7 +311,7 @@ body {
   font-weight: 500;
 }
 .dark .intersection-name {
-  color: #d1d5db;
+  color: #f0f6fc;
 }
 
 .intersection-volume {
@@ -283,7 +319,7 @@ body {
   font-size: 0.9em;
 }
 .dark .intersection-volume {
-  color: #9ca3af;
+  color: #c9d1d9;
 }
 
 .progress-bar-container {
@@ -294,13 +330,13 @@ body {
   overflow: hidden;
 }
 .dark .progress-bar-container {
-  background-color: #374151;
+  background-color: #0d1117;
 }
 
 .progress-bar {
   height: 100%;
   border-radius: 4px;
-  background: linear-gradient(90deg, #d84a45, #991915);
+  background: linear-gradient(90deg, #3daef0, #0f5ba7);
   transition: width 0.5s ease-in-out;
 }
 
@@ -311,14 +347,244 @@ body {
   display: flex;
   justify-content: space-between;
   color: #4b5563;
-  font-size: 0.9em;
+  font-size: 1em;
 }
 .dark .inter-card-footer {
   border-top-color: #374151;
-  color: #d1d5db;
+  color: #e6edf3;
 }
 
 canvas {
   width: 100% !important;
   height: 100% !important;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 767px) {
+  .dashboard-screen .main-content {
+    padding: 1rem;
+    padding-top: 6rem;
+    padding-bottom: 100px;
+    min-height: calc(100vh - 100px);
+  }
+
+  .card-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .card-icon-1,
+  .card-icon-2,
+  .card-icon-3 {
+    font-size: 2rem;
+    padding: 0.5rem;
+  }
+
+  .card-h3 {
+    font-size: 1rem;
+  }
+
+  .card-p {
+    font-size: 2rem;
+  }
+
+  .dashboard-main-grid {
+    gap: 1rem;
+  }
+
+  .main-column,
+  .side-column {
+    gap: 1rem;
+  }
+
+  .side-column {
+    flex-direction: column;
+  }
+
+  .graph-card,
+  .inter-card {
+    padding: 1rem;
+  }
+
+  .traffic-chart-container {
+    min-height: 200px;
+  }
+
+  .quick-action-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.9em;
+  }
+
+  .recent-simulations-tab {
+    padding: 1rem;
+  }
+
+  .recent-simulations-tab h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .recent-simulations-tab table {
+    font-size: 0.9rem;
+  }
+
+  .recent-simulations-tab th,
+  .recent-simulations-tab td {
+    padding: 0.5rem;
+  }
+
+  .intersection-details {
+    font-size: 0.85rem;
+  }
+
+  .inter-card-footer {
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+  }
+}
+
+/* Tablet Responsive Styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .dashboard-screen .main-content {
+    padding: 2rem;
+    padding-top: 7rem;
+    padding-bottom: 120px;
+    min-height: calc(100vh - 120px);
+  }
+
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .dashboard-main-grid {
+    gap: 1.25rem;
+  }
+
+  .main-column,
+  .side-column {
+    gap: 1.25rem;
+  }
+
+  .side-column {
+    flex-direction: column;
+  }
+
+  .graph-card,
+  .inter-card {
+    padding: 1.25rem;
+  }
+
+  .traffic-chart-container {
+    min-height: 220px;
+  }
+
+  .quick-action-button {
+    padding: 0.75rem 1.25rem;
+  }
+
+  .recent-simulations-tab {
+    padding: 1.25rem;
+  }
+
+  .recent-simulations-tab h2 {
+    font-size: 1.375rem;
+  }
+
+  .recent-simulations-tab table {
+    font-size: 0.95rem;
+  }
+
+  .recent-simulations-tab th,
+  .recent-simulations-tab td {
+    padding: 0.625rem;
+  }
+}
+
+/* Small Mobile (Portrait) */
+@media (max-width: 480px) {
+  .dashboard-screen .main-content {
+    padding: 0.75rem;
+    padding-top: 5.5rem;
+    padding-bottom: 80px;
+    min-height: calc(100vh - 80px);
+  }
+
+  .card-grid {
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .card {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .card-icon-1,
+  .card-icon-2,
+  .card-icon-3 {
+    font-size: 1.75rem;
+    padding: 0.4rem;
+  }
+
+  .card-h3 {
+    font-size: 0.9rem;
+  }
+
+  .card-p {
+    font-size: 1.75rem;
+  }
+
+  .graph-card,
+  .inter-card {
+    padding: 0.75rem;
+  }
+
+  .traffic-chart-container {
+    min-height: 180px;
+  }
+
+  .quick-action-button {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.85em;
+  }
+
+  .recent-simulations-tab {
+    padding: 0.75rem;
+  }
+
+  .recent-simulations-tab h2 {
+    font-size: 1.125rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .recent-simulations-tab table {
+    font-size: 0.85rem;
+  }
+
+  .recent-simulations-tab th,
+  .recent-simulations-tab td {
+    padding: 0.375rem;
+  }
+
+  .intersection-details {
+    font-size: 0.8rem;
+  }
+
+  .inter-card-footer {
+    font-size: 0.85rem;
+    margin-top: 0.75rem;
+    padding-top: 0.625rem;
+  }
 }

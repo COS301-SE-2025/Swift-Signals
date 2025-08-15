@@ -24,3 +24,76 @@ type UserService interface {
 	MakeAdmin(ctx context.Context, userID, adminUserID string) error
 	RemoveAdmin(ctx context.Context, userID, adminUserID string) error
 }
+
+type RegisterUserRequest struct {
+	Name     string `validate:"required,min=2,max=100" json:"name"`
+	Email    string `validate:"required,email,max=255" json:"email"`
+	Password string `validate:"required,min=8,max=128" json:"password"`
+}
+
+type LoginUserRequest struct {
+	Email    string `validate:"required,email,max=255" json:"email"`
+	Password string `validate:"required,min=8"         json:"password"`
+}
+
+type UpdateUserRequest struct {
+	UserID string `validate:"required,uuid4"         json:"user_id"`
+	Name   string `validate:"required,min=2,max=100" json:"name"`
+	Email  string `validate:"required,email,max=255" json:"email"`
+}
+
+type ChangePasswordRequest struct {
+	UserID          string `validate:"required,uuid4"         json:"user_id"`
+	CurrentPassword string `validate:"required,min=1"         json:"current_password"`
+	NewPassword     string `validate:"required,min=8,max=128" json:"new_password"`
+}
+
+type ResetPasswordRequest struct {
+	Email string `validate:"required,email,max=255" json:"email"`
+}
+
+type GetUserByIDRequest struct {
+	UserID string `validate:"required,uuid4" json:"user_id"`
+}
+
+type GetUserByEmailRequest struct {
+	Email string `validate:"required,email,max=255" json:"email"`
+}
+
+type GetAllUsersRequest struct {
+	Page     int32  `validate:"min=1"         json:"page"`
+	PageSize int32  `validate:"min=1,max=100" json:"page_size"`
+	Filter   string `validate:"max=255"       json:"filter"`
+}
+
+type DeleteUserRequest struct {
+	UserID string `validate:"required,uuid4" json:"user_id"`
+}
+
+type LogoutUserRequest struct {
+	UserID string `validate:"required,uuid4" json:"user_id"`
+}
+
+type GetUserIntersectionIDsRequest struct {
+	UserID string `validate:"required,uuid4" json:"user_id"`
+}
+
+type AddIntersectionIDRequest struct {
+	UserID         string `validate:"required,uuid4"         json:"user_id"`
+	IntersectionID string `validate:"required,min=1,max=100" json:"intersection_id"`
+}
+
+type RemoveIntersectionIDsRequest struct {
+	UserID          string   `validate:"required,uuid4"                             json:"user_id"`
+	IntersectionIDs []string `validate:"required,min=1,dive,required,min=1,max=100" json:"intersection_ids"`
+}
+
+type MakeAdminRequest struct {
+	UserID      string `validate:"required,uuid4" json:"user_id"`
+	AdminUserID string `validate:"required,uuid4" json:"admin_user_id"`
+}
+
+type RemoveAdminRequest struct {
+	UserID      string `validate:"required,uuid4" json:"user_id"`
+	AdminUserID string `validate:"required,uuid4" json:"admin_user_id"`
+}

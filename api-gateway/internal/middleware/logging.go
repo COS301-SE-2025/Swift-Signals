@@ -27,9 +27,12 @@ func SetLogger(ctx context.Context, logger *slog.Logger) context.Context {
 	return context.WithValue(ctx, loggerKey, logger)
 }
 
-func LoggerFromContext(ctx context.Context) (*slog.Logger, bool) {
+func LoggerFromContext(ctx context.Context) *slog.Logger {
 	logger, ok := ctx.Value(loggerKey).(*slog.Logger)
-	return logger, ok
+	if !ok {
+		return slog.Default()
+	}
+	return logger
 }
 
 func Logging(baseLogger *slog.Logger) Middleware {

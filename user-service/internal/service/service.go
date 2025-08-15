@@ -3,7 +3,10 @@ package service
 import (
 	"context"
 	"errors"
-	"regexp"
+	"log"
+	"maps"
+	"os"
+	"slices"
 	"strings"
 	"time"
 
@@ -12,42 +15,78 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/util"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Service struct {
-	repo db.UserRepository
+	repo      db.UserRepository
+	validator *validator.Validate
 }
 
 func NewUserService(r db.UserRepository) UserService {
-	return &Service{repo: r}
+	service := &Service{
+		repo:      r,
+		validator: validator.New(),
+	}
+
+	if err := service.ensureAdminExists(); err != nil {
+		log.Printf("Warning: Failed to create default admin user: %v", err)
+	}
+
+	return service
 }
 
-// emailRegex is a simple regex for basic email validation
-var emailRegex = regexp.MustCompile(`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
-
-func normalizeEmail(email string) string {
-	return strings.ToLower(strings.TrimSpace(email))
+func (s *Service) ensureAdminExists() error {
+	ctx := context.Background()
+	exists, err := s.repo.AdminExists(ctx)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		id := uuid.New().String()
+		name := os.Getenv("DEFAULT_USER_NAME")
+		email := os.Getenv("DEFAULT_USER_EMAIL")
+		password := os.Getenv("DEFAULT_USER_PASSWORD")
+		hashedPassword, _ := hashPassword(password)
+		defaultUser := &model.User{
+			ID:       id,
+			Name:     name,
+			Email:    normalizeEmail(email),
+			Password: string(hashedPassword),
+			IsAdmin:  true,
+		}
+		_, err := s.repo.CreateUser(ctx, defaultUser)
+		if err != nil {
+			var svcErr *errs.ServiceError
+			if errors.As(err, &svcErr) {
+				return err
+			}
+			return errs.NewInternalError("failed to create admin user", err, map[string]any{})
+		}
+		return nil
+	}
+	return nil
 }
 
-// RegisterUser creates a new user with proper validation and password hashing
 func (s *Service) RegisterUser(
 	ctx context.Context,
 	name, email, password string,
 ) (*model.User, error) {
 	logger := util.LoggerFromContext(ctx)
 
-	// Validate input before using db resources
 	logger.Debug("validating input")
-	email = normalizeEmail(email)
-	if err := s.validateUserInput(name, email, password); err != nil {
-		return nil, err
+	req := RegisterUserRequest{
+		Name:     strings.TrimSpace(name),
+		Email:    strings.TrimSpace(email),
+		Password: password,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
 	}
 
-	// Check if user already exists
 	logger.Debug("checking if email already exists")
-	existingUser, err := s.repo.GetUserByEmail(ctx, email)
+	existingUser, err := s.repo.GetUserByEmail(ctx, normalizeEmail(email))
 	// NOTE: Logic is dependent on GetUserByEmail returning nil if user does not exist
 	//       If this returns an error instead, we need to handle it differently
 	//       This is a limitation of the current implementation
@@ -67,21 +106,20 @@ func (s *Service) RegisterUser(
 		)
 	}
 
-	// Hash password
 	logger.Debug("hashing password")
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	hashedPassword, err := hashPassword(password)
 	if err != nil {
-		return nil, errs.NewInternalError("failed to hash password", err, nil)
+		return nil, errs.NewExternalError("failed to hash password", err, nil)
 	}
 
-	// Create user
 	logger.Debug("creating user")
 	id := uuid.New().String()
 	user := &model.User{
 		ID:       id,
-		Name:     strings.TrimSpace(name),
-		Email:    strings.ToLower(strings.TrimSpace(email)),
+		Name:     req.Name,
+		Email:    req.Email,
 		Password: string(hashedPassword),
+		IsAdmin:  false,
 	}
 
 	createdUser, err := s.repo.CreateUser(ctx, user)
@@ -95,55 +133,47 @@ func (s *Service) RegisterUser(
 	return createdUser, nil
 }
 
-// validateUserInput validates the input parameters for user registration
-func (s *Service) validateUserInput(name, email, password string) error {
-	var validationErrors []string
-
-	if strings.TrimSpace(name) == "" {
-		validationErrors = append(validationErrors, "name is required")
-	}
-	if email == "" || !emailRegex.MatchString(email) {
-		validationErrors = append(validationErrors, "email is invalid")
-	}
-	if len(password) < 8 {
-		validationErrors = append(validationErrors, "password is too short")
-	}
-
-	if len(validationErrors) > 0 {
-		combinedErrors := strings.Join(validationErrors, "; ")
-		return errs.NewValidationError(combinedErrors, map[string]any{"email": email})
-	}
-	return nil
-}
-
-func checkPassword(inputPassword, storedHashedPassword string) error {
-	return bcrypt.CompareHashAndPassword([]byte(storedHashedPassword), []byte(inputPassword))
-}
-
-// LoginUser authenticates a user and returns auth token
 func (s *Service) LoginUser(
 	ctx context.Context,
 	email, password string,
 ) (string, time.Time, error) {
-	// TODO: Implement user login
-	// - Validate input parameters
+	logger := util.LoggerFromContext(ctx)
 
-	// Find user by email
+	logger.Debug("validating input")
+	req := LoginUserRequest{
+		Email:    strings.TrimSpace(email),
+		Password: password,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return "", time.Time{}, handleValidationError(err)
+	}
+
+	logger.Debug("checking if email already exists")
 	user, err := s.repo.GetUserByEmail(ctx, normalizeEmail(email))
 	if err != nil {
-		return "", time.Time{}, err
+		return "", time.Time{}, errs.NewInternalError(
+			"failed to check existing user",
+			err,
+			map[string]any{"email": email})
 	}
 	if user == nil {
-		return "", time.Time{}, errors.New("user does not exist")
+		return "", time.Time{}, errs.NewInternalError(
+			"user does not exist",
+			err,
+			map[string]any{"email": email},
+		)
 	}
 
-	// Verify password
+	logger.Debug("checking if password is correct")
 	err = checkPassword(password, user.Password)
 	if err != nil {
-		return "", time.Time{}, errors.New("invalid credentials")
+		return "", time.Time{}, errs.NewUnauthorizedError(
+			"password is incorrect",
+			map[string]any{"user": user.PublicUser()},
+		)
 	}
 
-	// Generate JWT token
+	logger.Debug("generating token")
 	role := "regular"
 	if user.IsAdmin {
 		role = "admin"
@@ -151,197 +181,718 @@ func (s *Service) LoginUser(
 	expiryDate := time.Now().Add(time.Hour * 72)
 	token, err := jwt.GenerateToken(user.ID, role, time.Hour*72)
 	if err != nil {
-		return "", time.Time{}, err
+		return "", time.Time{}, errs.NewInternalError(
+			"failed to generated token",
+			err,
+			map[string]any{"user": user.PublicUser()},
+		)
 	}
 
 	return token, expiryDate, nil
 }
 
-// LogoutUser invalidates the user's session/token
 func (s *Service) LogoutUser(ctx context.Context, userID string) error {
-	// TODO: Implement user logout
-	// - Invalidate user session/token
-	// - Clear any cached user data
-	// - Log logout event
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input")
+	req := LogoutUserRequest{
+		UserID: userID,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+
+	logger.Debug("checking if user exists")
+	_, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError("failed to find user", err, map[string]any{})
+	}
+
 	return nil
 }
 
-// GetUserByID retrieves a user by their ID
 func (s *Service) GetUserByID(ctx context.Context, userID string) (*model.User, error) {
-	// TODO: Validate user ID
+	logger := util.LoggerFromContext(ctx)
 
-	// Query database for user
-	user, err := s.repo.GetUserByID(ctx, userID)
-	if err != nil {
-		return nil, err
+	logger.Debug("validating input")
+	req := GetUserByIDRequest{
+		UserID: userID,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
 	}
 
-	// Return user model or not found error
+	logger.Debug("query database for user")
+	user, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+
 	return user, nil
 }
 
-// GetUserByEmail retrieves a user by their email address
 func (s *Service) GetUserByEmail(ctx context.Context, email string) (*model.User, error) {
-	// TODO: Implement get user by email
-	// - Validate email format
-	// - Query database for user by email
-	// - Return user model or not found error
-	return nil, nil
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input")
+	req := GetUserByEmailRequest{
+		Email: email,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
+	}
+
+	logger.Debug("query database for user")
+	user, err := s.repo.GetUserByEmail(ctx, normalizeEmail(email))
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"email": email},
+		)
+	}
+
+	if user == nil {
+		return nil, nil
+	}
+
+	return user, nil
 }
 
-// GetAllUsers retrieves all users with pagination and filtering
 func (s *Service) GetAllUsers(
 	ctx context.Context,
 	page, pageSize int32,
 	filter string,
 ) ([]*model.User, error) {
-	// TODO: Implement get all users
-	// - Validate pagination parameters
-	// - Apply filters if provided
-	// - Query database with pagination
-	// - Return slice of user model
-	return nil, nil
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating pagination parameters")
+	req := GetAllUsersRequest{
+		Page:     page,
+		PageSize: pageSize,
+		Filter:   filter,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
+	}
+
+	logger.Debug("preparing filter parameters")
+	normalizedFilter := strings.TrimSpace(filter)
+	offset := (page - 1) * pageSize
+	limit := pageSize
+
+	logger.Debug("querying database with pagination",
+		"page", page,
+		"pageSize", pageSize,
+		"offset", offset,
+		"filter", normalizedFilter,
+	)
+	// NOTE: ListUsers does not support filtering at the moment
+	users, err := s.repo.ListUsers(ctx, int(limit), int(offset))
+	if err != nil {
+		return nil, errs.NewInternalError(
+			"failed to retrieve users",
+			err,
+			map[string]any{
+				"page":     page,
+				"pageSize": pageSize,
+				"filter":   normalizedFilter,
+			},
+		)
+	}
+
+	return users, nil
 }
 
-// UpdateUser updates user information
 func (s *Service) UpdateUser(ctx context.Context, userID, name, email string) (*model.User, error) {
-	// TODO: Implement user update
-	// - Validate input parameters
-	// - Check if user exists
-	// - Check if email is already taken by another user
-	// - Update user in database
-	// - Return updated user model
-	return nil, nil
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input parameters")
+	req := UpdateUserRequest{
+		UserID: strings.TrimSpace(userID),
+		Name:   strings.TrimSpace(name),
+		Email:  strings.TrimSpace(email),
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
+	}
+
+	logger.Debug("checking if user exists")
+	existingUser, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": req.UserID},
+		)
+	}
+
+	logger.Debug("checking if email is being changed")
+	normalizedEmail := normalizeEmail(req.Email)
+	if existingUser.Email != normalizedEmail {
+		logger.Debug("checking if new email is already taken")
+		userWithEmail, err := s.repo.GetUserByEmail(ctx, normalizedEmail)
+		if err != nil {
+			var svcErr *errs.ServiceError
+			if errors.As(err, &svcErr) {
+				return nil, err
+			}
+			return nil, errs.NewInternalError(
+				"failed to find user",
+				err,
+				map[string]any{"email": email},
+			)
+		}
+
+		if userWithEmail != nil && userWithEmail.ID != req.UserID {
+			return nil, errs.NewAlreadyExistsError(
+				"email already taken by another user",
+				map[string]any{"email": req.Email},
+			)
+		}
+	}
+
+	logger.Debug("updating user in database")
+	updatedUserData := &model.User{
+		ID:              existingUser.ID,
+		Name:            req.Name,
+		Email:           req.Email,
+		Password:        existingUser.Password,
+		IsAdmin:         existingUser.IsAdmin,
+		IntersectionIDs: existingUser.IntersectionIDs,
+		CreatedAt:       existingUser.CreatedAt,
+		UpdatedAt:       time.Now(),
+	}
+	updatedUser, err := s.repo.UpdateUser(ctx, updatedUserData)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to update user",
+			err,
+			map[string]any{
+				"userID": req.UserID,
+				"name":   req.Name,
+				"email":  req.Email,
+			},
+		)
+	}
+
+	return updatedUser, nil
 }
 
-// DeleteUser removes a user from the system
 func (s *Service) DeleteUser(ctx context.Context, userID string) error {
-	// TODO: Implement user deletion
-	// - Validate user ID
-	// - Check if user exists
-	// - Perform soft delete or hard delete based on business rules
-	// - Clean up related data if necessary
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input parameters")
+	req := DeleteUserRequest{
+		UserID: strings.TrimSpace(userID),
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+
+	logger.Debug("checking if user exists")
+	existingUser, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+
+	if existingUser.IsAdmin {
+		logger.Warn("deleting admin user")
+	}
+
+	logger.Debug("deleting user in database")
+	err = s.repo.DeleteUser(ctx, userID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to delete user",
+			err,
+			map[string]any{
+				"userID": req.UserID,
+			},
+		)
+	}
+
 	return nil
 }
 
-// GetUserIntersectionIDs retrieves all intersection IDs for a user
 func (s *Service) GetUserIntersectionIDs(ctx context.Context, userID string) ([]string, error) {
-	// TODO: Validate user ID
+	logger := util.LoggerFromContext(ctx)
 
-	// Check if user exists
-	user, err := s.repo.GetUserByID(ctx, userID)
+	logger.Debug("validating input")
+	req := GetUserIntersectionIDsRequest{
+		UserID: userID,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
+	}
+
+	logger.Debug("getting user")
+	_, err := s.repo.GetUserByID(ctx, userID)
 	if err != nil {
-		return nil, err
-	}
-	if user == nil {
-		return nil, errors.New("user not found")
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
 	}
 
-	// Query database for user's intersection IDs
+	logger.Debug("getting user's intersection IDs")
 	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, userID)
 	if err != nil {
-		return nil, err
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError(
+			"failed to fetch user's intersection IDs",
+			err,
+			map[string]any{"userID": userID},
+		)
 	}
 
-	// - Return slice of intersection IDs
 	return intIDs, nil
 }
 
-// AddIntersectionID adds an intersection ID to a user's list
 func (s *Service) AddIntersectionID(
 	ctx context.Context,
 	userID string,
 	intersectionID string,
 ) error {
-	// TODO: Validate user ID and intersection ID
+	logger := util.LoggerFromContext(ctx)
 
-	// Check if user exists
-	user, err := s.repo.GetUserByID(ctx, userID)
-	if err != nil {
-		return err
+	logger.Debug("validating input")
+	req := AddIntersectionIDRequest{
+		UserID:         strings.TrimSpace(userID),
+		IntersectionID: strings.TrimSpace(intersectionID),
 	}
-	if user == nil {
-		return errors.New("user not found")
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
 	}
 
-	// Check if intersection ID already exists for user
-	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, userID)
+	logger.Debug("getting user")
+	_, err := s.repo.GetUserByID(ctx, req.UserID)
 	if err != nil {
-		return err
-	}
-	for _, intID := range intIDs {
-		if intID == intersectionID {
-			return errors.New("intersection already exists")
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
 		}
+		return errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
 	}
 
-	// Add intersection ID to user's list
-	err = s.repo.AddIntersectionID(ctx, userID, intersectionID)
+	logger.Debug("checking if intersection ID already exists")
+	intIDs, err := s.repo.GetIntersectionsByUserID(ctx, req.UserID)
 	if err != nil {
-		return err
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to check existing intersection IDs",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+	if slices.Contains(intIDs, req.IntersectionID) {
+		logger.Warn("intersection ID already exists in user's list")
+		return nil
+	}
+
+	logger.Debug("Add intersection ID to user's list")
+	err = s.repo.AddIntersectionID(ctx, userID, req.IntersectionID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to add intersection ID",
+			err,
+			map[string]any{"userID": userID},
+		)
 	}
 
 	return nil
 }
 
-// RemoveIntersectionID removes an intersection ID from a user's list
 func (s *Service) RemoveIntersectionIDs(
 	ctx context.Context,
 	userID string,
 	intersectionID []string,
 ) error {
-	// TODO: Implement remove intersection ID
-	// - Validate user ID and intersection ID
-	// - Check if user exists
-	// - Remove intersection ID from user's list
-	// - Update database
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input parameters")
+	req := RemoveIntersectionIDsRequest{
+		UserID:          strings.TrimSpace(userID),
+		IntersectionIDs: intersectionID,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+
+	logger.Debug("checking if user exists")
+	existingUser, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+
+	logger.Debug("fetching current intersections")
+	currentIntersectionIDs, err := s.repo.GetIntersectionsByUserID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to fetch current intersections",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+
+	logger.Debug("removing requested intersection ids")
+	currentSet := make(map[string]struct{}, len(currentIntersectionIDs))
+	for _, id := range currentIntersectionIDs {
+		currentSet[id] = struct{}{}
+	}
+	invalidSet := make(map[string]struct{})
+	for _, id := range req.IntersectionIDs {
+		if _, exists := currentSet[id]; !exists {
+			invalidSet[id] = struct{}{}
+		}
+	}
+	if len(invalidSet) > 0 {
+		logger.Warn(
+			"attempting to remove intersection IDs that are not in the current user's list",
+			"invalidIDs", maps.Keys(invalidSet),
+		)
+	}
+	requestedSet := make(map[string]struct{}, len(req.IntersectionIDs))
+	for _, id := range req.IntersectionIDs {
+		if _, isInvalid := invalidSet[id]; isInvalid {
+			continue
+		}
+		requestedSet[id] = struct{}{}
+	}
+	var updatedIntersections []string
+	for _, id := range currentIntersectionIDs {
+		if _, remove := requestedSet[id]; !remove {
+			updatedIntersections = append(updatedIntersections, id)
+		}
+	}
+
+	logger.Debug("updating user in database")
+	updatedUser := &model.User{
+		ID:              existingUser.ID,
+		Name:            existingUser.Name,
+		Email:           existingUser.Email,
+		Password:        existingUser.Password,
+		IsAdmin:         existingUser.IsAdmin,
+		IntersectionIDs: updatedIntersections,
+		CreatedAt:       existingUser.CreatedAt,
+		UpdatedAt:       time.Now(),
+	}
+	_, err = s.repo.UpdateUser(ctx, updatedUser)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to update user",
+			err,
+			map[string]any{
+				"userID": req.UserID,
+			},
+		)
+	}
+
 	return nil
 }
 
-// ChangePassword updates a user's password
 func (s *Service) ChangePassword(
 	ctx context.Context,
 	userID, currentPassword, newPassword string,
 ) error {
-	// TODO: Implement password change
-	// - Validate user ID and passwords
-	// - Check if user exists
-	// - Verify current password
-	// - Validate new password strength
-	// - Hash new password
-	// - Update password in database
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input parameters")
+	req := ChangePasswordRequest{
+		UserID:          strings.TrimSpace(userID),
+		CurrentPassword: currentPassword,
+		NewPassword:     newPassword,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+
+	logger.Debug("checking if user exists")
+	existingUser, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userID": userID},
+		)
+	}
+
+	logger.Debug("authorising current password")
+	err = checkPassword(currentPassword, existingUser.Password)
+	if err != nil {
+		return errs.NewUnauthorizedError(
+			"current password is incorrect",
+			map[string]any{"user": existingUser.PublicUser()},
+		)
+	}
+
+	logger.Debug("hashing new password")
+	newPasswordHashed, err := hashPassword(newPassword)
+	if err != nil {
+		return errs.NewExternalError("failed to hash password", err, nil)
+	}
+
+	logger.Debug("updating user in database")
+	updatedUserData := &model.User{
+		ID:              existingUser.ID,
+		Name:            existingUser.Name,
+		Email:           existingUser.Email,
+		Password:        string(newPasswordHashed),
+		IsAdmin:         existingUser.IsAdmin,
+		IntersectionIDs: existingUser.IntersectionIDs,
+		CreatedAt:       existingUser.CreatedAt,
+		UpdatedAt:       time.Now(),
+	}
+	_, err = s.repo.UpdateUser(ctx, updatedUserData)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to update user",
+			err,
+			map[string]any{
+				"userID": req.UserID,
+			},
+		)
+	}
+
 	return nil
 }
 
-// ResetPassword initiates password reset process
 func (s *Service) ResetPassword(ctx context.Context, email string) error {
 	// TODO: Implement password reset
-	// - Validate email format
-	// - Check if user exists with this email
-	// - Generate password reset token
-	// - Send password reset email
-	// - Store reset token with expiration
 	return nil
 }
 
-// MakeAdmin grants admin privileges to a user
 func (s *Service) MakeAdmin(ctx context.Context, userID, adminUserID string) error {
-	// TODO: Implement make admin
-	// - Validate user IDs
-	// - Check if admin user has permission to grant admin rights
-	// - Check if target user exists
-	// - Update user's admin status in database
-	// - Log admin privilege change
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input parameters")
+	req := MakeAdminRequest{
+		UserID:      strings.TrimSpace(userID),
+		AdminUserID: strings.TrimSpace(adminUserID),
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+	logger.Debug("fetching admin user")
+	adminUser, err := s.repo.GetUserByID(ctx, req.AdminUserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to find admin user",
+			err,
+			map[string]any{"adminUserID": req.AdminUserID},
+		)
+	}
+
+	logger.Debug("verifying admin user has admin privileges")
+	if !adminUser.IsAdmin {
+		return errs.NewForbiddenError(
+			"admin user does not have admin privileges",
+			map[string]any{"adminUserID": adminUserID},
+		)
+	}
+
+	logger.Debug("fetching user to make admin")
+	existingUser, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to find user",
+			err,
+			map[string]any{"userId": req.UserID},
+		)
+	}
+	if existingUser.IsAdmin {
+		logger.Warn("user is already an admin")
+		return nil
+	}
+
+	logger.Debug("giving user admin privileges")
+	updatedUserData := &model.User{
+		ID:              existingUser.ID,
+		Name:            existingUser.Name,
+		Email:           existingUser.Email,
+		Password:        existingUser.Password,
+		IsAdmin:         true,
+		IntersectionIDs: existingUser.IntersectionIDs,
+		CreatedAt:       existingUser.CreatedAt,
+		UpdatedAt:       time.Now(),
+	}
+	_, err = s.repo.UpdateUser(ctx, updatedUserData)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to update user",
+			err,
+			map[string]any{
+				"userID": req.UserID,
+			},
+		)
+	}
+
 	return nil
 }
 
-// RemoveAdmin revokes admin privileges from a user
 func (s *Service) RemoveAdmin(ctx context.Context, userID, adminUserID string) error {
-	// TODO: Implement remove admin
-	// - Validate user IDs
-	// - Check if admin user has permission to revoke admin rights
-	// - Check if target user exists and is currently admin
-	// - Update user's admin status in database
-	// - Log admin privilege change
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input parameters")
+	req := RemoveAdminRequest{
+		UserID:      strings.TrimSpace(userID),
+		AdminUserID: strings.TrimSpace(adminUserID),
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+	logger.Debug("fetching admin user")
+	adminUser, err := s.repo.GetUserByID(ctx, req.AdminUserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to find admin user",
+			err,
+			map[string]any{"adminUserID": req.AdminUserID},
+		)
+	}
+
+	logger.Debug("verifying admin user has admin privileges")
+	if !adminUser.IsAdmin {
+		return errs.NewForbiddenError(
+			"admin user does not have admin privileges",
+			map[string]any{"adminUserID": req.AdminUserID},
+		)
+	}
+
+	logger.Debug("fetching user to remove admin privileges")
+	existingUser, err := s.repo.GetUserByID(ctx, req.UserID)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError("failed to find user", err, map[string]any{"userId": userID})
+	}
+	if !existingUser.IsAdmin {
+		logger.Warn("user is already not an admin")
+		return nil
+	}
+
+	logger.Debug("removing user's admin privileges")
+	updatedUserData := &model.User{
+		ID:              existingUser.ID,
+		Name:            existingUser.Name,
+		Email:           existingUser.Email,
+		Password:        existingUser.Password,
+		IsAdmin:         false,
+		IntersectionIDs: existingUser.IntersectionIDs,
+		CreatedAt:       existingUser.CreatedAt,
+		UpdatedAt:       time.Now(),
+	}
+	_, err = s.repo.UpdateUser(ctx, updatedUserData)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError(
+			"failed to update user",
+			err,
+			map[string]any{
+				"userID": req.UserID,
+			},
+		)
+	}
+
 	return nil
 }

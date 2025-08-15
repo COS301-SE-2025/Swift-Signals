@@ -3,13 +3,11 @@ package test
 import (
 	"context"
 	"errors"
-	"testing"
 	"time"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -38,7 +36,7 @@ func (suite *TestSuite) TestRegisterUser_Success() {
 
 	result, err := suite.handler.RegisterUser(ctx, req)
 
-	suite.Nil(err)
+	suite.Require().NoError(err)
 	suite.Equal(expectedUser.ID, result.GetId())
 	suite.Equal(expectedUser.Name, result.GetName())
 	suite.Equal(expectedUser.Email, result.GetEmail())
@@ -61,7 +59,7 @@ func (suite *TestSuite) TestRegisterUser_Failure() {
 	result, err := suite.handler.RegisterUser(ctx, req)
 
 	suite.Nil(result)
-	suite.Error(err)
+	suite.Require().Error(err)
 
 	st, ok := status.FromError(err)
 	suite.True(ok)
@@ -69,8 +67,4 @@ func (suite *TestSuite) TestRegisterUser_Failure() {
 	suite.Equal("internal server error", st.Message())
 
 	suite.service.AssertExpectations(suite.T())
-}
-
-func TestHandlerRegisterUser(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

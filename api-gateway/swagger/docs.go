@@ -20,8 +20,234 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/users": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves a paginated list of all users. Only accessible by admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get All Users",
+                "parameters": [
+                    {
+                        "description": "Pagination options",
+                        "name": "getAllUsersRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.GetAllUsersRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of users",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.User"
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Only admins can access this endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/users/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves a user by their ID. Only accessible by admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Get User by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User details",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Only admins can access this endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a user by their ID. Only accessible by admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Delete User by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "User deleted successfully"
+                    },
+                    "403": {
+                        "description": "Forbidden - Only admins can access this endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates a user's details by their ID. Only accessible by admins.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Update User by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated user details",
+                        "name": "updateUserRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UpdateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated user details",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Only admins can access this endpoint",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/intersections": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves all the intersections associated with the user.",
                 "consumes": [
                     "application/json"
@@ -55,6 +281,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Creates a new intersection with the given arguments",
                 "consumes": [
                     "application/json"
@@ -107,6 +338,11 @@ const docTemplate = `{
         },
         "/intersections/{id}": {
             "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Retrieves a single intersection by its unique identifier.",
                 "consumes": [
                     "application/json"
@@ -160,7 +396,68 @@ const docTemplate = `{
                     }
                 }
             },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes the intersection with the given ID.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Intersections"
+                ],
+                "summary": "Delete Intersection",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
                 "description": "Partially updates fields of an existing intersection by ID.",
                 "consumes": [
                     "application/json"
@@ -211,6 +508,187 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found: Intersection does not exist",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/intersections/{id}/optimise": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Generates and returns optimised simulation data for a specific intersection.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulation"
+                ],
+                "summary": "Get Optimised Simulation Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful optimised simulation data retrieval",
+                        "schema": {
+                            "$ref": "#/definitions/model.SimulationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input parameters",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection not found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Runs optimisation for a specific intersection and returns if there was an improvement.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulation"
+                ],
+                "summary": "Run Optimisation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful optimisation run",
+                        "schema": {
+                            "$ref": "#/definitions/model.OptimisationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input parameters",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection not found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/intersections/{id}/simulate": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Generates and returns simulation data for a specific intersection.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulation"
+                ],
+                "summary": "Get Simulation Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful simulation data retrieval",
+                        "schema": {
+                            "$ref": "#/definitions/model.SimulationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input parameters",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection not found",
                         "schema": {
                             "$ref": "#/definitions/model.ErrorResponse"
                         }
@@ -297,6 +775,130 @@ const docTemplate = `{
                     },
                     "401": {
                         "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/me": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieves the profile of the currently authenticated user.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Get User Profile",
+                "responses": {
+                    "200": {
+                        "description": "User profile retrieved successfully",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes the profile of the currently authenticated user.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Delete User Profile",
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Updates the profile of the currently authenticated user.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Profile"
+                ],
+                "summary": "Update User Profile",
+                "parameters": [
+                    {
+                        "description": "User profile data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.UpdateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User profile updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/model.User"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request: Validation error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized access",
                         "schema": {
                             "$ref": "#/definitions/model.ErrorResponse"
                         }
@@ -406,6 +1008,10 @@ const docTemplate = `{
     "definitions": {
         "model.CreateIntersectionRequest": {
             "type": "object",
+            "required": [
+                "default_parameters",
+                "name"
+            ],
             "properties": {
                 "default_parameters": {
                     "$ref": "#/definitions/model.SimulationParameters"
@@ -429,6 +1035,7 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string",
+                    "maxLength": 256,
                     "example": "My Intersection"
                 },
                 "traffic_density": {
@@ -467,12 +1074,32 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "code": {
-                    "type": "string",
-                    "example": "BAD_REQUEST"
+                    "type": "integer",
+                    "example": 404
                 },
                 "message": {
                     "type": "string",
-                    "example": "ERROR_MSG"
+                    "example": "resource not found"
+                }
+            }
+        },
+        "model.GetAllUsersRequest": {
+            "type": "object",
+            "required": [
+                "page",
+                "page_size"
+            ],
+            "properties": {
+                "page": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "example": 1
+                },
+                "page_size": {
+                    "type": "integer",
+                    "maximum": 100,
+                    "minimum": 1,
+                    "example": 10
                 }
             }
         },
@@ -541,11 +1168,11 @@ const docTemplate = `{
             "properties": {
                 "email": {
                     "type": "string",
-                    "example": "user@example.com"
+                    "example": "testuser@example.com"
                 },
                 "password": {
                     "type": "string",
-                    "example": "StrongPassword123"
+                    "example": "testpass1234"
                 }
             }
         },
@@ -558,7 +1185,7 @@ const docTemplate = `{
                 },
                 "token": {
                     "type": "string",
-                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                    "example": "header.payload.signature"
                 }
             }
         },
@@ -570,6 +1197,17 @@ const docTemplate = `{
                     "example": "Logout successful"
                 }
             }
+        },
+        "model.NodeType": {
+            "type": "string",
+            "enum": [
+                "PRIORITY",
+                "TRAFFIC_LIGHT"
+            ],
+            "x-enum-varnames": [
+                "NodeTypePriority",
+                "NodeTypeTrafficLight"
+            ]
         },
         "model.OptimisationParameters": {
             "type": "object",
@@ -583,6 +1221,36 @@ const docTemplate = `{
                 }
             }
         },
+        "model.OptimisationResponse": {
+            "type": "object",
+            "properties": {
+                "improved": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "model.Position": {
+            "type": "object",
+            "properties": {
+                "speed": {
+                    "type": "number",
+                    "example": 50
+                },
+                "time": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "x": {
+                    "type": "number",
+                    "example": 100
+                },
+                "y": {
+                    "type": "number",
+                    "example": 200
+                }
+            }
+        },
         "model.RegisterRequest": {
             "type": "object",
             "required": [
@@ -593,15 +1261,19 @@ const docTemplate = `{
             "properties": {
                 "email": {
                     "type": "string",
-                    "example": "newuser@example.com"
+                    "example": "testuser@example.com"
                 },
                 "password": {
                     "type": "string",
-                    "example": "VeryStrongPassword456"
+                    "maxLength": 64,
+                    "minLength": 8,
+                    "example": "testpass1234"
                 },
                 "username": {
                     "type": "string",
-                    "example": "johndoe"
+                    "maxLength": 32,
+                    "minLength": 3,
+                    "example": "tester"
                 }
             }
         },
@@ -635,11 +1307,137 @@ const docTemplate = `{
                 }
             }
         },
+        "model.SimulationConn": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "string",
+                    "example": "node1"
+                },
+                "fromLane": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "tl": {
+                    "type": "integer"
+                },
+                "to": {
+                    "type": "string",
+                    "example": "node2"
+                },
+                "toLane": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "model.SimulationEdge": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "string",
+                    "example": "node1"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "edge1"
+                },
+                "lanes": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "speed": {
+                    "type": "number",
+                    "example": 50
+                },
+                "to": {
+                    "type": "string",
+                    "example": "node2"
+                }
+            }
+        },
+        "model.SimulationIntersection": {
+            "type": "object",
+            "properties": {
+                "connections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationConn"
+                    }
+                },
+                "edges": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationEdge"
+                    }
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationNode"
+                    }
+                },
+                "trafficLights": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationTrafficLight"
+                    }
+                }
+            }
+        },
+        "model.SimulationNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "node1"
+                },
+                "type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.NodeType"
+                        }
+                    ],
+                    "example": "PRIORITY"
+                },
+                "x": {
+                    "type": "number",
+                    "example": 100
+                },
+                "y": {
+                    "type": "number",
+                    "example": 200
+                }
+            }
+        },
+        "model.SimulationOutput": {
+            "type": "object",
+            "properties": {
+                "intersection": {
+                    "$ref": "#/definitions/model.SimulationIntersection"
+                },
+                "vehicles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationVehicle"
+                    }
+                }
+            }
+        },
         "model.SimulationParameters": {
             "type": "object",
+            "required": [
+                "green",
+                "intersection_type",
+                "red",
+                "seed",
+                "speed",
+                "yellow"
+            ],
             "properties": {
                 "green": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 10
                 },
                 "intersection_type": {
@@ -648,6 +1446,7 @@ const docTemplate = `{
                 },
                 "red": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 6
                 },
                 "seed": {
@@ -656,11 +1455,116 @@ const docTemplate = `{
                 },
                 "speed": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 60
                 },
                 "yellow": {
                     "type": "integer",
+                    "minimum": 1,
                     "example": 2
+                }
+            }
+        },
+        "model.SimulationPhase": {
+            "type": "object",
+            "properties": {
+                "duration": {
+                    "type": "integer",
+                    "example": 30
+                },
+                "state": {
+                    "type": "string",
+                    "example": "GREEN"
+                }
+            }
+        },
+        "model.SimulationResponse": {
+            "type": "object",
+            "properties": {
+                "output": {
+                    "$ref": "#/definitions/model.SimulationOutput"
+                },
+                "results": {
+                    "$ref": "#/definitions/model.SimulationResults"
+                }
+            }
+        },
+        "model.SimulationResults": {
+            "type": "object",
+            "properties": {
+                "average_speed": {
+                    "type": "number",
+                    "example": 50
+                },
+                "average_travel_time": {
+                    "type": "number",
+                    "example": 300
+                },
+                "average_waiting_time": {
+                    "type": "number",
+                    "example": 60
+                },
+                "emergency_brakes": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "emergency_stops": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "generated_vehicles": {
+                    "type": "integer",
+                    "example": 120
+                },
+                "near_collisions": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "total_travel_time": {
+                    "type": "number",
+                    "example": 30000
+                },
+                "total_vehicles": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "total_waiting_time": {
+                    "type": "number",
+                    "example": 6000
+                }
+            }
+        },
+        "model.SimulationTrafficLight": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "tl1"
+                },
+                "phases": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationPhase"
+                    }
+                },
+                "type": {
+                    "type": "string",
+                    "example": "FIXED"
+                }
+            }
+        },
+        "model.SimulationVehicle": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "vehicle1"
+                },
+                "positions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Position"
+                    }
                 }
             }
         },
@@ -687,6 +1591,53 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "My Updated Intersection"
+                }
+            }
+        },
+        "model.UpdateUserRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                },
+                "username": {
+                    "type": "string",
+                    "maxLength": 32,
+                    "minLength": 3,
+                    "example": "newusername"
+                }
+            }
+        },
+        "model.User": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "user@example.com"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "intersection_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[1",
+                        "2",
+                        "3]"
+                    ]
+                },
+                "is_admin": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "username": {
+                    "type": "string",
+                    "example": "johndoe"
                 }
             }
         }
