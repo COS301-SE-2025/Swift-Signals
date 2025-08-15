@@ -239,6 +239,10 @@ func (s *SimulationService) GetUserIntersectionIDs(
 type SimulationServiceInterface interface {
 	GetSimulationData(ctx context.Context, intersectionID string) (model.SimulationResponse, error)
 	GetOptimisedData(ctx context.Context, intersectionID string) (model.SimulationResponse, error)
+	OptimiseIntersection(
+		ctx context.Context,
+		intersectionID string,
+	) (model.OptimisationResponse, error)
 }
 
 // NOTE: Asserts the SimulationService implements the SimulationServiceInterface

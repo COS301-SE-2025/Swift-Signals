@@ -87,3 +87,38 @@ func (h *SimulationHandler) GetOptimisedSimulation(w http.ResponseWriter, r *htt
 	logger.Info("request successful")
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }
+
+// @Summary Run Optimisation
+// @Description Runs optimisation for a specific intersection and returns if there was an improvement.
+// @Tags Simulation
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Intersection ID"
+// @Success 200 {object} model.OptimisationResponse "Successful optimisation run"
+// @Failure 400 {object} model.ErrorResponse "Bad Request: Invalid input parameters"
+// @Failure 401 {object} model.ErrorResponse "Unauthorized: Token missing or invalid"
+// @Failure 404 {object} model.ErrorResponse "Not Found: Intersection not found"
+// @Failure 500 {object} model.ErrorResponse "Internal server error"
+// @Router /intersections/{id}/optimise [post]
+func (h *SimulationHandler) RunOptimisation(w http.ResponseWriter, r *http.Request) {
+	logger := middleware.LoggerFromContext(r.Context()).With(
+		"handler", "simulation",
+		"action", "runOptimisation",
+	)
+	logger.Info("processing runOptimisation request")
+
+	intersectionID := r.PathValue("id")
+
+	resp, err := h.service.OptimiseIntersection(r.Context(), intersectionID)
+	if err != nil {
+		logger.Error("request failed",
+			"error", err.Error(),
+		)
+		util.SendErrorResponse(w, err)
+		return
+	}
+
+	logger.Info("request successful")
+	util.SendJSONResponse(w, http.StatusOK, resp)
+}
