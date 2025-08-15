@@ -37,6 +37,10 @@ describe("Users Page", () => {
     cy.get("button[aria-label='Previous page']").click();
     cy.get("tbody tr").first().should("contain", "John Doe");
   });
+
+  it("displays ellipsis for long pagination", () => {
+    cy.get(".usersPaging").should("contain", "...");
+  });
   
 });
 
