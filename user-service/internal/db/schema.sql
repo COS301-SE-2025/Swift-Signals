@@ -20,6 +20,6 @@ CREATE TABLE user_intersections (
 INSERT INTO users (uuid, name, email, password, is_admin)
 VALUES
     ('9b9b1c5c-2e57-4e18-a15c-e3219be9dc01', 'Alice Smith', 'alice@example.com', 'password123', false),
-    ('2f1a9b99-bdc2-44ce-9f0c-d3903f7b9eb1', 'Bob Johnson', 'bob@example.com', 'securepass', true),
+    ('2f1a9b99-bdc2-44ce-9f0c-d3903f7b9eb1', 'Bob Johnson', 'bob@example.com', 'securepass', false),
     ('30d6cbb9-0f3f-4f9b-bb2a-52c9d5e7231e', 'Charlie Lee', 'charlie@example.com', 'hunter2', false);
 
