@@ -109,7 +109,7 @@ interface SimulationData {
   intersection: string;
   lastRunAt: string;
   runCount: number;
-  status: string; // Will be 'Running', 'Complete', or 'Failed'
+  status: string; // Will be 'optimised', 'unoptimised', or 'Failed'
 }
 
 // Type for intersection with calculated distance
@@ -1719,12 +1719,11 @@ const SimulationTable: React.FC<{
     setCurrentPage(page);
   };
 
-  // ***UPDATED***: statusClass now uses the simplified "Complete", "Running", "Failed" statuses.
   const statusClass = (status: string) => {
     switch (status) {
-      case "Complete":
+      case "optimised":
         return "bg-green-200 text-green-800 border-green-300";
-      case "Running":
+      case "unoptimised":
         return "bg-yellow-200 text-yellow-800 border-yellow-300";
       case "Failed":
         return "bg-red-200 text-red-800 border-red-300";
@@ -1736,7 +1735,6 @@ const SimulationTable: React.FC<{
   return (
     <div className="simTable bg-white dark:bg-[#161B22] shadow-md rounded-lg overflow-hidden table-fixed-height relative">
       <table className="simulationTable min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        {/* ***UPDATED***: Table headers now reflect the new data columns. */}
         <thead className="simTableHead bg-gray-50 dark:bg-[#161B22]">
           <tr>
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -1759,7 +1757,6 @@ const SimulationTable: React.FC<{
             </th>
           </tr>
         </thead>
-        {/* ***UPDATED***: Table body now displays the new data and the numbered list. */}
         <tbody className="bg-white dark:bg-[#161B22] divide-y divide-gray-200 dark:divide-gray-700">
           {paginatedSimulations.map((sim) => (
             <tr key={sim.backendId}>
@@ -1792,22 +1789,22 @@ const SimulationTable: React.FC<{
                     onClick={() =>
                       onViewResults(sim.backendId, sim.intersection)
                     }
-                      className="viewBtn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium w-full text-center"
-                      title="View Results"
-                    >
-                      <Eye size={18} strokeWidth={2} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(sim.backendId)}
-                      className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center"
-                      title="Delete Simulation"
-                    >
-                      <Trash2 size={18} strokeWidth={2} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                    className="viewBtn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium w-full text-center"
+                    title="View Results"
+                  >
+                    <Eye size={18} strokeWidth={2} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(sim.backendId)}
+                    className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center"
+                    title="Delete Simulation"
+                  >
+                    <Trash2 size={18} strokeWidth={2} />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
       {simulations.length > rowsPerPage && (
@@ -1956,7 +1953,6 @@ const Simulations: React.FC = () => {
     }
   };
 
-  // ***UPDATED***: Maps API statuses ('optimised', 'unoptimised') to front-end statuses ('Complete', 'Running').
   const convertToSimulationData = (
     intersections: ApiIntersection[],
   ): { sims: SimulationData[]; opts: SimulationData[] } => {
@@ -1964,13 +1960,13 @@ const Simulations: React.FC = () => {
     const mapApiStatus = (apiStatus?: string): string => {
       switch (apiStatus) {
         case "optimised":
-          return "Complete";
+          return "optimised";
         case "unoptimised":
-          return "Running";
+          return "unoptimised";
         case "Failed":
           return "Failed";
         default:
-          return "Running"; // Default for Pending, null, etc.
+          return "unoptimised"; // Default for Pending, null, etc.
       }
     };
 
@@ -1991,8 +1987,8 @@ const Simulations: React.FC = () => {
       status: mapApiStatus(intersection.status), // Use the mapping function
     }));
 
-    // Filter the main list to get only the completed (optimized) simulations
-    const opts = allSims.filter((sim) => sim.status === "Complete");
+    // Filter the main list to get only the optimised simulations
+    const opts = allSims.filter((sim) => sim.status === "optimised");
 
     return { sims: allSims, opts };
   };
