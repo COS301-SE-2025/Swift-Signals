@@ -50,6 +50,9 @@ func (h *SimulationHandler) GetSimulation(w http.ResponseWriter, r *http.Request
 	}
 
 	logger.Info("request successful")
+	logger.Debug("simulation response",
+		"response", resp,
+	)
 	util.SendJSONResponse(w, http.StatusOK, resp)
 }
 

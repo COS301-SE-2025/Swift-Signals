@@ -15,10 +15,14 @@ type SimulationClient struct {
 	client simulationpb.SimulationServiceClient
 }
 
-func NewSimulationClient(conn *grpc.ClientConn) *SimulationClient {
+func NewSimulationClient(client simulationpb.SimulationServiceClient) *SimulationClient {
 	return &SimulationClient{
-		client: simulationpb.NewSimulationServiceClient(conn),
+		client: client,
 	}
+}
+
+func NewSimulationClientFromConn(conn *grpc.ClientConn) *SimulationClient {
+	return NewSimulationClient(simulationpb.NewSimulationServiceClient(conn))
 }
 
 func (sc *SimulationClient) GetSimulationResults(
