@@ -3,7 +3,7 @@
 }
 
 .dark .intersectionCard {
-  background-color: #2a2a2a;
+  background-color: #161b22;
 }
 
 .mobileIntBtns {
@@ -12,16 +12,8 @@
 
 @media screen and (min-width: 481px) and (max-width: 768px) {
   .intersectionCard {
-    width: 50px;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .intersectionCard {
     width: 100%;
-    height: 200px;
-    text-align: left;
-    position: relative; /* Add this to make position: absolute work relative to the card */
+    padding: 20px;
   }
 
   .cardImage {
@@ -30,17 +22,66 @@
   }
 
   .intersectionName {
-    font-size: 1em;
+    font-size: 1.5rem;
+  }
+
+  .intersectionID,
+  .intersectionLocation,
+  .intersectionLanes {
+    font-size: 1rem;
+  }
+
+  .intersectionBtn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .intersectionCard {
+    width: 100%;
+    height: 160px;
+    text-align: left;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 12px;
+  }
+
+  .intersectionCard .flex.items-center {
+    flex: 1;
+    margin-right: 12px;
+    height: 100%;
+    align-items: center;
+  }
+
+  .intersectionCard .flex.items-center .flex {
+    align-items: center;
+    height: 100%;
+  }
+
+  .cardImage {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+  }
+
+  .intersectionName {
+    font-size: 0.9em;
+    margin-bottom: 2px;
   }
 
   .intersectionID {
-    font-size: 0.8em;
+    font-size: 0.75em;
+    margin-bottom: 1px;
   }
   .intersectionLocation {
-    font-size: 0.8em;
+    font-size: 0.75em;
+    margin-bottom: 1px;
   }
   .intersectionLanes {
-    font-size: 0.8em;
+    font-size: 0.75em;
   }
 
   .intBtns {
@@ -49,17 +90,18 @@
 
   .mobileIntBtns {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    position: absolute;
-    bottom: 10px; /* Position at the bottom with some padding */
-    left: 10px; /* Optional: add padding from left */
-    right: 10px; /* Optional: add padding from right */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    position: static;
+    flex-shrink: 0;
+    height: 100%;
   }
 
-  .intersectionBtn {
-    font-size: 0.8em;
-    height: 40px;
-    width: 40px;
+  .mobileIntBtns .intersectionBtn {
+    font-size: 0.7em;
+    height: 34px;
+    width: 34px;
   }
 }

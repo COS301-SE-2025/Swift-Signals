@@ -18,10 +18,14 @@ definitions:
         type: object
       name:
         example: My Intersection
+        maxLength: 256
         type: string
       traffic_density:
         example: high
         type: string
+    required:
+    - default_parameters
+    - name
     type: object
   model.CreateIntersectionResponse:
     properties:
@@ -44,11 +48,26 @@ definitions:
   model.ErrorResponse:
     properties:
       code:
-        example: BAD_REQUEST
-        type: string
+        example: 404
+        type: integer
       message:
-        example: ERROR_MSG
+        example: resource not found
         type: string
+    type: object
+  model.GetAllUsersRequest:
+    properties:
+      page:
+        example: 1
+        minimum: 1
+        type: integer
+      page_size:
+        example: 10
+        maximum: 100
+        minimum: 1
+        type: integer
+    required:
+    - page
+    - page_size
     type: object
   model.Intersection:
     properties:
@@ -92,10 +111,10 @@ definitions:
   model.LoginRequest:
     properties:
       email:
-        example: user@example.com
+        example: testuser@example.com
         type: string
       password:
-        example: StrongPassword123
+        example: testpass1234
         type: string
     required:
     - email
@@ -107,7 +126,7 @@ definitions:
         example: Login successful
         type: string
       token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        example: header.payload.signature
         type: string
     type: object
   model.LogoutResponse:
@@ -127,13 +146,17 @@ definitions:
   model.RegisterRequest:
     properties:
       email:
-        example: newuser@example.com
+        example: testuser@example.com
         type: string
       password:
-        example: VeryStrongPassword456
+        example: testpass1234
+        maxLength: 64
+        minLength: 8
         type: string
       username:
-        example: johndoe
+        example: tester
+        maxLength: 32
+        minLength: 3
         type: string
     required:
     - email
@@ -164,22 +187,33 @@ definitions:
     properties:
       green:
         example: 10
+        minimum: 1
         type: integer
       intersection_type:
         example: t-junction
         type: string
       red:
         example: 6
+        minimum: 1
         type: integer
       seed:
         example: 3247128304
         type: integer
       speed:
         example: 60
+        minimum: 1
         type: integer
       yellow:
         example: 2
+        minimum: 1
         type: integer
+    required:
+    - green
+    - intersection_type
+    - red
+    - seed
+    - speed
+    - yellow
     type: object
   model.UpdateIntersectionRequest:
     properties:
@@ -199,6 +233,40 @@ definitions:
         example: My Updated Intersection
         type: string
     type: object
+  model.UpdateUserRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      username:
+        example: newusername
+        maxLength: 32
+        minLength: 3
+        type: string
+    type: object
+  model.User:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      id:
+        example: "1"
+        type: string
+      intersection_ids:
+        example:
+        - '[1'
+        - "2"
+        - 3]
+        items:
+          type: string
+        type: array
+      is_admin:
+        example: false
+        type: boolean
+      username:
+        example: johndoe
+        type: string
+    type: object
 host: localhost:9090
 info:
   contact:
@@ -211,6 +279,147 @@ info:
   title: Authentication API Gateway
   version: "1.0"
 paths:
+  /admin/users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a paginated list of all users. Only accessible by admins.
+      parameters:
+      - description: Pagination options
+        in: body
+        name: getAllUsersRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.GetAllUsersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+        "403":
+          description: Forbidden - Only admins can access this endpoint
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get All Users
+      tags:
+      - Admin
+  /admin/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a user by their ID. Only accessible by admins.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User deleted successfully
+        "403":
+          description: Forbidden - Only admins can access this endpoint
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete User by ID
+      tags:
+      - Admin
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a user by their ID. Only accessible by admins.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details
+          schema:
+            $ref: '#/definitions/model.User'
+        "403":
+          description: Forbidden - Only admins can access this endpoint
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get User by ID
+      tags:
+      - Admin
+    patch:
+      consumes:
+      - application/json
+      description: Updates a user's details by their ID. Only accessible by admins.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated user details
+        in: body
+        name: updateUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated user details
+          schema:
+            $ref: '#/definitions/model.User'
+        "403":
+          description: Forbidden - Only admins can access this endpoint
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update User by ID
+      tags:
+      - Admin
   /intersections:
     get:
       consumes:
@@ -231,6 +440,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get All Intersections
       tags:
       - Intersections
@@ -264,10 +475,48 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create Intersection
       tags:
       - Intersections
   /intersections/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes the intersection with the given ID.
+      parameters:
+      - description: Intersection ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: 'Bad Request: Invalid input'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: 'Not Found: Intersection does not exist'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete Intersection
+      tags:
+      - Intersections
     get:
       consumes:
       - application/json
@@ -301,6 +550,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get Intersection by ID
       tags:
       - Intersections
@@ -343,6 +594,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update Intersection
       tags:
       - Intersections
@@ -401,6 +654,84 @@ paths:
       summary: User Logout
       tags:
       - Authentication
+  /me:
+    delete:
+      description: Deletes the profile of the currently authenticated user.
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized access
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete User Profile
+      tags:
+      - Profile
+    get:
+      description: Retrieves the profile of the currently authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile retrieved successfully
+          schema:
+            $ref: '#/definitions/model.User'
+        "401":
+          description: Unauthorized access
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get User Profile
+      tags:
+      - Profile
+    patch:
+      consumes:
+      - application/json
+      description: Updates the profile of the currently authenticated user.
+      parameters:
+      - description: User profile data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile updated successfully
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: 'Bad request: Validation error'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized access
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update User Profile
+      tags:
+      - Profile
   /register:
     post:
       consumes:

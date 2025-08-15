@@ -3,6 +3,7 @@ package util
 import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/optimisation"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -41,7 +42,27 @@ func RPCOptiParamToOptiParam(
 	}
 }
 
+func RPCOptiParamToOptiParamOp(
+	rpc *optimisation.OptimisationParameters,
+) model.OptimisationParameters {
+	return model.OptimisationParameters{
+		OptimisationType:     rpc.OptimisationType.String(),
+		SimulationParameters: RPCSimParamToSimParamOp(rpc.Parameters),
+	}
+}
+
 func RPCSimParamToSimParam(rpc *intersection.SimulationParameters) model.SimulationParameters {
+	return model.SimulationParameters{
+		IntersectionType: rpc.IntersectionType.String(),
+		Red:              int(rpc.Red),
+		Yellow:           int(rpc.Yellow),
+		Green:            int(rpc.Green),
+		Speed:            int(rpc.Speed),
+		Seed:             int(rpc.Seed),
+	}
+}
+
+func RPCSimParamToSimParamOp(rpc *optimisation.SimulationParameters) model.SimulationParameters {
 	return model.SimulationParameters{
 		IntersectionType: rpc.IntersectionType.String(),
 		Red:              int(rpc.Red),

@@ -24,7 +24,9 @@ func (suite *TestSuite) TestGetUserIntersectionIDs_Success() {
 
 	ctx := context.Background()
 
-	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer(suite.T())
+	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[userpb.IntersectionIDResponse](
+		suite.T(),
+	)
 
 	mockStream.On("Context").Return(ctx)
 
@@ -54,7 +56,9 @@ func (suite *TestSuite) TestGetUserIntersectionIDs_ServiceFailure() {
 
 	ctx := context.Background()
 
-	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer(suite.T())
+	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[userpb.IntersectionIDResponse](
+		suite.T(),
+	)
 
 	mockStream.On("Context").Return(ctx)
 
@@ -82,7 +86,9 @@ func (suite *TestSuite) TestGetUserIntersectionIDs_StreamSendFailure() {
 
 	ctx := context.Background()
 
-	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer(suite.T())
+	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[userpb.IntersectionIDResponse](
+		suite.T(),
+	)
 
 	mockStream.On("Context").Return(ctx)
 
@@ -112,7 +118,9 @@ func (suite *TestSuite) TestGetUserIntersectionIDs_EmptyList() {
 
 	ctx := context.Background()
 
-	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer(suite.T())
+	mockStream := grpcmocks.NewMockUserService_GetUserIntersectionIDsServer[userpb.IntersectionIDResponse](
+		suite.T(),
+	)
 
 	mockStream.On("Context").Return(ctx)
 

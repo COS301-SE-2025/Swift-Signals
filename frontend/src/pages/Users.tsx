@@ -147,14 +147,12 @@ const Users = () => {
     },
   ];
 
-  // Detect screen size and adjust rowsPerPage
   useEffect(() => {
     const mediaQuery = window.matchMedia(
       "(max-width: 1400px) and (max-height: 800px)",
     );
     const handleMediaChange = (e: MediaQueryListEvent | MediaQueryList) => {
       setRowsPerPage(e.matches ? 7 : 9);
-      // Reset to first page when rowsPerPage changes to avoid invalid page
       setCurrentPage(1);
     };
 
@@ -166,7 +164,6 @@ const Users = () => {
 
   const totalPages = Math.ceil(users.length / rowsPerPage);
 
-  // Calculate the start and end indices for the current page
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const currentUsers = users.slice(startIndex, endIndex);
@@ -178,7 +175,6 @@ const Users = () => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  // Generate page numbers with ellipsis
   const getPageNumbers = () => {
     const pageNumbers: (number | string)[] = [];
     const maxPagesToShow = 5;
@@ -207,7 +203,7 @@ const Users = () => {
     <div className="userBody min-h-screen bg-gray-100">
       <Navbar />
       <div className="user-main-content flex-grow">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="usersDisp max-w-6xl mx-auto px-4 py-8">
           <UsersTable
             users={currentUsers}
             onEdit={handleEdit}
@@ -247,7 +243,7 @@ const Users = () => {
                   onClick={() => goToPage(page)}
                   className={`px-4 py-2 rounded-full transition-colors duration-200 ${
                     currentPage === page
-                      ? "bg-blue-500 text-white"
+                      ? "bg-[#0F5BA7] text-white"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                   }`}
                 >

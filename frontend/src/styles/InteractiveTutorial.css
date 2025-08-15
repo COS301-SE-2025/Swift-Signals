@@ -5,15 +5,18 @@
   width: 100vw;
   height: 100vh;
   z-index: 10000;
+  pointer-events: auto;
+  background: rgba(0, 0, 0, 0.65); /* Darken everything behind */
 }
 
+/* Highlight the selected element with a cutout and glow */
 .tutorial-highlight {
   position: absolute;
   border-radius: 8px;
-  /* This box-shadow creates the "cutout" effect over the entire screen */
   box-shadow:
-    0 0 0 9999px rgba(0, 0, 0, 0.6),
-    0 0 15px rgba(0, 0, 0, 0.3);
+    0 0 0 9999px rgba(0, 0, 0, 0.65),
+    /* darken everything except highlight */ 0 0 24px 8px #4e8cff,
+    /* blue glow around highlight */ 0 0 0 2px #fff; /* white border for emphasis */
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   pointer-events: none; /* Allows clicks to go through to the popover */
 }
