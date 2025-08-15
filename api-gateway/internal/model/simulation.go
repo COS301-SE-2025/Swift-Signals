@@ -1,13 +1,16 @@
 package model
 
-type nodeType string
+type NodeType string
 
 const (
-	NodeTypePriority     nodeType = "PRIORITY"
-	NodeTypeTrafficLight nodeType = "TRAFFIC_LIGHT"
+	NodeTypePriority     NodeType = "PRIORITY"
+	NodeTypeTrafficLight NodeType = "TRAFFIC_LIGHT"
 )
 
-type SimulationResponse struct{}
+type SimulationResponse struct {
+	Results SimulationResults `json:"results"`
+	Output  SimulationOutput  `json:"output"`
+}
 
 type SimulationResults struct {
 	TotalVehicles      int     `json:"total_vehicles"       example:"100"`
@@ -38,7 +41,7 @@ type SimulationNode struct {
 	ID   string   `json:"id"   example:"node1"`
 	X    float64  `json:"x"    example:"100.0"`
 	Y    float64  `json:"y"    example:"200.0"`
-	Type nodeType `json:"type" example:"PRIORITY"`
+	Type NodeType `json:"type" example:"PRIORITY"`
 }
 
 type SimulationEdge struct {
