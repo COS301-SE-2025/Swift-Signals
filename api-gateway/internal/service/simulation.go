@@ -204,6 +204,9 @@ func (s *SimulationService) OptimiseIntersection(
 		intersectionID,
 		util.RPCOptiParamToOptiParamOp(response),
 	)
+	if err != nil {
+		return model.OptimisationResponse{}, err
+	}
 
 	return model.OptimisationResponse{Improved: resp.Improved}, nil
 }
