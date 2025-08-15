@@ -3,12 +3,10 @@ package test
 import (
 	"context"
 	"errors"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestAddIntersectionID_Success() {
@@ -285,8 +283,4 @@ func (suite *TestSuite) TestAddIntersectionID_InvalidUUIDFormat() {
 	suite.Equal("invalid input", svcError.Message)
 
 	suite.repo.AssertExpectations(suite.T())
-}
-
-func TestServiceAddIntersectionID(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

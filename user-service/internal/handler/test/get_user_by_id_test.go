@@ -3,13 +3,11 @@ package test
 import (
 	"context"
 	"errors"
-	"testing"
 	"time"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -67,8 +65,4 @@ func (suite *TestSuite) TestGetUserByID_Failure() {
 	suite.Equal("internal server error", st.Message())
 
 	suite.service.AssertExpectations(suite.T())
-}
-
-func TestHandlerGetUserByID(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

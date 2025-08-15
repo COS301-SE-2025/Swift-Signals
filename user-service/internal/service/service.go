@@ -3,7 +3,9 @@ package service
 import (
 	"context"
 	"errors"
+	"log"
 	"maps"
+	"os"
 	"slices"
 	"strings"
 	"time"
@@ -23,10 +25,48 @@ type Service struct {
 }
 
 func NewUserService(r db.UserRepository) UserService {
-	return &Service{
+	service := &Service{
 		repo:      r,
 		validator: validator.New(),
 	}
+
+	if err := service.ensureAdminExists(); err != nil {
+		log.Printf("Warning: Failed to create default admin user: %v", err)
+	}
+
+	return service
+}
+
+func (s *Service) ensureAdminExists() error {
+	ctx := context.Background()
+	exists, err := s.repo.AdminExists(ctx)
+	if err != nil {
+		return err
+	}
+	if !exists {
+		id := uuid.New().String()
+		name := os.Getenv("DEFAULT_USER_NAME")
+		email := os.Getenv("DEFAULT_USER_EMAIL")
+		password := os.Getenv("DEFAULT_USER_PASSWORD")
+		hashedPassword, _ := hashPassword(password)
+		defaultUser := &model.User{
+			ID:       id,
+			Name:     name,
+			Email:    normalizeEmail(email),
+			Password: string(hashedPassword),
+			IsAdmin:  true,
+		}
+		_, err := s.repo.CreateUser(ctx, defaultUser)
+		if err != nil {
+			var svcErr *errs.ServiceError
+			if errors.As(err, &svcErr) {
+				return err
+			}
+			return errs.NewInternalError("failed to create admin user", err, map[string]any{})
+		}
+		return nil
+	}
+	return nil
 }
 
 func (s *Service) RegisterUser(
@@ -79,6 +119,7 @@ func (s *Service) RegisterUser(
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: string(hashedPassword),
+		IsAdmin:  false,
 	}
 
 	createdUser, err := s.repo.CreateUser(ctx, user)

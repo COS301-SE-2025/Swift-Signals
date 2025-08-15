@@ -3,11 +3,9 @@ package test
 import (
 	"context"
 	"errors"
-	"testing"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -53,8 +51,4 @@ func (suite *TestSuite) TestMakeAdmin_Failure() {
 	suite.Equal("internal server error", st.Message())
 
 	suite.service.AssertExpectations(suite.T())
-}
-
-func TestHandlerMakeAdmin(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

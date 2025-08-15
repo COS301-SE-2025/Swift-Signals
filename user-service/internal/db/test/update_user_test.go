@@ -2,12 +2,10 @@ package test
 
 import (
 	"context"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/lib/pq"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestUpdateUser_Success() {
@@ -124,8 +122,4 @@ func (suite *TestSuite) TestUpdateUser_Column_Does_Not_Exist() {
 	suite.Equal(map[string]any{"column": "column that does not exist"}, svcError.Context)
 
 	suite.NoError(suite.mock.ExpectationsWereMet())
-}
-
-func TestDBUpdateUser(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

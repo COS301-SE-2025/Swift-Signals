@@ -2,12 +2,10 @@ package test
 
 import (
 	"errors"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/lib/pq"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestHandleDatabaseError_Unique_Constraint_Violation() {
@@ -187,8 +185,4 @@ func (suite *TestSuite) TestHandleDatabaseError_Uncaught_Code_Delete_Operation()
 	err := db.HandleDatabaseError(pqError, ctx)
 
 	suite.NoError(err)
-}
-
-func TestDBHandleDatabaseError(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

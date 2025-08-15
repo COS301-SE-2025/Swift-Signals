@@ -2,12 +2,10 @@ package test
 
 import (
 	"context"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/lib/pq"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestCreateUser_Success() {
@@ -149,8 +147,4 @@ func (suite *TestSuite) TestCreateUser_Field_Too_Long() {
 	suite.Equal(map[string]any{"column": "column where field is too long"}, svcError.Context)
 
 	suite.NoError(suite.mock.ExpectationsWereMet())
-}
-
-func TestDBRegisterUser(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

@@ -2,10 +2,8 @@ package test
 
 import (
 	"context"
-	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestGetIntersectionsByUserID_Success() {
@@ -40,8 +38,4 @@ func (suite *TestSuite) TestGetIntersectionsByUserID_ScanError() {
 	suite.Require().Error(err)
 	suite.Nil(result)
 	suite.NoError(suite.mock.ExpectationsWereMet())
-}
-
-func TestDBGetIntersectinsByUserID(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }

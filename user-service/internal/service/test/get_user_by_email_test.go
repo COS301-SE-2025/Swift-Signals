@@ -3,12 +3,10 @@ package test
 import (
 	"context"
 	"errors"
-	"testing"
 
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
 )
 
 func (suite *TestSuite) TestGetUserByEmail_Success() {
@@ -153,8 +151,4 @@ func (suite *TestSuite) TestGetUserByEmail_ServiceErrorPropagation() {
 	suite.Equal("user not found", svcError.Message)
 
 	suite.repo.AssertExpectations(suite.T())
-}
-
-func TestServiceGetUserByEmail(t *testing.T) {
-	suite.Run(t, new(TestSuite))
 }
