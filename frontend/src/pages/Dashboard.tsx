@@ -31,7 +31,15 @@ interface Intersection {
 }
 
 interface ApiIntersection {
-  details: {
+  id: string;
+  name: string;
+  created_at?: string;
+  run_count?: number;
+  status?: string;
+  details?: {
+    address?: string;
+    city?: string;
+    province?: string;
     latitude?: number;
     longitude?: number;
     [key: string]: unknown;
@@ -70,12 +78,6 @@ const simulations = [
   },
 ];
 
-const topIntersections = [
-  { name: "Main St & 5th Ave", volume: 15000, volumeText: "15,000 vehicles" },
-  { name: "Broadway & 7th St", volume: 13500, volumeText: "13,500 vehicles" },
-  { name: "Park Ave & 3rd St", volume: 12000, volumeText: "12,000 vehicles" },
-];
-
 const Dashboard: React.FC = () => {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
@@ -84,100 +86,191 @@ const Dashboard: React.FC = () => {
   const [isLoadingMap, setIsLoadingMap] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (chartRef.current) {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-      const ctx = chartRef.current.getContext("2d");
-      if (!ctx) return;
+  const [recentIntersections, setRecentIntersections] = useState<ApiIntersection[]>([]);
+  const [loadingRecent, setLoadingRecent] = useState(false);
+  const [recentError, setRecentError] = useState<string | null>(null);
 
-      const isDarkMode = document.documentElement.classList.contains("dark");
+  const [totalIntersections, setTotalIntersections] = useState<number>(0);
+  const [loadingTotal, setLoadingTotal] = useState(false);
 
-      const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-      gradient.addColorStop(0, "rgba(15, 91, 167, 0.4)");
-      gradient.addColorStop(1, "rgba(15, 91, 167, 0)");
+  const [allIntersections, setAllIntersections] = useState<ApiIntersection[]>([]);
 
-      const labelColor = isDarkMode ? "#F0F6FC" : "#6B7280";
-      const gridColor = isDarkMode ? "#30363D" : "#E5E7EB";
-
-      chartInstanceRef.current = new Chart(ctx, {
-        type: "line",
-        data: {
-          labels: ["6 AM", "7 AM", "8 AM", "9 AM", "10 AM"],
-          datasets: [
-            {
-              label: "Traffic Volume",
-              data: [5000, 10000, 8000, 12000, 9000],
-              fill: true,
-              backgroundColor: gradient,
-              borderColor: "#0F5BA7",
-              borderWidth: 2.5,
-              pointRadius: 0,
-              pointHoverRadius: 8,
-              pointHoverBackgroundColor: "#0F5BA7",
-              pointHoverBorderColor: "#0066CC",
-              tension: 0.4,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          interaction: { mode: "index", intersect: false },
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: {
-                color: labelColor,
-                font: { size: 12, family: "'Inter', sans-serif" },
-              },
-              border: { display: false },
-            },
-            y: {
-              grid: { color: gridColor, drawTicks: false },
-              ticks: {
-                color: labelColor,
-                stepSize: 2500,
-                font: { size: 12, family: "'Inter', sans-serif" },
-                padding: 10,
-              },
-              border: { display: false },
-            },
-          },
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              enabled: true,
-              backgroundColor: "#111827",
-              titleColor: "#F9FAFB",
-              bodyColor: "#E5E7EB",
-              cornerRadius: 8,
-              padding: 12,
-              titleFont: {
-                weight: "bold",
-                size: 14,
-                family: "'Inter', sans-serif",
-              },
-              bodyFont: { size: 12, family: "'Inter', sans-serif" },
-              displayColors: false,
-              caretPadding: 10,
-            },
-          },
-        },
+  const fetchAllIntersections = async () => {
+    setLoadingTotal(true);
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await fetch("http://localhost:9090/intersections", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-    }
-    return () => {
+      if (!response.ok) throw new Error("Failed to fetch intersections");
+      const data = await response.json();
+      const items: ApiIntersection[] = data.intersections || [];
+
+      setAllIntersections(items);
+      setTotalIntersections(items.length);
+
+      updateChart(items);
+    } catch (err: unknown) {
+      console.error("Failed to fetch intersections:", err);
+      setTotalIntersections(0);
+      setAllIntersections([]);
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
         chartInstanceRef.current = null;
       }
-    };
+    } finally {
+      setLoadingTotal(false);
+    }
+  };
+
+  const updateChart = (intersections: ApiIntersection[]) => {
+    if (!chartRef.current) return;
+
+    if (chartInstanceRef.current) {
+      chartInstanceRef.current.destroy();
+    }
+
+    const ctx = chartRef.current.getContext("2d");
+    if (!ctx) return;
+
+    const chartData = processRunCountData(intersections);
+
+    const isDarkMode = document.documentElement.classList.contains("dark");
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+    gradient.addColorStop(0, "rgba(37, 99, 235, 0.4)");
+    gradient.addColorStop(1, "rgba(37, 99, 235, 0)");
+
+    const labelColor = isDarkMode ? "#F0F6FC" : "#6B7280";
+    const gridColor = isDarkMode ? "#30363D" : "#E5E7EB";
+
+    const maxY = Math.max(...chartData.data);
+    const step = Math.max(1, Math.ceil(maxY / 5) || 1);
+
+    chartInstanceRef.current = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: chartData.labels,
+        datasets: [
+          {
+            label: "Optimization Runs (Cumulative)",
+            data: chartData.data,
+            fill: true,
+            backgroundColor: gradient,
+            borderColor: "#0f5ba7",
+            borderWidth: 2.5,
+            pointRadius: 4,
+            pointHoverRadius: 8,
+            pointHoverBackgroundColor: "#0f5ba7",
+            pointHoverBorderColor: "#0f5ba7",
+            tension: 0.4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: labelColor,
+              font: { size: 12, family: "'Inter', sans-serif" },
+            },
+            border: { display: false },
+          },
+          y: {
+            grid: { color: gridColor, drawTicks: false },
+            ticks: {
+              color: labelColor,
+              stepSize: step,
+              font: { size: 12, family: "'Inter', sans-serif" },
+              padding: 10,
+            },
+            border: { display: false },
+          },
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            enabled: true,
+            backgroundColor: "#111827",
+            titleColor: "#F9FAFB",
+            bodyColor: "#E5E7EB",
+            cornerRadius: 8,
+            padding: 12,
+            titleFont: {
+              weight: "bold",
+              size: 14,
+              family: "'Inter', sans-serif",
+            },
+            bodyFont: { size: 12, family: "'Inter', sans-serif" },
+            displayColors: false,
+            caretPadding: 10,
+            callbacks: {
+              title: function (context) {
+                return `${context[0].label}`;
+              },
+              label: function (context) {
+                return `Total Runs: ${context.parsed.y}`;
+              },
+            },
+          },
+        },
+      },
+    });
+  };
+
+  const processRunCountData = (intersections: ApiIntersection[]) => {
+    const withDates = intersections.filter((i) => i.created_at);
+    if (withDates.length === 0) {
+      return { labels: ["No Data"], data: [0] };
+    }
+
+    const sorted = withDates.sort(
+      (a, b) =>
+        new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
+    );
+
+    const perDay: Record<string, number> = {};
+    sorted.forEach((i) => {
+      const label = new Date(i.created_at!).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+      perDay[label] = (perDay[label] || 0) + (typeof i.run_count === "number" ? i.run_count : 0);
+    });
+
+    const labels = Object.keys(perDay);
+    const data: number[] = [];
+    let running = 0;
+    labels.forEach((d) => {
+      running += perDay[d];
+      data.push(running);
+    });
+
+    const last = labels.slice(-5);
+    const lastData = data.slice(-5);
+
+    if (last.length === 0) return { labels: ["No Data"], data: [0] };
+
+    while (last.length < 5) {
+      const nextDate = new Date();
+      nextDate.setDate(nextDate.getDate() + last.length);
+      last.push(
+        nextDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      );
+      lastData.push(lastData[lastData.length - 1]);
+    }
+
+    return { labels: last, data: lastData };
+  };
+
+  useEffect(() => {
+    fetchAllIntersections();
   }, []);
 
-  const maxVolume = Math.max(...topIntersections.map((i) => i.volume), 0);
-
-  // Fetch intersections for map modal
   const fetchMapIntersections = async () => {
     setIsLoadingMap(true);
     setMapError(null);
@@ -188,13 +281,16 @@ const Dashboard: React.FC = () => {
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");
       const data = await response.json();
-      const intersectionsWithCoords = (data.intersections || []).map(
+      const intersectionsWithCoords: Intersection[] = (data.intersections || []).map(
         (intr: ApiIntersection, idx: number) => ({
-          ...intr,
+          id: String(intr.id),
+          name: intr.name ?? "Unnamed",
           details: {
-            ...intr.details,
-            latitude: intr.details.latitude ?? -25.7479 + 0.01 * idx,
-            longitude: intr.details.longitude ?? 28.2293 + 0.01 * idx,
+            address: intr.details?.address ?? "",
+            city: intr.details?.city ?? "",
+            province: intr.details?.province ?? "",
+            latitude: intr.details?.latitude ?? -25.7479 + 0.01 * idx,
+            longitude: intr.details?.longitude ?? 28.2293 + 0.01 * idx,
           },
         }),
       );
@@ -207,6 +303,41 @@ const Dashboard: React.FC = () => {
       setIsLoadingMap(false);
     }
   };
+
+  const fetchRecentIntersections = async () => {
+    setLoadingRecent(true);
+    setRecentError(null);
+    try {
+      const token = localStorage.getItem("authToken");
+      const response = await fetch("http://localhost:9090/intersections", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!response.ok) throw new Error("Failed to fetch intersections");
+      const data = await response.json();
+      const items: ApiIntersection[] = data.intersections || [];
+
+      const sorted = items
+        .slice()
+        .sort((a, b) => {
+          const at = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const bt = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return bt - at;
+        })
+        .slice(0, 5);
+
+      setRecentIntersections(sorted);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      setRecentError(errorMessage);
+      setRecentIntersections([]);
+    } finally {
+      setLoadingRecent(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRecentIntersections();
+  }, []);
 
   const handleOpenMapModal = () => {
     setIsMapModalOpen(true);
@@ -227,7 +358,9 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <h3 className="card-h3">Total Intersections</h3>
-              <p className="card-p">24</p>
+              <p className="card-p">
+                {loadingTotal ? "..." : totalIntersections}
+              </p>
             </div>
           </div>
           <div className="card">
@@ -318,12 +451,9 @@ const Dashboard: React.FC = () => {
           <div className="side-column">
             <div className="graph-card bg-white dark:bg-gray-800 rounded-lg shadow-md">
               <div className="graph-card-header">
-                <h2 className="text-xl font-semibold text-gray-800 dark:text-[#E6EDF3]">
-                  Traffic Volume
+                <h2 className="text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] text-align-center">
+                  Optimization Runs Over Time
                 </h2>
-                <button className="view-report-button">
-                  View Report <FaArrowRight />
-                </button>
               </div>
               <div className="traffic-chart-container">
                 <canvas ref={chartRef}></canvas>
@@ -333,36 +463,53 @@ const Dashboard: React.FC = () => {
             <div className="inter-card bg-white dark:bg-gray-800 rounded-lg shadow-md">
               <div className="inter-card-header">
                 <h3 className="text-xl font-semibold text-gray-800 dark:text-[#E6EDF3]">
-                  Top Intersections
+                  Recent Intersections
                 </h3>
               </div>
               <div className="intersection-list">
-                {topIntersections.map((intersection, index) => {
-                  const percentage =
-                    maxVolume > 0 ? (intersection.volume / maxVolume) * 100 : 0;
-                  return (
-                    <div key={index} className="intersection-item">
-                      <div className="intersection-details">
-                        <span className="intersection-name">
-                          {intersection.name}
-                        </span>
-                        <span className="intersection-volume">
-                          {intersection.volumeText}
-                        </span>
+                {loadingRecent && (
+                  <div className="p-3 text-gray-600 dark:text-[#C9D1D9]">
+                    Loading...
+                  </div>
+                )}
+                {recentError && (
+                  <div className="p-3 text-red-600">{recentError}</div>
+                )}
+                {!loadingRecent &&
+                  !recentError &&
+                  recentIntersections.map((intr) => {
+                    const address =
+                      intr.details?.address ||
+                      [intr.details?.city, intr.details?.province]
+                        .filter(Boolean)
+                        .join(", ") ||
+                      "No address";
+                    return (
+                      <div key={intr.id} className="intersection-item">
+                        <div className="intersection-details">
+                          <span className="intersection-name">
+                            {intr.name}
+                          </span>
+                          <span className="intersection-volume">
+                            {address}
+                          </span>
+                        </div>
                       </div>
-                      <div className="progress-bar-container">
-                        <div
-                          className="progress-bar"
-                          style={{ width: `${percentage}%` }}
-                        ></div>
-                      </div>
+                    );
+                  })}
+                {!loadingRecent &&
+                  !recentError &&
+                  recentIntersections.length === 0 && (
+                    <div className="p-3 text-gray-600 dark:text-[#C9D1D9]">
+                      No intersections yet.
                     </div>
-                  );
-                })}
+                  )}
               </div>
               <div className="inter-card-footer">
-                <span>Avg Daily Volume:</span>
-                <span className="font-semibold">12,000 vehicles</span>
+                <span>Total:</span>
+                <span className="font-semibold">
+                  {totalIntersections}
+                </span>
               </div>
             </div>
           </div>
