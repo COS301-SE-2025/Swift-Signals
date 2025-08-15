@@ -9,9 +9,28 @@ import type { ChartConfiguration } from "chart.js";
 
 Chart.register(...registerables);
 
+// #region API Integration
+const API_BASE_URL = "http://localhost:9090";
+
+const getAuthToken = () => {
+  return localStorage.getItem("authToken");
+};
+
+// Types based on the API Swagger definition
+interface ApiSimulationResults {
+  average_speed: number;
+  average_travel_time: number;
+  average_waiting_time: number;
+  total_vehicles: number;
+  total_travel_time: number;
+  // Other fields from model.SimulationResults can be added here
+}
+
 type Position = { time: number; x: number; y: number; speed: number };
 type Vehicle = { id: string; positions: Position[] };
-type SimulationData = {
+
+// This type now matches the 'output' part of the API's SimulationResponse
+type SimulationOutput = {
   name?: string;
   description?: string;
   intersections?: string[];
@@ -22,7 +41,9 @@ type SimulationData = {
     }[];
   };
 };
+// #endregion
 
+// #region Helper Functions (Unchanged)
 function computeStats(vehicles: Vehicle[]) {
   let totalSpeed = 0,
     maxSpeed = -Infinity,
@@ -164,27 +185,34 @@ function downsampleData<TLabel, TData>(
 
   return { downsampledLabels, downsampledData };
 }
+// #endregion
 
 const SimulationResults: React.FC = () => {
-  const [simData, setSimData] = useState<SimulationData | null>(null);
-  const [optimizedData, setOptimizedData] = useState<SimulationData | null>(
+  const [simData, setSimData] = useState<SimulationOutput | null>(null);
+  const [optimizedData, setOptimizedData] = useState<SimulationOutput | null>(
     null,
   );
+  const [apiResults, setApiResults] = useState<ApiSimulationResults | null>(
+    null,
+  );
+  const [optimizedApiResults, setOptimizedApiResults] =
+    useState<ApiSimulationResults | null>(null);
+
   const [showOptimized, setShowOptimized] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [optimizing, setOptimizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [optimizedDataExists, setOptimizedDataExists] = useState(false);
+  const [canBeOptimized, setCanBeOptimized] = useState(false);
+
   const location = useLocation();
   const simInfo = location.state || {};
 
-  const simName = simInfo.name || simData?.name || "Simulation";
-  const simDesc = simInfo.description || simData?.description || "";
-  const simIntersections =
-    simInfo.intersections || simData?.intersections || [];
+  // Extract details passed from the Simulations page
+  const intersectionId = simInfo.intersectionIds?.[0];
+  const simName = simInfo.name || "Simulation";
+  const simDesc = simInfo.description || "";
+  const simIntersections = simInfo.intersections || [];
 
   const chartInstances = useRef<Chart[]>([]);
-
   const chartRefs = {
     avgSpeedRef: useRef<HTMLCanvasElement | null>(null),
     vehCountRef: useRef<HTMLCanvasElement | null>(null),
@@ -192,93 +220,69 @@ const SimulationResults: React.FC = () => {
     totalDistHistRef: useRef<HTMLCanvasElement | null>(null),
   };
 
-  // Load original simulation data
+  // Fetch data from API on component mount
   useEffect(() => {
-    fetch("/simulation_output (1).json")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setSimData(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(
-          "Failed to load simulation data. Please check the file path and format.",
-        );
-        setLoading(false);
-        console.error(err);
-      });
-  }, []);
+    if (!intersectionId) {
+      setError("No intersection ID provided to display results.");
+      setLoading(false);
+      return;
+    }
 
-  // Check if optimized data exists and load it
-  useEffect(() => {
-    fetch("/optimized_output.json")
-      .then((res) => {
-        if (!res.ok) {
-          // File doesn't exist or can't be accessed
-          setOptimizedDataExists(false);
-          return null;
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const authToken = getAuthToken();
+        const headers = { Authorization: `Bearer ${authToken}` };
+
+        // Fetch standard simulation data
+        const simRes = await fetch(
+          `${API_BASE_URL}/intersections/${intersectionId}/simulate`,
+          { headers },
+        );
+        if (!simRes.ok) {
+          throw new Error(
+            `Failed to fetch simulation data: ${simRes.statusText}`,
+          );
         }
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          setOptimizedData(data);
-          setOptimizedDataExists(true);
+        const simResponseData = await simRes.json();
+        setSimData(simResponseData.output);
+        setApiResults(simResponseData.results);
+
+        // Check for and fetch optimized data
+        const optRes = await fetch(
+          `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
+          { headers },
+        );
+        if (optRes.ok) {
+          const optResponseData = await optRes.json();
+          setOptimizedData(optResponseData.output);
+          setOptimizedApiResults(optResponseData.results);
+          setCanBeOptimized(true); // Optimized data is available
+          // If the user came here from running an optimization, show it by default
+          if (simInfo.type === "optimizations") {
+            setShowOptimized(true);
+          }
+        } else {
+          setCanBeOptimized(false);
         }
-      })
-      .catch((err) => {
-        console.log("Optimized data file not found or invalid:", err);
-        setOptimizedDataExists(false);
-      });
-  }, []);
+      } catch (err: any) {
+        setError(err.message || "Failed to load data from the API.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [intersectionId, simInfo.type]);
 
   const handleOptimize = () => {
-    if (!optimizedDataExists) {
-      setError(
-        "No optimized data available. Please run the optimization first.",
-      );
-      return;
+    if (canBeOptimized) {
+      setShowOptimized(!showOptimized);
     }
-
-    if (showOptimized) {
-      setShowOptimized(false);
-      return;
-    }
-
-    if (optimizedData) {
-      // Data is already loaded, just show it
-      setShowOptimized(true);
-      return;
-    }
-
-    // Load optimized data if not already loaded
-    setOptimizing(true);
-    fetch("/optimized_output.json")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setOptimizedData(data);
-        setShowOptimized(true);
-        setOptimizing(false);
-      })
-      .catch((err) => {
-        setError(
-          "Failed to load optimized data. Please check if the optimization has been run.",
-        );
-        setOptimizing(false);
-        console.error(err);
-      });
   };
 
+  // Render charts when data changes
   useEffect(() => {
     chartInstances.current.forEach((c) => c?.destroy());
     chartInstances.current = [];
@@ -602,7 +606,7 @@ const SimulationResults: React.FC = () => {
   if (loading)
     return (
       <div className="text-center text-gray-700 dark:text-gray-300 py-10">
-        Loading simulation data...
+        Loading simulation data from API...
       </div>
     );
   if (error)
@@ -614,6 +618,7 @@ const SimulationResults: React.FC = () => {
       </div>
     );
 
+  // Use a mix of API results (for accuracy) and locally computed stats (for graphs/details)
   const stats = computeStats(simData.vehicles);
   const optStats =
     showOptimized && optimizedData && optimizedData.vehicles
@@ -673,27 +678,18 @@ const SimulationResults: React.FC = () => {
               </button>
               <button
                 onClick={handleOptimize}
-                disabled={optimizing || !optimizedDataExists}
+                disabled={!canBeOptimized}
                 className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
-                  optimizing
-                    ? "bg-gray-500 cursor-not-allowed"
-                    : !optimizedDataExists
-                      ? "bg-gray-600 cursor-not-allowed"
-                      : "bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:scale-105 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
+                  !canBeOptimized
+                    ? "bg-gray-600 cursor-not-allowed"
+                    : "bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:scale-105 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
                 }`}
               >
-                {optimizing ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Loading...
-                  </div>
-                ) : !optimizedDataExists ? (
-                  "No Optimized Data"
-                ) : showOptimized ? (
-                  "Hide Optimization"
-                ) : (
-                  "Show Optimization"
-                )}
+                {!canBeOptimized
+                  ? "Not Optimized"
+                  : showOptimized
+                    ? "Hide Optimization"
+                    : "Show Optimization"}
               </button>
             </div>
           </div>
@@ -724,14 +720,14 @@ const SimulationResults: React.FC = () => {
                   Average Speed
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
-                  {stats ? stats.avgSpeed.toFixed(2) : "..."}{" "}
+                  {apiResults ? apiResults.average_speed.toFixed(2) : "..."}{" "}
                   <span className="text-sm text-[#0F5BA7] font-normal">
                     m/s
                   </span>
                 </div>
-                {showOptimized && optStats && (
+                {showOptimized && optimizedApiResults && (
                   <div className="text-lg font-semibold text-[#2B9348] mt-1">
-                    {optStats.avgSpeed.toFixed(2)}{" "}
+                    {optimizedApiResults.average_speed.toFixed(2)}{" "}
                     <span className="text-xs text-[#2B9348] font-normal">
                       m/s
                     </span>
@@ -798,11 +794,11 @@ const SimulationResults: React.FC = () => {
                   # Vehicles
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
-                  {stats ? stats.vehicleCount : "..."}
+                  {apiResults ? apiResults.total_vehicles : "..."}
                 </div>
-                {showOptimized && optStats && (
+                {showOptimized && optimizedApiResults && (
                   <div className="text-lg font-semibold text-[#2B9348] mt-1">
-                    {optStats.vehicleCount}
+                    {optimizedApiResults.total_vehicles}
                   </div>
                 )}
               </div>
