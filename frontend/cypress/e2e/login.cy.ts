@@ -50,6 +50,24 @@ describe("Login Page", () => {
     cy.contains('Login failed. Server says: "Invalid credentials"').should("exist");
   });
 
+  it("opens forgot password modal and submits reset request", () => {
+    cy.contains("Forgot Password?").click();
+    cy.contains("Reset Password").should("exist");
+
+    cy.get("input[name='resetEmail']").type("reset@example.com");
+
+    cy.intercept("POST", "http://localhost:9090/reset-password", {
+      statusCode: 200,
+      body: {
+        message: "Password reset instructions sent to your email.",
+      },
+    }).as("resetRequest");
+
+    cy.contains("Send Reset Link").click();
+    cy.wait("@resetRequest");
+    cy.contains("Password reset instructions sent to your email.").should("exist");
+  });
+
   
 });
 
