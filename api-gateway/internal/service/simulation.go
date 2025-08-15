@@ -93,7 +93,7 @@ func (s *SimulationService) GetOptimisedData(
 	ctx context.Context,
 	intersectionID string,
 ) (model.SimulationResponse, error) {
-	logger := middleware.LoggerFromContext(context.Background()).With(
+	logger := middleware.LoggerFromContext(ctx).With(
 		"service", "simulation",
 	)
 
