@@ -144,7 +144,6 @@ func setupRoutes(
 	mux.HandleFunc("POST /intersections", intersectionHandler.CreateIntersection)
 	mux.HandleFunc("PATCH /intersections/{id}", intersectionHandler.UpdateIntersection)
 	mux.HandleFunc("DELETE /intersections/{id}", intersectionHandler.DeleteIntersection)
-	mux.HandleFunc("POST /intersections/{id}/optimise", NotImplemented)
 	mux.HandleFunc("GET /intersections/simple", NotImplemented)
 	log.Println("Initialized Intersection Handlers.")
 

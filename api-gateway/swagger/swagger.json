@@ -518,6 +518,128 @@
                 }
             }
         },
+        "/intersections/{id}/optimise": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Generates and returns optimised simulation data for a specific intersection.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulation"
+                ],
+                "summary": "Get Optimised Simulation Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful optimised simulation data retrieval",
+                        "schema": {
+                            "$ref": "#/definitions/model.SimulationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input parameters",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection not found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/intersections/{id}/simulate": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Generates and returns simulation data for a specific intersection.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulation"
+                ],
+                "summary": "Get Simulation Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful simulation data retrieval",
+                        "schema": {
+                            "$ref": "#/definitions/model.SimulationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input parameters",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection not found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/login": {
             "post": {
                 "description": "Authenticates a user and returns an authentication token.",
@@ -1014,6 +1136,17 @@
                 }
             }
         },
+        "model.NodeType": {
+            "type": "string",
+            "enum": [
+                "PRIORITY",
+                "TRAFFIC_LIGHT"
+            ],
+            "x-enum-varnames": [
+                "NodeTypePriority",
+                "NodeTypeTrafficLight"
+            ]
+        },
         "model.OptimisationParameters": {
             "type": "object",
             "properties": {
@@ -1023,6 +1156,27 @@
                 },
                 "simulation_parameters": {
                     "$ref": "#/definitions/model.SimulationParameters"
+                }
+            }
+        },
+        "model.Position": {
+            "type": "object",
+            "properties": {
+                "speed": {
+                    "type": "number",
+                    "example": 50
+                },
+                "time": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "x": {
+                    "type": "number",
+                    "example": 100
+                },
+                "y": {
+                    "type": "number",
+                    "example": 200
                 }
             }
         },
@@ -1082,6 +1236,123 @@
                 }
             }
         },
+        "model.SimulationConn": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "string",
+                    "example": "node1"
+                },
+                "fromLane": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "tl": {
+                    "type": "integer"
+                },
+                "to": {
+                    "type": "string",
+                    "example": "node2"
+                },
+                "toLane": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "model.SimulationEdge": {
+            "type": "object",
+            "properties": {
+                "from": {
+                    "type": "string",
+                    "example": "node1"
+                },
+                "id": {
+                    "type": "string",
+                    "example": "edge1"
+                },
+                "lanes": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "speed": {
+                    "type": "number",
+                    "example": 50
+                },
+                "to": {
+                    "type": "string",
+                    "example": "node2"
+                }
+            }
+        },
+        "model.SimulationIntersection": {
+            "type": "object",
+            "properties": {
+                "connections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationConn"
+                    }
+                },
+                "edges": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationEdge"
+                    }
+                },
+                "nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationNode"
+                    }
+                },
+                "trafficLights": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationTrafficLight"
+                    }
+                }
+            }
+        },
+        "model.SimulationNode": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "node1"
+                },
+                "type": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.NodeType"
+                        }
+                    ],
+                    "example": "PRIORITY"
+                },
+                "x": {
+                    "type": "number",
+                    "example": 100
+                },
+                "y": {
+                    "type": "number",
+                    "example": 200
+                }
+            }
+        },
+        "model.SimulationOutput": {
+            "type": "object",
+            "properties": {
+                "intersection": {
+                    "$ref": "#/definitions/model.SimulationIntersection"
+                },
+                "vehicles": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationVehicle"
+                    }
+                }
+            }
+        },
         "model.SimulationParameters": {
             "type": "object",
             "required": [
@@ -1120,6 +1391,109 @@
                     "type": "integer",
                     "minimum": 1,
                     "example": 2
+                }
+            }
+        },
+        "model.SimulationPhase": {
+            "type": "object",
+            "properties": {
+                "duration": {
+                    "type": "integer",
+                    "example": 30
+                },
+                "state": {
+                    "type": "string",
+                    "example": "GREEN"
+                }
+            }
+        },
+        "model.SimulationResponse": {
+            "type": "object",
+            "properties": {
+                "output": {
+                    "$ref": "#/definitions/model.SimulationOutput"
+                },
+                "results": {
+                    "$ref": "#/definitions/model.SimulationResults"
+                }
+            }
+        },
+        "model.SimulationResults": {
+            "type": "object",
+            "properties": {
+                "average_speed": {
+                    "type": "number",
+                    "example": 50
+                },
+                "average_travel_time": {
+                    "type": "number",
+                    "example": 300
+                },
+                "average_waiting_time": {
+                    "type": "number",
+                    "example": 60
+                },
+                "emergency_brakes": {
+                    "type": "integer",
+                    "example": 5
+                },
+                "emergency_stops": {
+                    "type": "integer",
+                    "example": 3
+                },
+                "generated_vehicles": {
+                    "type": "integer",
+                    "example": 120
+                },
+                "near_collisions": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "total_travel_time": {
+                    "type": "number",
+                    "example": 30000
+                },
+                "total_vehicles": {
+                    "type": "integer",
+                    "example": 100
+                },
+                "total_waiting_time": {
+                    "type": "number",
+                    "example": 6000
+                }
+            }
+        },
+        "model.SimulationTrafficLight": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "tl1"
+                },
+                "phases": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.SimulationPhase"
+                    }
+                },
+                "type": {
+                    "type": "string",
+                    "example": "FIXED"
+                }
+            }
+        },
+        "model.SimulationVehicle": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "vehicle1"
+                },
+                "positions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Position"
+                    }
                 }
             }
         },
