@@ -121,18 +121,6 @@ func setupRoutes(
 	mux.HandleFunc("POST /reset-password", authHandler.ResetPassword)
 	log.Println("Initialized Auth Handlers.")
 
-	// Intersection routes
-	intersectionService := service.NewIntersectionService(intrClient, optiClient, userClient)
-	intersectionHandler := handler.NewIntersectionHandler(intersectionService)
-	mux.HandleFunc("GET /intersections", intersectionHandler.GetAllIntersections)
-	mux.HandleFunc("GET /intersections/{id}", intersectionHandler.GetIntersection)
-	mux.HandleFunc("POST /intersections", intersectionHandler.CreateIntersection)
-	mux.HandleFunc("PATCH /intersections/{id}", intersectionHandler.UpdateIntersection)
-	mux.HandleFunc("DELETE /intersections/{id}", intersectionHandler.DeleteIntersection)
-	mux.HandleFunc("POST /intersections/{id}/optimise", NotImplemented)
-	mux.HandleFunc("GET /intersections/simple", NotImplemented)
-	log.Println("Initialized Intersection Handlers.")
-
 	// Profile routes
 	profileService := service.NewProfileService(userClient)
 	profileHandler := handler.NewProfileHandler(profileService)
@@ -147,6 +135,23 @@ func setupRoutes(
 	mux.HandleFunc("GET /users/{id}", adminHandler.GetUserByID)
 	mux.HandleFunc("PATCH /users/{id}", adminHandler.UpdateUserByID)
 	mux.HandleFunc("DELETE /users/{id}", adminHandler.DeleteUserByID)
+
+	// Intersection routes
+	intersectionService := service.NewIntersectionService(intrClient, optiClient, userClient)
+	intersectionHandler := handler.NewIntersectionHandler(intersectionService)
+	mux.HandleFunc("GET /intersections", intersectionHandler.GetAllIntersections)
+	mux.HandleFunc("GET /intersections/{id}", intersectionHandler.GetIntersection)
+	mux.HandleFunc("POST /intersections", intersectionHandler.CreateIntersection)
+	mux.HandleFunc("PATCH /intersections/{id}", intersectionHandler.UpdateIntersection)
+	mux.HandleFunc("DELETE /intersections/{id}", intersectionHandler.DeleteIntersection)
+	mux.HandleFunc("POST /intersections/{id}/optimise", NotImplemented)
+	mux.HandleFunc("GET /intersections/simple", NotImplemented)
+	log.Println("Initialized Intersection Handlers.")
+
+	// Simulation routes
+	mux.HandleFunc("GET /intersections/{id}/simulate", NotImplemented)
+	mux.HandleFunc("GET /intersections/{id}/optimise", NotImplemented)
+	mux.HandleFunc("POST /intersections/{id}/optimise", NotImplemented)
 
 	// Swagger
 	mux.Handle("/docs/", httpSwagger.WrapHandler)
