@@ -16,6 +16,15 @@ describe("Users Page", () => {
       .contains("td", "Admin")
       .should("exist");
   });
+
+  it("has working edit and delete buttons for each row", () => {
+    cy.get("table.usersTable tbody tr").each(($row) => {
+      cy.wrap($row).within(() => {
+        cy.get("button[aria-label='Edit user']").should("exist").click();
+        cy.get("button[aria-label='Delete user']").should("exist").click();
+      });
+    });
+  });
   
 });
 
