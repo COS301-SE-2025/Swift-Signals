@@ -68,6 +68,20 @@ describe("Login Page", () => {
     cy.contains("Password reset instructions sent to your email.").should("exist");
   });
 
+  it("shows error for invalid reset email", () => {
+    cy.contains("Forgot Password?").click();
+
+    cy.get("input[name='resetEmail']").type("fail@example.com");
+    cy.intercept("POST", "http://localhost:9090/reset-password", {
+      statusCode: 400,
+      body: { message: "Reset failed. Email not found." },
+    }).as("resetFail");
+
+    cy.contains("Send Reset Link").click();
+    cy.wait("@resetFail");
+    cy.contains("Reset failed. Email not found.").should("exist");
+  });
+
   
 });
 
