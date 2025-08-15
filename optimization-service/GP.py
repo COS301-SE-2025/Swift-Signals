@@ -1,24 +1,15 @@
 import os
 import random
-import subprocess
 import json
-import pickle
 from datetime import datetime
 from deap import base, creator, tools
 from tqdm import tqdm
 
-# Paths
-SIM_SCRIPT = "../simulation-service/SimLoad.py"
-PARAMS_FOLDER = "../simulation-service/parameters"
-RESULTS_FOLDER = "../simulation-service/out/results"
-RESULT_FILE_TEMPLATE = os.path.join(RESULTS_FOLDER, "simulation_results_{}.json")
-REFERENCE_RESULT = "../simulation-service/out/results/simulation_results.json"
-BEST_PARAM_OUTPUT = "out/best_parameters.json"
-ALL_RESULTS_CSV = "ga_results/all_individuas_log.csv"
+from client.simulation import SimulationClient
 
-# Track files for cleanup
-generated_param_files = []
-generated_result_files = []
+# Local paths for optimization service
+BEST_PARAM_OUTPUT = "out/best_parameters.json"
+ALL_RESULTS_CSV = "ga_results/all_individuals_log.csv"
 
 # Fitness setup
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -64,236 +55,299 @@ def custom_mutate(individual, indpb=0.2, min_speed=40):
 toolbox.register("mutate", custom_mutate)
 
 
-def run_simulation(individual):
-    green, yellow, red, speed, seed = individual
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-    param_file = os.path.join(PARAMS_FOLDER, f"params_Trafficlight_{timestamp}.json")
-    result_file = RESULT_FILE_TEMPLATE.format(timestamp)
+class OptimizationEngine:
+    def __init__(self, simulation_server_address=None):
+        """
+        Initialize the optimization engine with gRPC simulation client
 
-    generated_param_files.append(param_file)
-    generated_result_files.append(result_file)
+        Args:
+            simulation_server_address: Address of the simulation service (default: localhost:50053)
+        """
+        self.simulation_client = SimulationClient(simulation_server_address)
+        self.generated_logs = []
 
-    params = {
-        "intersection": {
-            "name": "Trafficlight",
-            "Traffic Density": 2,
-            "simulation_parameters": {
-                "Intersection Type": 1,
-                "Green": green,
-                "Yellow": yellow,
-                "Red": red,
-                "Speed": speed,
-                "seed": seed,
-            },
-            "output_path": result_file,
-        }
-    }
+    def run_simulation(self, individual):
+        """
+        Run simulation using gRPC client instead of subprocess
 
-    os.makedirs(PARAMS_FOLDER, exist_ok=True)
-    with open(param_file, "w") as f:
-        json.dump(params, f)
+        Args:
+            individual: List containing [green, yellow, red, speed, seed]
 
-    try:
-        subprocess.run(["python3", SIM_SCRIPT], input=param_file.encode(), check=True)
-    except subprocess.CalledProcessError:
-        return None
+        Returns:
+            dict or None: Simulation results or None if failed
+        """
+        green, yellow, red, speed, seed = individual
 
-    try:
-        with open(result_file, "r") as f:
-            result_data = json.load(f)
-        return result_data["intersection"]["results"]
-    except:
-        return None
-
-
-def evaluate_waiting_and_travel(individual):
-    result = run_simulation(individual)
-    if result is None:
-        return (1e6,)
-
-    waiting = result.get("Total Waiting Time", 1e6)
-    travel = result.get("Total Travel Time", 1e6)
-    return (0.9 * waiting + 0.3 * travel,)  # Weighted objective
-
-
-def evaluate_safety_given_waiting(individual):
-    if individual[3] < 60:
-        return (1e6,)  # Penalize unsafe speeds below 60
-
-    result = run_simulation(individual)
-    if result is None:
-        return (1e6,)
-
-    brakes = result.get("Emergency Brakes", 0)
-    stops = result.get("Emergency Stops", 0)
-    collisions = result.get("Near collisions", 0)
-    waiting = result.get("Total Waiting Time", 0)
-
-    fitness = 1000 * brakes + 1000 * stops + 20000 * collisions + 0.9 * waiting
-    return (fitness,)
-
-
-def log_individual_to_file(individual, generation, ind_id):
-    os.makedirs("ga_results", exist_ok=True)
-    with open(ALL_RESULTS_CSV, "a") as f:
-        f.write(
-            f"{generation},{ind_id},{individual[0]},{individual[1]},{individual[2]},"
-            f"{individual[3]},{individual[4]},{individual.fitness.values[0]}\n"
-        )
-
-
-def run_ga(pop, hof, ngen, cxpb, mutpb, label="GA"):
-    stats = tools.Statistics(lambda ind: ind.fitness.values[0])
-    stats.register("avg", lambda fits: sum(fits) / len(fits))
-    stats.register("min", min)
-
-    logbook = tools.Logbook()
-    logbook.header = ["gen", "nevals"] + stats.fields
-
-    for gen in range(ngen + 1):
-        if gen == 0:
-            invalid_ind = pop
-        else:
-            offspring = toolbox.select(pop, len(pop))
-            offspring = list(map(toolbox.clone, offspring))
-
-            for child1, child2 in zip(offspring[::2], offspring[1::2]):
-                if random.random() < cxpb:
-                    toolbox.mate(child1, child2)
-                    del child1.fitness.values
-                    del child2.fitness.values
-
-            for mutant in offspring:
-                if random.random() < mutpb:
-                    toolbox.mutate(mutant)
-                    del mutant.fitness.values
-
-            invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
-            pop[:] = offspring
-
-        with tqdm(total=len(invalid_ind), desc=f"{label} Gen {gen}") as pbar:
-            for i, ind in enumerate(invalid_ind):
-                ind.fitness.values = toolbox.evaluate(ind)
-                log_individual_to_file(ind, generation=gen, ind_id=i)
-                pbar.update(1)
-
-        hof.update(pop)
-        record = stats.compile(pop)
-        logbook.record(gen=gen, nevals=len(invalid_ind), **record)
-
-
-def run_final_simulation_and_compare(best_params):
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
-    final_param_file = os.path.join(PARAMS_FOLDER, f"final_params_{timestamp}.json")
-    final_result_file = os.path.join(
-        RESULTS_FOLDER,
-        f"final_simulation_result_{timestamp}.json",
-    )
-
-    params = {
-        "intersection": {
-            "name": "Trafficlight",
-            "Traffic Density": 2,
-            "simulation_parameters": {
-                "Intersection Type": 1,
-                "Green": best_params["Green"],
-                "Yellow": best_params["Yellow"],
-                "Red": best_params["Red"],
-                "Speed": best_params["Speed"],
-                "seed": best_params["Seed"],
-            },
-            "output_path": final_result_file,
-        }
-    }
-
-    with open(final_param_file, "w") as f:
-        json.dump(params, f)
-
-    try:
-        subprocess.run(
-            ["python3", SIM_SCRIPT, "--params", final_param_file], check=True
-        )
-    except subprocess.CalledProcessError as e:
-        print(f"Final simulation failed: {e}")
-        return
-
-    try:
-        with open(final_result_file, "r") as f:
-            final_results = json.load(f)["intersection"]["results"]
-        with open(REFERENCE_RESULT, "r") as f:
-            reference_results = json.load(f)["intersection"]["results"]
-    except Exception as e:
-        print(f"Failed to read final or reference results: {e}")
-        return
-
-    print("\n--- Final Comparison ---")
-    print(f"{'Metric':<25}{'Optimized':>15}{'Reference':>15}")
-    for metric in [
-        "Total Waiting Time",
-        "Total Travel Time",
-        "Emergency Brakes",
-        "Emergency Stops",
-        "Near collisions",
-    ]:
-        opt = final_results.get(metric, "N/A")
-        ref = reference_results.get(metric, "N/A")
-        print(f"{metric:<25}{str(opt):>15}{str(ref):>15}")
-
-
-def cleanup_files():
-    for fpath in generated_param_files + generated_result_files:
         try:
-            os.remove(fpath)
-        except Exception:
-            pass
+            result = self.simulation_client.get_simulation_results(
+                green=green,
+                yellow=yellow,
+                red=red,
+                speed=speed,
+                seed=seed
+            )
+            return result
+        except Exception as e:
+            print(f"Simulation failed for individual {individual}: {e}")
+            return None
+
+    def evaluate_waiting_and_travel(self, individual):
+        """
+        Evaluate individual based on waiting and travel time
+        """
+        result = self.run_simulation(individual)
+        if result is None:
+            return (1e6,)
+
+        waiting = result.get("Total Waiting Time", 1e6)
+        travel = result.get("Total Travel Time", 1e6)
+        return (0.9 * waiting + 0.3 * travel,)  # Weighted objective
+
+    def evaluate_safety_given_waiting(self, individual):
+        """
+        Evaluate individual based on safety metrics with speed constraints
+        """
+        if individual[3] < 60:
+            return (1e6,)  # Penalize unsafe speeds below 60
+
+        result = self.run_simulation(individual)
+        if result is None:
+            return (1e6,)
+
+        brakes = result.get("Emergency Brakes", 0)
+        stops = result.get("Emergency Stops", 0)
+        collisions = result.get("Near collisions", 0)
+        waiting = result.get("Total Waiting Time", 0)
+
+        fitness = 1000 * brakes + 1000 * stops + 20000 * collisions + 0.9 * waiting
+        return (fitness,)
+
+    def log_individual_to_file(self, individual, generation, ind_id):
+        """
+        Log individual results to CSV file
+        """
+        os.makedirs("ga_results", exist_ok=True)
+        with open(ALL_RESULTS_CSV, "a") as f:
+            f.write(
+                f"{generation},{ind_id},{individual[0]},{individual[1]},{individual[2]},"
+                f"{individual[3]},{individual[4]},{individual.fitness.values[0]}\n"
+            )
+
+    def run_ga(self, pop, hof, ngen, cxpb, mutpb, label="GA"):
+        """
+        Run genetic algorithm with progress tracking
+        """
+        stats = tools.Statistics(lambda ind: ind.fitness.values[0])
+        stats.register("avg", lambda fits: sum(fits) / len(fits))
+        stats.register("min", min)
+
+        logbook = tools.Logbook()
+        logbook.header = ["gen", "nevals"] + stats.fields
+
+        for gen in range(ngen + 1):
+            if gen == 0:
+                invalid_ind = pop
+            else:
+                offspring = toolbox.select(pop, len(pop))
+                offspring = list(map(toolbox.clone, offspring))
+
+                for child1, child2 in zip(offspring[::2], offspring[1::2]):
+                    if random.random() < cxpb:
+                        toolbox.mate(child1, child2)
+                        del child1.fitness.values
+                        del child2.fitness.values
+
+                for mutant in offspring:
+                    if random.random() < mutpb:
+                        toolbox.mutate(mutant)
+                        del mutant.fitness.values
+
+                invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+                pop[:] = offspring
+
+            with tqdm(total=len(invalid_ind), desc=f"{label} Gen {gen}") as pbar:
+                for i, ind in enumerate(invalid_ind):
+                    ind.fitness.values = toolbox.evaluate(ind)
+                    self.log_individual_to_file(ind, generation=gen, ind_id=i)
+                    pbar.update(1)
+
+            hof.update(pop)
+            record = stats.compile(pop)
+            logbook.record(gen=gen, nevals=len(invalid_ind), **record)
+
+        return logbook
+
+    def get_final_comparison(self, best_params, reference_results=None):
+        """
+        Get final simulation results for comparison
+
+        Args:
+            best_params: Dictionary with optimized parameters
+            reference_results: Optional reference results for comparison
+
+        Returns:
+            dict: Final simulation results and comparison
+        """
+        try:
+            final_results = self.simulation_client.get_simulation_results(
+                green=best_params["Green"],
+                yellow=best_params["Yellow"],
+                red=best_params["Red"],
+                speed=best_params["Speed"],
+                seed=best_params["Seed"]
+            )
+
+            comparison = {
+                "optimized_results": final_results,
+                "reference_results": reference_results,
+                "comparison": {}
+            }
+
+            if reference_results:
+                for metric in [
+                    "Total Waiting Time",
+                    "Total Travel Time",
+                    "Emergency Brakes",
+                    "Emergency Stops",
+                    "Near collisions",
+                ]:
+                    opt_val = final_results.get(metric, "N/A")
+                    ref_val = reference_results.get(metric, "N/A")
+                    comparison["comparison"][metric] = {
+                        "optimized": opt_val,
+                        "reference": ref_val,
+                        "improvement": ref_val - opt_val if isinstance(opt_val, (int, float)) and isinstance(ref_val, (int, float)) else "N/A"
+                    }
+
+            return comparison
+
+        except Exception as e:
+            print(f"Failed to get final comparison: {e}")
+            return {"error": str(e)}
+
+    def run_optimization(self, ngen_waiting=30, ngen_safety=10, pop_size=30, cxpb=0.5, mutpb=0.3, random_seed=1408):
+        """
+        Run the complete optimization process
+
+        Args:
+            ngen_waiting: Generations for waiting time optimization
+            ngen_safety: Generations for safety optimization
+            pop_size: Population size
+            cxpb: Crossover probability
+            mutpb: Mutation probability
+            random_seed: Random seed for reproducibility
+
+        Returns:
+            dict: Complete optimization results
+        """
+        # Set random seed
+        random.seed(random_seed)
+
+        optimization_results = {
+            "parameters": {
+                "ngen_waiting": ngen_waiting,
+                "ngen_safety": ngen_safety,
+                "pop_size": pop_size,
+                "cxpb": cxpb,
+                "mutpb": mutpb,
+                "random_seed": random_seed
+            },
+            "phases": {},
+            "best_parameters": {},
+            "final_comparison": {}
+        }
+
+        try:
+            # Phase 1: Minimize waiting time
+            print("\n--- Phase 1: Minimizing Waiting Time ---")
+            toolbox.register("evaluate", self.evaluate_waiting_and_travel)
+            toolbox.register("mutate", lambda ind: custom_mutate(ind, indpb=0.2, min_speed=60))
+
+            pop = toolbox.population(n=pop_size)
+            hof_wait = tools.HallOfFame(3)
+
+            # Initialize CSV log
+            os.makedirs("ga_results", exist_ok=True)
+            with open(ALL_RESULTS_CSV, "w") as f:
+                f.write("generation,individual_id,green,yellow,red,speed,seed,fitness\n")
+
+            logbook_waiting = self.run_ga(pop, hof_wait, ngen_waiting, cxpb, mutpb, label="WaitingTime")
+            optimization_results["phases"]["waiting_time"] = {
+                "hall_of_fame": [
+                    {
+                        "parameters": {"Green": ind[0], "Yellow": ind[1], "Red": ind[2], "Speed": ind[3], "Seed": ind[4]},
+                        "fitness": ind.fitness.values[0]
+                    } for ind in hof_wait
+                ],
+                "logbook": str(logbook_waiting)
+            }
+
+            # Phase 2: Minimize safety issues
+            print("\n--- Phase 2: Minimizing Safety Hazards ---")
+            toolbox.register("evaluate", self.evaluate_safety_given_waiting)
+            toolbox.register("mutate", lambda ind: custom_mutate(ind, indpb=0.2, min_speed=60))
+
+            pop2 = [toolbox.clone(ind) for ind in hof_wait]
+            pop2 += toolbox.population(n=pop_size - len(pop2))
+            hof_safety = tools.HallOfFame(1)
+
+            logbook_safety = self.run_ga(pop2, hof_safety, ngen_safety, cxpb, mutpb, label="Safety")
+            optimization_results["phases"]["safety"] = {
+                "hall_of_fame": [
+                    {
+                        "parameters": {"Green": ind[0], "Yellow": ind[1], "Red": ind[2], "Speed": ind[3], "Seed": ind[4]},
+                        "fitness": ind.fitness.values[0]
+                    } for ind in hof_safety
+                ],
+                "logbook": str(logbook_safety)
+            }
+
+            # Extract best parameters
+            best = hof_safety[0]
+            best_params = {
+                "Green": best[0],
+                "Yellow": best[1],
+                "Red": best[2],
+                "Speed": best[3],
+                "Seed": best[4],
+                "Fitness": best.fitness.values[0],
+            }
+
+            optimization_results["best_parameters"] = best_params
+
+            # Optionally save to file for debugging/logging
+            os.makedirs("out", exist_ok=True)
+            with open(BEST_PARAM_OUTPUT, "w") as f:
+                json.dump(best_params, f, indent=2)
+
+            # Get final comparison
+            final_comparison = self.get_final_comparison(best_params)
+            optimization_results["final_comparison"] = final_comparison
+
+            print("\nOptimization completed successfully!")
+            print("Best Parameters Found:")
+            print(json.dumps(best_params, indent=2))
+
+            return optimization_results
+
+        except Exception as e:
+            print(f"Optimization failed: {e}")
+            optimization_results["error"] = str(e)
+            return optimization_results
+
+        finally:
+            # Clean up gRPC connection
+            self.simulation_client.close()
 
 
 def main():
-    random.seed(1408)
-    ngen_waiting = 30
-    ngen_safety = 10
-    pop_size = 30
-    cxpb = 0.5
-    mutpb = 0.3
+    """
+    Main function for standalone execution
+    """
+    engine = OptimizationEngine()
+    results = engine.run_optimization()
+    return results
 
-    # Phase 1: Minimize waiting time
-    print("\n--- Phase 1: Minimizing Waiting Time ---")
-    toolbox.register("evaluate", evaluate_waiting_and_travel)
-    toolbox.register("mutate", lambda ind: custom_mutate(ind, indpb=0.2, min_speed=60))
-    pop = toolbox.population(n=pop_size)
-    hof_wait = tools.HallOfFame(3)
-    with open(ALL_RESULTS_CSV, "w") as f:
-        f.write("generation,individual_id,green,yellow,red,speed,seed,fitness\n")
-    run_ga(pop, hof_wait, ngen_waiting, cxpb, mutpb, label="WaitingTime")
-
-    # Phase 2: Minimize safety issues
-    print("\n--- Phase 2: Minimizing Safety Hazards ---")
-    toolbox.register("evaluate", evaluate_safety_given_waiting)
-    toolbox.register("mutate", lambda ind: custom_mutate(ind, indpb=0.2, min_speed=60))
-    pop2 = [toolbox.clone(ind) for ind in hof_wait]
-    pop2 += toolbox.population(n=pop_size - len(pop2))
-    hof_safety = tools.HallOfFame(1)
-    run_ga(pop2, hof_safety, ngen_safety, cxpb, mutpb, label="Safety")
-
-    # Save and compare best
-    os.makedirs("out", exist_ok=True)
-    best = hof_safety[0]
-    best_params = {
-        "Green": best[0],
-        "Yellow": best[1],
-        "Red": best[2],
-        "Speed": best[3],
-        "Seed": best[4],
-        "Fitness": best.fitness.values[0],
-    }
-    with open(BEST_PARAM_OUTPUT, "w") as f:
-        json.dump(best_params, f, indent=2)
-
-    print("\nBest Parameters Found:")
-    print(json.dumps(best_params, indent=2))
-
-    run_final_simulation_and_compare(best_params)
-    cleanup_files()
 
 if __name__ == "__main__":
     main()
