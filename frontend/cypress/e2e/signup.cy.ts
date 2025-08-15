@@ -18,5 +18,26 @@ describe("SignUp Page", () => {
     cy.contains("Please fill in all fields.").should("exist");
   });
 
+  it("registers successfully with valid input", () => {
+    cy.intercept("POST", "http://localhost:9090/register", {
+      statusCode: 200,
+      body: {
+        message: "Registration successful",
+      },
+    }).as("register");
+
+    cy.get("input[name='username']").type("newuser");
+    cy.get("input[name='email']").type("newuser@example.com");
+    cy.get("input[name='password']").type("mypassword123");
+
+    cy.contains("Register").click();
+
+    cy.wait("@register");
+    cy.contains("Registration successful! Redirecting to login...").should("exist");
+
+    // Wait for redirect
+    cy.url({ timeout: 5000 }).should("include", "/login");
+  });
+
 });
 
