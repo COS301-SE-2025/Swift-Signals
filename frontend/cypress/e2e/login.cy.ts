@@ -51,6 +51,7 @@ describe("Login Page", () => {
   });
 
   it("opens forgot password modal and submits reset request", () => {
+    // Open modal
     cy.contains("Forgot Password?").click();
     cy.contains("Reset Password").should("exist");
 
@@ -102,6 +103,8 @@ describe("Login Page", () => {
     });
   });
 
-  
+  it("navigates to signup on Register Here button click", () => {
+    cy.contains("Register Here").click();
+    cy.url().should("include", "/signup");
+  });
 });
-
