@@ -25,6 +25,12 @@ describe("Users Page", () => {
       });
     });
   });
+
+  it("paginates to the next page", () => {
+    cy.get("tbody tr").first().should("contain", "John Doe"); 
+    cy.get("button[aria-label='Next page']").click();
+    cy.get("tbody tr").first().should("not.contain", "John Doe");
+  });
   
 });
 
