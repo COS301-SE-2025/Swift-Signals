@@ -5,6 +5,7 @@ import (
 
 	mocks "github.com/COS301-SE-2025/Swift-Signals/user-service/internal/mocks/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/service"
+	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -16,6 +17,7 @@ type TestSuite struct {
 
 func (suite *TestSuite) SetupTest() {
 	suite.repo = new(mocks.MockUserRepository)
+	suite.repo.On("AdminExists", mock.Anything).Return(true, nil)
 	suite.service = service.NewUserService(suite.repo)
 }
 
