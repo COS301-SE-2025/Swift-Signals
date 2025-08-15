@@ -14,7 +14,11 @@ describe("Dashboard Page", () => {
     cy.contains("156").should("exist");
   });
 
-  
+  it("shows quick action buttons", () => {
+    cy.contains("New Intersection").should("exist");
+    cy.contains("Run Simulation").should("exist");
+    cy.contains("View Map").should("exist");
+  });
   
 });
 
