@@ -135,6 +135,14 @@ definitions:
         example: Logout successful
         type: string
     type: object
+  model.NodeType:
+    enum:
+    - PRIORITY
+    - TRAFFIC_LIGHT
+    type: string
+    x-enum-varnames:
+    - NodeTypePriority
+    - NodeTypeTrafficLight
   model.OptimisationParameters:
     properties:
       optimisation_type:
@@ -142,6 +150,27 @@ definitions:
         type: string
       simulation_parameters:
         $ref: '#/definitions/model.SimulationParameters'
+    type: object
+  model.OptimisationResponse:
+    properties:
+      improved:
+        example: true
+        type: boolean
+    type: object
+  model.Position:
+    properties:
+      speed:
+        example: 50
+        type: number
+      time:
+        example: 0
+        type: integer
+      x:
+        example: 100
+        type: number
+      "y":
+        example: 200
+        type: number
     type: object
   model.RegisterRequest:
     properties:
@@ -183,6 +212,85 @@ definitions:
         example: Password reset instructions sent to your email.
         type: string
     type: object
+  model.SimulationConn:
+    properties:
+      from:
+        example: node1
+        type: string
+      fromLane:
+        example: 1
+        type: integer
+      tl:
+        type: integer
+      to:
+        example: node2
+        type: string
+      toLane:
+        example: 1
+        type: integer
+    type: object
+  model.SimulationEdge:
+    properties:
+      from:
+        example: node1
+        type: string
+      id:
+        example: edge1
+        type: string
+      lanes:
+        example: 2
+        type: integer
+      speed:
+        example: 50
+        type: number
+      to:
+        example: node2
+        type: string
+    type: object
+  model.SimulationIntersection:
+    properties:
+      connections:
+        items:
+          $ref: '#/definitions/model.SimulationConn'
+        type: array
+      edges:
+        items:
+          $ref: '#/definitions/model.SimulationEdge'
+        type: array
+      nodes:
+        items:
+          $ref: '#/definitions/model.SimulationNode'
+        type: array
+      trafficLights:
+        items:
+          $ref: '#/definitions/model.SimulationTrafficLight'
+        type: array
+    type: object
+  model.SimulationNode:
+    properties:
+      id:
+        example: node1
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/model.NodeType'
+        example: PRIORITY
+      x:
+        example: 100
+        type: number
+      "y":
+        example: 200
+        type: number
+    type: object
+  model.SimulationOutput:
+    properties:
+      intersection:
+        $ref: '#/definitions/model.SimulationIntersection'
+      vehicles:
+        items:
+          $ref: '#/definitions/model.SimulationVehicle'
+        type: array
+    type: object
   model.SimulationParameters:
     properties:
       green:
@@ -214,6 +322,78 @@ definitions:
     - seed
     - speed
     - yellow
+    type: object
+  model.SimulationPhase:
+    properties:
+      duration:
+        example: 30
+        type: integer
+      state:
+        example: GREEN
+        type: string
+    type: object
+  model.SimulationResponse:
+    properties:
+      output:
+        $ref: '#/definitions/model.SimulationOutput'
+      results:
+        $ref: '#/definitions/model.SimulationResults'
+    type: object
+  model.SimulationResults:
+    properties:
+      average_speed:
+        example: 50
+        type: number
+      average_travel_time:
+        example: 300
+        type: number
+      average_waiting_time:
+        example: 60
+        type: number
+      emergency_brakes:
+        example: 5
+        type: integer
+      emergency_stops:
+        example: 3
+        type: integer
+      generated_vehicles:
+        example: 120
+        type: integer
+      near_collisions:
+        example: 2
+        type: integer
+      total_travel_time:
+        example: 30000
+        type: number
+      total_vehicles:
+        example: 100
+        type: integer
+      total_waiting_time:
+        example: 6000
+        type: number
+    type: object
+  model.SimulationTrafficLight:
+    properties:
+      id:
+        example: tl1
+        type: string
+      phases:
+        items:
+          $ref: '#/definitions/model.SimulationPhase'
+        type: array
+      type:
+        example: FIXED
+        type: string
+    type: object
+  model.SimulationVehicle:
+    properties:
+      id:
+        example: vehicle1
+        type: string
+      positions:
+        items:
+          $ref: '#/definitions/model.Position'
+        type: array
     type: object
   model.UpdateIntersectionRequest:
     properties:
@@ -599,6 +779,124 @@ paths:
       summary: Update Intersection
       tags:
       - Intersections
+  /intersections/{id}/optimise:
+    get:
+      consumes:
+      - application/json
+      description: Generates and returns optimised simulation data for a specific
+        intersection.
+      parameters:
+      - description: Intersection ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful optimised simulation data retrieval
+          schema:
+            $ref: '#/definitions/model.SimulationResponse'
+        "400":
+          description: 'Bad Request: Invalid input parameters'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: 'Not Found: Intersection not found'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Optimised Simulation Data
+      tags:
+      - Simulation
+    post:
+      consumes:
+      - application/json
+      description: Runs optimisation for a specific intersection and returns if there
+        was an improvement.
+      parameters:
+      - description: Intersection ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful optimisation run
+          schema:
+            $ref: '#/definitions/model.OptimisationResponse'
+        "400":
+          description: 'Bad Request: Invalid input parameters'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: 'Not Found: Intersection not found'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Run Optimisation
+      tags:
+      - Simulation
+  /intersections/{id}/simulate:
+    get:
+      consumes:
+      - application/json
+      description: Generates and returns simulation data for a specific intersection.
+      parameters:
+      - description: Intersection ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful simulation data retrieval
+          schema:
+            $ref: '#/definitions/model.SimulationResponse'
+        "400":
+          description: 'Bad Request: Invalid input parameters'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: 'Not Found: Intersection not found'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Simulation Data
+      tags:
+      - Simulation
   /login:
     post:
       consumes:

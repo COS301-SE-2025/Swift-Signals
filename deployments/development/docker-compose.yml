@@ -105,6 +105,9 @@ services:
       APP_PORT: 9090
       USER_GRPC_ADDR: user-service:50051
       INTR_GRPC_ADDR: intersection-service:50052
+      SIMU_GRPC_ADDR: simulation-service:50053
+      OPTI_GRPC_ADDR: optimisation-service:50054
+
     ports:
       - "9090:9090"
     networks:
