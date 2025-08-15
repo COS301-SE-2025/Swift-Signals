@@ -34,6 +34,101 @@ interface CreateIntersectionModalProps {
   isEditing: boolean;
 }
 
+interface DeleteConfirmationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  intersectionName: string;
+  isLoading: boolean;
+}
+
+const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  intersectionName,
+  isLoading,
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+      <div className="bg-white dark:bg-[#161B22] p-8 rounded-xl shadow-2xl w-full max-w-lg relative border border-gray-200 dark:border-[#30363D] transform transition-all duration-200 scale-100">
+        <button
+          onClick={onClose}
+          disabled={isLoading}
+          className="absolute top-5 right-5 text-gray-400 dark:text-[#7D8590] hover:text-gray-600 dark:hover:text-[#E6EDF3] transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <X size={24} />
+        </button>
+        
+        <div className="text-center mb-8">
+          <div className="mx-auto mb-4 w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
+            <svg
+              className="w-8 h-8 text-red-600 dark:text-red-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+          </div>
+          
+          <h2 className="text-2xl font-bold mb-3 text-gray-900 dark:text-[#E6EDF3]">
+            Delete Intersection?
+          </h2>
+          
+          <div className="space-y-2">
+            <p className="text-gray-700 dark:text-[#C9D1D9]">
+              You're about to permanently delete
+            </p>
+            <p className="text-lg font-semibold text-gray-900 dark:text-[#E6EDF3] bg-gray-50 dark:bg-[#21262D] px-3 py-2 rounded-lg border border-gray-200 dark:border-[#30363D]">
+              "{intersectionName}"
+            </p>
+            <p className="text-sm text-red-600 dark:text-red-400 font-medium mt-3">
+              ⚠️ This action cannot be undone
+            </p>
+          </div>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isLoading}
+            className="flex-1 px-6 py-3 bg-gray-100 dark:bg-[#21262D] border-2 border-gray-300 dark:border-[#30363D] text-gray-700 dark:text-[#C9D1D9] rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-[#30363D] focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-[#30363D] transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="flex-1 px-6 py-3 bg-red-600 dark:bg-[#DA3633] text-white rounded-lg font-medium hover:bg-red-700 dark:hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Deleting...
+              </>
+            ) : (
+              "Delete Intersection"
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   isOpen,
   onClose,
@@ -43,27 +138,29 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   initialData,
   isEditing,
 }) => {
-  const [formData, setFormData] = useState<IntersectionFormData>(
-    initialData || {
-      name: "",
-      traffic_density: "low",
-      details: { address: "", city: "Pretoria", province: "Gauteng" },
-      default_parameters: {
-        green: 10,
-        yellow: 3,
-        red: 5,
-        speed: 60,
-        seed: Math.floor(Math.random() * 10000000000),
-        intersection_type: "traffic light",
-      },
-    }
-  );
+  const getDefaultFormData = (): IntersectionFormData => ({
+    name: "",
+    traffic_density: "low",
+    details: { address: "", city: "Pretoria", province: "Gauteng" },
+    default_parameters: {
+      green: 10,
+      yellow: 3,
+      red: 5,
+      speed: 60,
+      seed: Math.floor(Math.random() * 10000000000),
+      intersection_type: "traffic light",
+    },
+  });
+
+  const [formData, setFormData] = useState<IntersectionFormData>(getDefaultFormData());
 
   useEffect(() => {
-    if (initialData) {
+    if (isEditing && initialData) {
       setFormData(initialData);
+    } else if (!isEditing) {
+      setFormData(getDefaultFormData());
     }
-  }, [initialData]);
+  }, [initialData, isEditing, isOpen]);
 
   if (!isOpen) return null;
 
@@ -286,6 +383,13 @@ const Intersections = () => {
   >(null);
   const [editData, setEditData] = useState<IntersectionFormData | null>(null);
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [intersectionToDelete, setIntersectionToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const fetchIntersections = async () => {
     setIsLoading(true);
     setError(null);
@@ -385,6 +489,52 @@ const Intersections = () => {
     }
   };
 
+  const handleDeleteClick = (id: string) => {
+    const intersection = intersections.find((i) => i.id === id);
+    if (!intersection) return;
+    
+    setIntersectionToDelete({
+      id: intersection.id,
+      name: intersection.name,
+    });
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!intersectionToDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/intersections/${intersectionToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${getAuthToken()}`,
+          },
+        }
+      );
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to delete intersection");
+      }
+
+      setIsDeleteModalOpen(false);
+      setIntersectionToDelete(null);
+
+      if (searchQuery.trim() === intersectionToDelete.id) {
+        setSearchQuery("");
+      }
+      
+      fetchIntersections();
+    } catch (err: any) {
+      setError(err.message || "Failed to delete intersection");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleEditClick = (id: string) => {
     const intersection = intersections.find((i) => i.id === id);
     if (!intersection) return;
@@ -438,7 +588,7 @@ const Intersections = () => {
               <div className="searchContainer relative w-full max-w-md">
                 <input
                   type="text"
-                  placeholder="Search by Name or ID..."
+                  placeholder="Search by Name..."
                   className="searchBar w-full pl-4 pr-10 py-2 border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -451,6 +601,8 @@ const Intersections = () => {
                 onClick={() => {
                   setIsEditing(false);
                   setEditData(null);
+                  setSelectedIntersectionId(null);
+                  setCreateError(null);
                   setIsModalOpen(true);
                 }}
                 className="addIntersectionBtn flex-shrink-0 bg-[#0F5BA7] dark:bg-[#388BFD] hover:bg-[#3DAEF0] text-white font-medium py-2 px-4 rounded-md"
@@ -475,7 +627,7 @@ const Intersections = () => {
                     lanes={intersection.default_parameters.intersection_type}
                     onSimulate={(id) => console.log(`Simulate ${id}`)}
                     onEdit={handleEditClick}
-                    onDelete={(id) => console.log(`Delete ${id}`)}
+                    onDelete={handleDeleteClick}
                   />
                 ))
               ) : (
@@ -492,7 +644,13 @@ const Intersections = () => {
 
       <CreateIntersectionModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setCreateError(null);
+          if (!isEditing) {
+            setEditData(null);
+          }
+        }}
         onSubmit={
           isEditing ? handleUpdateIntersection : handleCreateIntersection
         }
@@ -500,6 +658,17 @@ const Intersections = () => {
         error={createError}
         initialData={editData}
         isEditing={isEditing}
+      />
+
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setIntersectionToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        intersectionName={intersectionToDelete?.name || ""}
+        isLoading={isDeleting}
       />
     </>
   );
