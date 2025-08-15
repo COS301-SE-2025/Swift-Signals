@@ -2,6 +2,10 @@ package model
 
 type NodeType string
 
+type OptimisationResponse struct {
+	Improved bool `json:"improved" example:"true"`
+}
+
 const (
 	NodeTypePriority     NodeType = "PRIORITY"
 	NodeTypeTrafficLight NodeType = "TRAFFIC_LIGHT"
