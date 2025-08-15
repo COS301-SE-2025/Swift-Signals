@@ -151,6 +151,12 @@ definitions:
       simulation_parameters:
         $ref: '#/definitions/model.SimulationParameters'
     type: object
+  model.OptimisationResponse:
+    properties:
+      improved:
+        example: true
+        type: boolean
+    type: object
   model.Position:
     properties:
       speed:
@@ -811,6 +817,45 @@ paths:
       security:
       - BearerAuth: []
       summary: Get Optimised Simulation Data
+      tags:
+      - Simulation
+    post:
+      consumes:
+      - application/json
+      description: Runs optimisation for a specific intersection and returns if there
+        was an improvement.
+      parameters:
+      - description: Intersection ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful optimisation run
+          schema:
+            $ref: '#/definitions/model.OptimisationResponse'
+        "400":
+          description: 'Bad Request: Invalid input parameters'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: 'Not Found: Intersection not found'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Run Optimisation
       tags:
       - Simulation
   /intersections/{id}/simulate:

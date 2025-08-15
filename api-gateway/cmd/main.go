@@ -148,9 +148,11 @@ func setupRoutes(
 	log.Println("Initialized Intersection Handlers.")
 
 	// Simulation routes
-	mux.HandleFunc("GET /intersections/{id}/simulate", NotImplemented)
-	mux.HandleFunc("GET /intersections/{id}/optimise", NotImplemented)
-	mux.HandleFunc("POST /intersections/{id}/optimise", NotImplemented)
+	simulationService := service.NewSimulationService(intrClient, optiClient, userClient)
+	simulationHandler := handler.NewSimulationHandler(simulationService)
+	mux.HandleFunc("GET /intersections/{id}/simulate", simulationHandler.GetSimulation)
+	mux.HandleFunc("GET /intersections/{id}/optimise", simulationHandler.GetOptimisedSimulation)
+	mux.HandleFunc("POST /intersections/{id}/optimise", simulationHandler.RunOptimisation)
 
 	// Swagger
 	mux.Handle("/docs/", httpSwagger.WrapHandler)

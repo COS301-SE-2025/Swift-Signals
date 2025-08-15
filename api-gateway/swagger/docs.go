@@ -580,6 +580,65 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Runs optimisation for a specific intersection and returns if there was an improvement.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Simulation"
+                ],
+                "summary": "Run Optimisation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Intersection ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful optimisation run",
+                        "schema": {
+                            "$ref": "#/definitions/model.OptimisationResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Invalid input parameters",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized: Token missing or invalid",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found: Intersection not found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/intersections/{id}/simulate": {
@@ -1159,6 +1218,15 @@ const docTemplate = `{
                 },
                 "simulation_parameters": {
                     "$ref": "#/definitions/model.SimulationParameters"
+                }
+            }
+        },
+        "model.OptimisationResponse": {
+            "type": "object",
+            "properties": {
+                "improved": {
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },
