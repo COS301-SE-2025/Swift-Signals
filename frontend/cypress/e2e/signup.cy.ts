@@ -39,5 +39,23 @@ describe("SignUp Page", () => {
     cy.url({ timeout: 5000 }).should("include", "/login");
   });
 
+  it("shows error on failed registration", () => {
+    cy.intercept("POST", "http://localhost:9090/register", {
+      statusCode: 400,
+      body: {
+        message: "Email already exists",
+      },
+    }).as("registerFail");
+
+    cy.get("input[name='username']").type("existinguser");
+    cy.get("input[name='email']").type("existing@example.com");
+    cy.get("input[name='password']").type("password123");
+
+    cy.contains("Register").click();
+
+    cy.wait("@registerFail");
+    cy.contains("Email already exists").should("exist");
+  });
+
 });
 
