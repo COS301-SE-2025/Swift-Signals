@@ -80,5 +80,8 @@ describe("SignUp Page", () => {
     });
   });
 
+  it("navigates to login page when clicking Login here", () => {
+    cy.contains("Login here").click();
+    cy.url().should("include", "/login");
+  });
 });
-
