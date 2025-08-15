@@ -123,6 +123,13 @@ func (s *SimulationService) GetOptimisedData(
 		return model.SimulationResponse{}, err
 	}
 
+	if intersection.BestParameters == nil {
+		return model.SimulationResponse{}, errs.NewNotFoundError(
+			"no optimised parameters found for this intersection",
+			map[string]any{"intersectionID": intersectionID},
+		)
+	}
+
 	defaultParams := util.RPCSimParamToSimParam(intersection.BestParameters.Parameters)
 
 	logger.Debug("calling simulation service to get simulation results")
@@ -141,6 +148,64 @@ func (s *SimulationService) GetOptimisedData(
 		Results: util.RPCSimResultsToSimResults(simulationResults),
 		Output:  util.RPCSimOutputToSimOutput(simulationOutput),
 	}, nil
+}
+
+func (s *SimulationService) OptimiseIntersection(
+	ctx context.Context,
+	intersectionID string,
+) (model.OptimisationResponse, error) {
+	logger := middleware.LoggerFromContext(ctx).With(
+		"service", "simulation",
+	)
+
+	userID, ok := middleware.GetUserID(ctx)
+	if !ok {
+		return model.OptimisationResponse{}, errs.NewInternalError(
+			"user ID missing inside of handler",
+			nil,
+			map[string]any{},
+		)
+	}
+
+	logger.Debug("calling user service to retrieve user's intersection IDs")
+	intersectionIDs, err := s.GetUserIntersectionIDs(ctx, userID)
+	if err != nil {
+		return model.OptimisationResponse{}, err
+	}
+
+	if !slices.Contains(intersectionIDs, intersectionID) {
+		return model.OptimisationResponse{}, errs.NewForbiddenError(
+			"you do not have access to this intersection",
+			map[string]any{"intersectionID": intersectionID},
+		)
+	}
+
+	logger.Debug("intersection service to get intersection details")
+	intersection, err := s.intrClient.GetIntersection(ctx, intersectionID)
+	if err != nil {
+		return model.OptimisationResponse{}, err
+	}
+
+	// TODO: Change optimisation status to "IN_PROGRESS" or similar
+	// ...
+
+	logger.Debug("calling optimisation service to optimise intersection")
+	response, err := s.optiClient.RunOptimisation(
+		ctx,
+		util.RPCOptiParamToOptiParam(intersection.DefaultParameters),
+	)
+	if err != nil {
+		return model.OptimisationResponse{}, err
+	}
+
+	logger.Debug("updating intersection with optimised parameters")
+	resp, err := s.intrClient.PutOptimisation(
+		ctx,
+		intersectionID,
+		util.RPCOptiParamToOptiParamOp(response),
+	)
+
+	return model.OptimisationResponse{Improved: resp.Improved}, nil
 }
 
 func (s *SimulationService) GetUserIntersectionIDs(
