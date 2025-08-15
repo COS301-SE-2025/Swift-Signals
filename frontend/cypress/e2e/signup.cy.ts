@@ -13,5 +13,10 @@ describe("SignUp Page", () => {
     cy.contains("Register").should("exist");
   });
 
+  it("shows validation error on empty submit", () => {
+    cy.contains("Register").click();
+    cy.contains("Please fill in all fields.").should("exist");
+  });
+
 });
 
