@@ -41,10 +41,25 @@ func Load(cfg any) error {
 		case reflect.Bool:
 			parsed, err := strconv.ParseBool(valStr)
 			if err != nil {
-				log.Printf("Invalid bool for field %s: %s (defaulting to %s)", envName, valStr, defaultVal)
+				log.Printf(
+					"Invalid bool for field %s: %s (defaulting to %s)",
+					envName,
+					valStr,
+					defaultVal,
+				)
 				parsed, _ = strconv.ParseBool(defaultVal)
 			}
 			v.Field(i).SetBool(parsed)
+
+		case reflect.Float32,
+			reflect.Float64, reflect.Uint, reflect.Uint8, reflect.Slice,
+			reflect.Map, reflect.Struct, reflect.Ptr, reflect.Interface,
+			reflect.Array, reflect.Chan, reflect.Func, reflect.Invalid,
+			reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+			reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+			reflect.Complex64, reflect.Complex128, reflect.UnsafePointer:
+			return fmt.Errorf("unsupported field type: %s", field.Type)
+
 		default:
 			return fmt.Errorf("unsupported field type: %s", field.Type)
 		}

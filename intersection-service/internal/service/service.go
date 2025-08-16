@@ -2,21 +2,28 @@ package service
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"strings"
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/model"
+	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/util"
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 )
 
 type Service struct {
-	repo db.IntersectionRepository
+	repo      db.IntersectionRepository
+	validator *validator.Validate
 }
 
-func NewService(r db.IntersectionRepository) *Service {
-	return &Service{repo: r}
+func NewIntersectionService(r db.IntersectionRepository) IntersectionService {
+	return &Service{
+		repo:      r,
+		validator: validator.New(),
+	}
 }
 
 func (s *Service) CreateIntersection(
@@ -25,20 +32,28 @@ func (s *Service) CreateIntersection(
 	details model.IntersectionDetails,
 	density model.TrafficDensity,
 	defaultParams model.OptimisationParameters,
-) (*model.IntersectionResponse, error) {
-	// Validate Input
-	if err := validateCreateIntersectionInput(name, details, density, defaultParams); err != nil {
-		return nil, err
+) (*model.Intersection, error) {
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input")
+	req := CreateIntersectionRequest{
+		Name:          strings.TrimSpace(name),
+		Details:       details,
+		Density:       density,
+		DefaultParams: defaultParams,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
 	}
 
-	// Create Intersection object
+	logger.Debug("creating intersection")
 	id := uuid.New().String()
 	createdAt := time.Now()
 	lastRunAt := time.Now()
 	status := model.Unoptimised
-	runCount := int32(0)
+	runCount := 0
 
-	intersection := &model.IntersectionResponse{
+	intersection := &model.Intersection{
 		ID:                id,
 		Name:              name,
 		Details:           details,
@@ -52,33 +67,68 @@ func (s *Service) CreateIntersection(
 		CurrentParameters: defaultParams,
 	}
 
-	// Store Intersection in repo
 	createdIntersection, err := s.repo.CreateIntersection(ctx, intersection)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create intersection: %w", err)
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError("failed to create intersection", err, map[string]any{})
 	}
 
-	// Return Created Intersection
 	return createdIntersection, nil
 }
 
-func (s *Service) GetIntersection(ctx context.Context, id string) (*model.IntersectionResponse, error) {
-	// Validate ID
-	if strings.TrimSpace(id) == "" {
-		return nil, fmt.Errorf("id cannot be empty")
+func (s *Service) GetIntersection(ctx context.Context, id string) (*model.Intersection, error) {
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input")
+	req := GetIntersectionRequest{
+		ID: strings.TrimSpace(id),
 	}
-	// Check if intersection exists
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
+	}
+
+	logger.Debug("finding intersection")
 	intersection, err := s.repo.GetIntersectionByID(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to find existing intersection: %w", err)
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError("failed to find intersection", err, map[string]any{})
 	}
 	return intersection, nil
 }
 
-func (s *Service) GetAllIntersections(ctx context.Context) ([]*model.IntersectionResponse, error) {
-	intersections, err := s.repo.GetAllIntersections(ctx)
+func (s *Service) GetAllIntersections(
+	ctx context.Context,
+	page, pageSize int,
+	filter string,
+) ([]*model.Intersection, error) {
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input")
+	req := GetAllIntersectionsRequest{
+		Page:     page,
+		PageSize: pageSize,
+		Filter:   strings.TrimSpace(filter),
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
+	}
+
+	logger.Debug("finding all intersections")
+	offset := (page - 1) * pageSize
+	limit := pageSize
+	intersections, err := s.repo.GetAllIntersections(ctx, limit, offset, filter)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch intersections: %w", err)
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError("failed to find all intersections", err, map[string]any{})
 	}
 	return intersections, nil
 }
@@ -88,13 +138,51 @@ func (s *Service) UpdateIntersection(
 	id string,
 	name string,
 	details model.IntersectionDetails,
-) (*model.IntersectionResponse, error) {
-	//TODO:Implement UpdateIntersection
-	return nil, nil
+) (*model.Intersection, error) {
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input")
+	req := UpdateIntersectionRequest{
+		ID:      strings.TrimSpace(id),
+		Name:    strings.TrimSpace(name),
+		Details: details,
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return nil, handleValidationError(err)
+	}
+
+	logger.Debug("updating intersection")
+	intersection, err := s.repo.UpdateIntersection(ctx, id, name, details)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return nil, err
+		}
+		return nil, errs.NewInternalError("failed to update intersection", err, map[string]any{})
+	}
+	return intersection, nil
 }
 
 func (s *Service) DeleteIntersection(ctx context.Context, id string) error {
-	//TODO: DeleteIntersection
+	logger := util.LoggerFromContext(ctx)
+
+	logger.Debug("validating input")
+	req := DeleteIntersectionRequest{
+		ID: strings.TrimSpace(id),
+	}
+	if err := s.validator.Struct(req); err != nil {
+		return handleValidationError(err)
+	}
+
+	logger.Debug("deleting intersection")
+	err := s.repo.DeleteIntersection(ctx, id)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return err
+		}
+		return errs.NewInternalError("failed to delete intersection", err, map[string]any{})
+	}
 	return nil
 }
 
@@ -102,83 +190,64 @@ func (s *Service) PutOptimisation(
 	ctx context.Context,
 	id string,
 	params model.OptimisationParameters,
-) (*model.PutOptimisationResponse, error) {
-	//TODO:Implement PutOptimisation
-	return nil, nil
-}
+) (bool, error) {
+	logger := util.LoggerFromContext(ctx)
 
-////////////////////////
-// Validation Helpers //
-////////////////////////
-
-func validateCreateIntersectionInput(name string, details model.IntersectionDetails, density model.TrafficDensity, params model.OptimisationParameters) error {
-	var validationErrors []string
-
-	// Validate name
-	if strings.TrimSpace(name) == "" {
-		validationErrors = append(validationErrors, "intersection name is required and cannot be empty")
+	logger.Debug("validating input")
+	req := PutOptimisationRequest{
+		ID:     strings.TrimSpace(id),
+		Params: params,
 	}
-	if len(name) > 255 {
-		validationErrors = append(validationErrors, "intersection name cannot exceed 255 characters")
+	if err := s.validator.Struct(req); err != nil {
+		return false, handleValidationError(err)
 	}
 
-	// Validate intersection details
-	if strings.TrimSpace(details.Address) == "" {
-		validationErrors = append(validationErrors, "address is required")
-	}
-	if strings.TrimSpace(details.City) == "" {
-		validationErrors = append(validationErrors, "city is required")
-	}
-	if strings.TrimSpace(details.Province) == "" {
-		validationErrors = append(validationErrors, "province is required")
-	}
-
-	// Validate traffic density enum
-	if density < model.TrafficLow || density > model.TrafficHigh {
-		validationErrors = append(validationErrors, "invalid traffic density value")
+	logger.Debug("finding existing current params")
+	_, err := s.repo.GetIntersectionByID(ctx, id)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return false, err
+		}
+		return false, errs.NewInternalError(
+			"failed to update current intersection",
+			err,
+			map[string]any{},
+		)
 	}
 
-	// Validate optimisation parameters
-	if params.OptimisationType < model.OptNone || params.OptimisationType > model.OptGeneticEvaluation {
-		validationErrors = append(validationErrors, "invalid optimisation type")
+	logger.Debug("evaluating whether current params are better then best params")
+	// TODO: Implement logic to decide whether current params are better than current
+	// NOTE: For now always updating best params to current's
+	better := true
+
+	logger.Debug("updating best params")
+	err = s.repo.UpdateBestParams(ctx, id, params)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return false, err
+		}
+		return false, errs.NewInternalError(
+			"failed to update best params for intersection",
+			err,
+			map[string]any{},
+		)
 	}
 
-	// Validate simulation parameters
-	if params.Parameters.IntersectionType < model.IntersectionUnspecified || params.Parameters.IntersectionType > model.IntersectionStopSign {
-		validationErrors = append(validationErrors, "invalid intersection type")
+	logger.Debug("updating current params")
+	err = s.repo.UpdateCurrentParams(ctx, id, params)
+	if err != nil {
+		var svcErr *errs.ServiceError
+		if errors.As(err, &svcErr) {
+			return false, err
+		}
+		return false, errs.NewInternalError(
+			"failed to update current params for intersection",
+			err,
+			map[string]any{},
+		)
 	}
 
-	// Validate timing parameters (must be positive)
-	if params.Parameters.Green <= 0 {
-		validationErrors = append(validationErrors, "green light duration must be positive")
-	}
-	if params.Parameters.Yellow <= 0 {
-		validationErrors = append(validationErrors, "yellow light duration must be positive")
-	}
-	if params.Parameters.Red <= 0 {
-		validationErrors = append(validationErrors, "red light duration must be positive")
-	}
-	if params.Parameters.Speed <= 0 {
-		validationErrors = append(validationErrors, "speed must be positive")
-	}
-
-	// Validate reasonable timing ranges
-	if params.Parameters.Green > 300 { // 5 minutes max
-		validationErrors = append(validationErrors, "green light duration cannot exceed 300 seconds")
-	}
-	if params.Parameters.Yellow > 10 { // 10 seconds max
-		validationErrors = append(validationErrors, "yellow light duration cannot exceed 10 seconds")
-	}
-	if params.Parameters.Red > 300 { // 5 minutes max
-		validationErrors = append(validationErrors, "red light duration cannot exceed 300 seconds")
-	}
-	if params.Parameters.Speed > 200 { // 200 km/h max (reasonable for simulation)
-		validationErrors = append(validationErrors, "speed cannot exceed 200 km/h")
-	}
-
-	if len(validationErrors) > 0 {
-		return fmt.Errorf("validation failed: %s", strings.Join(validationErrors, "; "))
-	}
-
-	return nil
+	return better, nil
 }

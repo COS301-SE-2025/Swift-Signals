@@ -4,13 +4,14 @@ package swiftsignals.simulation;
 option go_package = "protos/gen/simulation";
 
 service SimulationService {
-  rpc GetSimulationResults(SimulationRequest) returns (SimulationResultsResponse); // runs the simulation and returns the result
-  rpc GetSimulationOutput(SimulationRequest) returns (SimulationOutputResponse); // runs the simulation with detailed output
+  rpc GetSimulationResults(SimulationRequest)
+      returns (SimulationResultsResponse);
+  rpc GetSimulationOutput(SimulationRequest) returns (SimulationOutputResponse);
 }
 
 message SimulationRequest {
-  string intersection_id = 1; // ID of the intersection to simulate
-  SimulationParameters simulation_parameters = 2; // Parameters for the simulation
+  string intersection_id = 1;
+  SimulationParameters simulation_parameters = 2;
 }
 
 message SimulationParameters {
@@ -25,8 +26,9 @@ message SimulationParameters {
 enum IntersectionType {
   INTERSECTION_TYPE_UNSPECIFIED = 0;
   INTERSECTION_TYPE_TRAFFICLIGHT = 1;
-  INTERSECTION_TYPE_ROUNDABOUT = 2;
-  INTERSECTION_TYPE_STOP_SIGN = 3;
+  INTERSECTION_TYPE_TJUNCTION = 2;
+  INTERSECTION_TYPE_ROUNDABOUT = 3;
+  INTERSECTION_TYPE_STOP_SIGN = 4;
 }
 
 message SimulationResultsResponse {
@@ -37,9 +39,9 @@ message SimulationResultsResponse {
   float average_waiting_time = 5;
   float total_waiting_time = 6;
   int64 generated_vehicles = 7;
-  int64 emergency_brakes = 8; // Number of emergency brakes applied
-  int64 emergency_stops = 9; // Number of emergency stops
-  int64 near_collisions = 10; // Number of near collisions
+  int64 emergency_brakes = 8;
+  int64 emergency_stops = 9;
+  int64 near_collisions = 10;
 }
 
 message SimulationOutputResponse {

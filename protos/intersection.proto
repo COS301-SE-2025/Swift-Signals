@@ -6,7 +6,6 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "protos/gen/intersection";
 
-// Service definition
 service IntersectionService {
   rpc CreateIntersection(CreateIntersectionRequest)
       returns (IntersectionResponse);
@@ -19,7 +18,6 @@ service IntersectionService {
   rpc PutOptimisation(PutOptimisationRequest) returns (PutOptimisationResponse);
 }
 
-// Common Messages
 message IntersectionIDRequest { string id = 1; }
 
 message IntersectionResponse {
@@ -36,7 +34,6 @@ message IntersectionResponse {
   OptimisationParameters current_parameters = 11;
 }
 
-// Create Intersection messages
 message CreateIntersectionRequest {
   string name = 1;
   IntersectionDetails details = 2;
@@ -44,19 +41,18 @@ message CreateIntersectionRequest {
   OptimisationParameters default_parameters = 4;
 }
 
-// Get All Intersections messages
 message GetAllIntersectionsRequest {
-  // Empty for now, but could add filtering parameters later
+  int32 page = 1;
+  int32 page_size = 2;
+  string filter = 3;
 }
 
-// Update Intersection messages
 message UpdateIntersectionRequest {
   string id = 1;
   string name = 2;
   IntersectionDetails details = 3;
 }
 
-// Put Optimisation messages
 message PutOptimisationRequest {
   string id = 1;
   OptimisationParameters parameters = 2;
@@ -64,7 +60,6 @@ message PutOptimisationRequest {
 
 message PutOptimisationResponse { bool improved = 1; }
 
-// Intersection details (address information)
 message IntersectionDetails {
   string address = 1;
   string city = 2;
@@ -76,7 +71,6 @@ message OptimisationParameters {
   SimulationParameters parameters = 2;
 }
 
-// Traffic light timing parameters
 message SimulationParameters {
   IntersectionType intersection_type = 2;
   int32 green = 3;
@@ -86,24 +80,26 @@ message SimulationParameters {
   int32 seed = 7;
 }
 
-// Enums for different types and statuses
 enum IntersectionStatus {
-  INTERSECTION_STATUS_UNOPTIMISED = 0;
-  INTERSECTION_STATUS_OPTIMISING = 1;
-  INTERSECTION_STATUS_OPTIMISED = 2;
-  INTERSECTION_STATUS_FAILED = 3;
+  INTERSECTION_STATUS_UNSPECIFIED = 0;
+  INTERSECTION_STATUS_UNOPTIMISED = 1;
+  INTERSECTION_STATUS_OPTIMISING = 2;
+  INTERSECTION_STATUS_OPTIMISED = 3;
+  INTERSECTION_STATUS_FAILED = 4;
 }
 
 enum TrafficDensity {
-  TRAFFIC_DENSITY_LOW = 0;
-  TRAFFIC_DENSITY_MEDIUM = 1;
-  TRAFFIC_DENSITY_HIGH = 2;
+  TRAFFIC_DENSITY_UNSPECIFIED = 0;
+  TRAFFIC_DENSITY_LOW = 1;
+  TRAFFIC_DENSITY_MEDIUM = 2;
+  TRAFFIC_DENSITY_HIGH = 3;
 }
 
 enum OptimisationType {
-  OPTIMISATION_TYPE_NONE = 0;
-  OPTIMISATION_TYPE_GRIDSEARCH = 1;
-  OPTIMISATION_TYPE_GENETIC_EVALUATION = 2;
+  OPTIMISATION_TYPE_UNSPECIFIED = 0;
+  OPTIMISATION_TYPE_NONE = 1;
+  OPTIMISATION_TYPE_GRIDSEARCH = 2;
+  OPTIMISATION_TYPE_GENETIC_EVALUATION = 3;
 }
 
 enum IntersectionType {

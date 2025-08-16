@@ -2,35 +2,37 @@ package handler
 
 import (
 	"context"
+
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/service"
+	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/util"
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type Handler struct {
 	intersectionpb.UnimplementedIntersectionServiceServer
-	service *service.Service
+	service service.IntersectionService
 }
 
-func NewHandler(s *service.Service) *Handler {
+func NewIntersectionHandler(s service.IntersectionService) *Handler {
 	return &Handler{service: s}
 }
 
-func (h *Handler) CreateIntersection(ctx context.Context, req *intersectionpb.CreateIntersectionRequest) (*intersectionpb.IntersectionResponse, error) {
-	// Validate request
-	if err := h.validateCreateIntersectionRequest(req); err != nil {
-		return nil, h.handleValidationError(err)
-	}
+func (h *Handler) CreateIntersection(
+	ctx context.Context,
+	req *intersectionpb.CreateIntersectionRequest,
+) (*intersectionpb.IntersectionResponse, error) {
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing CreateIntersection request")
 
-	// Convert protobuf request to model objects
 	intersectionDetails := h.mapIntersectionDetails(req.GetDetails())
-	trafficDensity := model.TrafficDensity(req.GetTrafficDensity())
+	trafficDensity := model.TrafficDensity(
+		intersectionpb.TrafficDensity_name[int32(req.GetTrafficDensity())],
+	)
 	optimisationParams := h.mapOptimisationParameters(req.GetDefaultParameters())
 
-	// Call service layer
 	intersection, err := h.service.CreateIntersection(
 		ctx,
 		req.GetName(),
@@ -39,80 +41,92 @@ func (h *Handler) CreateIntersection(ctx context.Context, req *intersectionpb.Cr
 		optimisationParams,
 	)
 	if err != nil {
-		return nil, h.handleServiceError(err)
+		logger.Error("failed to create intersection",
+			"error", err.Error(),
+		)
+		return nil, errs.HandleServiceError(err)
 	}
 
-	// Convert model response to protobuf response
-	return h.mapToIntersectionResponse(intersection), nil
+	logger.Info("CreateIntersection successful")
+	return h.mapToIntersection(intersection), nil
 }
 
-func (h *Handler) GetIntersection(ctx context.Context, req *intersectionpb.IntersectionIDRequest) (*intersectionpb.IntersectionResponse, error) {
-	// Validate request
-	if err := h.validateIntersectionIDRequest(req); err != nil {
-		return nil, h.handleValidationError(err)
-	}
+func (h *Handler) GetIntersection(
+	ctx context.Context,
+	req *intersectionpb.IntersectionIDRequest,
+) (*intersectionpb.IntersectionResponse, error) {
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing GetIntersection request")
 
-	// Call service layer
 	intersection, err := h.service.GetIntersection(
 		ctx,
 		req.GetId(),
 	)
 	if err != nil {
-		return nil, h.handleServiceError(err)
+		logger.Error("failed to find intersection",
+			"error", err.Error(),
+		)
+		return nil, errs.HandleServiceError(err)
 	}
 
-	// Convert model response to protobuf response
-	return h.mapToIntersectionResponse(intersection), nil
+	logger.Info("GetIntersection successful")
+	return h.mapToIntersection(intersection), nil
 }
 
-func (h *Handler) GetAllIntersections(req *intersectionpb.GetAllIntersectionsRequest, stream intersectionpb.IntersectionService_GetAllIntersectionsServer) error {
+func (h *Handler) GetAllIntersections(
+	req *intersectionpb.GetAllIntersectionsRequest,
+	stream intersectionpb.IntersectionService_GetAllIntersectionsServer,
+) error {
 	ctx := stream.Context()
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing GetAllIntersections request")
 
-	// Validate request
-	if err := h.validateGetAllIntersectionsRequest(req); err != nil {
-		return h.handleValidationError(err)
-	}
-
-	// Get all intersections from service
-	intersections, err := h.service.GetAllIntersections(ctx)
+	intersections, err := h.service.GetAllIntersections(
+		ctx,
+		int(req.GetPage()),
+		int(req.GetPageSize()),
+		req.GetFilter(),
+	)
 	if err != nil {
-		return h.handleServiceError(err)
+		logger.Error("failed to find all intersections",
+			"error", err.Error(),
+		)
+		return errs.HandleServiceError(err)
 	}
 
-	// Stream each intersection back to client
 	for _, intersection := range intersections {
-		// Check if context is cancelled
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
 		}
 
-		// Convert model to protobuf response
-		response := h.mapToIntersectionResponse(intersection)
+		response := h.mapToIntersection(intersection)
 		if response == nil {
-			continue // Skip nil intersections
+			continue
 		}
 
-		// Send the intersection to the client
 		if err := stream.Send(response); err != nil {
-			return status.Errorf(codes.Internal, "failed to send intersection: %v", err)
+			logger.Error("failed to send intersection",
+				"error", err.Error(),
+			)
+			return errs.HandleServiceError(err)
 		}
 	}
 
+	logger.Info("GetAllIntersections successful")
 	return nil
 }
 
-func (h *Handler) UpdateIntersection(ctx context.Context, req *intersectionpb.UpdateIntersectionRequest) (*intersectionpb.IntersectionResponse, error) {
-	// Validate request
-	if err := h.validateUpdateIntersectionRequest(req); err != nil {
-		return nil, h.handleValidationError(err)
-	}
+func (h *Handler) UpdateIntersection(
+	ctx context.Context,
+	req *intersectionpb.UpdateIntersectionRequest,
+) (*intersectionpb.IntersectionResponse, error) {
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing UpdateIntersection request")
 
-	// Convert protobuf request to model objects
 	intersectionDetails := h.mapIntersectionDetails(req.GetDetails())
 
-	// Call service layer
 	intersection, err := h.service.UpdateIntersection(
 		ctx,
 		req.GetId(),
@@ -120,48 +134,56 @@ func (h *Handler) UpdateIntersection(ctx context.Context, req *intersectionpb.Up
 		intersectionDetails,
 	)
 	if err != nil {
-		return nil, h.handleServiceError(err)
+		logger.Error("failed to update intersection",
+			"error", err.Error(),
+		)
+		return nil, errs.HandleServiceError(err)
 	}
 
-	// Convert model response to protobuf response
-	return h.mapToIntersectionResponse(intersection), nil
+	logger.Info("UpdateIntersection successful")
+	return h.mapToIntersection(intersection), nil
 }
 
-func (h *Handler) DeleteIntersection(ctx context.Context, req *intersectionpb.IntersectionIDRequest) (*emptypb.Empty, error) {
-	// Validate request
-	if err := h.validateIntersectionIDRequest(req); err != nil {
-		return nil, h.handleValidationError(err)
-	}
+func (h *Handler) DeleteIntersection(
+	ctx context.Context,
+	req *intersectionpb.IntersectionIDRequest,
+) (*emptypb.Empty, error) {
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing DeleteIntersection request")
 
-	// Call service layer to delete intersection
 	err := h.service.DeleteIntersection(ctx, req.GetId())
 	if err != nil {
-		return nil, h.handleServiceError(err)
+		logger.Error("failed to delete intersection",
+			"error", err.Error(),
+		)
+		return nil, errs.HandleServiceError(err)
 	}
 
-	// Return empty response on success
+	logger.Info("DeleteIntersection successful")
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) PutOptimisation(ctx context.Context, req *intersectionpb.PutOptimisationRequest) (*intersectionpb.PutOptimisationResponse, error) {
-	// Validate request
-	if err := h.validatePutOptimisationRequest(req); err != nil {
-		return nil, h.handleValidationError(err)
-	}
+func (h *Handler) PutOptimisation(
+	ctx context.Context,
+	req *intersectionpb.PutOptimisationRequest,
+) (*intersectionpb.PutOptimisationResponse, error) {
+	logger := util.LoggerFromContext(ctx)
+	logger.Info("processing PutOptimisation request")
 
-	// Convert protobuf request to model objects
 	optimisationParams := h.mapOptimisationParameters(req.GetParameters())
 
-	// Call service layer
 	optimisationResponse, err := h.service.PutOptimisation(
 		ctx,
 		req.GetId(),
 		optimisationParams,
 	)
 	if err != nil {
-		return nil, h.handleServiceError(err)
+		logger.Error("failed to update intersection optimisation params",
+			"error", err.Error(),
+		)
+		return nil, errs.HandleServiceError(err)
 	}
 
-	// Convert model response to protobuf response
-	return h.mapToPutOptimisationResponse(optimisationResponse), nil
+	logger.Info("PutOptimisation successful")
+	return &intersectionpb.PutOptimisationResponse{Improved: optimisationResponse}, nil
 }

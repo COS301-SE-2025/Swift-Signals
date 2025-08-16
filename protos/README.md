@@ -38,3 +38,10 @@ protoc --go_out=./gen/simulation/ --go_opt=paths=source_relative \
        --go-grpc_out=./gen/simulation/ --go-grpc_opt=paths=source_relative \
        simulation.proto
 ```
+
+### To update optimisation.proto generated code
+```bash
+protoc --go_out=./gen/optimisation/ --go_opt=paths=source_relative \
+       --go-grpc_out=./gen/optimisation/ --go-grpc_opt=paths=source_relative \
+       optimisation.proto
+```

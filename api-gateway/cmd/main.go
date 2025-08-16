@@ -4,34 +4,36 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
-	"google.golang.org/grpc"
-
-	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/client"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
-	"github.com/COS301-SE-2025/Swift-Signals/shared/config"
-
 	_ "github.com/COS301-SE-2025/Swift-Signals/api-gateway/swagger"
+	"github.com/COS301-SE-2025/Swift-Signals/shared/config"
 	httpSwagger "github.com/swaggo/http-swagger"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Config struct {
 	Port             int    `env:"PORT"           envDefault:"9090"`
+	JwtSecret        string `env:"JWT_SECRET"     envDefault:"a-string-secret-at-least-256-bits-long"`
 	UserServiceAddr  string `env:"USER_GRPC_ADDR" envDefault:"localhost:50051"` // TODO: Change to proper address
 	IntersectionAddr string `env:"INTR_GRPC_ADDR" envDefault:"localhost:50052"` // TODO: Change to proper address
+	SimulationAddr   string `env:"SIMU_GRPC_ADDR" envDefault:"localhost:50053"` // TODO: Change to proper address
+	OptimisationAddr string `env:"OPTI_GRPC_ADDR" envDefault:"localhost:50054"` // TODO: Change to proper address
 }
 
 // @title Authentication API Gateway
 // @version 1.0
-// @description This is the API Gateway for the Swift-Signals project,
-// @description forwarding requests to backend gRPC microservices.
+// @description This is the API Gateway for the Swift-Signals project, forwarding requests to backend gRPC microservices.
 // @termsOfService http://example.com/terms/
 
 // @contact.name Inside Insights Team
@@ -54,24 +56,36 @@ func main() {
 
 	userClient := mustConnectUserService(cfg.UserServiceAddr)
 	intrClient := mustConnectIntersectionService(cfg.IntersectionAddr)
+	simClient := mustConnectSimulationService(cfg.SimulationAddr)
+	optiClient := mustConnectOptimisationService(cfg.OptimisationAddr)
 
-	mux := setupRoutes(userClient, intrClient)
+	baseLogger := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelDebug,
+	}))
+
+	mux := setupRoutes(baseLogger, cfg.JwtSecret, userClient, intrClient, simClient, optiClient)
 
 	server := createServer(cfg.Port, mux)
 	runServer(server)
 }
 
 func mustConnectUserService(address string) *client.UserClient {
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
+	conn, err := grpc.NewClient(
+		address,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	) // TODO: Add TLS
 	if err != nil {
 		log.Fatalf("failed to connect to User gRPC server: %v", err)
 	}
 	log.Println("Connected to User-Service")
-	return client.NewUserClient(conn)
+	return client.NewUserClientFromConn(conn)
 }
 
 func mustConnectIntersectionService(address string) *client.IntersectionClient {
-	conn, err := grpc.Dial(address, grpc.WithInsecure()) // NOTE: Will change to use TLS later on
+	conn, err := grpc.NewClient(
+		address,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	) // TODO: Add TLS
 	if err != nil {
 		log.Fatalf("failed to connect to Intersection gRPC server: %v", err)
 	}
@@ -79,7 +93,38 @@ func mustConnectIntersectionService(address string) *client.IntersectionClient {
 	return client.NewIntersectionClient(conn)
 }
 
-func setupRoutes(userClient *client.UserClient, intrClient *client.IntersectionClient) http.Handler {
+func mustConnectOptimisationService(address string) *client.OptimisationClient {
+	conn, err := grpc.NewClient(
+		address,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	) // TODO: Add TLS
+	if err != nil {
+		log.Fatalf("failed to connect to Optimisation gRPC server: %v", err)
+	}
+	log.Println("Connected to Optimisation-Service")
+	return client.NewOptimisationClientFromConn(conn)
+}
+
+func mustConnectSimulationService(address string) *client.SimulationClient {
+	conn, err := grpc.NewClient(
+		address,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	) // TODO: Add TLS
+	if err != nil {
+		log.Fatalf("failed to connect to Simulation gRPC server: %v", err)
+	}
+	log.Println("Connected to Simulation-Service")
+	return client.NewSimulationClientFromConn(conn)
+}
+
+func setupRoutes(
+	logger *slog.Logger,
+	JwtSecret string,
+	userClient *client.UserClient,
+	intrClient *client.IntersectionClient,
+	simClient *client.SimulationClient,
+	optiClient *client.OptimisationClient,
+) http.Handler {
 	mux := http.NewServeMux()
 
 	// Auth routes
@@ -91,17 +136,38 @@ func setupRoutes(userClient *client.UserClient, intrClient *client.IntersectionC
 	mux.HandleFunc("POST /reset-password", authHandler.ResetPassword)
 	log.Println("Initialized Auth Handlers.")
 
+	// Profile routes
+	profileService := service.NewProfileService(userClient)
+	profileHandler := handler.NewProfileHandler(profileService)
+	mux.HandleFunc("GET /me", profileHandler.GetProfile)
+	mux.HandleFunc("PATCH /me", profileHandler.UpdateProfile)
+	mux.HandleFunc("DELETE /me", profileHandler.DeleteProfile)
+
+	// User (Admin Only) routes
+	adminService := service.NewAdminService(userClient)
+	adminHandler := handler.NewAdminHandler(adminService)
+	mux.HandleFunc("GET /admin/users", adminHandler.GetAllUsers)
+	mux.HandleFunc("GET /admin/users/{id}", adminHandler.GetUserByID)
+	mux.HandleFunc("PATCH /admin/users/{id}", adminHandler.UpdateUserByID)
+	mux.HandleFunc("DELETE /admin/users/{id}", adminHandler.DeleteUserByID)
+
 	// Intersection routes
-	intersectionService := service.NewIntersectionService(intrClient)
+	intersectionService := service.NewIntersectionService(intrClient, optiClient, userClient)
 	intersectionHandler := handler.NewIntersectionHandler(intersectionService)
 	mux.HandleFunc("GET /intersections", intersectionHandler.GetAllIntersections)
 	mux.HandleFunc("GET /intersections/{id}", intersectionHandler.GetIntersection)
 	mux.HandleFunc("POST /intersections", intersectionHandler.CreateIntersection)
 	mux.HandleFunc("PATCH /intersections/{id}", intersectionHandler.UpdateIntersection)
-	mux.HandleFunc("DELETE /intersections/{id}", NotImplemented)
-	mux.HandleFunc("POST /intersections/{id}/optimise", NotImplemented)
+	mux.HandleFunc("DELETE /intersections/{id}", intersectionHandler.DeleteIntersection)
 	mux.HandleFunc("GET /intersections/simple", NotImplemented)
 	log.Println("Initialized Intersection Handlers.")
+
+	// Simulation routes
+	simulationService := service.NewSimulationService(intrClient, optiClient, userClient, simClient)
+	simulationHandler := handler.NewSimulationHandler(simulationService)
+	mux.HandleFunc("GET /intersections/{id}/simulate", simulationHandler.GetSimulation)
+	mux.HandleFunc("GET /intersections/{id}/optimise", simulationHandler.GetOptimisedSimulation)
+	mux.HandleFunc("POST /intersections/{id}/optimise", simulationHandler.RunOptimisation)
 
 	// Swagger
 	mux.Handle("/docs/", httpSwagger.WrapHandler)
@@ -109,9 +175,19 @@ func setupRoutes(userClient *client.UserClient, intrClient *client.IntersectionC
 
 	// Middleware stack
 	return middleware.CreateStack(
-		middleware.Logging,
+		middleware.Logging(logger),
 		middleware.CORS,
-	)(mux)
+		middleware.AuthMiddleware(
+			JwtSecret,
+			"/login",
+			"/register",
+			"/reset-password",
+			"/docs",
+			"/favicon.ico",
+		),
+	)(
+		mux,
+	)
 }
 
 func createServer(port int, handler http.Handler) *http.Server {
