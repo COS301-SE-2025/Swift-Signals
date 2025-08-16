@@ -2230,7 +2230,7 @@ const Simulations: React.FC = () => {
       <Footer />
       <NewSimulationModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen(false)} 
         onSubmit={handleModalSubmit}
         intersections={allIntersections}
         type={modalType}

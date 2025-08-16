@@ -10,12 +10,18 @@ import HelpMenu from "../components/HelpMenu";
 // DATA STRUCTURES & INTERFACES
 // =================================================================
 
-/**
- * Defines the shape of the data used within the create/edit form.
- */
+type TrafficDensityUI = "low" | "medium" | "high";
+
+type TrafficDensityAPI = 
+  | "TRAFFIC_DENSITY_LOW" 
+  | "TRAFFIC_DENSITY_MEDIUM" 
+  | "TRAFFIC_DENSITY_HIGH" 
+  | "TRAFFIC_DENSITY_UNSPECIFIED";
+
+
 export interface IntersectionFormData {
   name: string;
-  traffic_density: "low" | "medium" | "high";
+  traffic_density: TrafficDensityUI;
   details: {
     address: string;
     city: string;
@@ -31,9 +37,6 @@ export interface IntersectionFormData {
   };
 }
 
-/**
- * Defines the structure for simulation parameters as returned by the API.
- */
 interface SimulationParameters {
   intersection_type: string;
   green: number;
@@ -43,17 +46,11 @@ interface SimulationParameters {
   seed: number;
 }
 
-/**
- * Defines the nested structure for parameters in the API response.
- */
 interface OptimisationParameters {
   optimisation_type: string;
   simulation_parameters: SimulationParameters;
 }
 
-/**
- * Defines the complete Intersection object structure as returned by the API.
- */
 interface Intersection {
   id: string;
   name: string;
@@ -63,13 +60,27 @@ interface Intersection {
     province: string;
   };
   default_parameters: OptimisationParameters;
-  traffic_density: "low" | "medium" | "high";
+  traffic_density: TrafficDensityAPI;
   image?: string;
 }
 
 // =================================================================
-// MODAL COMPONENTS & PROPS
+// MAPPING & MODAL COMPONENTS
 // =================================================================
+
+const apiToUiDensityMap: Record<TrafficDensityAPI, TrafficDensityUI> = {
+  "TRAFFIC_DENSITY_LOW": "low",
+  "TRAFFIC_DENSITY_MEDIUM": "medium",
+  "TRAFFIC_DENSITY_HIGH": "high",
+  "TRAFFIC_DENSITY_UNSPECIFIED": "medium",
+};
+
+const uiToApiDensityMap: Record<TrafficDensityUI, TrafficDensityAPI> = {
+  "low": "TRAFFIC_DENSITY_LOW",
+  "medium": "TRAFFIC_DENSITY_MEDIUM",
+  "high": "TRAFFIC_DENSITY_HIGH",
+};
+
 
 interface CreateIntersectionModalProps {
   isOpen: boolean;
@@ -220,21 +231,24 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   ) => {
     const { name, value } = e.target;
     const keys = name.split(".");
-    if (keys.length > 1) {
-      const [parentKey, childKey] = keys as [keyof IntersectionFormData, string];
-      if (parentKey === "details" || parentKey === "default_parameters") {
-        const isNumber = ["green", "yellow", "red", "speed", "seed"].includes(childKey);
-        setFormData((prev) => ({
-          ...prev,
-          [parentKey]: {
-            ...prev[parentKey],
-            [childKey]: isNumber ? parseInt(value, 10) || 0 : value,
-          },
-        }));
+  
+    setFormData((prev) => {
+      const newFormData = JSON.parse(JSON.stringify(prev));
+  
+      if (keys.length > 1) {
+        let currentLevel: any = newFormData;
+        for (let i = 0; i < keys.length - 1; i++) {
+          currentLevel = currentLevel[keys[i]];
+        }
+        const finalKey = keys[keys.length - 1];
+        const isNumber = ["green", "yellow", "red", "speed", "seed"].includes(finalKey);
+        currentLevel[finalKey] = isNumber ? parseInt(value, 10) || 0 : value;
+      } else {
+        (newFormData as any)[name] = value;
       }
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value as any }));
-    }
+      
+      return newFormData;
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -242,14 +256,12 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
     onSubmit(formData);
   };
   
-  // --- MODIFIED: Changed focus ring color to green for form consistency ---
   const inputClasses = "mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-[#0D1117] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#161B22] focus:ring-[#2da44e] sm:text-sm text-gray-900 dark:text-[#C9D1D9]";
 
-  const TrafficDensityButton = ({ value, label }: { value: "low" | "medium" | "high", label: string }) => (
+  const TrafficDensityButton = ({ value, label }: { value: TrafficDensityUI, label: string }) => (
     <button
       type="button"
       onClick={() => setFormData(prev => ({ ...prev, traffic_density: value }))}
-      // --- MODIFIED: Selected background and focus rings are now green ---
       className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#161B22] focus:ring-[#2da44e] ${
         formData.traffic_density === value
           ? "bg-[#2da44e] text-white shadow-md"
@@ -271,12 +283,9 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
         </h2>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
-            {/* --- LEFT COLUMN --- */}
             <div className="space-y-8">
-              {/* General Information Section */}
               <div className="space-y-5">
                 <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">
-                  {/* --- MODIFIED: Icon color is now blue --- */}
                   <FileText size={20} className="text-[#0f5ba7]"/>
                   General Information
                 </h3>
@@ -293,11 +302,8 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                   </div>
                 </div>
               </div>
-
-              {/* Location Details Section */}
               <div className="space-y-5">
                 <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">
-                   {/* --- MODIFIED: Icon color is now blue --- */}
                   <MapPin size={20} className="text-[#0f5ba7]"/>
                   Location Details
                 </h3>
@@ -317,13 +323,9 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                 </div>
               </div>
             </div>
-
-            {/* --- RIGHT COLUMN --- */}
             <div className="space-y-8">
-              {/* Simulation Parameters Section */}
               <div className="space-y-5">
                 <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">
-                   {/* --- MODIFIED: Icon color is now blue --- */}
                   <TrafficCone size={20} className="text-[#0f5ba7]"/>
                   Simulation Parameters
                 </h3>
@@ -367,7 +369,6 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              // --- MODIFIED: Background and hover colors are now green ---
               className="px-6 py-2.5 bg-[#2da44e] text-white rounded-lg font-medium hover:bg-[#288c42] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center transition-colors duration-150 shadow-sm"
             >
               {isLoading ? (
@@ -396,6 +397,7 @@ const getAuthToken = () => {
 
 const intersectionTypeDisplayMap: { [key: string]: string } = {
   "INTERSECTION_TYPE_TRAFFICLIGHT": "Traffic Light",
+  "INTERSECTION_TYPE_UNSPECIFIED": "Traffic Light",
 };
 
 
@@ -459,13 +461,18 @@ const Intersections = () => {
     setIsCreating(true);
     setCreateError(null);
     try {
+      const payload = {
+        ...formData,
+        traffic_density: uiToApiDensityMap[formData.traffic_density],
+      };
+
       const res = await fetch(`${API_BASE_URL}/intersections`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getAuthToken()}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) {
         const errorData = await res.json();
@@ -487,11 +494,11 @@ const Intersections = () => {
     try {
       const updatePayload = {
         name: formData.name,
-        traffic_density: formData.traffic_density,
+        traffic_density: uiToApiDensityMap[formData.traffic_density],
         details: formData.details,
-        default_parameters: formData.default_parameters
+        default_parameters: formData.default_parameters,
       };
-
+  
       const res = await fetch(
         `${API_BASE_URL}/intersections/${selectedIntersectionId}`,
         {
@@ -503,10 +510,12 @@ const Intersections = () => {
           body: JSON.stringify(updatePayload),
         }
       );
+  
       if (!res.ok) {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to update intersection");
       }
+  
       setIsModalOpen(false);
       setIsEditing(false);
       setSelectedIntersectionId(null);
@@ -571,9 +580,15 @@ const Intersections = () => {
       
       setEditData({
         name: intersection.name,
-        traffic_density: intersection.traffic_density,
+        traffic_density: apiToUiDensityMap[intersection.traffic_density],
         details: intersection.details,
-        default_parameters: intersection.default_parameters.simulation_parameters,
+        default_parameters: {
+          ...intersection.default_parameters.simulation_parameters,
+          intersection_type: 
+            intersection.default_parameters.simulation_parameters.intersection_type !== "INTERSECTION_TYPE_UNSPECIFIED" 
+            ? intersection.default_parameters.simulation_parameters.intersection_type 
+            : "INTERSECTION_TYPE_TRAFFICLIGHT",
+        },
       });
       
       setSelectedIntersectionId(id);
@@ -646,7 +661,7 @@ const Intersections = () => {
               ) : filteredIntersections.length > 0 ? (
                 filteredIntersections.map((intersection) => {
                     const apiType = intersection.default_parameters.simulation_parameters.intersection_type;
-                    const displayType = intersectionTypeDisplayMap[apiType] || apiType;
+                    const displayType = intersectionTypeDisplayMap[apiType] || "Traffic Light";
 
                     return (
                         <IntersectionCard
