@@ -19,6 +19,20 @@ logging.basicConfig(
 logger = logging.getLogger("simulation-service")
 
 
+def log_object_stats(name, obj):
+    """Log type + size stats of an object without dumping everything."""
+    if obj is None:
+        logger.debug("%s: None", name)
+    elif isinstance(obj, (list, tuple)):
+        logger.debug("%s: type=%s, length=%d", name, type(obj).__name__, len(obj))
+    elif isinstance(obj, dict):
+        logger.debug(
+            "%s: type=dict, keys=%d -> %s", name, len(obj), list(obj.keys())[:5]
+        )
+    else:
+        logger.debug("%s: type=%s, value=%s", name, type(obj).__name__, str(obj)[:100])
+
+
 class SimulationServicer(pb_grpc.SimulationServiceServicer):
     def GetSimulationResults(self, request, context):
         logger.info(
@@ -31,11 +45,11 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
                 request, preserving_proto_field_name=True, use_integers_for_enums=True
             )
         }
-        logger.debug("Request converted to dict: %s", req_dict)
+        log_object_stats("Request dict", req_dict)
 
         try:
             sim_output = SimLoad.main(req_dict)
-            logger.debug("Raw simulation output: %s", sim_output)
+            log_object_stats("Raw simulation output", sim_output)
 
             if not sim_output or sim_output[0] is None:
                 msg = f"Simulation returned no results for intersection_id={request.intersection_id}"
@@ -45,7 +59,7 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
                 return pb.SimulationResultsResponse()
 
             results = sim_output[0]["intersection"]["results"]
-            logger.debug("Parsed results: %s", results)
+            log_object_stats("Parsed results", results)
 
             msg_results = pb.SimulationResultsResponse()
             ParseDict(results, msg_results)
@@ -73,11 +87,11 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
                 request, preserving_proto_field_name=True, use_integers_for_enums=True
             )
         }
-        logger.debug("Request converted to dict: %s", req_dict)
+        log_object_stats("Request dict", req_dict)
 
         try:
             sim_output = SimLoad.main(req_dict)
-            logger.debug("Raw simulation output: %s", sim_output)
+            log_object_stats("Raw simulation output", sim_output)
 
             if not sim_output or len(sim_output) < 2:
                 msg = f"Simulation returned no output for intersection_id={request.intersection_id}"
@@ -87,7 +101,7 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
                 return pb.SimulationOutputResponse()
 
             results = sim_output[1]
-            logger.debug("Parsed output: %s", results)
+            log_object_stats("Parsed output", results)
 
             msg_results = pb.SimulationOutputResponse()
             ParseDict(results, msg_results)
