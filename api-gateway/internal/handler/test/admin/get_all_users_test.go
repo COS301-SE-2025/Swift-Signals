@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,10 +12,6 @@ import (
 )
 
 func (suite *TestSuite) TestGetAllUsers_Success() {
-	expectedRequest := model.GetAllUsersRequest{
-		Page:     1,
-		PageSize: 10,
-	}
 	expectedUsers := []model.User{
 		{
 			ID:              "user1",
@@ -34,12 +29,10 @@ func (suite *TestSuite) TestGetAllUsers_Success() {
 		},
 	}
 
-	suite.service.On("GetAllUsers", mock.Anything, expectedRequest.Page, expectedRequest.PageSize).
+	suite.service.On("GetAllUsers", mock.Anything, 1, 10).
 		Return(expectedUsers, nil)
 
-	body, _ := json.Marshal(expectedRequest)
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=1&page_size=10", nil)
 	req = req.WithContext(suite.ctx)
 	w := httptest.NewRecorder()
 
@@ -59,96 +52,134 @@ func (suite *TestSuite) TestGetAllUsers_Success() {
 	suite.service.AssertExpectations(suite.T())
 }
 
-func (suite *TestSuite) TestGetAllUsers_InvalidJSON() {
-	req := httptest.NewRequest(
-		http.MethodGet,
-		"/admin/users",
-		bytes.NewBufferString(`{"invalid": json}`),
-	)
-	req.Header.Set("Content-Type", "application/json")
+func (suite *TestSuite) TestGetAllUsers_DefaultValues() {
+	expectedUsers := []model.User{
+		{
+			ID:              "user1",
+			Username:        "user1",
+			Email:           "user1@example.com",
+			IsAdmin:         false,
+			IntersectionIDs: []string{"int1", "int2"},
+		},
+	}
+
+	// When no query params are provided, defaults should be page=1, page_size=100
+	suite.service.On("GetAllUsers", mock.Anything, 1, 100).
+		Return(expectedUsers, nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/admin/users", nil)
+	req = req.WithContext(suite.ctx)
+	w := httptest.NewRecorder()
+
+	suite.handler.GetAllUsers(w, req)
+
+	suite.Equal(http.StatusOK, w.Code)
+
+	var response []model.User
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	suite.Require().NoError(err)
+	suite.Len(response, 1)
+	suite.Equal(expectedUsers[0].ID, response[0].ID)
+
+	suite.service.AssertExpectations(suite.T())
+}
+
+func (suite *TestSuite) TestGetAllUsers_InvalidQueryParam_NonNumericPage() {
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=invalid&page_size=10", nil)
 	req = req.WithContext(suite.ctx)
 	w := httptest.NewRecorder()
 
 	suite.handler.GetAllUsers(w, req)
 
 	suite.Equal(http.StatusBadRequest, w.Code)
-	suite.Contains(w.Body.String(), "Invalid request payload")
+	suite.Contains(w.Body.String(), "Invalid page number")
 
 	suite.service.AssertNotCalled(suite.T(), "GetAllUsers")
 }
 
-func (suite *TestSuite) TestGetAllUsers_ValidationError_MissingPage() {
-	requestBody := model.GetAllUsersRequest{
-		Page:     0, // Invalid - required and min=1
-		PageSize: 10,
-	}
-
-	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+func (suite *TestSuite) TestGetAllUsers_InvalidQueryParam_NonNumericPageSize() {
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=1&page_size=invalid", nil)
 	req = req.WithContext(suite.ctx)
 	w := httptest.NewRecorder()
 
 	suite.handler.GetAllUsers(w, req)
 
 	suite.Equal(http.StatusBadRequest, w.Code)
-	suite.Contains(w.Body.String(), "Invalid request parameters")
+	suite.Contains(w.Body.String(), "Invalid page size")
 
 	suite.service.AssertNotCalled(suite.T(), "GetAllUsers")
 }
 
-func (suite *TestSuite) TestGetAllUsers_ValidationError_MissingPageSize() {
-	requestBody := model.GetAllUsersRequest{
-		Page:     1,
-		PageSize: 0, // Invalid - required and min=1
-	}
-
-	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+func (suite *TestSuite) TestGetAllUsers_ValidationError_PageZero() {
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=0&page_size=10", nil)
 	req = req.WithContext(suite.ctx)
 	w := httptest.NewRecorder()
 
 	suite.handler.GetAllUsers(w, req)
 
 	suite.Equal(http.StatusBadRequest, w.Code)
-	suite.Contains(w.Body.String(), "Invalid request parameters")
+	suite.Contains(w.Body.String(), "Invalid page number")
+
+	suite.service.AssertNotCalled(suite.T(), "GetAllUsers")
+}
+
+func (suite *TestSuite) TestGetAllUsers_ValidationError_PageSizeZero() {
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=1&page_size=0", nil)
+	req = req.WithContext(suite.ctx)
+	w := httptest.NewRecorder()
+
+	suite.handler.GetAllUsers(w, req)
+
+	suite.Equal(http.StatusBadRequest, w.Code)
+	suite.Contains(w.Body.String(), "Invalid page size")
 
 	suite.service.AssertNotCalled(suite.T(), "GetAllUsers")
 }
 
 func (suite *TestSuite) TestGetAllUsers_ValidationError_PageSizeTooLarge() {
-	requestBody := model.GetAllUsersRequest{
-		Page:     1,
-		PageSize: 101, // Invalid - max=100
-	}
-
-	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=1&page_size=101", nil)
 	req = req.WithContext(suite.ctx)
 	w := httptest.NewRecorder()
 
 	suite.handler.GetAllUsers(w, req)
 
 	suite.Equal(http.StatusBadRequest, w.Code)
-	suite.Contains(w.Body.String(), "Invalid request parameters")
+	suite.Contains(w.Body.String(), "Invalid page size")
+
+	suite.service.AssertNotCalled(suite.T(), "GetAllUsers")
+}
+
+func (suite *TestSuite) TestGetAllUsers_ValidationError_NegativePage() {
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=-1&page_size=10", nil)
+	req = req.WithContext(suite.ctx)
+	w := httptest.NewRecorder()
+
+	suite.handler.GetAllUsers(w, req)
+
+	suite.Equal(http.StatusBadRequest, w.Code)
+	suite.Contains(w.Body.String(), "Invalid page number")
+
+	suite.service.AssertNotCalled(suite.T(), "GetAllUsers")
+}
+
+func (suite *TestSuite) TestGetAllUsers_ValidationError_NegativePageSize() {
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=1&page_size=-5", nil)
+	req = req.WithContext(suite.ctx)
+	w := httptest.NewRecorder()
+
+	suite.handler.GetAllUsers(w, req)
+
+	suite.Equal(http.StatusBadRequest, w.Code)
+	suite.Contains(w.Body.String(), "Invalid page size")
 
 	suite.service.AssertNotCalled(suite.T(), "GetAllUsers")
 }
 
 func (suite *TestSuite) TestGetAllUsers_ServiceForbiddenError() {
-	requestBody := model.GetAllUsersRequest{
-		Page:     1,
-		PageSize: 10,
-	}
-
-	suite.service.On("GetAllUsers", mock.Anything, requestBody.Page, requestBody.PageSize).
+	suite.service.On("GetAllUsers", mock.Anything, 1, 10).
 		Return([]model.User{}, errs.NewForbiddenError("only admins can access this endpoint", map[string]any{}))
 
-	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=1&page_size=10", nil)
 	req = req.WithContext(suite.ctx)
 	w := httptest.NewRecorder()
 
@@ -161,17 +192,10 @@ func (suite *TestSuite) TestGetAllUsers_ServiceForbiddenError() {
 }
 
 func (suite *TestSuite) TestGetAllUsers_ServiceInternalError() {
-	requestBody := model.GetAllUsersRequest{
-		Page:     1,
-		PageSize: 10,
-	}
-
-	suite.service.On("GetAllUsers", mock.Anything, requestBody.Page, requestBody.PageSize).
+	suite.service.On("GetAllUsers", mock.Anything, 1, 10).
 		Return([]model.User{}, errs.NewInternalError("database connection failed", nil, map[string]any{}))
 
-	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=1&page_size=10", nil)
 	req = req.WithContext(suite.ctx)
 	w := httptest.NewRecorder()
 
@@ -184,17 +208,10 @@ func (suite *TestSuite) TestGetAllUsers_ServiceInternalError() {
 }
 
 func (suite *TestSuite) TestGetAllUsers_EmptyUserList() {
-	requestBody := model.GetAllUsersRequest{
-		Page:     1,
-		PageSize: 10,
-	}
-
-	suite.service.On("GetAllUsers", mock.Anything, requestBody.Page, requestBody.PageSize).
+	suite.service.On("GetAllUsers", mock.Anything, 1, 10).
 		Return([]model.User{}, nil)
 
-	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=1&page_size=10", nil)
 	req = req.WithContext(suite.ctx)
 	w := httptest.NewRecorder()
 
@@ -210,40 +227,7 @@ func (suite *TestSuite) TestGetAllUsers_EmptyUserList() {
 	suite.service.AssertExpectations(suite.T())
 }
 
-func (suite *TestSuite) TestGetAllUsers_EmptyBody() {
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", bytes.NewReader([]byte{}))
-	req.Header.Set("Content-Type", "application/json")
-	req = req.WithContext(suite.ctx)
-	w := httptest.NewRecorder()
-
-	suite.handler.GetAllUsers(w, req)
-
-	suite.Equal(http.StatusBadRequest, w.Code)
-	suite.Contains(w.Body.String(), "Invalid request payload")
-
-	suite.service.AssertNotCalled(suite.T(), "GetAllUsers")
-}
-
-func (suite *TestSuite) TestGetAllUsers_NilBody() {
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", nil)
-	req.Header.Set("Content-Type", "application/json")
-	req = req.WithContext(suite.ctx)
-	w := httptest.NewRecorder()
-
-	suite.handler.GetAllUsers(w, req)
-
-	suite.Equal(http.StatusBadRequest, w.Code)
-	suite.Contains(w.Body.String(), "Invalid request payload")
-
-	suite.service.AssertNotCalled(suite.T(), "GetAllUsers")
-}
-
 func (suite *TestSuite) TestGetAllUsers_MinimalValidRequest() {
-	requestBody := model.GetAllUsersRequest{
-		Page:     1,
-		PageSize: 1,
-	}
-
 	expectedUsers := []model.User{
 		{
 			ID:              "single-user",
@@ -254,12 +238,10 @@ func (suite *TestSuite) TestGetAllUsers_MinimalValidRequest() {
 		},
 	}
 
-	suite.service.On("GetAllUsers", mock.Anything, requestBody.Page, requestBody.PageSize).
+	suite.service.On("GetAllUsers", mock.Anything, 1, 1).
 		Return(expectedUsers, nil)
 
-	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=1&page_size=1", nil)
 	req = req.WithContext(suite.ctx)
 	w := httptest.NewRecorder()
 
@@ -277,11 +259,6 @@ func (suite *TestSuite) TestGetAllUsers_MinimalValidRequest() {
 }
 
 func (suite *TestSuite) TestGetAllUsers_MaxPageSize() {
-	requestBody := model.GetAllUsersRequest{
-		Page:     1,
-		PageSize: 100, // Maximum allowed
-	}
-
 	expectedUsers := make([]model.User, 100)
 	for i := 0; i < 100; i++ {
 		expectedUsers[i] = model.User{
@@ -292,12 +269,10 @@ func (suite *TestSuite) TestGetAllUsers_MaxPageSize() {
 		}
 	}
 
-	suite.service.On("GetAllUsers", mock.Anything, requestBody.Page, requestBody.PageSize).
+	suite.service.On("GetAllUsers", mock.Anything, 1, 100).
 		Return(expectedUsers, nil)
 
-	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=1&page_size=100", nil)
 	req = req.WithContext(suite.ctx)
 	w := httptest.NewRecorder()
 
@@ -314,17 +289,10 @@ func (suite *TestSuite) TestGetAllUsers_MaxPageSize() {
 }
 
 func (suite *TestSuite) TestGetAllUsers_ResponseHeadersSet() {
-	requestBody := model.GetAllUsersRequest{
-		Page:     1,
-		PageSize: 10,
-	}
-
-	suite.service.On("GetAllUsers", mock.Anything, requestBody.Page, requestBody.PageSize).
+	suite.service.On("GetAllUsers", mock.Anything, 1, 10).
 		Return([]model.User{}, nil)
 
-	body, _ := json.Marshal(requestBody)
-	req := httptest.NewRequest(http.MethodGet, "/admin/users", bytes.NewBuffer(body))
-	req.Header.Set("Content-Type", "application/json")
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=1&page_size=10", nil)
 	req = req.WithContext(suite.ctx)
 	w := httptest.NewRecorder()
 
@@ -332,6 +300,128 @@ func (suite *TestSuite) TestGetAllUsers_ResponseHeadersSet() {
 
 	suite.Equal(http.StatusOK, w.Code)
 	suite.Equal("application/json", w.Header().Get("Content-Type"))
+
+	suite.service.AssertExpectations(suite.T())
+}
+
+func (suite *TestSuite) TestGetAllUsers_LargePageNumber() {
+	suite.service.On("GetAllUsers", mock.Anything, 999999, 10).
+		Return([]model.User{}, nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=999999&page_size=10", nil)
+	req = req.WithContext(suite.ctx)
+	w := httptest.NewRecorder()
+
+	suite.handler.GetAllUsers(w, req)
+
+	suite.Equal(http.StatusOK, w.Code)
+
+	var response []model.User
+	err := json.Unmarshal(w.Body.Bytes(), &response)
+	suite.Require().NoError(err)
+	suite.Empty(response)
+
+	suite.service.AssertExpectations(suite.T())
+}
+
+func (suite *TestSuite) TestGetAllUsers_ExtraQueryParameters() {
+	// Test that extra query parameters are ignored
+	suite.service.On("GetAllUsers", mock.Anything, 1, 10).
+		Return([]model.User{}, nil)
+
+	req := httptest.NewRequest(
+		http.MethodGet,
+		"/admin/users?page=1&page_size=10&extra=ignored&another=param",
+		nil,
+	)
+	req = req.WithContext(suite.ctx)
+	w := httptest.NewRecorder()
+
+	suite.handler.GetAllUsers(w, req)
+
+	suite.Equal(http.StatusOK, w.Code)
+
+	suite.service.AssertExpectations(suite.T())
+}
+
+func (suite *TestSuite) TestGetAllUsers_DuplicateQueryParameters() {
+	// Test behavior when duplicate query parameters are provided (should use first value)
+	suite.service.On("GetAllUsers", mock.Anything, 1, 10).
+		Return([]model.User{}, nil)
+
+	req := httptest.NewRequest(
+		http.MethodGet,
+		"/admin/users?page=1&page=2&page_size=10&page_size=20",
+		nil,
+	)
+	req = req.WithContext(suite.ctx)
+	w := httptest.NewRecorder()
+
+	suite.handler.GetAllUsers(w, req)
+
+	suite.Equal(http.StatusOK, w.Code)
+
+	suite.service.AssertExpectations(suite.T())
+}
+
+func (suite *TestSuite) TestGetAllUsers_EmptyQueryParameterValues() {
+	// Empty page parameter should use default (page=1)
+	suite.service.On("GetAllUsers", mock.Anything, 1, 100).
+		Return([]model.User{}, nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=&page_size=", nil)
+	req = req.WithContext(suite.ctx)
+	w := httptest.NewRecorder()
+
+	suite.handler.GetAllUsers(w, req)
+
+	suite.Equal(http.StatusOK, w.Code)
+
+	suite.service.AssertExpectations(suite.T())
+}
+
+func (suite *TestSuite) TestGetAllUsers_WhitespaceQueryParameterValues() {
+	// Whitespace values should be treated as invalid and return error
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=%20&page_size=%20", nil)
+	req = req.WithContext(suite.ctx)
+	w := httptest.NewRecorder()
+
+	suite.handler.GetAllUsers(w, req)
+
+	suite.Equal(http.StatusBadRequest, w.Code)
+	suite.Contains(w.Body.String(), "Invalid page number")
+
+	suite.service.AssertNotCalled(suite.T(), "GetAllUsers")
+}
+
+func (suite *TestSuite) TestGetAllUsers_OnlyPageProvided() {
+	// Only page provided, page_size should use default (100)
+	suite.service.On("GetAllUsers", mock.Anything, 5, 100).
+		Return([]model.User{}, nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page=5", nil)
+	req = req.WithContext(suite.ctx)
+	w := httptest.NewRecorder()
+
+	suite.handler.GetAllUsers(w, req)
+
+	suite.Equal(http.StatusOK, w.Code)
+
+	suite.service.AssertExpectations(suite.T())
+}
+
+func (suite *TestSuite) TestGetAllUsers_OnlyPageSizeProvided() {
+	// Only page_size provided, page should use default (1)
+	suite.service.On("GetAllUsers", mock.Anything, 1, 25).
+		Return([]model.User{}, nil)
+
+	req := httptest.NewRequest(http.MethodGet, "/admin/users?page_size=25", nil)
+	req = req.WithContext(suite.ctx)
+	w := httptest.NewRecorder()
+
+	suite.handler.GetAllUsers(w, req)
+
+	suite.Equal(http.StatusOK, w.Code)
 
 	suite.service.AssertExpectations(suite.T())
 }
