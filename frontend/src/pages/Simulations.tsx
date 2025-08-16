@@ -81,35 +81,40 @@ interface OverpassElement {
 }
 
 interface ApiIntersection {
-  id: string;
-  name: string;
-  details: {
-    address: string;
-    city: string;
-    province: string;
-  };
-  default_parameters: {
-    green: number;
-    yellow: number;
-    red: number;
-    speed: number;
-    seed: number;
-    intersection_type: string;
-  };
-  traffic_density: string;
-  status?: string;
-  created_at?: string;
-  run_count?: number;
-  last_run_at?: string;
+  id: string;
+  name: string;
+  details: {
+    address: string;
+    city: string;
+    province: string;
+  };
+  default_parameters: { // This object contains the nested simulation data
+    optimisation_type: string;
+    simulation_parameters: {
+      green: number;
+      yellow: number;
+      red: number;
+      speed: number;
+      seed: number;
+      intersection_type: string;
+    };
+  };
+  traffic_density: string;
+  status?: string;
+  created_at?: string;
+  run_count?: number;
+  last_run_at?: string;
 }
 
+
+// ✅ UPDATED: Changed the data structure for the table
 interface SimulationData {
-  id: number; // Numbered list ID
-  backendId: string; // This is the actual ID from the database
+  id: number;
+  backendId: string;
   intersection: string;
-  lastRunAt: string;
-  runCount: number;
-  status: string; // Will be 'optimised', 'unoptimised', or 'Failed'
+  trafficDensity: string; // New: "High", "Medium", or "Low"
+  speed: number; // New: Vehicle speed in km/h
+  status: string;
 }
 
 // Type for intersection with calculated distance
@@ -1743,11 +1748,12 @@ const SimulationTable: React.FC<{
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
               Intersection
             </th>
+            {/* ✅ UPDATED: Changed table headers */}
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Last Run
+              Traffic Density
             </th>
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Run Count
+              Speed
             </th>
             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
               Status
@@ -1766,13 +1772,12 @@ const SimulationTable: React.FC<{
               <td className="intersectionCell px-4 py-3 whitespace-wrap text-sm text-gray-900 dark:text-gray-200">
                 {sim.intersection}
               </td>
+              {/* ✅ UPDATED: Changed table cells to display new data */}
               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                {sim.lastRunAt !== "Never"
-                  ? new Date(sim.lastRunAt).toLocaleString()
-                  : "Never"}
+                {sim.trafficDensity}
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                {sim.runCount}
+                {sim.speed} km/h
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-sm">
                 <span
@@ -1797,7 +1802,7 @@ const SimulationTable: React.FC<{
                   <button
                     onClick={() => handleDelete(sim.backendId)}
                     className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center"
-                    title="Delete Simulation"
+                  	 title="Delete Simulation"
                   >
                     <Trash2 size={18} strokeWidth={2} />
                   </button>
@@ -1956,7 +1961,15 @@ const Simulations: React.FC = () => {
   const convertToSimulationData = (
     intersections: ApiIntersection[],
   ): { sims: SimulationData[]; opts: SimulationData[] } => {
-    // Helper function to map backend status to frontend display status
+		// ✅ ADDED: Helper function to format traffic density strings
+    const formatTrafficDensity = (density?: string): string => {
+      if (!density) return "Medium";
+      const lowerCaseDensity = density.toLowerCase();
+      if (lowerCaseDensity.includes("high")) return "High";
+      if (lowerCaseDensity.includes("low")) return "Low";
+      return "Medium";
+    };
+
     const mapApiStatus = (apiStatus?: string): string => {
       switch (apiStatus) {
         case "optimised":
@@ -1966,28 +1979,26 @@ const Simulations: React.FC = () => {
         case "Failed":
           return "Failed";
         default:
-          return "unoptimised"; // Default for Pending, null, etc.
+          return "unoptimised";
       }
     };
 
-    // Sort intersections by creation date, most recent first
     const sortedIntersections = [...intersections].sort((a, b) => {
       const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
       const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
       return dateB - dateA;
     });
 
-    // Map the sorted data to the format required by the table
+		// ✅ UPDATED: Mapped API data to the new SimulationData structure
     const allSims = sortedIntersections.map((intersection, index) => ({
-      id: index + 1, // 1-based numbering for the list
+      id: index + 1,
       backendId: intersection.id,
       intersection: intersection.details?.address || intersection.name,
-      lastRunAt: intersection.last_run_at || "Never",
-      runCount: intersection.run_count || 0,
-      status: mapApiStatus(intersection.status), // Use the mapping function
+      trafficDensity: formatTrafficDensity(intersection.traffic_density),
+      speed: intersection.default_parameters?.simulation_parameters?.speed || 0,
+      status: mapApiStatus(intersection.status),
     }));
 
-    // Filter the main list to get only the optimised simulations
     const opts = allSims.filter((sim) => sim.status === "optimised");
 
     return { sims: allSims, opts };
@@ -2141,7 +2152,7 @@ const Simulations: React.FC = () => {
             </p>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            	 className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
             >
               Retry
             </button>
@@ -2165,78 +2176,78 @@ const Simulations: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => handleNewSimulation("simulations")}
-                  className="new-simulation-button px-4 py-2 rounded-md text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-green-600 hover:to-green-700 dark:from-green-400 dark:to-green-500 dark:hover:from-green-500 dark:hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg"
+                	 className="new-simulation-button px-4 py-2 rounded-md text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-green-600 hover:to-green-700 dark:from-green-400 dark:to-green-500 dark:hover:from-green-500 dark:hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   New Simulation
                 </button>
                 <select
-                  value={filter1}
-                  onChange={(e) => {
-                    setFilter1(e.target.value);
-                    setPage1(0);
-                  }}
-                  className="w-48 p-2 rounded-md border border-gray-300 dark:border-[#388BFD] bg-white dark:bg-[#161B22] text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                	 value={filter1}
+                	 onChange={(e) => {
+                  	 setFilter1(e.target.value);
+                  	 setPage1(0);
+                	 }}
+                	 className="w-48 p-2 rounded-md border border-gray-300 dark:border-[#388BFD] bg-white dark:bg-[#161B22] text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   {["All Intersections", ...allIntersections].map(
-                    (intersection) => (
-                      <option key={intersection} value={intersection}>
-                        {intersection}
-                      </option>
-                    ),
+                  	 (intersection) => (
+                  	   <option key={intersection} value={intersection}>
+                  	   	 {intersection}
+                  	   </option>
+                  	 ),
                   )}
                 </select>
               </div>
             </div>
             <SimulationTable
-              simulations={filteredSimulations1}
-              currentPage={page1}
-              setCurrentPage={setPage1}
-              onViewResults={handleViewResults}
+            	 simulations={filteredSimulations1}
+            	 currentPage={page1}
+            	 setCurrentPage={setPage1}
+            	 onViewResults={handleViewResults}
             />
           </div>
           <div className="simTableContainer opts">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-3xl font-bold text-gray-800 dark:text-[#E6EDF3]">
                 Recent Optimizations
-              </h1>
-              <div className="flex items-center space-x-2">
-                <select
-                  value={filter2}
-                  onChange={(e) => {
-                    setFilter2(e.target.value);
-                    setPage2(0);
-                  }}
-                  className="w-48 p-2 rounded-md border border-gray-300 dark:border-[#388BFD] bg-white dark:bg-[#161B22] text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  {["All Intersections", ...allIntersections].map(
-                    (intersection) => (
-                      <option key={intersection} value={intersection}>
-                        {intersection}
-                      </option>
-                    ),
-                  )}
-                </select>
-              </div>
+            	 </h1>
+            	 <div className="flex items-center space-x-2">
+            	 	 <select
+            	 	 	 value={filter2}
+            	 	 	 onChange={(e) => {
+            	 	 	 	 setFilter2(e.target.value);
+            	 	 	 	 setPage2(0);
+            	 	 	 }}
+            	 	 	 className="w-48 p-2 rounded-md border border-gray-300 dark:border-[#388BFD] bg-white dark:bg-[#161B22] text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            	 	 >
+            	 	 	 {["All Intersections", ...allIntersections].map(
+            	 	 	 	 (intersection) => (
+            	 	 	 	 	 <option key={intersection} value={intersection}>
+            	 	 	 	 	 	 {intersection}
+            	   	 	 	 </option>
+            	 	 	 	 ),
+            	 	 	 )}
+            	 	 </select>
+            	 </div>
             </div>
             <SimulationTable
-              simulations={filteredSimulations2}
+            	 simulations={filteredSimulations2}
             	 currentPage={page2}
             	 setCurrentPage={setPage2}
             	 onViewResults={handleViewResults}
             />
-          </div>
-        </div>
-      </div>
-      <Footer />
-      <NewSimulationModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)} 
-        onSubmit={handleModalSubmit}
-        intersections={allIntersections}
-        type={modalType}
-      />
-      <HelpMenu />
-    </div>
+        	 </div>
+      	 </div>
+    	 </div>
+    	 <Footer />
+    	 <NewSimulationModal
+    	 	 isOpen={isModalOpen}
+    	 	 onClose={() => setIsModalOpen(false)}
+    	 	 onSubmit={handleModalSubmit}
+    	 	 intersections={allIntersections}
+    	 	 type={modalType}
+    	 />
+    	 <HelpMenu />
+  	 </div>
   );
 };
 
