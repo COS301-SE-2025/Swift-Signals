@@ -28,7 +28,7 @@ func AuthMiddleware(secret string, paths ...string) Middleware {
 			}
 
 			logger := LoggerFromContext(r.Context())
-			logger.Info("authentication user request")
+			logger.Info("authenticating user request...")
 
 			token, err := util.GetToken(r)
 			if err != nil {

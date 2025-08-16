@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
@@ -30,7 +31,8 @@ func NewAdminHandler(s service.AdminServiceInterface) *AdminHandler {
 // @Accept json
 // @Produce json
 // @Security BearerAuth
-// @Param getAllUsersRequest body model.GetAllUsersRequest true "Pagination options"
+// @Param page query int false "Page number (default is 1)"
+// @Param page_size query int false "Number of users per page (default is 100 and max is 100)"
 // @Success 200 {array} model.User "List of users"
 // @Failure 403 {object} model.ErrorResponse "Forbidden - Only admins can access this endpoint"
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
@@ -40,33 +42,58 @@ func (h *AdminHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 		"handler", "admin",
 		"action", "get_all_users",
 	)
+	logger.Info("AdminHandler.GetAllUsers called")
 	logger.Info("processing get all users request")
 
-	var req model.GetAllUsersRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		logger.Warn("failed to decode request body",
-			"error", err.Error(),
-		)
-		util.SendErrorResponse(
-			w,
-			errs.NewValidationError("Invalid request payload", map[string]any{}),
-		)
-		return
+	pageStr := r.URL.Query().Get("page")
+	page := 1
+	if pageStr != "" {
+		if ps, err := strconv.Atoi(pageStr); err == nil && ps > 0 {
+			page = ps
+		} else {
+			var errMsg string
+			if err != nil {
+				errMsg = err.Error()
+			} else {
+				errMsg = "page must be greater than 0"
+			}
+			logger.Warn("invalid page number",
+				"page", pageStr,
+				"error", errMsg,
+			)
+			util.SendErrorResponse(
+				w,
+				errs.NewValidationError("Invalid page number", map[string]any{"page": pageStr}),
+			)
+			return
+		}
 	}
 
-	logger.Debug("validating request")
-	if err := h.validator.Struct(req); err != nil {
-		logger.Warn("validation failed",
-			"error", err.Error(),
-		)
-		util.SendErrorResponse(
-			w,
-			errs.NewValidationError("Invalid request parameters", map[string]any{}),
-		)
-		return
+	pageSizeStr := r.URL.Query().Get("page_size")
+	pageSize := 100
+	if pageSizeStr != "" {
+		if ps, err := strconv.Atoi(pageSizeStr); err == nil && ps > 0 && ps <= 100 {
+			pageSize = ps
+		} else {
+			var errMsg string
+			if err != nil {
+				errMsg = err.Error()
+			} else {
+				errMsg = "page_size must be between 1 and 100"
+			}
+			logger.Warn("invalid page size",
+				"page_size", pageSizeStr,
+				"error", errMsg,
+			)
+			util.SendErrorResponse(
+				w,
+				errs.NewValidationError("Invalid page size", map[string]any{"page_size": pageSizeStr}),
+			)
+			return
+		}
 	}
 
-	users, err := h.service.GetAllUsers(r.Context(), req.Page, req.PageSize)
+	users, err := h.service.GetAllUsers(r.Context(), page, pageSize)
 	if err != nil {
 		logger.Error("failed to get all users",
 			"error", err.Error(),
