@@ -261,7 +261,7 @@ def parseNodes(filename):
             "id": n.get("id"),
             "x": float(n.get("x")),
             "y": float(n.get("y")),
-            "type": n.get("type").upper(),
+            "type": n.get("type", "").upper(),
         }
         for n in tree.getroot().findall("node")
     ]
