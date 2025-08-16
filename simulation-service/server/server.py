@@ -132,7 +132,7 @@ def serve():
     port = os.environ.get("APP_PORT", "50053")
     server.add_insecure_port(f"[::]:{port}")
     server.start()
-    logger.info("Simulation Service listening on port :50053")
+    logger.info(f"Simulation Service listening on port :{port}")
     server.wait_for_termination()
 
 
