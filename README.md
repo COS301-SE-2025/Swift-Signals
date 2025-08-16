@@ -82,13 +82,12 @@ design.
 
 ## Services Overview
 
+- **frontend**: Web dashboard for visualization and control
 - **api-gateway**: API Gateway for routing requests  
 - **user-service**: User management and authentication  
+- **intersection-service**: Intersection control and management  
 - **simulation-service**: Simulation engine  
 - **optimization-service**: Machine learning and AI capabilities  
-- **intersection-service**: Intersection control and management  
-- **metrics-service**: Monitoring and metrics collection  
-- **frontend**: Web dashboard for visualization and control
 
 ## Getting Started
 
