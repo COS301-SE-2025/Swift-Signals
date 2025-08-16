@@ -195,7 +195,6 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
       red: 27,
       speed: 60,
       seed: Math.floor(Math.random() * 10000000000),
-      // --- MODIFIED: Default value is now TRAFFICLIGHT ---
       intersection_type: "INTERSECTION_TYPE_TRAFFICLIGHT",
     },
   });
@@ -242,16 +241,18 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
     e.preventDefault();
     onSubmit(formData);
   };
-
-  const inputClasses = "mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-[#0D1117] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#161B22] focus:ring-red-500 sm:text-sm text-gray-900 dark:text-[#C9D1D9]";
+  
+  // --- MODIFIED: Changed focus ring color to green for form consistency ---
+  const inputClasses = "mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-[#0D1117] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#161B22] focus:ring-[#2da44e] sm:text-sm text-gray-900 dark:text-[#C9D1D9]";
 
   const TrafficDensityButton = ({ value, label }: { value: "low" | "medium" | "high", label: string }) => (
     <button
       type="button"
       onClick={() => setFormData(prev => ({ ...prev, traffic_density: value }))}
-      className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#161B22] focus:ring-red-500 ${
+      // --- MODIFIED: Selected background and focus rings are now green ---
+      className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#161B22] focus:ring-[#2da44e] ${
         formData.traffic_density === value
-          ? "bg-red-600 dark:bg-red-500 text-white shadow-md"
+          ? "bg-[#2da44e] text-white shadow-md"
           : "bg-gray-200 dark:bg-[#21262D] text-gray-700 dark:text-[#C9D1D9] hover:bg-gray-300 dark:hover:bg-[#30363D]"
       }`}
     >
@@ -275,7 +276,8 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
               {/* General Information Section */}
               <div className="space-y-5">
                 <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">
-                  <FileText size={20} className="text-red-500"/>
+                  {/* --- MODIFIED: Icon color is now blue --- */}
+                  <FileText size={20} className="text-[#0f5ba7]"/>
                   General Information
                 </h3>
                 <div>
@@ -295,7 +297,8 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
               {/* Location Details Section */}
               <div className="space-y-5">
                 <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">
-                  <MapPin size={20} className="text-red-500"/>
+                   {/* --- MODIFIED: Icon color is now blue --- */}
+                  <MapPin size={20} className="text-[#0f5ba7]"/>
                   Location Details
                 </h3>
                 <div>
@@ -320,12 +323,12 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
               {/* Simulation Parameters Section */}
               <div className="space-y-5">
                 <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">
-                  <TrafficCone size={20} className="text-red-500"/>
+                   {/* --- MODIFIED: Icon color is now blue --- */}
+                  <TrafficCone size={20} className="text-[#0f5ba7]"/>
                   Simulation Parameters
                 </h3>
                 <div>
                   <label htmlFor="default_parameters.intersection_type" className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1">Intersection Type</label>
-                  {/* --- MODIFIED: Select now only has the Traffic Light option --- */}
                   <select name="default_parameters.intersection_type" id="default_parameters.intersection_type" required className={inputClasses} value={formData.default_parameters.intersection_type} onChange={handleChange}>
                     <option value="INTERSECTION_TYPE_TRAFFICLIGHT">Traffic Light</option>
                   </select>
@@ -364,7 +367,8 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="px-6 py-2.5 bg-red-600 dark:bg-red-500 text-white rounded-lg font-medium hover:bg-red-700 dark:hover:bg-red-600 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center transition-colors duration-150 shadow-sm"
+              // --- MODIFIED: Background and hover colors are now green ---
+              className="px-6 py-2.5 bg-[#2da44e] text-white rounded-lg font-medium hover:bg-[#288c42] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center transition-colors duration-150 shadow-sm"
             >
               {isLoading ? (
                 <>
@@ -390,10 +394,8 @@ const getAuthToken = () => {
   return localStorage.getItem("authToken");
 };
 
-// --- ADDED: A map to translate API values to user-friendly names ---
 const intersectionTypeDisplayMap: { [key: string]: string } = {
   "INTERSECTION_TYPE_TRAFFICLIGHT": "Traffic Light",
-  // Add other mappings here if they ever exist
 };
 
 
@@ -614,7 +616,7 @@ const Intersections = () => {
               <div className="searchContainer relative w-full max-w-md">
                 <input
                   type="text"
-                  placeholder="Search by Name or ID..."
+                  placeholder="Search by Name..."
                   className="searchBar w-full pl-10 pr-4 py-2 border-2 border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#161B22] text-gray-900 dark:text-[#E6EDF3] rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-500 transition-colors"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -652,7 +654,6 @@ const Intersections = () => {
                         id={intersection.id}
                         name={intersection.name}
                         location={`${intersection.details.address}`}
-                        // --- MODIFIED: Use the display name from the map ---
                         lanes={displayType}
                         onSimulate={(id) => console.log(`Simulate ${id}`)}
                         onEdit={handleEditClick}
