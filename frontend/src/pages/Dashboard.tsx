@@ -44,6 +44,7 @@ interface ApiIntersection {
     longitude?: number;
     [key: string]: unknown;
   };
+  traffic_density?: string; // Added for traffic density
   [key: string]: unknown;
 }
 
@@ -119,7 +120,7 @@ const Dashboard: React.FC = () => {
     const ctx = chartRef.current.getContext("2d");
     if (!ctx) return;
 
-    const chartData = processRunCountData(intersections);
+    const chartData = processTrafficDensityData(intersections);
 
     const isDarkMode = document.documentElement.classList.contains("dark");
 
@@ -139,7 +140,7 @@ const Dashboard: React.FC = () => {
         labels: chartData.labels,
         datasets: [
           {
-            label: "Optimization Runs (Cumulative)",
+            label: "Traffic Density",
             data: chartData.data,
             fill: true,
             backgroundColor: gradient,
@@ -170,11 +171,17 @@ const Dashboard: React.FC = () => {
             grid: { color: gridColor, drawTicks: false },
             ticks: {
               color: labelColor,
-              stepSize: step,
+              stepSize: 1,
               font: { size: 12, family: "'Inter', sans-serif" },
               padding: 10,
+              callback: function(value) {
+                const densityLabels = ["", "Low", "Medium", "High"];
+                return densityLabels[value as number] || value;
+              }
             },
             border: { display: false },
+            min: 0,
+            max: 4,
           },
         },
         plugins: {
@@ -199,7 +206,9 @@ const Dashboard: React.FC = () => {
                 return `${context[0].label}`;
               },
               label: function (context) {
-                return `Total Runs: ${context.parsed.y}`;
+                const densityLabels = ["", "Low", "Medium", "High"];
+                const densityValue = densityLabels[context.parsed.y as number] || context.parsed.y;
+                return `Traffic Density: ${densityValue}`;
               },
             },
           },
@@ -226,7 +235,7 @@ const Dashboard: React.FC = () => {
         day: "numeric",
       });
       perDay[label] =
-        (perDay[label] || 0) + (typeof i.run_count === "number" ? i.run_count : 0);
+        (perDay[label] || 0) + (typeof i.run_count === 'number' ? i.run_count : 0);
     });
 
     const labels = Object.keys(perDay);
@@ -252,6 +261,38 @@ const Dashboard: React.FC = () => {
     }
 
     return { labels: last, data: lastData };
+  };
+
+  const processTrafficDensityData = (intersections: ApiIntersection[]) => {
+    if (intersections.length === 0) {
+      return { labels: ["No Data"], data: [0] };
+    }
+
+    // Map traffic density categories to numeric values based on actual API response
+    const densityMap: { [key: string]: number } = {
+      "TRAFFIC_DENSITY_LOW": 1,
+      "TRAFFIC_DENSITY_MEDIUM": 2,
+      "TRAFFIC_DENSITY_HIGH": 3
+    };
+
+    // Process intersections and map their traffic density to numeric values
+    const densityData = intersections.map((intersection) => {
+      const density = intersection.traffic_density || "TRAFFIC_DENSITY_MEDIUM";
+      const mappedValue = densityMap[density] || 2; // Default to medium (2) if density is unknown
+      
+      // Debug logging
+      console.log(`Intersection: ${intersection.name}, Raw density: ${density}, Mapped value: ${mappedValue}`);
+      
+      return mappedValue;
+    });
+
+    // Create labels for the x-axis (intersection numbers)
+    const labels = intersections.map((_, index) => `Intersection ${index + 1}`);
+
+    console.log('Final density data:', densityData);
+    console.log('Final labels:', labels);
+
+    return { labels, data: densityData };
   };
 
   useEffect(() => {
@@ -537,7 +578,7 @@ const Dashboard: React.FC = () => {
             <div className="graph-card bg-white dark:bg-gray-800 rounded-lg shadow-md">
               <div className="graph-card-header">
                 <h2 className="text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] text-align-center">
-                  Optimization Runs Over Time
+                  Traffic Density Distribution
                 </h2>
               </div>
               <div className="traffic-chart-container">
