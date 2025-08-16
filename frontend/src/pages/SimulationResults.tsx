@@ -38,15 +38,84 @@ type SimulationOutput = {
   };
 };
 
-// Added interface for the full intersection data
+// Full API response for simulation/optimisation endpoints
+interface ApiSimulationResponse {
+  output: SimulationOutput;
+  results: ApiSimulationResults;
+}
+
+// Full API response for a single intersection
 interface ApiIntersection {
-    name: string;
-    traffic_density: string;
-    // Add other fields from the full intersection object if needed
+  name: string;
+  traffic_density: string;
+  // Add other fields from the full intersection object if needed
 }
 // #endregion
 
-// #region Helper Functions (Unchanged)
+// #region Loading Component
+const LoadingAnimation: React.FC = () => (
+  <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
+    <div className="relative">
+      {/* Outer spinning ring */}
+      <div className="w-20 h-20 border-4 border-gray-600 border-t-teal-500 rounded-full animate-spin"></div>
+      {/* Inner pulsing dot */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <div className="w-4 h-4 bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full animate-pulse"></div>
+      </div>
+    </div>
+    
+    {/* Loading text with animated dots */}
+    <div className="text-center">
+      <div className="text-xl font-semibold text-gray-300 mb-2">Loading Simulation Data</div>
+      <div className="flex items-center justify-center space-x-1">
+        <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+        <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+        <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+      </div>
+    </div>
+    
+    {/* Progress bar */}
+    <div className="w-64 h-2 bg-gray-700 rounded-full overflow-hidden">
+      <div className="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full animate-pulse"></div>
+    </div>
+  </div>
+);
+// #endregion
+
+// #region Error Component
+const ErrorDisplay: React.FC<{ error: string; onRetry: () => void }> = ({ error, onRetry }) => (
+  <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6 text-center">
+    {/* Error icon */}
+    <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center">
+      <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    
+    {/* Error message */}
+    <div className="max-w-md">
+      <h3 className="text-xl font-semibold text-red-400 mb-2">Failed to Load Data</h3>
+      <p className="text-gray-400 mb-6">{error}</p>
+    </div>
+    
+    {/* Retry button */}
+    <button
+      onClick={onRetry}
+      className="px-8 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-xl 
+                 hover:from-red-700 hover:to-red-800 transform transition-all duration-300 ease-in-out 
+                 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50 
+                 hover:shadow-xl hover:shadow-red-500/40 flex items-center space-x-2"
+    >
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+      <span>Retry</span>
+    </button>
+  </div>
+);
+// #endregion
+
+// #region Helper Functions
 function computeStats(vehicles: Vehicle[]) {
   let totalSpeed = 0, maxSpeed = -Infinity, minSpeed = Infinity, speedCount = 0;
   let totalDistance = 0;
@@ -204,58 +273,62 @@ const SimulationResults: React.FC = () => {
     totalDistHistRef: useRef<HTMLCanvasElement | null>(null),
   };
 
-  useEffect(() => {
+  const fetchData = async () => {
     if (!intersectionId) {
       setError("No intersection ID provided.");
       setLoading(false);
       return;
     }
 
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const authToken = getAuthToken();
-        const headers = { Authorization: `Bearer ${authToken}` };
+    setLoading(true);
+    setError(null);
+    try {
+      const authToken = getAuthToken();
+      const headers = { Authorization: `Bearer ${authToken}` };
 
-        // Fetch all three pieces of data in parallel
-        const [simRes, optRes, intersectionRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/intersections/${intersectionId}/simulate`, { headers }),
-          fetch(`${API_BASE_URL}/intersections/${intersectionId}/optimise`, { headers }),
-          fetch(`${API_BASE_URL}/intersections/${intersectionId}`, { headers })
-        ]);
+      // Fetch all three pieces of data in parallel
+      const [simRes, optRes, intersectionRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/intersections/${intersectionId}/simulate`, { headers }),
+        fetch(`${API_BASE_URL}/intersections/${intersectionId}/optimise`, { headers }),
+        fetch(`${API_BASE_URL}/intersections/${intersectionId}`, { headers })
+      ]);
 
-        if (!simRes.ok) throw new Error(`Failed to fetch simulation data: ${simRes.statusText}`);
-        const simResponseData = await simRes.json();
-        setSimData(simResponseData.output);
-        setApiResults(simResponseData.results);
-        
-        if (!intersectionRes.ok) throw new Error(`Failed to fetch intersection details: ${intersectionRes.statusText}`);
-        setIntersectionData(await intersectionRes.json());
+      // Process simulation data
+      if (!simRes.ok) throw new Error(`Failed to fetch simulation data: ${simRes.statusText}`);
+      const simResponseData: ApiSimulationResponse = await simRes.json();
+      setSimData(simResponseData.output);
+      setApiResults(simResponseData.results);
+      
+      // Process intersection details
+      if (!intersectionRes.ok) throw new Error(`Failed to fetch intersection details: ${intersectionRes.statusText}`);
+      const intersectionResponseData: ApiIntersection = await intersectionRes.json();
+      setIntersectionData(intersectionResponseData);
 
-        if (optRes.ok) {
-          const optResponseData = await optRes.json();
-          setOptimizedData(optResponseData.output);
-          setOptimizedApiResults(optResponseData.results);
-          setCanBeOptimized(true);
-          if (type === "optimizations") {
-            setShowOptimized(true);
-          }
-        } else {
-          setCanBeOptimized(false);
+      // Process optimization data if available
+      if (optRes.ok) {
+        const optResponseData: ApiSimulationResponse = await optRes.json();
+        setOptimizedData(optResponseData.output);
+        setOptimizedApiResults(optResponseData.results);
+        setCanBeOptimized(true);
+        // If the user came from the "Optimizations" table, show the comparison by default
+        if (type === "optimizations") {
+          setShowOptimized(true);
         }
-      } catch (err: any) {
-        setError(err.message || "Failed to load data from the API.");
-        console.error(err);
-      } finally {
-        setLoading(false);
+      } else {
+        setCanBeOptimized(false);
       }
-    };
+    } catch (err: any) {
+      setError(err.message || "Failed to load data from the API.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, [intersectionId, type]);
   
-  // Chart rendering logic remains unchanged...
   useEffect(() => {
     chartInstances.current.forEach((c) => c?.destroy());
     chartInstances.current = [];
@@ -576,9 +649,44 @@ const SimulationResults: React.FC = () => {
     };
   }, [simData, showOptimized, optimizedData]);
 
-  if (loading) return <div className="text-center text-gray-700 dark:text-gray-300 py-10">Loading simulation data...</div>;
-  if (error) return <div className="text-center text-red-500 py-10">{error}</div>;
-  if (!simData) return <div className="text-center text-gray-700 dark:text-gray-300 py-10">No simulation data found.</div>;
+  if (loading) {
+    return (
+      <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
+        <Navbar />
+        <div className="simRes-main-content py-8 px-6 overflow-y-auto">
+          <LoadingAnimation />
+        </div>
+        <Footer />
+        <HelpMenu />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
+        <Navbar />
+        <div className="simRes-main-content py-8 px-6 overflow-y-auto">
+          <ErrorDisplay error={error} onRetry={fetchData} />
+        </div>
+        <Footer />
+        <HelpMenu />
+      </div>
+    );
+  }
+
+  if (!simData) {
+    return (
+      <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
+        <Navbar />
+        <div className="simRes-main-content py-8 px-6 overflow-y-auto">
+          <div className="text-center text-gray-700 dark:text-gray-300 py-10">No simulation data found.</div>
+        </div>
+        <Footer />
+        <HelpMenu />
+      </div>
+    );
+  }
 
   const { numPhases, totalCycle } = simData.intersection?.trafficLights?.[0]
     ? {
