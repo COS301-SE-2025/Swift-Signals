@@ -191,7 +191,7 @@ class TestTJunction(unittest.TestCase):
             self.assertEqual(result[0]["id"], "n1")
             self.assertEqual(result[0]["x"], 1.1)
             self.assertEqual(result[0]["y"], 2.2)
-            self.assertEqual(result[0]["type"], "priority")
+            self.assertEqual(result[0]["type"], "PRIORITY")
 
     def test_parseEdges_parses_correctly(self):
         xml = """<edges>
