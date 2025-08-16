@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
-import { Search, X } from "lucide-react";
+import { Search, X, FileText, MapPin, TrafficCone } from "lucide-react";
 import IntersectionCard from "../components/IntersectionCard";
 import "../styles/Intersections.css";
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
 
+// =================================================================
+// DATA STRUCTURES & INTERFACES
+// =================================================================
+
+/**
+ * Defines the shape of the data used within the create/edit form.
+ */
 export interface IntersectionFormData {
   name: string;
   traffic_density: "low" | "medium" | "high";
@@ -23,6 +30,46 @@ export interface IntersectionFormData {
     intersection_type: string;
   };
 }
+
+/**
+ * Defines the structure for simulation parameters as returned by the API.
+ */
+interface SimulationParameters {
+  intersection_type: string;
+  green: number;
+  yellow: number;
+  red: number;
+  speed: number;
+  seed: number;
+}
+
+/**
+ * Defines the nested structure for parameters in the API response.
+ */
+interface OptimisationParameters {
+  optimisation_type: string;
+  simulation_parameters: SimulationParameters;
+}
+
+/**
+ * Defines the complete Intersection object structure as returned by the API.
+ */
+interface Intersection {
+  id: string;
+  name: string;
+  details: {
+    address: string;
+    city: string;
+    province: string;
+  };
+  default_parameters: OptimisationParameters;
+  traffic_density: "low" | "medium" | "high";
+  image?: string;
+}
+
+// =================================================================
+// MODAL COMPONENTS & PROPS
+// =================================================================
 
 interface CreateIntersectionModalProps {
   isOpen: boolean;
@@ -61,7 +108,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
         >
           <X size={24} />
         </button>
-        
+
         <div className="text-center mb-8">
           <div className="mx-auto mb-4 w-16 h-16 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center">
             <svg
@@ -78,11 +125,11 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
               />
             </svg>
           </div>
-          
+
           <h2 className="text-2xl font-bold mb-3 text-gray-900 dark:text-[#E6EDF3]">
             Delete Intersection?
           </h2>
-          
+
           <div className="space-y-2">
             <p className="text-gray-700 dark:text-[#C9D1D9]">
               You're about to permanently delete
@@ -95,7 +142,7 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
             </p>
           </div>
         </div>
-        
+
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <button
             type="button"
@@ -140,25 +187,30 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
 }) => {
   const getDefaultFormData = (): IntersectionFormData => ({
     name: "",
-    traffic_density: "low",
+    traffic_density: "medium",
     details: { address: "", city: "Pretoria", province: "Gauteng" },
     default_parameters: {
-      green: 10,
+      green: 30,
       yellow: 3,
-      red: 5,
+      red: 27,
       speed: 60,
       seed: Math.floor(Math.random() * 10000000000),
-      intersection_type: "traffic light",
+      // --- MODIFIED: Default value is now TRAFFICLIGHT ---
+      intersection_type: "INTERSECTION_TYPE_TRAFFICLIGHT",
     },
   });
 
-  const [formData, setFormData] = useState<IntersectionFormData>(getDefaultFormData());
+  const [formData, setFormData] = useState<IntersectionFormData>(
+    getDefaultFormData()
+  );
 
   useEffect(() => {
-    if (isEditing && initialData) {
-      setFormData(initialData);
-    } else if (!isEditing) {
-      setFormData(getDefaultFormData());
+    if (isOpen) {
+      if (isEditing && initialData) {
+        setFormData(initialData);
+      } else {
+        setFormData(getDefaultFormData());
+      }
     }
   }, [initialData, isEditing, isOpen]);
 
@@ -169,27 +221,20 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   ) => {
     const { name, value } = e.target;
     const keys = name.split(".");
-
     if (keys.length > 1) {
-      const [parentKey, childKey] = keys as [
-        keyof IntersectionFormData,
-        string,
-      ];
+      const [parentKey, childKey] = keys as [keyof IntersectionFormData, string];
       if (parentKey === "details" || parentKey === "default_parameters") {
+        const isNumber = ["green", "yellow", "red", "speed", "seed"].includes(childKey);
         setFormData((prev) => ({
           ...prev,
           [parentKey]: {
             ...prev[parentKey],
-            [childKey]:
-              e.target.type === "number" ? parseInt(value, 10) : value,
+            [childKey]: isNumber ? parseInt(value, 10) || 0 : value,
           },
         }));
       }
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setFormData((prev) => ({ ...prev, [name]: value as any }));
     }
   };
 
@@ -198,147 +243,135 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
     onSubmit(formData);
   };
 
+  const inputClasses = "mt-1 block w-full px-3 py-2 bg-gray-50 dark:bg-[#0D1117] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#161B22] focus:ring-red-500 sm:text-sm text-gray-900 dark:text-[#C9D1D9]";
+
+  const TrafficDensityButton = ({ value, label }: { value: "low" | "medium" | "high", label: string }) => (
+    <button
+      type="button"
+      onClick={() => setFormData(prev => ({ ...prev, traffic_density: value }))}
+      className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-[#161B22] focus:ring-red-500 ${
+        formData.traffic_density === value
+          ? "bg-red-600 dark:bg-red-500 text-white shadow-md"
+          : "bg-gray-200 dark:bg-[#21262D] text-gray-700 dark:text-[#C9D1D9] hover:bg-gray-300 dark:hover:bg-[#30363D]"
+      }`}
+    >
+      {label}
+    </button>
+  );
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-      <div className="bg-white dark:bg-[#161B22] p-4 sm:p-8 rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 dark:text-[#E6EDF3] hover:text-gray-800 dark:hover:text-gray-200"
-        >
+    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+      <div className="bg-white dark:bg-[#161B22] p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-4xl relative border border-gray-200 dark:border-[#30363D]">
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 dark:text-[#7D8590] hover:text-gray-600 dark:hover:text-[#E6EDF3] transition-colors duration-150">
           <X size={24} />
         </button>
-        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-[#E6EDF3]">
+        <h2 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-[#E6EDF3]">
           {isEditing ? "Edit Intersection" : "Create New Intersection"}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
-            >
-              Intersection Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              required
-              className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
-              value={formData.name}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="details.address"
-              className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
-            >
-              Address
-            </label>
-            <input
-              type="text"
-              name="details.address"
-              id="details.address"
-              required
-              className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
-              value={formData.details.address}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="traffic_density"
-              className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
-            >
-              Traffic Density
-            </label>
-            <select
-              name="traffic_density"
-              id="traffic_density"
-              required
-              className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
-              value={formData.traffic_density}
-              onChange={handleChange}
-            >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label
-                htmlFor="default_parameters.green"
-                className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
-              >
-                Green Light (s)
-              </label>
-              <input
-                type="number"
-                name="default_parameters.green"
-                id="default_parameters.green"
-                required
-                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
-                value={formData.default_parameters.green}
-                onChange={handleChange}
-              />
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
+            {/* --- LEFT COLUMN --- */}
+            <div className="space-y-8">
+              {/* General Information Section */}
+              <div className="space-y-5">
+                <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">
+                  <FileText size={20} className="text-red-500"/>
+                  General Information
+                </h3>
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1">Intersection Name</label>
+                  <input type="text" name="name" id="name" required className={inputClasses} value={formData.name} onChange={handleChange} placeholder="e.g., Lynnwood & Atterbury"/>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-2">Traffic Density</label>
+                  <div className="flex space-x-2 bg-gray-100 dark:bg-[#0D1117] p-1 rounded-lg">
+                    <TrafficDensityButton value="low" label="Low" />
+                    <TrafficDensityButton value="medium" label="Medium" />
+                    <TrafficDensityButton value="high" label="High" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Location Details Section */}
+              <div className="space-y-5">
+                <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">
+                  <MapPin size={20} className="text-red-500"/>
+                  Location Details
+                </h3>
+                <div>
+                  <label htmlFor="details.address" className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1">Address / Cross Streets</label>
+                  <input type="text" name="details.address" id="details.address" required className={inputClasses} value={formData.details.address} onChange={handleChange} placeholder="Corner of Lynnwood Rd and Atterbury Rd"/>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="details.city" className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1">City</label>
+                    <input type="text" name="details.city" id="details.city" required className={inputClasses} value={formData.details.city} onChange={handleChange}/>
+                  </div>
+                  <div>
+                    <label htmlFor="details.province" className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1">Province</label>
+                    <input type="text" name="details.province" id="details.province" required className={inputClasses} value={formData.details.province} onChange={handleChange}/>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <label
-                htmlFor="default_parameters.yellow"
-                className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
-              >
-                Yellow Light (s)
-              </label>
-              <input
-                type="number"
-                name="default_parameters.yellow"
-                id="default_parameters.yellow"
-                required
-                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
-                value={formData.default_parameters.yellow}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="default_parameters.red"
-                className="block text-sm font-medium text-gray-700 dark:text-[#E6EDF3]"
-              >
-                Red Light (s)
-              </label>
-              <input
-                type="number"
-                name="default_parameters.red"
-                id="default_parameters.red"
-                required
-                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-[#161B22] border-2 border-gray-300 dark:border-[#30363D] rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm text-black dark:text-white"
-                value={formData.default_parameters.red}
-                onChange={handleChange}
-              />
+
+            {/* --- RIGHT COLUMN --- */}
+            <div className="space-y-8">
+              {/* Simulation Parameters Section */}
+              <div className="space-y-5">
+                <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">
+                  <TrafficCone size={20} className="text-red-500"/>
+                  Simulation Parameters
+                </h3>
+                <div>
+                  <label htmlFor="default_parameters.intersection_type" className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1">Intersection Type</label>
+                  {/* --- MODIFIED: Select now only has the Traffic Light option --- */}
+                  <select name="default_parameters.intersection_type" id="default_parameters.intersection_type" required className={inputClasses} value={formData.default_parameters.intersection_type} onChange={handleChange}>
+                    <option value="INTERSECTION_TYPE_TRAFFICLIGHT">Traffic Light</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label htmlFor="default_parameters.green" className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1">Green (s)</label>
+                    <input type="number" name="default_parameters.green" id="default_parameters.green" required min="1" className={inputClasses} value={formData.default_parameters.green} onChange={handleChange}/>
+                  </div>
+                  <div>
+                    <label htmlFor="default_parameters.yellow" className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1">Yellow (s)</label>
+                    <input type="number" name="default_parameters.yellow" id="default_parameters.yellow" required min="1" className={inputClasses} value={formData.default_parameters.yellow} onChange={handleChange}/>
+                  </div>
+                  <div>
+                    <label htmlFor="default_parameters.red" className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1">Red (s)</label>
+                    <input type="number" name="default_parameters.red" id="default_parameters.red" required min="1" className={inputClasses} value={formData.default_parameters.red} onChange={handleChange}/>
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="default_parameters.speed" className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1">Vehicle Speed (km/h)</label>
+                  <input type="number" name="default_parameters.speed" id="default_parameters.speed" required min="1" className={inputClasses} value={formData.default_parameters.speed} onChange={handleChange}/>
+                </div>
+              </div>
             </div>
           </div>
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-          <div className="flex justify-end space-x-4 pt-4">
+          
+          {error && <p className="text-red-500 text-sm text-center mt-6">{error}</p>}
+          <div className="flex justify-end space-x-4 pt-8 border-t border-gray-200 dark:border-[#30363D] mt-8">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 bg-gray-300 dark:bg-[#161B22] dark:border-2 dark:border-[#DA3633] text-gray-800 rounded-md hover:bg-gray-400 dark:text-white dark:hover:bg-[#DA3633]"
+              className="px-6 py-2.5 bg-gray-100 dark:bg-[#21262D] border-2 border-gray-300 dark:border-[#30363D] text-gray-700 dark:text-[#C9D1D9] rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-[#30363D] transition-colors duration-150"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 bg-[#0F5BA7] dark:bg-[#388BFD] text-white rounded-md hover:bg-red-800 disabled:bg-red-400 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 bg-red-600 dark:bg-red-500 text-white rounded-lg font-medium hover:bg-red-700 dark:hover:bg-red-600 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center transition-colors duration-150 shadow-sm"
             >
-              {isLoading
-                ? isEditing
-                  ? "Updating..."
-                  : "Creating..."
-                : isEditing
-                  ? "Update Intersection"
-                  : "Create Intersection"}
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  {isEditing ? "Updating..." : "Creating..."}
+                </>
+              ) : isEditing ? "Update Intersection" : "Create Intersection"}
             </button>
           </div>
         </form>
@@ -347,25 +380,22 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   );
 };
 
+// =================================================================
+// MAIN PAGE COMPONENT
+// =================================================================
+
 const API_BASE_URL = "http://localhost:9090";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");
 };
 
-interface Intersection {
-  id: string;
-  name: string;
-  details: {
-    address: string;
-    city: string;
-    province: string;
-  };
-  default_parameters: {
-    intersection_type: string;
-  };
-  image?: string;
-}
+// --- ADDED: A map to translate API values to user-friendly names ---
+const intersectionTypeDisplayMap: { [key: string]: string } = {
+  "INTERSECTION_TYPE_TRAFFICLIGHT": "Traffic Light",
+  // Add other mappings here if they ever exist
+};
+
 
 const Intersections = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -378,16 +408,11 @@ const Intersections = () => {
   const [createError, setCreateError] = useState<string | null>(null);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedIntersectionId, setSelectedIntersectionId] = useState<
-    string | null
-  >(null);
+  const [selectedIntersectionId, setSelectedIntersectionId] = useState<string | null>(null);
   const [editData, setEditData] = useState<IntersectionFormData | null>(null);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [intersectionToDelete, setIntersectionToDelete] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
+  const [intersectionToDelete, setIntersectionToDelete] = useState<{id: string; name: string;} | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchIntersections = async () => {
@@ -397,8 +422,7 @@ const Intersections = () => {
       const res = await fetch(`${API_BASE_URL}/intersections`, {
         headers: { Authorization: `Bearer ${getAuthToken()}` },
       });
-      if (!res.ok)
-        throw new Error(`Failed to fetch intersections: ${res.statusText}`);
+      if (!res.ok) throw new Error(`Failed to fetch intersections: ${res.statusText}`);
       const data = await res.json();
       setIntersections(data.intersections || []);
     } catch (err: any) {
@@ -418,8 +442,7 @@ const Intersections = () => {
         setIntersections([]);
         return;
       }
-      if (!res.ok)
-        throw new Error(`Failed to find intersection: ${res.statusText}`);
+      if (!res.ok) throw new Error(`Failed to find intersection: ${res.statusText}`);
       const data = await res.json();
       setIntersections(data ? [data] : []);
     } catch (err: any) {
@@ -460,6 +483,13 @@ const Intersections = () => {
     setIsCreating(true);
     setCreateError(null);
     try {
+      const updatePayload = {
+        name: formData.name,
+        traffic_density: formData.traffic_density,
+        details: formData.details,
+        default_parameters: formData.default_parameters
+      };
+
       const res = await fetch(
         `${API_BASE_URL}/intersections/${selectedIntersectionId}`,
         {
@@ -468,10 +498,7 @@ const Intersections = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${getAuthToken()}`,
           },
-          body: JSON.stringify({
-            name: formData.name,
-            details: formData.details,
-          }),
+          body: JSON.stringify(updatePayload),
         }
       );
       if (!res.ok) {
@@ -493,40 +520,30 @@ const Intersections = () => {
     const intersection = intersections.find((i) => i.id === id);
     if (!intersection) return;
     
-    setIntersectionToDelete({
-      id: intersection.id,
-      name: intersection.name,
-    });
+    setIntersectionToDelete({ id: intersection.id, name: intersection.name });
     setIsDeleteModalOpen(true);
   };
 
   const handleDeleteConfirm = async () => {
     if (!intersectionToDelete) return;
-    
     setIsDeleting(true);
     try {
       const res = await fetch(
         `${API_BASE_URL}/intersections/${intersectionToDelete.id}`,
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
-          },
+          headers: { Authorization: `Bearer ${getAuthToken()}` },
         }
       );
-      
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.message || "Failed to delete intersection");
       }
-
       setIsDeleteModalOpen(false);
       setIntersectionToDelete(null);
-
       if (searchQuery.trim() === intersectionToDelete.id) {
         setSearchQuery("");
       }
-      
       fetchIntersections();
     } catch (err: any) {
       setError(err.message || "Failed to delete intersection");
@@ -535,25 +552,34 @@ const Intersections = () => {
     }
   };
 
-  const handleEditClick = (id: string) => {
-    const intersection = intersections.find((i) => i.id === id);
-    if (!intersection) return;
-    setEditData({
-      name: intersection.name,
-      traffic_density: "low",
-      details: intersection.details,
-      default_parameters: {
-        green: 10,
-        yellow: 3,
-        red: 5,
-        speed: 60,
-        seed: 1,
-        intersection_type: intersection.default_parameters.intersection_type,
-      },
-    });
-    setSelectedIntersectionId(id);
-    setIsEditing(true);
-    setIsModalOpen(true);
+  const handleEditClick = async (id: string) => {
+    setCreateError(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/intersections/${id}`, {
+        headers: { Authorization: `Bearer ${getAuthToken()}` },
+      });
+      if (!res.ok) {
+        throw new Error("Failed to fetch intersection details for editing.");
+      }
+      const intersection: Intersection = await res.json();
+
+      if (!intersection?.default_parameters?.simulation_parameters) {
+        throw new Error("Incomplete intersection data received from server.");
+      }
+      
+      setEditData({
+        name: intersection.name,
+        traffic_density: intersection.traffic_density,
+        details: intersection.details,
+        default_parameters: intersection.default_parameters.simulation_parameters,
+      });
+      
+      setSelectedIntersectionId(id);
+      setIsEditing(true);
+      setIsModalOpen(true);
+    } catch (err: any) {
+      alert(`Error: ${err.message}`);
+    }
   };
 
   useEffect(() => {
@@ -580,20 +606,20 @@ const Intersections = () => {
 
   return (
     <>
-      <div className="intersectionBody flex flex-col min-h-screen bg-gray-100">
+      <div className="intersectionBody flex flex-col min-h-screen bg-gray-50 dark:bg-[#0D1117]">
         <Navbar />
-        <div className="main-content flex-grow w-full">
+        <main className="main-content flex-grow w-full">
           <div className="max-w-6xl mx-auto w-full px-4 py-8 pb-24">
-            <div className="topBar flex justify-between items-center mb-6 gap-x-4">
+            <div className="topBar flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
               <div className="searchContainer relative w-full max-w-md">
                 <input
                   type="text"
-                  placeholder="Search by Name..."
-                  className="searchBar w-full pl-4 pr-10 py-2 border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-red-500"
+                  placeholder="Search by Name or ID..."
+                  className="searchBar w-full pl-10 pr-4 py-2 border-2 border-gray-200 dark:border-[#30363D] bg-white dark:bg-[#161B22] text-gray-900 dark:text-[#E6EDF3] rounded-full focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-500 transition-colors"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-[#7D8590]">
                   <Search size={20} />
                 </div>
               </div>
@@ -605,39 +631,41 @@ const Intersections = () => {
                   setCreateError(null);
                   setIsModalOpen(true);
                 }}
-                className="addIntersectionBtn flex-shrink-0 bg-[#0F5BA7] dark:bg-[#388BFD] hover:bg-[#3DAEF0] text-white font-medium py-2 px-4 rounded-md"
+                className="addIntersectionBtn w-full sm:w-auto flex-shrink-0 bg-[#0F5BA7] dark:bg-[#238636] hover:bg-blue-700 dark:hover:bg-[#2DA44E] text-white font-medium py-2 px-6 rounded-lg transition-colors shadow-sm"
               >
                 Add Intersection
               </button>
             </div>
-            <div className="intersections space-y-6 pr-2">
+            <div className="intersections space-y-6">
               {isLoading ? (
-                <p className="text-center text-gray-500 dark:text-gray-400">
-                  Loading intersections...
-                </p>
+                <p className="text-center text-gray-500 dark:text-gray-400">Loading intersections...</p>
               ) : error ? (
                 <p className="text-center text-red-500">{error}</p>
               ) : filteredIntersections.length > 0 ? (
-                filteredIntersections.map((intersection) => (
-                  <IntersectionCard
-                    key={intersection.id}
-                    id={intersection.id}
-                    name={intersection.name}
-                    location={`${intersection.details.address}`}
-                    lanes={intersection.default_parameters.intersection_type}
-                    onSimulate={(id) => console.log(`Simulate ${id}`)}
-                    onEdit={handleEditClick}
-                    onDelete={handleDeleteClick}
-                  />
-                ))
+                filteredIntersections.map((intersection) => {
+                    const apiType = intersection.default_parameters.simulation_parameters.intersection_type;
+                    const displayType = intersectionTypeDisplayMap[apiType] || apiType;
+
+                    return (
+                        <IntersectionCard
+                        key={intersection.id}
+                        id={intersection.id}
+                        name={intersection.name}
+                        location={`${intersection.details.address}`}
+                        // --- MODIFIED: Use the display name from the map ---
+                        lanes={displayType}
+                        onSimulate={(id) => console.log(`Simulate ${id}`)}
+                        onEdit={handleEditClick}
+                        onDelete={handleDeleteClick}
+                        />
+                    );
+                })
               ) : (
-                <p className="text-center text-gray-500 dark:text-gray-400">
-                  No intersections found.
-                </p>
+                <p className="text-center text-gray-500 dark:text-gray-400">No intersections found.</p>
               )}
             </div>
           </div>
-        </div>
+        </main>
         <Footer />
         <HelpMenu />
       </div>
@@ -647,9 +675,8 @@ const Intersections = () => {
         onClose={() => {
           setIsModalOpen(false);
           setCreateError(null);
-          if (!isEditing) {
-            setEditData(null);
-          }
+          setIsEditing(false);
+          setEditData(null);
         }}
         onSubmit={
           isEditing ? handleUpdateIntersection : handleCreateIntersection

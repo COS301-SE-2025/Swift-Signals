@@ -5,7 +5,16 @@ import "../styles/Users.css";
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
 
-// TypeScript interface for user data
+// TypeScript interface for user data from API
+interface ApiUser {
+  id: string;
+  username: string;
+  email: string;
+  is_admin: boolean;
+  intersection_ids: string[];
+}
+
+// TypeScript interface for display user data
 interface User {
   id: number;
   name: string;
@@ -14,145 +23,95 @@ interface User {
   lastLogin: string;
 }
 
+// API response interface
+interface ApiResponse {
+  users?: ApiUser[];
+  message?: string;
+}
+
 const Users = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(9);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [totalUsers, setTotalUsers] = useState(0);
 
-  const users: User[] = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "email@email.com",
-      role: "Admin",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "email@email.com",
-      role: "Engineer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 3,
-      name: "John Calvin",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 4,
-      name: "Paul Washer",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 5,
-      name: "Joshua Garner",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 6,
-      name: "Chris Xides",
-      email: "email@email.com",
-      role: "Engineer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 7,
-      name: "Kgosi Segale",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 8,
-      name: "John Flavel",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 9,
-      name: "John Owen",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 10,
-      name: "John Doe",
-      email: "email@email.com",
-      role: "Admin",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 11,
-      name: "Jane Smith",
-      email: "email@email.com",
-      role: "Engineer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 12,
-      name: "John Calvin",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 13,
-      name: "Paul Washer",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 14,
-      name: "Joshua Garner",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 15,
-      name: "Chris Xides",
-      email: "email@email.com",
-      role: "Engineer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 16,
-      name: "Kgosi Segale",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 17,
-      name: "John Flavel",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-    {
-      id: 18,
-      name: "John Owen",
-      email: "email@email.com",
-      role: "Viewer",
-      lastLogin: "2025-05-13 09:00",
-    },
-  ];
+  // Function to get auth token from localStorage or wherever it's stored
+  const getAuthToken = () => {
+    return localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+  };
 
+  // Function to fetch users from API
+  const fetchUsers = async (page: number, pageSize: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      // Create URL with query parameters
+      const url = new URL('/admin/users', window.location.origin);
+      url.searchParams.append('page', page.toString());
+      url.searchParams.append('page_size', pageSize.toString());
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Unauthorized - Please log in again');
+        } else if (response.status === 403) {
+          throw new Error('Forbidden - Admin access required');
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      }
+
+      const data: ApiUser[] = await response.json();
+      
+      // Transform API data to display format
+      const transformedUsers: User[] = data.map((apiUser, index) => ({
+        id: parseInt(apiUser.id),
+        name: apiUser.username,
+        email: apiUser.email,
+        role: apiUser.is_admin ? 'Admin' : 'User',
+        lastLogin: 'N/A' // API doesn't provide last login, you might need to add this field
+      }));
+
+      setUsers(transformedUsers);
+      setTotalUsers(data.length); // Note: You might need total count from API for proper pagination
+      
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch users');
+      setUsers([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch users when component mounts or pagination changes
+  useEffect(() => {
+    fetchUsers(currentPage, rowsPerPage);
+  }, [currentPage, rowsPerPage]);
+
+  // Handle responsive design
   useEffect(() => {
     const mediaQuery = window.matchMedia(
       "(max-width: 1400px) and (max-height: 800px)",
     );
     const handleMediaChange = (e: MediaQueryListEvent | MediaQueryList) => {
-      setRowsPerPage(e.matches ? 7 : 9);
+      const newRowsPerPage = e.matches ? 7 : 9;
+      setRowsPerPage(newRowsPerPage);
       setCurrentPage(1);
     };
 
@@ -162,17 +121,75 @@ const Users = () => {
     return () => mediaQuery.removeEventListener("change", handleMediaChange);
   }, []);
 
-  const totalPages = Math.ceil(users.length / rowsPerPage);
+  // Calculate pagination
+  const totalPages = Math.ceil(totalUsers / rowsPerPage);
 
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const currentUsers = users.slice(startIndex, endIndex);
+  // Handle user actions
+  const handleEdit = async (id: number) => {
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
 
-  const handleEdit = (id: number) => console.log(`Edit user ${id}`);
-  const handleDelete = (id: number) => console.log(`Delete user ${id}`);
+      // You can implement edit functionality here
+      console.log(`Edit user ${id}`);
+      
+      // Example: Navigate to edit page or open modal
+      // For now, just log the action
+    } catch (err) {
+      console.error('Error editing user:', err);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this user?')) {
+      return;
+    }
+
+    try {
+      const token = getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await fetch(`/admin/users/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Unauthorized - Please log in again');
+        } else if (response.status === 403) {
+          throw new Error('Forbidden - Admin access required');
+        } else if (response.status === 404) {
+          throw new Error('User not found');
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      }
+
+      // Refresh the users list after successful deletion
+      await fetchUsers(currentPage, rowsPerPage);
+      
+      // If current page is empty after deletion, go to previous page
+      if (users.length === 1 && currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      alert(err instanceof Error ? err.message : 'Failed to delete user');
+    }
+  };
 
   const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
   const getPageNumbers = () => {
@@ -204,75 +221,112 @@ const Users = () => {
       <Navbar />
       <div className="user-main-content flex-grow">
         <div className="usersDisp max-w-6xl mx-auto px-4 py-8">
-          <UsersTable
-            users={currentUsers}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          
+          {/* Loading State */}
+          {loading && (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0F5BA7]"></div>
+              <span className="ml-2 text-gray-600">Loading users...</span>
+            </div>
+          )}
 
-          <div className="usersPaging flex justify-center items-center py-4 gap-2 mt-4">
-            <button
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-              aria-label="Previous page"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          {/* Error State */}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              <strong>Error:</strong> {error}
+              <button
+                onClick={() => fetchUsers(currentPage, rowsPerPage)}
+                className="ml-4 bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-            </button>
+                Retry
+              </button>
+            </div>
+          )}
 
-            {getPageNumbers().map((page, index) =>
-              typeof page === "string" ? (
-                <span key={index} className="px-4 py-2 text-gray-500">
-                  ...
-                </span>
-              ) : (
-                <button
-                  key={page}
-                  onClick={() => goToPage(page)}
-                  className={`px-4 py-2 rounded-full transition-colors duration-200 ${
-                    currentPage === page
-                      ? "bg-[#0F5BA7] text-white"
-                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                  }`}
-                >
-                  {page}
-                </button>
-              ),
-            )}
+          {/* Users Table */}
+          {!loading && !error && (
+            <>
+              <UsersTable
+                users={users}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
 
-            <button
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-              aria-label="Next page"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-          </div>
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="usersPaging flex justify-center items-center py-4 gap-2 mt-4">
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                    aria-label="Previous page"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M15 19l-7-7 7-7"
+                      />
+                    </svg>
+                  </button>
+
+                  {getPageNumbers().map((page, index) =>
+                    typeof page === "string" ? (
+                      <span key={index} className="px-4 py-2 text-gray-500">
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        key={page}
+                        onClick={() => goToPage(page)}
+                        className={`px-4 py-2 rounded-full transition-colors duration-200 ${
+                          currentPage === page
+                            ? "bg-[#0F5BA7] text-white"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ),
+                  )}
+
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                    aria-label="Next page"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Empty State */}
+          {!loading && !error && users.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-gray-500 text-lg">No users found.</p>
+            </div>
+          )}
         </div>
       </div>
       <Footer />
