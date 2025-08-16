@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import "../styles/SimulationResults.css";
 import HelpMenu from "../components/HelpMenu";
 import { Chart, registerables } from "chart.js";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import type { ChartConfiguration } from "chart.js";
 
 Chart.register(...registerables);
@@ -262,6 +262,7 @@ const SimulationResults: React.FC = () => {
   const [canBeOptimized, setCanBeOptimized] = useState(false);
 
   const location = useLocation();
+  const navigate = useNavigate();
   const { intersectionIds, name, description, type } = location.state || {};
   const intersectionId = intersectionIds?.[0];
 
@@ -649,6 +650,19 @@ const SimulationResults: React.FC = () => {
     };
   }, [simData, showOptimized, optimizedData]);
 
+  const handleViewRendering = () => {
+    if (intersectionId) {
+      navigate("/comparison-rendering", {
+        state: {
+          originalIntersectionId: intersectionId,
+          originalIntersectionName: intersectionData?.name || "Simulation",
+        },
+      });
+    } else {
+      alert("No intersection ID available for rendering.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
@@ -715,7 +729,7 @@ const SimulationResults: React.FC = () => {
             </div>
             <div className="flex flex-col gap-3 lg:min-w-[280px]">
               <button
-                onClick={() => { window.location.href = "/comparison-rendering"; }}
+                onClick={handleViewRendering}
                 className="px-8 py-3 text-base font-bold text-white bg-[#0F5BA7] border-2 border-[#0F5BA7] rounded-xl transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#0F5BA7]/50 hover:shadow-xl hover:shadow-[#0F5BA7]/40"
               >
                 View Rendering

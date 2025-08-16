@@ -1704,153 +1704,153 @@ const NewSimulationModal: React.FC<{
 };
 
 const SimulationTable: React.FC<{
-  simulations: SimulationData[];
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
-  onViewResults: (backendId: string, intersectionName: string) => void;
+  simulations: SimulationData[];
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+  onViewResults: (backendId: string, intersectionName: string) => void;
 }> = ({ simulations, currentPage, setCurrentPage, onViewResults }) => {
-  const rowsPerPage = 4;
-  const totalPages = Math.ceil(simulations.length / rowsPerPage);
-  const startIndex = currentPage * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const paginatedSimulations = simulations.slice(startIndex, endIndex);
+  const rowsPerPage = 4;
+  const totalPages = Math.ceil(simulations.length / rowsPerPage);
+  const startIndex = currentPage * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const paginatedSimulations = simulations.slice(startIndex, endIndex);
 
-  const handleDelete = (backendId: string) => {
-    alert(`Deleting simulation with backend ID ${backendId}`);
-    // Replace with actual delete logic
-  };
+  const handleDelete = (backendId: string) => {
+    alert(`Deleting simulation with backend ID ${backendId}`);
+    // Replace with actual delete logic
+  };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
-  const statusClass = (status: string) => {
-    switch (status) {
-      case "optimised":
-        return "bg-green-200 text-green-800 border-green-300";
-      case "unoptimised":
-        return "bg-yellow-200 text-yellow-800 border-yellow-300";
-      case "Failed":
-        return "bg-red-200 text-red-800 border-red-300";
-      default:
-        return "bg-gray-200 text-gray-800 border-gray-300";
-    }
-  };
+  const statusClass = (status: string) => {
+    switch (status) {
+      case "optimised":
+        return "bg-green-200 text-green-800 border-green-300";
+      case "unoptimised":
+        return "bg-yellow-200 text-yellow-800 border-yellow-300";
+      case "Failed":
+        return "bg-red-200 text-red-800 border-red-300";
+      default:
+        return "bg-gray-200 text-gray-800 border-gray-300";
+    }
+  };
 
-  return (
-    <div className="simTable bg-white dark:bg-[#161B22] shadow-md rounded-lg overflow-hidden table-fixed-height relative">
-      <table className="simulationTable min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="simTableHead bg-gray-50 dark:bg-[#161B22]">
-          <tr>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              No.
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Intersection
-            </th>
-            {/* ✅ UPDATED: Changed table headers */}
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Traffic Density
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Speed
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Status
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white dark:bg-[#161B22] divide-y divide-gray-200 dark:divide-gray-700">
-          {paginatedSimulations.map((sim) => (
-            <tr key={sim.backendId}>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                #{sim.id}
-              </td>
-              <td className="intersectionCell px-4 py-3 whitespace-wrap text-sm text-gray-900 dark:text-gray-200">
-                {sim.intersection}
-              </td>
-              {/* ✅ UPDATED: Changed table cells to display new data */}
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                {sim.trafficDensity}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                {sim.speed} km/h
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm">
-                <span
-                  className={`sim-status inline-flex items-center px-3 py-1 rounded-full border ${statusClass(
-                    sim.status,
-                  )}`}
-                >
-                  {sim.status}
-                </span>
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm">
-                <div className="flex flex-col space-y-2">
-                  <button
-                    onClick={() =>
-                      onViewResults(sim.backendId, sim.intersection)
-                    }
-                    className="viewBtn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium w-full text-center"
-                    title="View Results"
-                  >
-                    <Eye size={18} strokeWidth={2} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(sim.backendId)}
-                    className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center"
-                  	 title="Delete Simulation"
-                  >
-                    <Trash2 size={18} strokeWidth={2} />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {simulations.length > rowsPerPage && (
-        <div className="pagination absolute bottom-0 left-0 right-0 flex justify-center items-center p-4 space-x-2 bg-white dark:bg-[#161B22] border-t border-gray-200 dark:border-gray-700">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 0}
-            className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${
-              currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            Prev
-          </button>
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index}
-              onClick={() => handlePageChange(index)}
-              className={`px-3 py-1 rounded-full text-sm font-medium ${
-                currentPage === index
-                  ? "bg-[#0F5BA7] text-white dark:bg-[#388BFD]"
-                  : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
-              } transition-all duration-300`}
-            >
-              {index + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages - 1}
-            className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${
-              currentPage === totalPages - 1
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-          >
-            Next
-          </button>
-        </div>
-      )}
-    </div>
-  );
+  return (
+    <div className="simTable bg-white dark:bg-[#161B22] shadow-md rounded-lg overflow-hidden table-fixed-height relative">
+      <table className="simulationTable min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead className="simTableHead bg-gray-50 dark:bg-[#161B22]">
+          <tr>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              No.
+            </th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Intersection
+            </th>
+            {/* ✅ UPDATED: Changed table headers */}
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Traffic Density
+            </th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Speed
+            </th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Status
+            </th>
+            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              Actions
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white dark:bg-[#161B22] divide-y divide-gray-200 dark:divide-gray-700">
+          {paginatedSimulations.map((sim) => (
+            <tr key={sim.backendId}>
+              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                #{sim.id}
+              </td>
+              <td className="intersectionCell px-4 py-3 whitespace-wrap text-sm text-gray-900 dark:text-gray-200">
+                {sim.intersection}
+              </td>
+              {/* ✅ UPDATED: Changed table cells to display new data */}
+              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                {sim.trafficDensity}
+              </td>
+              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                {sim.speed} km/h
+              </td>
+              <td className="px-4 py-3 whitespace-nowrap text-sm">
+                <span
+                  className={`sim-status inline-flex items-center px-3 py-1 rounded-md border ${statusClass(
+                    sim.status,
+                  )}`}
+                >
+                  {sim.status}
+                </span>
+              </td>
+              <td className="px-4 py-3 whitespace-nowrap text-sm">
+                <div className="flex flex-col space-y-2">
+                  <button
+                    onClick={() =>
+                      onViewResults(sim.backendId, sim.intersection)
+                    }
+                    className="viewBtn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium w-full text-center"
+                    title="View Results"
+                  >
+                    <Eye size={18} strokeWidth={2} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(sim.backendId)}
+                    className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center"
+                    title="Delete Simulation"
+                  >
+                    <Trash2 size={18} strokeWidth={2} />
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {simulations.length > rowsPerPage && (
+        <div className="pagination absolute bottom-0 left-0 right-0 flex justify-center items-center p-4 space-x-2 bg-white dark:bg-[#161B22] border-t border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 0}
+            className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${
+              currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            Prev
+          </button>
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => handlePageChange(index)}
+              className={`px-3 py-1 rounded-full text-sm font-medium ${
+                currentPage === index
+                  ? "bg-[#0F5BA7] text-white dark:bg-[#388BFD]"
+                  : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+              } transition-all duration-300`}
+            >
+              {index + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages - 1}
+            className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${
+              currentPage === totalPages - 1
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </div>
+  );
 };
 
 const Simulations: React.FC = () => {
@@ -2036,6 +2036,8 @@ const Simulations: React.FC = () => {
     });
   };
 
+
+
   const filteredSimulations1 =
     filter1 === "All Intersections"
       ? simulations
@@ -2190,9 +2192,9 @@ const Simulations: React.FC = () => {
                 >
                   {["All Intersections", ...allIntersections].map(
                   	 (intersection) => (
-                  	   <option key={intersection} value={intersection}>
-                  	   	 {intersection}
-                  	   </option>
+                  	 	 <option key={intersection} value={intersection}>
+                  	 	 	 {intersection}
+                  	 	 </option>
                   	 ),
                   )}
                 </select>
@@ -2223,7 +2225,7 @@ const Simulations: React.FC = () => {
             	 	 	 	 (intersection) => (
             	 	 	 	 	 <option key={intersection} value={intersection}>
             	 	 	 	 	 	 {intersection}
-            	   	 	 	 </option>
+            	 	 	 	 </option>
             	 	 	 	 ),
             	 	 	 )}
             	 	 </select>

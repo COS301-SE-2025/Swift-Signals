@@ -58,6 +58,30 @@ interface SimulationData {
   };
   vehicles: VehicleData[];
 }
+
+// API Response interface based on the swagger definition
+interface SimulationResponse {
+  output: SimulationData;
+  results: {
+    average_speed: number;
+    average_travel_time: number;
+    average_waiting_time: number;
+    emergency_brakes: number;
+    emergency_stops: number;
+    generated_vehicles: number;
+    near_collisions: number;
+    total_travel_time: number;
+    total_vehicles: number;
+    total_waiting_time: number;
+  };
+}
+
+const API_BASE_URL = "http://localhost:9090";
+
+const getAuthToken = () => {
+  return localStorage.getItem("authToken");
+};
+
 const findNodeById = (nodes: Node[], id: string): Node | null =>
   nodes.find((n) => n.id === id) || null;
 const lerp = (start: number, end: number, t: number): number =>
@@ -478,7 +502,7 @@ const SimulationController: FC<{
 };
 
 interface TrafficSimulationProps {
-  dataUrl: string;
+  intersectionId: string;
   scale?: number;
   isExpanded: boolean;
 }
@@ -502,7 +526,7 @@ const useIsMobile = () => {
 };
 
 const TrafficSimulation: FC<TrafficSimulationProps> = ({
-  dataUrl,
+  intersectionId,
   scale,
   isExpanded,
 }) => {
@@ -516,6 +540,8 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
   const [trafficLightStates, setTrafficLightStates] = useState<{
     [key: string]: string;
   }>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
   const roadDirections: { [key: string]: string } = useMemo(
@@ -528,56 +554,52 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
     [],
   );
 
-  const metrics = useMemo(() => {
-    if (!simulationData)
-      return {
-        activeVehicles: 0,
-        completedVehicles: 0,
-        avgSpeed: 0,
-        progress: 0,
-        totalVehicles: 0,
-        totalSimTime: 0,
-      };
-    const totalVehicles = simulationData.vehicles.length;
-    let activeVehicles = 0,
-      completedVehicles = 0,
-      speedSum = 0,
-      speedCount = 0,
-      maxTime = 0;
-    simulationData.vehicles.forEach((vehicle) => {
-      const positions = vehicle.positions;
-      if (positions.length === 0) return;
-      const firstTime = positions[0].time;
-      const lastTime = positions[positions.length - 1].time;
-      if (simulationTime >= firstTime && simulationTime <= lastTime) {
-        activeVehicles++;
-        let idx = positions.findIndex((p) => p.time > simulationTime);
-        if (idx === -1) idx = positions.length - 1;
-        else if (idx > 0) idx = idx - 1;
-        speedSum += positions[idx].speed;
-        speedCount++;
-      } else if (simulationTime > lastTime) {
-        completedVehicles++;
-      }
-      if (lastTime > maxTime) maxTime = lastTime;
-    });
-    const avgSpeed = speedCount > 0 ? speedSum / speedCount : 0;
-    const progress = maxTime > 0 ? Math.min(simulationTime / maxTime, 1) : 0;
-    return {
-      activeVehicles,
-      completedVehicles,
-      avgSpeed,
-      progress,
-      totalVehicles,
-      totalSimTime: maxTime,
-    };
-  }, [simulationData, simulationTime]);
-
+  // Fetch simulation data from API
   useEffect(() => {
-    fetch(dataUrl)
-      .then((res) => (res.ok ? res.json() : Promise.reject(res)))
-      .then((data: SimulationData) => {
-        if (data.intersection.trafficLights) {
+    const fetchSimulationData = async () => {
+      if (!intersectionId) {
+        setError("No intersection ID provided");
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        setIsLoading(true);
+        setError(null);
+
+        const authToken = getAuthToken();
+        if (!authToken) {
+          throw new Error("Authentication token not found. Please log in again.");
+        }
+
+        const response = await fetch(
+          `${API_BASE_URL}/intersections/${intersectionId}/simulate`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error("Authentication failed. Please log in again.");
+          } else if (response.status === 404) {
+            throw new Error("Simulation data not found for this intersection.");
+          } else {
+            throw new Error(`Failed to fetch simulation data: ${response.statusText}`);
+          }
+        }
+
+        const data: SimulationResponse = await response.json();
+        
+        if (!data.output) {
+          throw new Error("Invalid simulation data received from server");
+        }
+
+        // Process traffic lights if they exist
+        if (data.output.intersection.trafficLights) {
           const directionToSignalIndices: { [key: string]: number[] } = {
             North: [],
             South: [],
@@ -585,7 +607,8 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
             West: [],
           };
           const allConnectionIndices = new Set<number>();
-          data.intersection.connections.forEach((conn) => {
+          
+          data.output.intersection.connections.forEach((conn) => {
             if (conn.from.indexOf(":") === -1) {
               const direction = roadDirections[conn.from];
               const signalIndex = parseInt(conn.tl, 10);
@@ -598,6 +621,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
               allConnectionIndices.add(signalIndex);
             }
           });
+          
           const maxSignalIndex = Math.max(...Array.from(allConnectionIndices));
           const stateArrayLength =
             maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
@@ -650,7 +674,8 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
             duration: ewYellowDuration,
             state: ewYellowState.join(""),
           });
-          const processedTrafficLights = data.intersection.trafficLights.map(
+          
+          const processedTrafficLights = data.output.intersection.trafficLights.map(
             (light) => {
               let time = 0;
               const newStates = newPhases.map((phase) => {
@@ -662,22 +687,73 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
               return { ...light, phases: newPhases, states: newStates };
             },
           );
+          
           const newSimData = {
-            ...data,
+            ...data.output,
             intersection: {
-              ...data.intersection,
+              ...data.output.intersection,
               trafficLights: processedTrafficLights,
             },
           };
           setSimulationData(newSimData);
         } else {
-          setSimulationData(data);
+          setSimulationData(data.output);
         }
-      })
-      .catch((error) =>
-        console.error(`Error loading simulation data from ${dataUrl}:`, error),
-      );
-  }, [dataUrl, roadDirections]);
+      } catch (error) {
+        console.error("Error fetching simulation data:", error);
+        setError(error instanceof Error ? error.message : "Failed to fetch simulation data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSimulationData();
+  }, [intersectionId, roadDirections]);
+
+  const metrics = useMemo(() => {
+    if (!simulationData)
+      return {
+        activeVehicles: 0,
+        completedVehicles: 0,
+        avgSpeed: 0,
+        progress: 0,
+        totalVehicles: 0,
+        totalSimTime: 0,
+      };
+    const totalVehicles = simulationData.vehicles.length;
+    let activeVehicles = 0,
+      completedVehicles = 0,
+      speedSum = 0,
+      speedCount = 0,
+      maxTime = 0;
+    simulationData.vehicles.forEach((vehicle) => {
+      const positions = vehicle.positions;
+      if (positions.length === 0) return;
+      const firstTime = positions[0].time;
+      const lastTime = positions[positions.length - 1].time;
+      if (simulationTime >= firstTime && simulationTime <= lastTime) {
+        activeVehicles++;
+        let idx = positions.findIndex((p) => p.time > simulationTime);
+        if (idx === -1) idx = positions.length - 1;
+        else if (idx > 0) idx = idx - 1;
+        speedSum += positions[idx].speed;
+        speedCount++;
+      } else if (simulationTime > lastTime) {
+        completedVehicles++;
+      }
+      if (lastTime > maxTime) maxTime = lastTime;
+    });
+    const avgSpeed = speedCount > 0 ? speedSum / speedCount : 0;
+    const progress = maxTime > 0 ? Math.min(simulationTime / maxTime, 1) : 0;
+    return {
+      activeVehicles,
+      completedVehicles,
+      avgSpeed,
+      progress,
+      totalVehicles,
+      totalSimTime: maxTime,
+    };
+  }, [simulationData, simulationTime]);
 
   const { roadCenter, offset } = useMemo(() => {
     if (!simulationData) {
@@ -730,6 +806,49 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
     setRestartKey((prevKey) => prevKey + 1);
   };
 
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "grid",
+          placeContent: "center",
+          backgroundColor: "#3d3d3d",
+          color: "white",
+        }}
+      >
+        <div className="text-center">
+          <div className="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent rounded-full mb-4"></div>
+          <p>Loading simulation data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div
+        style={{
+          height: "100vh",
+          display: "grid",
+          placeContent: "center",
+          backgroundColor: "#3d3d3d",
+          color: "white",
+        }}
+      >
+        <div className="text-center">
+          <p className="text-red-400 mb-4">Error: {error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!simulationData) {
     return (
       <div
@@ -741,7 +860,9 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           color: "white",
         }}
       >
-        Loading Simulation from {dataUrl}...
+        <div className="text-center">
+          <p>No simulation data available</p>
+        </div>
       </div>
     );
   }
