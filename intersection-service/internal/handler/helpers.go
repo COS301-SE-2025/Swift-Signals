@@ -32,12 +32,14 @@ func (h *Handler) mapSimulationParameters(
 	}
 
 	return model.SimulationParameters{
-		IntersectionType: model.IntersectionType(pbParams.GetIntersectionType()),
-		Green:            int(pbParams.GetGreen()),
-		Yellow:           int(pbParams.GetYellow()),
-		Red:              int(pbParams.GetRed()),
-		Speed:            int(pbParams.GetSpeed()),
-		Seed:             int(pbParams.GetSeed()),
+		IntersectionType: model.IntersectionType(
+			intersectionpb.IntersectionType_name[int32(pbParams.GetIntersectionType())],
+		),
+		Green:  int(pbParams.GetGreen()),
+		Yellow: int(pbParams.GetYellow()),
+		Red:    int(pbParams.GetRed()),
+		Speed:  int(pbParams.GetSpeed()),
+		Seed:   int(pbParams.GetSeed()),
 	}
 }
 
@@ -49,8 +51,10 @@ func (h *Handler) mapOptimisationParameters(
 	}
 
 	return model.OptimisationParameters{
-		OptimisationType: model.OptimisationType(pbOptParams.GetOptimisationType()),
-		Parameters:       h.mapSimulationParameters(pbOptParams.GetParameters()),
+		OptimisationType: model.OptimisationType(
+			intersectionpb.OptimisationType_name[int32(pbOptParams.GetOptimisationType())],
+		),
+		Parameters: h.mapSimulationParameters(pbOptParams.GetParameters()),
 	}
 }
 
