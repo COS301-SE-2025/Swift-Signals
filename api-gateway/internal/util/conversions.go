@@ -207,3 +207,18 @@ func GrpcErrorToErr(err error) *errs.ServiceError {
 		return errs.NewInternalError(err.Error(), err, map[string]any{})
 	}
 }
+
+func SimulationTypeToInt(simulationType string) int {
+	switch simulationType {
+	case "traffic_light":
+		return 1
+	case "t-junction":
+		return 2
+	case "roundabout":
+		return 3
+	case "stop_sign":
+		return 4
+	default:
+		return 0
+	}
+}

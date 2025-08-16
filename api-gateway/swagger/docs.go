@@ -1425,7 +1425,7 @@ const docTemplate = `{
                 },
                 "intersection_type": {
                     "type": "string",
-                    "example": "t-junction"
+                    "example": "traffic_light"
                 },
                 "red": {
                     "type": "integer",

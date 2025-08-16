@@ -32,12 +32,12 @@ type OptimisationParameters struct {
 }
 
 type SimulationParameters struct {
-	IntersectionType string `json:"intersection_type" example:"t-junction" validate:"required"`
-	Green            int    `json:"green"             example:"10"         validate:"required,min=1"`
-	Yellow           int    `json:"yellow"            example:"2"          validate:"required,min=1"`
-	Red              int    `json:"red"               example:"6"          validate:"required,min=1"`
-	Speed            int    `json:"speed"             example:"60"         validate:"required,min=1"`
-	Seed             int    `json:"seed"              example:"3247128304" validate:"required"`
+	IntersectionType string `json:"intersection_type" example:"traffic_light" validate:"required"`
+	Green            int    `json:"green"             example:"10"            validate:"required,min=1"`
+	Yellow           int    `json:"yellow"            example:"2"             validate:"required,min=1"`
+	Red              int    `json:"red"               example:"6"             validate:"required,min=1"`
+	Speed            int    `json:"speed"             example:"60"            validate:"required,min=1"`
+	Seed             int    `json:"seed"              example:"3247128304"    validate:"required"`
 }
 
 type User struct {

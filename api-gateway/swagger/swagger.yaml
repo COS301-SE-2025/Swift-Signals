@@ -283,7 +283,7 @@ definitions:
         minimum: 1
         type: integer
       intersection_type:
-        example: t-junction
+        example: traffic_light
         type: string
       red:
         example: 6
