@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
@@ -47,6 +48,7 @@ interface ApiIntersection {
 }
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
   const [isMapModalOpen, setIsMapModalOpen] = useState(false);
@@ -62,6 +64,8 @@ const Dashboard: React.FC = () => {
 
   const [totalIntersections, setTotalIntersections] = useState<number>(0);
   const [loadingTotal, setLoadingTotal] = useState(false);
+  const [activeSimulations, setActiveSimulations] = useState<number>(0);
+  const [loadingActiveSimulations, setLoadingActiveSimulations] = useState(false);
 
   const [allIntersections, setAllIntersections] = useState<ApiIntersection[]>(
     []
@@ -69,6 +73,7 @@ const Dashboard: React.FC = () => {
 
   const fetchAllIntersections = async () => {
     setLoadingTotal(true);
+    setLoadingActiveSimulations(true);
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch("http://localhost:9090/intersections", {
@@ -81,17 +86,26 @@ const Dashboard: React.FC = () => {
       setAllIntersections(items);
       setTotalIntersections(items.length);
 
+      // Calculate active simulations (intersections with run_count > 0)
+      const activeCount = items.reduce((sum, item) => {
+        const runCount = typeof item.run_count === 'number' ? item.run_count : 0;
+        return sum + (runCount > 0 ? 1 : 0);
+      }, 0);
+      setActiveSimulations(activeCount);
+
       updateChart(items);
     } catch (err: unknown) {
       console.error("Failed to fetch intersections:", err);
       setTotalIntersections(0);
       setAllIntersections([]);
+      setActiveSimulations(0);
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
         chartInstanceRef.current = null;
       }
     } finally {
       setLoadingTotal(false);
+      setLoadingActiveSimulations(false);
     }
   };
 
@@ -318,6 +332,18 @@ const Dashboard: React.FC = () => {
   };
   const handleCloseMapModal = () => setIsMapModalOpen(false);
 
+  const handleViewDetails = (intersection: ApiIntersection) => {
+    navigate("/simulation-results", {
+      state: {
+        name: `Simulation Results for ${intersection.name}`,
+        description: `Viewing simulation results for ${intersection.name}`,
+        intersections: [intersection.name],
+        intersectionIds: [intersection.id],
+        type: "simulations",
+      },
+    });
+  };
+
   const getStatusStyles = (status?: string) => {
     switch (status) {
       case "optimised":
@@ -382,7 +408,9 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <h3 className="card-h3">Active Simulations</h3>
-              <p className="card-p">8</p>
+              <p className="card-p">
+                {loadingActiveSimulations ? "..." : activeSimulations}
+              </p>
             </div>
           </div>
           <div className="card">
@@ -400,10 +428,18 @@ const Dashboard: React.FC = () => {
         <div className="dashboard-main-grid">
           <div className="main-column">
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-              <button className="newInt quick-action-button bg-[#0F5BA7] dark:bg-[#388BFD] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2">
+              <button 
+                className="newInt quick-action-button bg-[#0F5BA7] dark:bg-[#388BFD] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2 hover:bg-[#0D4A8A] dark:hover:bg-[#2D7BD8] transition-colors duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                onClick={() => navigate('/intersections')}
+                title="Go to Intersections page to create new intersections"
+              >
                 <FaPlus /> New Intersection
               </button>
-              <button className="runSim quick-action-button bg-[#2B9348] dark:bg-[#2DA44E] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2">
+              <button 
+                className="runSim quick-action-button bg-[#2B9348] dark:bg-[#2DA44E] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2 hover:bg-[#237A3A] dark:hover:bg-[#238636] transition-colors duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+                onClick={() => navigate('/simulations')}
+                title="Go to Simulations page to run new simulations"
+              >
                 <FaPlay /> Run Simulation
               </button>
               <button
@@ -480,7 +516,10 @@ const Dashboard: React.FC = () => {
                               </span>
                             </td>
                             <td className="p-2">
-                              <button className="view-details-button text-[#0F5BA7] dark:text-[#388BFD] hover:underline border-none">
+                              <button
+                                className="view-details-button text-[#0F5BA7] dark:text-[#388BFD] hover:underline border-none"
+                                onClick={() => handleViewDetails(intr)}
+                              >
                                 View Details
                               </button>
                             </td>
@@ -571,6 +610,7 @@ const Dashboard: React.FC = () => {
                         <li
                           key={intr.id}
                           className="p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150 cursor-pointer"
+                          onClick={() => handleViewDetails(intr)}
                         >
                           <div className="flex items-center justify-between gap-4">
                             <div className="flex items-center gap-3 min-w-0">
@@ -612,7 +652,7 @@ const Dashboard: React.FC = () => {
 
               {/* Card Footer */}
               <div className="inter-card-footer p-2 border-t border-gray-200 dark:border-gray-700 mt-auto">
-                <button className="w-full text-center text-sm font-medium text-[#0F5BA7] dark:text-[#388BFD] hover:underline p-2 rounded-md transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/20">
+                <button className="w-full text-center text-sm font-medium text-[#0F5BA7] dark:text-[#388BFD] hover:underline p-2 rounded-md transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/20" onClick={() => navigate('/intersections')}>
                   View All ({totalIntersections})
                 </button>
               </div>

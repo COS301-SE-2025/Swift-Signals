@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { Search, X, FileText, MapPin, TrafficCone } from "lucide-react";
 import IntersectionCard from "../components/IntersectionCard";
@@ -384,7 +385,8 @@ const intersectionTypeDisplayMap: { [key: string]: string } = {
 
 
 const Intersections = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
   const [intersections, setIntersections] = useState<Intersection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -562,6 +564,21 @@ const Intersections = () => {
     }
   };
 
+  const handleSimulate = (id: string) => {
+    const intersection = intersections.find((i) => i.id === id);
+    if (!intersection) return;
+    
+    navigate("/simulation-results", {
+      state: {
+        name: `Simulation Results for ${intersection.name}`,
+        description: `Viewing simulation results for ${intersection.name}`,
+        intersections: [intersection.name],
+        intersectionIds: [id],
+        type: "simulations",
+      },
+    });
+  };
+
   const handleEditClick = async (id: string) => {
     setCreateError(null);
     try {
@@ -670,7 +687,7 @@ const Intersections = () => {
                         name={intersection.name}
                         location={`${intersection.details.address}`}
                         lanes={displayType}
-                        onSimulate={(id) => console.log(`Simulate ${id}`)}
+                        onSimulate={handleSimulate}
                         onEdit={handleEditClick}
                         onDelete={handleDeleteClick}
                         />

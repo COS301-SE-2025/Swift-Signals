@@ -1739,115 +1739,131 @@ const SimulationTable: React.FC<{
 
   return (
     <div className="simTable bg-white dark:bg-[#161B22] shadow-md rounded-lg overflow-hidden table-fixed-height relative">
-      <table className="simulationTable min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="simTableHead bg-gray-50 dark:bg-[#161B22]">
-          <tr>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              No.
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Intersection
-            </th>
-            {/* ✅ UPDATED: Changed table headers */}
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Traffic Density
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Speed
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Status
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white dark:bg-[#161B22] divide-y divide-gray-200 dark:divide-gray-700">
-          {paginatedSimulations.map((sim) => (
-            <tr key={sim.backendId}>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                #{sim.id}
-              </td>
-              <td className="intersectionCell px-4 py-3 whitespace-wrap text-sm text-gray-900 dark:text-gray-200">
-                {sim.intersection}
-              </td>
-              {/* ✅ UPDATED: Changed table cells to display new data */}
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                {sim.trafficDensity}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                {sim.speed} km/h
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm">
-                <span
-                  className={`sim-status inline-flex items-center px-3 py-1 rounded-md border ${statusClass(
-                    sim.status,
-                  )}`}
-                >
-                  {sim.status}
-                </span>
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-sm">
-                <div className="flex flex-col space-y-2">
-                  <button
-                    onClick={() =>
-                      onViewResults(sim.backendId, sim.intersection)
-                    }
-                    className="viewBtn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium w-full text-center"
-                    title="View Results"
-                  >
-                    <Eye size={18} strokeWidth={2} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(sim.backendId)}
-                    className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center"
-                    title="Delete Simulation"
-                  >
-                    <Trash2 size={18} strokeWidth={2} />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      {simulations.length > rowsPerPage && (
-        <div className="pagination absolute bottom-0 left-0 right-0 flex justify-center items-center p-4 space-x-2 bg-white dark:bg-[#161B22] border-t border-gray-200 dark:border-gray-700">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 0}
-            className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${
-              currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            Prev
-          </button>
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index}
-              onClick={() => handlePageChange(index)}
-              className={`px-3 py-1 rounded-full text-sm font-medium ${
-                currentPage === index
-                  ? "bg-[#0F5BA7] text-white dark:bg-[#388BFD]"
-                  : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
-              } transition-all duration-300`}
-            >
-              {index + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages - 1}
-            className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${
-              currentPage === totalPages - 1
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-          >
-            Next
-          </button>
+      {simulations.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <div className="text-gray-400 dark:text-gray-500 mb-4">
+            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-600 dark:text-gray-400 mb-2">No Data to Display</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-500 text-center max-w-sm">
+            There are no simulations available at the moment. Create a new simulation to get started.
+          </p>
         </div>
+      ) : (
+        <>
+          <table className="simulationTable min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="simTableHead bg-gray-50 dark:bg-[#161B22]">
+              <tr>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  No.
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Intersection
+                </th>
+                {/* ✅ UPDATED: Changed table headers */}
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Traffic Density
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Speed
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-[#161B22] divide-y divide-gray-200 dark:divide-gray-700">
+              {paginatedSimulations.map((sim) => (
+                <tr key={sim.backendId}>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                    #{sim.id}
+                  </td>
+                  <td className="intersectionCell px-4 py-3 whitespace-wrap text-sm text-gray-900 dark:text-gray-200">
+                    {sim.intersection}
+                  </td>
+                  {/* ✅ UPDATED: Changed table cells to display new data */}
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                    {sim.trafficDensity}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                    {sim.speed} km/h
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm">
+                    <span
+                      className={`sim-status inline-flex items-center px-3 py-1 rounded-md border ${statusClass(
+                        sim.status,
+                      )}`}
+                    >
+                      {sim.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm">
+                    <div className="flex flex-col space-y-2">
+                      <button
+                        onClick={() =>
+                          onViewResults(sim.backendId, sim.intersection)
+                        }
+                        className="viewBtn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium w-full text-center"
+                        title="View Results"
+                      >
+                        <Eye size={18} strokeWidth={2} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(sim.backendId)}
+                        className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center"
+                        title="Delete Simulation"
+                      >
+                        <Trash2 size={18} strokeWidth={2} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {simulations.length > rowsPerPage && (
+            <div className="pagination absolute bottom-0 left-0 right-0 flex justify-center items-center p-4 space-x-2 bg-white dark:bg-[#161B22] border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 0}
+                className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${
+                  currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                Prev
+              </button>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handlePageChange(index)}
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    currentPage === index
+                      ? "bg-[#0F5BA7] text-white dark:bg-[#388BFD]"
+                      : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+                  } transition-all duration-300`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages - 1}
+                className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${
+                  currentPage === totalPages - 1
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -2176,12 +2192,12 @@ const Simulations: React.FC = () => {
                 Recent Simulations
               </h1>
               <div className="flex items-center space-x-2">
-                <button
+                {/* <button
                   onClick={() => handleNewSimulation("simulations")}
                 	 className="new-simulation-button px-4 py-2 rounded-md text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-green-600 hover:to-green-700 dark:from-green-400 dark:to-green-500 dark:hover:from-green-500 dark:hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   New Simulation
-                </button>
+                </button> */}
                 <select
                 	 value={filter1}
                 	 onChange={(e) => {
