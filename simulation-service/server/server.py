@@ -1,4 +1,5 @@
 from concurrent import futures
+import logging
 
 from google.protobuf.json_format import MessageToDict, ParseDict
 import grpc
@@ -9,34 +10,98 @@ import simulation_pb2_grpc as pb_grpc
 import SimLoad
 
 
+# Configure logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+)
+logger = logging.getLogger("simulation-service")
+
+
 class SimulationServicer(pb_grpc.SimulationServiceServicer):
     def GetSimulationResults(self, request, context):
-        print("GetSimulationResults request received with id:", request.intersection_id)
+        logger.info(
+            "Received GetSimulationResults request",
+            extra={"intersection_id": request.intersection_id},
+        )
 
         req_dict = {
             "intersection": MessageToDict(
                 request, preserving_proto_field_name=True, use_integers_for_enums=True
             )
         }
-        results = SimLoad.main(req_dict)[0]["intersection"]["results"]
-        msg_results = pb.SimulationResultsResponse()
-        ParseDict(results, msg_results)
+        logger.debug("Request converted to dict: %s", req_dict)
 
-        return msg_results
+        try:
+            sim_output = SimLoad.main(req_dict)
+            logger.debug("Raw simulation output: %s", sim_output)
+
+            if not sim_output or sim_output[0] is None:
+                msg = f"Simulation returned no results for intersection_id={request.intersection_id}"
+                logger.error(msg)
+                context.set_code(grpc.StatusCode.INTERNAL)
+                context.set_details(msg)
+                return pb.SimulationResultsResponse()
+
+            results = sim_output[0]["intersection"]["results"]
+            logger.debug("Parsed results: %s", results)
+
+            msg_results = pb.SimulationResultsResponse()
+            ParseDict(results, msg_results)
+
+            logger.info(
+                "Returning simulation results",
+                extra={"intersection_id": request.intersection_id},
+            )
+            return msg_results
+
+        except Exception as e:
+            logger.exception("Error while processing GetSimulationResults")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(str(e))
+            return pb.SimulationResultsResponse()
 
     def GetSimulationOutput(self, request, context):
-        print("GetSimulationOutput request received with id:", request.intersection_id)
+        logger.info(
+            "Received GetSimulationOutput request",
+            extra={"intersection_id": request.intersection_id},
+        )
 
         req_dict = {
             "intersection": MessageToDict(
                 request, preserving_proto_field_name=True, use_integers_for_enums=True
             )
         }
-        results = SimLoad.main(req_dict)[1]
-        msg_results = pb.SimulationOutputResponse()
-        ParseDict(results, msg_results)
+        logger.debug("Request converted to dict: %s", req_dict)
 
-        return msg_results
+        try:
+            sim_output = SimLoad.main(req_dict)
+            logger.debug("Raw simulation output: %s", sim_output)
+
+            if not sim_output or len(sim_output) < 2:
+                msg = f"Simulation returned no output for intersection_id={request.intersection_id}"
+                logger.error(msg)
+                context.set_code(grpc.StatusCode.INTERNAL)
+                context.set_details(msg)
+                return pb.SimulationOutputResponse()
+
+            results = sim_output[1]
+            logger.debug("Parsed output: %s", results)
+
+            msg_results = pb.SimulationOutputResponse()
+            ParseDict(results, msg_results)
+
+            logger.info(
+                "Returning simulation output",
+                extra={"intersection_id": request.intersection_id},
+            )
+            return msg_results
+
+        except Exception as e:
+            logger.exception("Error while processing GetSimulationOutput")
+            context.set_code(grpc.StatusCode.INTERNAL)
+            context.set_details(str(e))
+            return pb.SimulationOutputResponse()
 
 
 def serve():
@@ -51,7 +116,7 @@ def serve():
 
     server.add_insecure_port("[::]:50053")
     server.start()
-    print("Simulation Service listening on port :50053")
+    logger.info("Simulation Service listening on port :50053")
     server.wait_for_termination()
 
 
