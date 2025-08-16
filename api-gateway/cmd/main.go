@@ -146,10 +146,10 @@ func setupRoutes(
 	// User (Admin Only) routes
 	adminService := service.NewAdminService(userClient)
 	adminHandler := handler.NewAdminHandler(adminService)
-	mux.HandleFunc("GET /users", adminHandler.GetAllUsers)
-	mux.HandleFunc("GET /users/{id}", adminHandler.GetUserByID)
-	mux.HandleFunc("PATCH /users/{id}", adminHandler.UpdateUserByID)
-	mux.HandleFunc("DELETE /users/{id}", adminHandler.DeleteUserByID)
+	mux.HandleFunc("GET /admin/users", adminHandler.GetAllUsers)
+	mux.HandleFunc("GET /admin/users/{id}", adminHandler.GetUserByID)
+	mux.HandleFunc("PATCH /admin/users/{id}", adminHandler.UpdateUserByID)
+	mux.HandleFunc("DELETE /admin/users/{id}", adminHandler.DeleteUserByID)
 
 	// Intersection routes
 	intersectionService := service.NewIntersectionService(intrClient, optiClient, userClient)
