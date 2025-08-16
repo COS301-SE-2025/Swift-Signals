@@ -43,7 +43,6 @@ func (h *AdminHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 		"action", "get_all_users",
 	)
 	logger.Info("AdminHandler.GetAllUsers called")
-	logger.Info("processing get all users request")
 
 	pageStr := r.URL.Query().Get("page")
 	page := 1
