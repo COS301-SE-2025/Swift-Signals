@@ -40,13 +40,16 @@ const docTemplate = `{
                 "summary": "Get All Users",
                 "parameters": [
                     {
-                        "description": "Pagination options",
-                        "name": "getAllUsersRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/model.GetAllUsersRequest"
-                        }
+                        "type": "integer",
+                        "description": "Page number (default is 1)",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of users per page (default is 100 and max is 100)",
+                        "name": "page_size",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1080,26 +1083,6 @@ const docTemplate = `{
                 "message": {
                     "type": "string",
                     "example": "resource not found"
-                }
-            }
-        },
-        "model.GetAllUsersRequest": {
-            "type": "object",
-            "required": [
-                "page",
-                "page_size"
-            ],
-            "properties": {
-                "page": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "example": 1
-                },
-                "page_size": {
-                    "type": "integer",
-                    "maximum": 100,
-                    "minimum": 1,
-                    "example": 10
                 }
             }
         },

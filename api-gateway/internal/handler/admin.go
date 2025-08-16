@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -38,6 +39,9 @@ func NewAdminHandler(s service.AdminServiceInterface) *AdminHandler {
 // @Failure 500 {object} model.ErrorResponse "Internal server error"
 // @Router /admin/users [get]
 func (h *AdminHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("===================")
+	fmt.Println("AdminHandler.GetAllUsers called")
+	fmt.Println("===================")
 	logger := middleware.LoggerFromContext(r.Context()).With(
 		"handler", "admin",
 		"action", "get_all_users",
