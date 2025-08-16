@@ -27,7 +27,7 @@ def log_object_stats(name, obj):
         logger.debug("%s: type=%s, length=%d", name, type(obj).__name__, len(obj))
     elif isinstance(obj, dict):
         logger.debug(
-            "%s: type=dict, keys=%d -> %s", name, len(obj.keys()), list(obj.keys())[:5]
+            "%s: type=dict, keys=%d -> %s", name, len(obj), list(obj.keys())[:5]
         )
     else:
         logger.debug("%s: type=%s, value=%s", name, type(obj).__name__, str(obj)[:100])
