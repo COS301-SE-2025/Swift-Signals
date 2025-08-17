@@ -6,7 +6,6 @@ from deap import tools
 from ga.ga_core import toolbox, run_ga
 from ga.evaluation import evaluate_waiting_and_travel, evaluate_safety_given_waiting
 from ga.simulation_client import run_simulation
-from ga.utils import log_individual_to_file
 
 
 def main() -> dict:
