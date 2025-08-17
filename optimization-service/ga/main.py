@@ -9,13 +9,21 @@ from ga.simulation_client import run_simulation
 from ga.utils import log_individual_to_file
 
 
-def main():
+def main() -> dict:
+    """Main function to run the genetic algorithm for optimising traffic light parameters.
+    This function initialises the genetic algorithm, runs it in two phases (minimising waiting time and safety hazards),
+    and saves the best parameters found to a JSON file. It also runs a final simulation with the best parameters
+    and prints the results.
+
+    Returns:
+        dict: A dictionary containing the best parameters found during the optimisation process.
+    """
     random.seed(1408)
 
     # GA parameters
-    ngen_waiting = 30
-    ngen_safety = 30
-    pop_size = 100
+    ngen_waiting = 2
+    ngen_safety = 2
+    pop_size = 5
     cxpb = 0.5
     mutpb = 0.3
 
@@ -78,6 +86,9 @@ def main():
         print("\n--- Final Simulation Results with Optimised Parameters ---")
         for metric, value in final_results.items():
             print(f"{metric}: {value}")
+
+    # Return the final best parameters
+    return best_params
 
 
 if __name__ == "__main__":

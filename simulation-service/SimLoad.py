@@ -204,9 +204,9 @@ def saveParams(params, intersection_type_str, simName):
     # print(f"Saved parameters to {fileName}")
 
 
-def main():
+def main(param_dict=None) -> dict:
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    params = loadParams()
+    params = loadParams(param_dict)
     mapped = params["mapped"]
     raw = params["raw"]
 

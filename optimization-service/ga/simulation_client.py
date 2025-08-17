@@ -1,4 +1,5 @@
 import os
+import logging
 
 import grpc
 from simulation_pb2 import (
@@ -10,10 +11,11 @@ from simulation_pb2 import (
 from simulation_pb2_grpc import SimulationServiceStub
 
 # Configuration
-GRPC_SIM_SERVER_ADDRESS = os.environ.get("GRPC_SIM_SERVER_ADDRESS", "localhost:50053")
+SIMU_GRPC_ADDR = os.environ.get("SIMU_GRPC_ADDR", "localhost:50053")
+logging.info(f"Connecting to gRPC server at {SIMU_GRPC_ADDR}")
 
 # Client
-channel = grpc.insecure_channel(GRPC_SIM_SERVER_ADDRESS)
+channel = grpc.insecure_channel(SIMU_GRPC_ADDR)
 stub = SimulationServiceStub(channel)
 
 
