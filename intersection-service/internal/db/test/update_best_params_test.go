@@ -1,6 +1,68 @@
 package test
 
-func (suite *TestSuite) TestUpdateBestParams_Success() {
-	// TODO: Add test case implementation
-	suite.True(true)
+import (
+    "context"
+    "testing"
+
+    "github.com/stretchr/testify/assert"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/mongo/integration/mtest"
+
+    db "github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/db"
+    "github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/model"
+)
+
+// Successful update of best parameters
+func TestUpdateBestParams_Success(t *testing.T) {
+    mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+
+    mt.Run("successful update", func(mt *mtest.T) {
+        mt.AddMockResponses(mtest.CreateSuccessResponse(
+            bson.E{"n", int32(1)}, // MatchedCount = 1
+        ))
+
+        repo := db.NewMongoIntersectionRepo(mt.Coll)
+        params := model.OptimisationParameters{} // use correct fields here
+
+        err := repo.UpdateBestParams(context.Background(), "1", params)
+
+        assert.NoError(t, err)
+    })
+}
+
+// Intersection ID not found
+func TestUpdateBestParams_NotFound(t *testing.T) {
+    mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+
+    mt.Run("intersection not found", func(mt *mtest.T) {
+        mt.AddMockResponses(mtest.CreateSuccessResponse(
+            bson.E{"n", int32(0)}, // MatchedCount = 0 triggers NotFoundError
+        ))
+
+        repo := db.NewMongoIntersectionRepo(mt.Coll)
+        params := model.OptimisationParameters{}
+
+        err := repo.UpdateBestParams(context.Background(), "missing-id", params)
+
+        assert.Error(t, err)
+        assert.Contains(t, err.Error(), "intersection ID not found")
+    })
+}
+
+// Database error occurs
+func TestUpdateBestParams_DatabaseError(t *testing.T) {
+    mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+
+    mt.Run("database error on update", func(mt *mtest.T) {
+        mt.AddMockResponses(mtest.CreateWriteErrorsResponse(
+            mtest.WriteError{Code: 123, Message: "mongo update failure"},
+        ))
+
+        repo := db.NewMongoIntersectionRepo(mt.Coll)
+        params := model.OptimisationParameters{}
+
+        err := repo.UpdateBestParams(context.Background(), "1", params)
+
+        assert.Error(t, err)
+    })
 }
