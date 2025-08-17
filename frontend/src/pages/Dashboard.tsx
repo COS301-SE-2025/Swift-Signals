@@ -696,7 +696,7 @@ const Dashboard: React.FC = () => {
 
               {/* Card Footer */}
               <div className="inter-card-footer p-2 border-t border-gray-200 dark:border-gray-700 mt-auto">
-                <button className="w-full text-center text-sm font-medium text-[#0F5BA7] dark:text-[#388BFD] hover:underline p-2 rounded-md transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/20" onClick={() => navigate('/intersections')}>
+                <button className="w-full text-center text-sm font-medium text-[#0F5BA7] dark:text-[#388BFD] bg-white dark:bg-transparent hover:underline p-2 rounded-md transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-gray-200 dark:border-transparent" onClick={() => navigate('/intersections')}>
                   View All ({totalIntersections})
                 </button>
               </div>
