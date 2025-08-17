@@ -2,7 +2,6 @@ import os
 import random
 import subprocess
 import json
-import pickle
 from datetime import datetime
 from deap import base, creator, tools
 from tqdm import tqdm
@@ -294,6 +293,7 @@ def main():
 
     run_final_simulation_and_compare(best_params)
     cleanup_files()
+
 
 if __name__ == "__main__":
     main()
