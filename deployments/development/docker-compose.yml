@@ -94,6 +94,7 @@ services:
     container_name: optimisation-service
     environment:
       APP_PORT: 50054
+      SIMU_GRPC_ADDR: simulation-service:50053
     ports:
       - "50054:50054"
     networks:
@@ -150,20 +151,6 @@ services:
       - "80:80"
     networks:
       - app-network
-
-  # metric-postgres:
-  #    image: postgres:16
-  #    container_name: metric-postgres
-  #    environment:
-  #      POSTGRES_USER: metric_service
-  #      POSTGRES_PASSWORD: password
-  #      POSTGRES_DB: metric_service_db
-  #    volumes:
-  #      - metric_pgdata:/var/lib/postgresql/data
-  #    ports:
-  #      - "5433:5432"
-      
-
 
 volumes:
   user_pgdata:

@@ -17,7 +17,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 # RUN pip3 install pytest # NOTE: Can be removed for production dockerfile
 
-COPY protos/ /app/protos
+COPY protos/ /app/protos/
 RUN mkdir -p /app/gen/python && \
     touch /app/gen/python/__init__.py && \
     python3 -m grpc_tools.protoc \

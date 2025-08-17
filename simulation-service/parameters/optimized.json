@@ -1,0 +1,53 @@
+{
+    "intersection": {
+        "id": "simId",
+        "name": "Trafficlight",
+        "owner": "username",
+        "details": {
+            "address": "1250 Jan Shoba",
+            "city": "Pretoria",
+            "province": "Gauteng"
+        },
+        "created_at": "2025-06-18T13:52:33Z",
+        "last_run_at": "2025-06-18T13:52:33Z",
+        "Traffic Density": 2,
+        "status": 0,
+        "run_count": 0,
+        "simulation_parameters": {
+            "Intersection Type": 1,
+            "Green": 38,
+            "Yellow": 3,
+            "Red": 42,
+            "Speed": 60,
+            "seed": 6396
+        }, 
+        "simulation_results": {
+            "$oid": "34d45aba0b1a4b70b8fea92d"
+        },
+        "simulation_data": {
+            "$oid": "6859447bbff4480048e7a9f7"
+        },
+        "optimized_parameters": {
+            "optimization_type": "gridsearch",
+            "Intersection Type": 1,
+            "Green": 0,
+            "Yellow": 0,
+            "Red": 0,
+            "Speed": 80,
+            "seed": 0
+        },
+        "optimization_results": {},
+        "optimization_data": {},
+        "best_parameters": {
+            "optimization_type": "gridsearch",
+            "Intersection Type": 1,
+            "Green": 0,
+            "Yellow": 0,
+            "Red": 0,
+            "Speed": 80,
+            "seed": 0
+        },
+        "best_results": {},
+        "best_data": {}
+    }
+}

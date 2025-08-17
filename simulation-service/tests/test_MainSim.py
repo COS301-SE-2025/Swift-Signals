@@ -39,7 +39,7 @@ class TestSimLoad(unittest.TestCase):
 
         self.assertEqual(params["mapped"]["intersection_type"], "trafficlight")
         self.assertEqual(params["mapped"]["traffic_density"], "high")
-        self.assertEqual(params["mapped"]["speed"], 40)
+        self.assertEqual(params["mapped"]["speed"], 60)
         self.assertEqual(params["mapped"]["seed"], 42)
 
         self.assertEqual(params["raw"]["intersection_type"], 1)
