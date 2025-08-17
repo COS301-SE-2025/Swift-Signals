@@ -1883,22 +1883,24 @@ const Simulations: React.FC = () => {
   const [optimizations, setOptimizations] = useState<SimulationData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
 
-  const fetchIntersections = async (): Promise<ApiIntersection[]> => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/intersections`, {
-        headers: { Authorization: `Bearer ${getAuthToken()}` },
-      });
-      if (!res.ok)
-        throw new Error(`Failed to fetch intersections: ${res.statusText}`);
-      const data = await res.json();
-      return data.intersections || [];
-    } catch (err: any) {
-      console.error("Error fetching intersections:", err);
-      throw err;
-    }
-  };
+  const fetchIntersections = async (): Promise<ApiIntersection[]> => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/intersections`, {
+        headers: { Authorization: `Bearer ${getAuthToken()}` },
+      });
+      if (!res.ok)
+        throw new Error(`Failed to fetch intersections: ${res.statusText}`);
+      const data = await res.json();
+      return data.intersections || [];
+    } catch (err: any) {
+      console.error("Error fetching intersections:", err);
+      throw err;
+    }
+  };
+
+
 
   const createIntersection = async (intersectionData: {
     name: string;
@@ -2015,6 +2017,7 @@ const Simulations: React.FC = () => {
       status: mapApiStatus(intersection.status),
     }));
 
+    // ✅ UPDATED: Filter optimizations based on actual "optimised" status
     const opts = allSims.filter((sim) => sim.status === "optimised");
 
     return { sims: allSims, opts };
@@ -2040,17 +2043,17 @@ const Simulations: React.FC = () => {
     loadData();
   }, []);
 
-  const handleViewResults = (backendId: string, intersectionName: string) => {
-    navigate("/simulation-results", {
-      state: {
-        name: `Results for ${intersectionName}`,
-        description: `Viewing detailed results for simulation run on ${intersectionName}.`,
-        intersections: [intersectionName],
-        intersectionIds: [backendId],
-        type: "simulations",
-      },
-    });
-  };
+  const handleViewResults = (backendId: string, intersectionName: string) => {
+    navigate("/simulation-results", {
+      state: {
+        name: `Results for ${intersectionName}`,
+        description: `Viewing detailed results for simulation run on ${intersectionName}.`,
+        intersections: [intersectionName],
+        intersectionIds: [backendId],
+        type: "simulations",
+      },
+    });
+  };
 
 
 
@@ -2129,12 +2132,12 @@ const Simulations: React.FC = () => {
       setIsModalOpen(false);
 
       navigate("/simulation-results", {
-        state: {
-          ...data,
-          intersectionIds: createdIntersections,
-          type: modalType,
-        },
-      });
+        state: {
+          ...data,
+          intersectionIds: createdIntersections,
+          type: modalType,
+        },
+      });
     } catch (err: any) {
       alert(`Failed to create ${modalType}: ${err.message}`);
     } finally {
@@ -2185,88 +2188,82 @@ const Simulations: React.FC = () => {
     <div className="simulationBody min-h-screen bg-gray-100 dark:bg-gray-900">
       <Navbar />
       <div className="sim-main-content flex-grow p-6">
-        <div className="simGrid grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="simTableContainer sims">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-3xl font-bold text-gray-800 dark:text-[#E6EDF3]">
-                Recent Simulations
-              </h1>
-              <div className="flex items-center space-x-2">
-                {/* <button
-                  onClick={() => handleNewSimulation("simulations")}
-                	 className="new-simulation-button px-4 py-2 rounded-md text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-green-600 hover:to-green-700 dark:from-green-400 dark:to-green-500 dark:hover:from-green-500 dark:hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg"
-                >
-                  New Simulation
-                </button> */}
-                <select
-                	 value={filter1}
-                	 onChange={(e) => {
-                  	 setFilter1(e.target.value);
-                  	 setPage1(0);
-                	 }}
-                	 className="w-48 p-2 rounded-md border border-gray-300 dark:border-[#388BFD] bg-white dark:bg-[#161B22] text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  {["All Intersections", ...allIntersections].map(
-                  	 (intersection) => (
-                  	 	 <option key={intersection} value={intersection}>
-                  	 	 	 {intersection}
-                  	 	 </option>
-                  	 ),
-                  )}
-                </select>
-              </div>
-            </div>
-            <SimulationTable
-            	 simulations={filteredSimulations1}
-            	 currentPage={page1}
-            	 setCurrentPage={setPage1}
-            	 onViewResults={handleViewResults}
-            />
-          </div>
-          <div className="simTableContainer opts">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-3xl font-bold text-gray-800 dark:text-[#E6EDF3]">
-                Recent Optimizations
-            	 </h1>
-            	 <div className="flex items-center space-x-2">
-            	 	 <select
-            	 	 	 value={filter2}
-            	 	 	 onChange={(e) => {
-            	 	 	 	 setFilter2(e.target.value);
-            	 	 	 	 setPage2(0);
-            	 	 	 }}
-            	 	 	 className="w-48 p-2 rounded-md border border-gray-300 dark:border-[#388BFD] bg-white dark:bg-[#161B22] text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            	 	 >
-            	 	 	 {["All Intersections", ...allIntersections].map(
-            	 	 	 	 (intersection) => (
-            	 	 	 	 	 <option key={intersection} value={intersection}>
-            	 	 	 	 	 	 {intersection}
-            	 	 	 	 </option>
-            	 	 	 	 ),
-            	 	 	 )}
-            	 	 </select>
-            	 </div>
-            </div>
-            <SimulationTable
-            	 simulations={filteredSimulations2}
-            	 currentPage={page2}
-            	 setCurrentPage={setPage2}
-            	 onViewResults={handleViewResults}
-            />
-        	 </div>
-      	 </div>
-    	 </div>
-    	 <Footer />
-    	 <NewSimulationModal
-    	 	 isOpen={isModalOpen}
-    	 	 onClose={() => setIsModalOpen(false)}
-    	 	 onSubmit={handleModalSubmit}
-    	 	 intersections={allIntersections}
-    	 	 type={modalType}
-    	 />
-    	 <HelpMenu />
-  	 </div>
-  );
+        <div className="simGrid grid grid-cols-1 lg:grid-cols-2 gap-8 px-4 lg:px-8 w-full max-w-7xl mx-auto">
+          <div className="simTableContainer sims">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-[#E6EDF3]">
+                Recent Simulations
+              </h1>
+              <div className="flex items-center space-x-2">
+                <select
+                  value={filter1}
+                  onChange={(e) => {
+                    setFilter1(e.target.value);
+                    setPage1(0);
+                  }}
+                  className="w-48 p-2 rounded-md border border-gray-300 dark:border-[#388BFD] bg-white dark:bg-[#161B22] text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  {["All Intersections", ...allIntersections].map(
+                    (intersection) => (
+                      <option key={intersection} value={intersection}>
+                        {intersection}
+                      </option>
+                    ),
+                  )}
+                </select>
+              </div>
+            </div>
+            <SimulationTable
+              simulations={filteredSimulations1}
+              currentPage={page1}
+              setCurrentPage={setPage1}
+              onViewResults={handleViewResults}
+            />
+          </div>
+          <div className="simTableContainer opts">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-3xl font-bold text-gray-800 dark:text-[#E6EDF3]">
+                Recent Optimizations
+              </h1>
+              <div className="flex items-center space-x-2">
+                <select
+                  value={filter2}
+                  onChange={(e) => {
+                    setFilter2(e.target.value);
+                    setPage2(0);
+                  }}
+                  className="w-48 p-2 rounded-md border border-gray-300 dark:border-[#388BFD] bg-white dark:bg-[#161B22] text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  {["All Intersections", ...allIntersections].map(
+                    (intersection) => (
+                      <option key={intersection} value={intersection}>
+                        {intersection}
+                      </option>
+                    ),
+                  )}
+                </select>
+              </div>
+            </div>
+            <SimulationTable
+              simulations={filteredSimulations2}
+              currentPage={page2}
+              setCurrentPage={setPage2}
+              onViewResults={handleViewResults}
+            />
+          </div>
+        </div>
+      </div>
+      <Footer />
+      <NewSimulationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleModalSubmit}
+        intersections={allIntersections}
+        type={modalType}
+      />
+      <HelpMenu />
+    </div>
+  );
 };
 
 export default Simulations;

@@ -299,6 +299,8 @@ const Dashboard: React.FC = () => {
     fetchAllIntersections();
   }, []);
 
+
+
   const fetchMapIntersections = async () => {
     setIsLoadingMap(true);
     setMapError(null);
@@ -427,6 +429,7 @@ const Dashboard: React.FC = () => {
     <div className="dashboard-screen min-h-screen bg-gray-100 dark:bg-gray-900">
       <Navbar />
       <main className="main-content">
+        
         <div className="card-grid">
           <div className="card">
             <div className="card-icon-1">

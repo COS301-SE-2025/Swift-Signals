@@ -48,6 +48,7 @@ interface ApiSimulationResponse {
 interface ApiIntersection {
   name: string;
   traffic_density: string;
+  status?: string; // Added status property
   // Add other fields from the full intersection object if needed
 }
 // #endregion
@@ -260,6 +261,8 @@ const SimulationResults: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [canBeOptimized, setCanBeOptimized] = useState(false);
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const [optimizationStatus, setOptimizationStatus] = useState<string>("");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -272,6 +275,203 @@ const SimulationResults: React.FC = () => {
     vehCountRef: useRef<HTMLCanvasElement | null>(null),
     finalSpeedHistRef: useRef<HTMLCanvasElement | null>(null),
     totalDistHistRef: useRef<HTMLCanvasElement | null>(null),
+  };
+
+  // Function to run optimization
+  const runOptimization = async () => {
+    if (!intersectionId) {
+      alert("No intersection ID available for optimization.");
+      return;
+    }
+
+    setIsOptimizing(true);
+    setOptimizationStatus("Running optimization...");
+    
+    try {
+      const authToken = getAuthToken();
+      if (!authToken) {
+        throw new Error("Authentication token not found. Please log in again.");
+      }
+
+      // Step 1: Run optimization
+      const optResponse = await fetch(
+        `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!optResponse.ok) {
+        if (optResponse.status === 401) {
+          throw new Error("Authentication failed. Please log in again.");
+        } else if (optResponse.status === 404) {
+          throw new Error("Intersection not found for optimization.");
+        } else {
+          throw new Error(`Failed to run optimization: ${optResponse.statusText}`);
+        }
+      }
+
+      const optResult = await optResponse.json();
+      console.log("Optimization result:", optResult);
+
+      if (optResult.improved) {
+        setOptimizationStatus("Optimization completed successfully! Fetching optimized data...");
+        
+        // Step 2: Fetch optimized simulation data
+        const optDataResponse = await fetch(
+          `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }
+        );
+
+        if (!optDataResponse.ok) {
+          throw new Error(`Failed to fetch optimized data: ${optDataResponse.statusText}`);
+        }
+
+        const optData: ApiSimulationResponse = await optDataResponse.json();
+        
+        if (!optData.output) {
+          throw new Error("Invalid optimized simulation data received from server");
+        }
+
+        // Process traffic lights for optimized data if they exist
+        if (optData.output.intersection && optData.output.intersection.trafficLights) {
+          const processedTrafficLights = processTrafficLights(optData.output.intersection.trafficLights);
+          const newOptData = {
+            ...optData.output,
+            intersection: {
+              ...optData.output.intersection,
+              trafficLights: processedTrafficLights,
+            },
+          };
+          setOptimizedData(newOptData);
+        } else {
+          setOptimizedData(optData.output);
+        }
+
+        setOptimizedApiResults(optData.results);
+        setCanBeOptimized(true);
+        setShowOptimized(true);
+        setOptimizationStatus("Optimization completed successfully!");
+        
+        // Update the intersection status to "optimised" in the backend
+        await updateIntersectionStatus(intersectionId, "optimised");
+        
+        // Refresh intersection data to get updated status
+        await fetchIntersectionData();
+        
+        setTimeout(() => {
+          setOptimizationStatus("");
+        }, 3000);
+      } else {
+        setOptimizationStatus("No improvement found in optimization.");
+        setTimeout(() => {
+          setOptimizationStatus("");
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error running optimization:", error);
+      setOptimizationStatus(`Optimization failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+      setTimeout(() => {
+        setOptimizationStatus("");
+      }, 5000);
+    } finally {
+      setIsOptimizing(false);
+    }
+  };
+
+  // Helper function to process traffic lights (extracted from existing code)
+  const processTrafficLights = (trafficLights: any[]) => {
+    const directionToSignalIndices: { [key: string]: number[] } = {
+      North: [],
+      South: [],
+      East: [],
+      West: [],
+    };
+    const allConnectionIndices = new Set<number>();
+    
+    // This would need to be updated based on your actual connection structure
+    // For now, using a simplified approach
+    const roadDirections: { [key: string]: string } = {
+      in_n2_1: "North",
+      in_n3_1: "South",
+      in_n4_1: "West",
+      in_n5_1: "East",
+    };
+
+    // Process connections to determine signal indices for each direction
+    // This is a simplified version - you may need to adjust based on your actual data structure
+    
+    const maxSignalIndex = 11; // Default value, adjust as needed
+    const stateArrayLength = maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
+    
+    const newPhases = [
+      { duration: 30, state: "G".repeat(stateArrayLength) }, // North-South green
+      { duration: 5, state: "y".repeat(stateArrayLength) },  // North-South yellow
+      { duration: 30, state: "G".repeat(stateArrayLength) }, // East-West green
+      { duration: 5, state: "y".repeat(stateArrayLength) },  // East-West yellow
+    ];
+    
+    return trafficLights.map((light) => {
+      let time = 0;
+      const newStates = newPhases.map((phase) => {
+        const state = { time: time, state: phase.state };
+        time += phase.duration;
+        return state;
+      });
+      newStates.push({ time: time, state: newPhases[0].state });
+      return { ...light, phases: newPhases, states: newStates };
+    });
+  };
+
+  // Function to update intersection status
+  const updateIntersectionStatus = async (id: string, status: string) => {
+    try {
+      const authToken = getAuthToken();
+      if (!authToken) return;
+
+      await fetch(`${API_BASE_URL}/intersections/${id}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
+    } catch (error) {
+      console.error("Failed to update intersection status:", error);
+    }
+  };
+
+  // Function to fetch intersection data (including status)
+  const fetchIntersectionData = async () => {
+    if (!intersectionId) return;
+    
+    try {
+      const authToken = getAuthToken();
+      if (!authToken) return;
+
+      const response = await fetch(`${API_BASE_URL}/intersections/${intersectionId}`, {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIntersectionData(data);
+        
+        // Check if intersection has been optimized
+        if (data.status === "optimised") {
+          setCanBeOptimized(true);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch intersection data:", error);
+    }
   };
 
   const fetchData = async () => {
@@ -304,6 +504,11 @@ const SimulationResults: React.FC = () => {
       if (!intersectionRes.ok) throw new Error(`Failed to fetch intersection details: ${intersectionRes.statusText}`);
       const intersectionResponseData: ApiIntersection = await intersectionRes.json();
       setIntersectionData(intersectionResponseData);
+      
+      // Check if intersection has been optimized
+      if (intersectionResponseData.status === "optimised") {
+        setCanBeOptimized(true);
+      }
 
       // Process optimization data if available
       if (optRes.ok) {
@@ -330,6 +535,14 @@ const SimulationResults: React.FC = () => {
     fetchData();
   }, [intersectionId, type]);
   
+  // Fetch intersection data on mount to get latest status
+  useEffect(() => {
+    if (intersectionId) {
+      fetchIntersectionData();
+    }
+  }, [intersectionId]);
+
+  // Chart creation and updates
   useEffect(() => {
     chartInstances.current.forEach((c) => c?.destroy());
     chartInstances.current = [];
@@ -734,19 +947,53 @@ const SimulationResults: React.FC = () => {
               >
                 View Rendering
               </button>
+              
+              {/* Optimization Button */}
               <button
-                onClick={() => setShowOptimized(!showOptimized)}
-                disabled={!canBeOptimized}
+                onClick={runOptimization}
+                disabled={isOptimizing || canBeOptimized}
                 className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
-                  !canBeOptimized
+                  isOptimizing
                     ? "bg-gray-600 cursor-not-allowed"
-                    : "bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:scale-105 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
+                    : canBeOptimized
+                    ? "bg-green-600 cursor-not-allowed"
+                    : "bg-gradient-to-r from-orange-600 to-orange-700 shadow-orange-500/50 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/60 focus:ring-orange-300"
                 }`}
               >
-                {!canBeOptimized ? "Not Optimized" : showOptimized ? "Hide Optimization" : "Show Optimization"}
+                {isOptimizing ? (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                    <span>Optimizing...</span>
+                  </div>
+                ) : canBeOptimized ? (
+                  "Already Optimized"
+                ) : (
+                  "Run Optimization"
+                )}
               </button>
+              
+              {/* Show Optimization Results Button */}
+              {canBeOptimized && (
+                <button
+                  onClick={() => setShowOptimized(!showOptimized)}
+                  className="px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-4 bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
+                >
+                  {showOptimized ? "Hide Optimization" : "Show Optimization"}
+                </button>
+              )}
             </div>
           </div>
+
+          {/* Optimization Status Message */}
+          {optimizationStatus && (
+            <div className={`mb-6 p-4 rounded-lg text-center ${
+              optimizationStatus.includes("failed") || optimizationStatus.includes("No improvement")
+                ? "bg-red-500/20 border border-red-500/30 text-red-300"
+                : "bg-green-500/20 border border-green-500/30 text-green-300"
+            }`}>
+              <p className="font-semibold">{optimizationStatus}</p>
+            </div>
+          )}
 
           <section className="visSection simulation-section bg-white/5 backdrop-blur-md p-8 rounded-xl shadow-lg border border-gray-800/50 w-full text-center">
             <h2 className="text-2xl font-semibold mb-8">

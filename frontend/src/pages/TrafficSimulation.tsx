@@ -505,6 +505,7 @@ interface TrafficSimulationProps {
   intersectionId: string;
   scale?: number;
   isExpanded: boolean;
+  endpoint?: "simulate" | "optimise";
 }
 
 // Hook to detect mobile screen size
@@ -529,6 +530,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
   intersectionId,
   scale,
   isExpanded,
+  endpoint = "simulate",
 }) => {
   const [simulationData, setSimulationData] = useState<SimulationData | null>(
     null,
@@ -573,7 +575,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
         }
 
         const response = await fetch(
-          `${API_BASE_URL}/intersections/${intersectionId}/simulate`,
+          `${API_BASE_URL}/intersections/${intersectionId}/${endpoint}`,
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -708,7 +710,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
     };
 
     fetchSimulationData();
-  }, [intersectionId, roadDirections]);
+  }, [intersectionId, roadDirections, endpoint]);
 
   const metrics = useMemo(() => {
     if (!simulationData)

@@ -20,15 +20,81 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     propOriginalId || location.state?.originalIntersectionId || "1"
   );
   const [optimizedIntersectionId, setOptimizedIntersectionId] = useState<string>(
-    propOptimizedId || location.state?.optimizedIntersectionId || "2"
+    propOriginalId || location.state?.originalIntersectionId || "1"
   );
   const [originalIntersectionName, setOriginalIntersectionName] = useState<string>(
     location.state?.originalIntersectionName || "Original Simulation"
   );
   const [optimizedIntersectionName, setOptimizedIntersectionName] = useState<string>(
-    location.state?.optimizedIntersectionName || "Optimized Simulation"
+    "Optimized Simulation"
   );
   const [expanded, setExpanded] = useState<"none" | "left" | "right">("none");
+  const [hasOptimizedData, setHasOptimizedData] = useState<boolean>(false);
+  const [isLoadingOptimized, setIsLoadingOptimized] = useState<boolean>(false);
+  const [optimizedDataError, setOptimizedDataError] = useState<string | null>(null);
+  const [optimizedDataSuccess, setOptimizedDataSuccess] = useState<string | null>(null);
+
+  // Check if optimized data is available
+  useEffect(() => {
+    const checkOptimizedData = async () => {
+      if (!originalIntersectionId) return;
+      
+      console.log("Checking optimized data for intersection:", originalIntersectionId);
+      setIsLoadingOptimized(true);
+      setOptimizedDataError(null);
+      
+      try {
+        const authToken = localStorage.getItem("authToken");
+        if (!authToken) {
+          setOptimizedDataError("Authentication token not found");
+          return;
+        }
+
+        // Try to fetch optimized data
+        const response = await fetch(
+          `http://localhost:9090/intersections/${originalIntersectionId}/optimise`,
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }
+        );
+
+        console.log("Optimization API response status:", response.status);
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Optimization API response data:", data);
+          
+          if (data.output && data.output.vehicles && data.output.vehicles.length > 0) {
+            console.log("Optimized data found, setting hasOptimizedData to true");
+            setHasOptimizedData(true);
+            setOptimizedIntersectionId(originalIntersectionId); // Use same ID for optimized data
+            setOptimizedDataSuccess("Optimized data found! Loading simulation...");
+            setOptimizedDataError(null);
+            
+            // Clear success message after 3 seconds
+            setTimeout(() => {
+              setOptimizedDataSuccess(null);
+            }, 3000);
+          } else {
+            console.log("No optimized data found in response");
+            setHasOptimizedData(false);
+            setOptimizedDataSuccess(null);
+          }
+        } else {
+          console.log("Optimization API request failed");
+          setHasOptimizedData(false);
+        }
+      } catch (error) {
+        console.error("Error checking optimized data:", error);
+        setOptimizedDataError("Failed to check optimization status");
+        setHasOptimizedData(false);
+      } finally {
+        setIsLoadingOptimized(false);
+      }
+    };
+
+    checkOptimizedData();
+  }, [originalIntersectionId]);
 
   // Update IDs if props change
   useEffect(() => {
@@ -181,7 +247,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   const toggleLeft = () =>
     setExpanded((prev) => (prev === "left" ? "none" : "left"));
   const toggleRight = () => {
-    if (optimizedIntersectionId && optimizedIntersectionId !== "2") {
+    if (hasOptimizedData) {
       setExpanded((prev) => (prev === "right" ? "none" : "right"));
     } else {
       // Show info about no optimization available
@@ -194,6 +260,56 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
       window.history.back();
     } else {
       window.close();
+    }
+  };
+
+  const handleRefreshOptimizedData = async () => {
+    if (!originalIntersectionId) return;
+    
+    setIsLoadingOptimized(true);
+    setOptimizedDataError(null);
+    
+    try {
+      const authToken = localStorage.getItem("authToken");
+      if (!authToken) {
+        setOptimizedDataError("Authentication token not found");
+        return;
+      }
+
+      // Try to fetch optimized data
+      const response = await fetch(
+        `http://localhost:9090/intersections/${originalIntersectionId}/optimise`,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        if (data.output && data.output.vehicles && data.output.vehicles.length > 0) {
+          setHasOptimizedData(true);
+          setOptimizedIntersectionId(originalIntersectionId);
+          setOptimizedDataSuccess("Optimized data found! Loading simulation...");
+          setOptimizedDataError(null);
+          
+          // Clear success message after 3 seconds
+          setTimeout(() => {
+            setOptimizedDataSuccess(null);
+          }, 3000);
+        } else {
+          setHasOptimizedData(false);
+          setOptimizedDataSuccess(null);
+        }
+      } else {
+        setHasOptimizedData(false);
+      }
+    } catch (error) {
+      console.error("Error refreshing optimized data:", error);
+      setOptimizedDataError("Failed to refresh optimization status");
+      setHasOptimizedData(false);
+    } finally {
+      setIsLoadingOptimized(false);
     }
   };
 
@@ -220,7 +336,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
         tooltip: "Exit fullscreen to show both views",
       };
     } else {
-      if (side === "right" && (!optimizedIntersectionId || optimizedIntersectionId === "2")) {
+      if (side === "right" && !hasOptimizedData) {
         return {
           icon: "ℹ️",
           text: "Info",
@@ -394,6 +510,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
             intersectionId={originalIntersectionId}
             scale={expanded === "left" ? 1.0 : 0.65}
             isExpanded={expanded === "left"}
+            endpoint="simulate"
           />
           <div style={labelStyle} className="comparison-label">
             {originalIntersectionName}
@@ -413,12 +530,39 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
 
         {/* Right side: Optimized Simulation or Message */}
         <div style={getDynamicStyles("right")} className="comparison-view">
-          {optimizedIntersectionId && optimizedIntersectionId !== "2" ? (
+          {isLoadingOptimized ? (
+            <>
+              <div
+                style={{
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#3d3d3d",
+                  color: "white",
+                  textAlign: "center",
+                  padding: "2rem",
+                }}
+              >
+                <div>
+                  <div className="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent rounded-full mb-4 mx-auto"></div>
+                  <h3 className="text-xl font-bold mb-2">Checking Optimization Status</h3>
+                  <p className="text-sm text-gray-300">
+                    Verifying if optimized data is available...
+                  </p>
+                </div>
+              </div>
+              <div style={labelStyle} className="comparison-label">
+                Loading...
+              </div>
+            </>
+          ) : hasOptimizedData ? (
             <>
               <TrafficSimulation
                 intersectionId={optimizedIntersectionId}
                 scale={expanded === "right" ? 1.0 : 0.65}
                 isExpanded={expanded === "right"}
+                endpoint="optimise"
               />
               <div style={labelStyle} className="comparison-label">
                 {optimizedIntersectionName}
@@ -446,9 +590,36 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                   <p className="text-lg text-gray-300 mb-6">
                     This simulation hasn't been optimized yet.
                   </p>
-                  <p className="text-sm text-gray-400">
-                    Run an optimization to compare results side-by-side.
+                  <p className="text-sm text-gray-400 mb-4">
+                    Run an optimization from the Simulation Results page to compare results side-by-side.
                   </p>
+                  <button
+                    onClick={handleRefreshOptimizedData}
+                    disabled={isLoadingOptimized}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-white rounded-md transition-colors duration-200 flex items-center gap-2 mx-auto"
+                  >
+                    {isLoadingOptimized ? (
+                      <>
+                        <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                        Checking...
+                      </>
+                    ) : (
+                      <>
+                        <span>🔄</span>
+                        Check for Optimization
+                      </>
+                    )}
+                  </button>
+                  {optimizedDataSuccess && (
+                    <p className="text-sm text-green-400 mt-2">
+                      {optimizedDataSuccess}
+                    </p>
+                  )}
+                  {optimizedDataError && (
+                    <p className="text-sm text-red-400 mt-2">
+                      Error: {optimizedDataError}
+                    </p>
+                  )}
                 </div>
               </div>
               <div style={labelStyle} className="comparison-label">
