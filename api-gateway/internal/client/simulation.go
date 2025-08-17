@@ -41,6 +41,10 @@ func (sc *SimulationClient) GetSimulationResults(
 		SimulationParameters: &simulationpb.SimulationParameters{
 			IntersectionType: simulationpb.IntersectionType(intersection),
 			Green:            int32(simulation_parameters.Green),
+			Yellow:           int32(simulation_parameters.Yellow),
+			Red:              int32(simulation_parameters.Red),
+			Speed:            int32(simulation_parameters.Speed),
+			Seed:             int32(simulation_parameters.Seed),
 		},
 	}
 
@@ -70,6 +74,10 @@ func (sc *SimulationClient) GetSimulationOutput(
 		SimulationParameters: &simulationpb.SimulationParameters{
 			IntersectionType: simulationpb.IntersectionType(intersection),
 			Green:            int32(simulation_parameters.Green),
+			Yellow:           int32(simulation_parameters.Yellow),
+			Red:              int32(simulation_parameters.Red),
+			Speed:            int32(simulation_parameters.Speed),
+			Seed:             int32(simulation_parameters.Seed),
 		},
 	}
 

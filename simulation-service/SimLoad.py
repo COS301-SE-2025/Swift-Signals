@@ -15,9 +15,9 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 INTERSECTION_TYPES = {
     0: "unspecified",
     1: "trafficlight",
-    2: "roundabout",
-    3: "fourwaystop",
-    4: "tjunction",
+    2: "roundabout",  # possibly removing
+    3: "fourwaystop",  # possibly removing
+    4: "tjunction",  # possibly removing
 }
 
 

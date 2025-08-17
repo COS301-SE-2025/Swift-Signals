@@ -54,21 +54,6 @@ definitions:
         example: resource not found
         type: string
     type: object
-  model.GetAllUsersRequest:
-    properties:
-      page:
-        example: 1
-        minimum: 1
-        type: integer
-      page_size:
-        example: 10
-        maximum: 100
-        minimum: 1
-        type: integer
-    required:
-    - page
-    - page_size
-    type: object
   model.Intersection:
     properties:
       best_parameters:
@@ -465,12 +450,14 @@ paths:
       - application/json
       description: Retrieves a paginated list of all users. Only accessible by admins.
       parameters:
-      - description: Pagination options
-        in: body
-        name: getAllUsersRequest
-        required: true
-        schema:
-          $ref: '#/definitions/model.GetAllUsersRequest'
+      - description: Page number (default is 1)
+        in: query
+        name: page
+        type: integer
+      - description: Number of users per page (default is 100 and max is 100)
+        in: query
+        name: page_size
+        type: integer
       produces:
       - application/json
       responses:

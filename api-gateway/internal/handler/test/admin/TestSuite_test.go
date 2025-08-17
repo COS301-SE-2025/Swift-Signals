@@ -27,7 +27,11 @@ func (suite *TestSuite) SetupSuite() {
 func (suite *TestSuite) SetupTest() {
 	suite.service = new(mocks.MockAdminServiceInterface)
 	suite.handler = handler.NewAdminHandler(suite.service)
-	suite.ctx = middleware.SetRole(context.Background(), "admin")
+
+	// Set up context with logger and role
+	ctx := context.Background()
+	ctx = middleware.SetLogger(ctx, slog.Default())
+	suite.ctx = middleware.SetRole(ctx, "admin")
 }
 
 func TestHandler(t *testing.T) {

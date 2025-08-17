@@ -28,7 +28,9 @@ func (h *Handler) CreateIntersection(
 	logger.Info("processing CreateIntersection request")
 
 	intersectionDetails := h.mapIntersectionDetails(req.GetDetails())
-	trafficDensity := model.TrafficDensity(req.GetTrafficDensity())
+	trafficDensity := model.TrafficDensity(
+		intersectionpb.TrafficDensity_name[int32(req.GetTrafficDensity())],
+	)
 	optimisationParams := h.mapOptimisationParameters(req.GetDefaultParameters())
 
 	intersection, err := h.service.CreateIntersection(
