@@ -196,7 +196,7 @@ func createServer(port int, handler http.Handler) *http.Server {
 		Addr:         addr,
 		Handler:      handler,
 		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		WriteTimeout: 10 * time.Hour,
 		IdleTimeout:  15 * time.Second,
 	}
 }
