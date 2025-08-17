@@ -21,7 +21,9 @@ def fake_json_load(f):
     return FAKE_RESULTS
 
 
-@mock.patch("builtins.open", new_callable=mock.mock_open, read_data=json.dumps(FAKE_RESULTS))
+@mock.patch(
+    "builtins.open", new_callable=mock.mock_open, read_data=json.dumps(FAKE_RESULTS)
+)
 @mock.patch("GP.subprocess.run")
 @mock.patch("GP.datetime")
 def test_full_run(mock_datetime, mock_run, mock_open):
@@ -48,10 +50,10 @@ def test_full_run(mock_datetime, mock_run, mock_open):
 
 def test_custom_mutate_for_full_coverage():
     ind = GP.creator.Individual([10, 3, 10, 40, 1408])
-    with mock.patch("random.random", return_value=0.0), \
-         mock.patch("random.randint", side_effect=[20, 5, 30]), \
-         mock.patch("random.choice", side_effect=[60]):
-        mutated, = GP.custom_mutate(ind, indpb=1.0, min_speed=40)
+    with mock.patch("random.random", return_value=0.0), mock.patch(
+        "random.randint", side_effect=[20, 5, 30]
+    ), mock.patch("random.choice", side_effect=[60]):
+        (mutated,) = GP.custom_mutate(ind, indpb=1.0, min_speed=40)
     assert mutated[0] == 20
     assert mutated[1] == 5
     assert mutated[2] == 30
@@ -82,7 +84,9 @@ def test_run_simulation_subprocess_error(mock_run):
 @mock.patch("GP.subprocess.run")
 @mock.patch("GP.json.load", side_effect=fake_json_load)
 @mock.patch("GP.datetime")
-def test_run_final_simulation_and_compare_normal(mock_datetime, mock_json_load, mock_run):
+def test_run_final_simulation_and_compare_normal(
+    mock_datetime, mock_json_load, mock_run
+):
     mock_datetime.now.return_value.strftime.return_value = "20200101-000000-000000"
     best_params = {"Green": 10, "Yellow": 3, "Red": 10, "Speed": 60, "Seed": 1408}
     GP.run_final_simulation_and_compare(best_params)
