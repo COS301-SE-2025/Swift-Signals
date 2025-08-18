@@ -184,8 +184,8 @@ const Users = () => {
         setTotalUsers(newTotal);
       }
       
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to fetch users");
       setUsers([]);
     } finally {
       setLoading(false);
@@ -256,8 +256,8 @@ const Users = () => {
         setIsEditModalOpen(false);
         setEditingUser(null);
         fetchUsers(currentPage, rowsPerPage);
-    } catch (err: any) {
-        setUpdateError(err.message);
+    } catch (err: unknown) {
+        setUpdateError(err instanceof Error ? err.message : "Failed to update user");
     } finally {
         setIsUpdating(false);
     }
@@ -285,8 +285,8 @@ const Users = () => {
         const errorData = await response.json().catch(() => null);
         throw new Error(errorData?.message || 'Failed to delete user.');
       }
-    } catch (err: any) {
-      alert(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      alert(`Error: ${err instanceof Error ? err.message : "Failed to delete user"}`);
     }
   };
 

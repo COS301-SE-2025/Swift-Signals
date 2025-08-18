@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import TrafficSimulation from "./TrafficSimulation";
 import HelpMenu from "../components/HelpMenu";
 
@@ -13,7 +13,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   optimizedIntersectionId: propOptimizedId,
 }) => {
   const location = useLocation();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   
   // Get intersection IDs from props or location state
   const [originalIntersectionId, setOriginalIntersectionId] = useState<string>(
@@ -22,10 +22,10 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   const [optimizedIntersectionId, setOptimizedIntersectionId] = useState<string>(
     propOriginalId || location.state?.originalIntersectionId || "1"
   );
-  const [originalIntersectionName, setOriginalIntersectionName] = useState<string>(
+  const [originalIntersectionName] = useState<string>(
     location.state?.originalIntersectionName || "Original Simulation"
   );
-  const [optimizedIntersectionName, setOptimizedIntersectionName] = useState<string>(
+  const [optimizedIntersectionName] = useState<string>(
     "Optimized Simulation"
   );
   const [expanded, setExpanded] = useState<"none" | "left" | "right">("none");

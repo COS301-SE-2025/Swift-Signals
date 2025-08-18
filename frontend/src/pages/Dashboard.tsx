@@ -68,10 +68,6 @@ const Dashboard: React.FC = () => {
   const [activeSimulations, setActiveSimulations] = useState<number>(0);
   const [loadingActiveSimulations, setLoadingActiveSimulations] = useState(false);
 
-  const [allIntersections, setAllIntersections] = useState<ApiIntersection[]>(
-    []
-  );
-
   const fetchAllIntersections = async () => {
     setLoadingTotal(true);
     setLoadingActiveSimulations(true);
@@ -84,7 +80,6 @@ const Dashboard: React.FC = () => {
       const data = await response.json();
       const items: ApiIntersection[] = data.intersections || [];
 
-      setAllIntersections(items);
       setTotalIntersections(items.length);
 
       // Calculate active simulations (intersections with run_count > 0)
@@ -98,8 +93,6 @@ const Dashboard: React.FC = () => {
     } catch (err: unknown) {
       console.error("Failed to fetch intersections:", err);
       setTotalIntersections(0);
-      setAllIntersections([]);
-      setActiveSimulations(0);
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
         chartInstanceRef.current = null;
@@ -130,9 +123,6 @@ const Dashboard: React.FC = () => {
 
     const labelColor = isDarkMode ? "#F0F6FC" : "#6B7280";
     const gridColor = isDarkMode ? "#30363D" : "#E5E7EB";
-
-    const maxY = Math.max(...chartData.data);
-    const step = Math.max(1, Math.ceil(maxY / 5) || 1);
 
     chartInstanceRef.current = new Chart(ctx, {
       type: "line",
@@ -215,52 +205,6 @@ const Dashboard: React.FC = () => {
         },
       },
     });
-  };
-
-  const processRunCountData = (intersections: ApiIntersection[]) => {
-    const withDates = intersections.filter((i) => i.created_at);
-    if (withDates.length === 0) {
-      return { labels: ["No Data"], data: [0] };
-    }
-
-    const sorted = withDates.sort(
-      (a, b) =>
-        new Date(a.created_at!).getTime() - new Date(b.created_at!).getTime()
-    );
-
-    const perDay: Record<string, number> = {};
-    sorted.forEach((i) => {
-      const label = new Date(i.created_at!).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-      });
-      perDay[label] =
-        (perDay[label] || 0) + (typeof i.run_count === 'number' ? i.run_count : 0);
-    });
-
-    const labels = Object.keys(perDay);
-    const data: number[] = [];
-    let running = 0;
-    labels.forEach((d) => {
-      running += perDay[d];
-      data.push(running);
-    });
-
-    const last = labels.slice(-5);
-    const lastData = data.slice(-5);
-
-    if (last.length === 0) return { labels: ["No Data"], data: [0] };
-
-    while (last.length < 5) {
-      const nextDate = new Date();
-      nextDate.setDate(nextDate.getDate() + last.length);
-      last.push(
-        nextDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-      );
-      lastData.push(lastData[lastData.length - 1]);
-    }
-
-    return { labels: last, data: lastData };
   };
 
   const processTrafficDensityData = (intersections: ApiIntersection[]) => {

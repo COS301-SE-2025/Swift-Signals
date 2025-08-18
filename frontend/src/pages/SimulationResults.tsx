@@ -386,26 +386,9 @@ const SimulationResults: React.FC = () => {
   };
 
   // Helper function to process traffic lights (extracted from existing code)
-  const processTrafficLights = (trafficLights: any[]) => {
-    const directionToSignalIndices: { [key: string]: number[] } = {
-      North: [],
-      South: [],
-      East: [],
-      West: [],
-    };
-    const allConnectionIndices = new Set<number>();
-    
+  const processTrafficLights = (trafficLights: { phases?: { duration?: number }[] }[]) => {
     // This would need to be updated based on your actual connection structure
     // For now, using a simplified approach
-    const roadDirections: { [key: string]: string } = {
-      in_n2_1: "North",
-      in_n3_1: "South",
-      in_n4_1: "West",
-      in_n5_1: "East",
-    };
-
-    // Process connections to determine signal indices for each direction
-    // This is a simplified version - you may need to adjust based on your actual data structure
     
     const maxSignalIndex = 11; // Default value, adjust as needed
     const stateArrayLength = maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
@@ -523,8 +506,8 @@ const SimulationResults: React.FC = () => {
       } else {
         setCanBeOptimized(false);
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to load data from the API.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to load data from the API.");
       console.error(err);
     } finally {
       setLoading(false);
