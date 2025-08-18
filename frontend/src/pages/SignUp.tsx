@@ -2,8 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/SignUp.css";
 import Footer from "../components/Footer";
+import logo from "../../src/assets/logo.png";
 
-const API_BASE_URL = "/api";
+const API_BASE_URL = "http://localhost:9090";
 
 interface TrafficLightProps {
   redActive: boolean;
@@ -142,7 +143,7 @@ const SignUp = () => {
         style={{ minWidth: 350 }}
       >
         <img
-          src="/src/assets/logo.png"
+          src={logo}
           alt="Swift Signals Logo"
           className="signupLogo h-20 w-20 object-contain drop-shadow-lg"
         />
