@@ -571,7 +571,9 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
 
         const authToken = getAuthToken();
         if (!authToken) {
-          throw new Error("Authentication token not found. Please log in again.");
+          throw new Error(
+            "Authentication token not found. Please log in again.",
+          );
         }
 
         const response = await fetch(
@@ -581,7 +583,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
               Authorization: `Bearer ${authToken}`,
               "Content-Type": "application/json",
             },
-          }
+          },
         );
 
         if (!response.ok) {
@@ -590,12 +592,14 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           } else if (response.status === 404) {
             throw new Error("Simulation data not found for this intersection.");
           } else {
-            throw new Error(`Failed to fetch simulation data: ${response.statusText}`);
+            throw new Error(
+              `Failed to fetch simulation data: ${response.statusText}`,
+            );
           }
         }
 
         const data: SimulationResponse = await response.json();
-        
+
         if (!data.output) {
           throw new Error("Invalid simulation data received from server");
         }
@@ -609,7 +613,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
             West: [],
           };
           const allConnectionIndices = new Set<number>();
-          
+
           data.output.intersection.connections.forEach((conn) => {
             if (conn.from.indexOf(":") === -1) {
               const direction = roadDirections[conn.from];
@@ -623,7 +627,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
               allConnectionIndices.add(signalIndex);
             }
           });
-          
+
           const maxSignalIndex = Math.max(...Array.from(allConnectionIndices));
           const stateArrayLength =
             maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
@@ -676,9 +680,9 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
             duration: ewYellowDuration,
             state: ewYellowState.join(""),
           });
-          
-          const processedTrafficLights = data.output.intersection.trafficLights.map(
-            (light) => {
+
+          const processedTrafficLights =
+            data.output.intersection.trafficLights.map((light) => {
               let time = 0;
               const newStates = newPhases.map((phase) => {
                 const state = { time: time, state: phase.state };
@@ -687,9 +691,8 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
               });
               newStates.push({ time: time, state: newPhases[0].state });
               return { ...light, phases: newPhases, states: newStates };
-            },
-          );
-          
+            });
+
           const newSimData = {
             ...data.output,
             intersection: {
@@ -703,7 +706,11 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
         }
       } catch (error) {
         console.error("Error fetching simulation data:", error);
-        setError(error instanceof Error ? error.message : "Failed to fetch simulation data");
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch simulation data",
+        );
       } finally {
         setIsLoading(false);
       }

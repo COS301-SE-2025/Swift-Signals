@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/WelcomePage.css";
 import Carousel from "../components/Carousel";
-import logo from "../../src/assets/logo.png"
+import logo from "../../src/assets/logo.png";
 
 const WelcomePage: React.FC = () => {
   const navigate = useNavigate(); // Initialize useNavigate

@@ -14,35 +14,41 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
 }) => {
   const location = useLocation();
   // const navigate = useNavigate();
-  
+
   // Get intersection IDs from props or location state
   const [originalIntersectionId, setOriginalIntersectionId] = useState<string>(
-    propOriginalId || location.state?.originalIntersectionId || "1"
+    propOriginalId || location.state?.originalIntersectionId || "1",
   );
-  const [optimizedIntersectionId, setOptimizedIntersectionId] = useState<string>(
-    propOriginalId || location.state?.originalIntersectionId || "1"
-  );
+  const [optimizedIntersectionId, setOptimizedIntersectionId] =
+    useState<string>(
+      propOriginalId || location.state?.originalIntersectionId || "1",
+    );
   const [originalIntersectionName] = useState<string>(
-    location.state?.originalIntersectionName || "Original Simulation"
+    location.state?.originalIntersectionName || "Original Simulation",
   );
-  const [optimizedIntersectionName] = useState<string>(
-    "Optimized Simulation"
-  );
+  const [optimizedIntersectionName] = useState<string>("Optimized Simulation");
   const [expanded, setExpanded] = useState<"none" | "left" | "right">("none");
   const [hasOptimizedData, setHasOptimizedData] = useState<boolean>(false);
   const [isLoadingOptimized, setIsLoadingOptimized] = useState<boolean>(false);
-  const [optimizedDataError, setOptimizedDataError] = useState<string | null>(null);
-  const [optimizedDataSuccess, setOptimizedDataSuccess] = useState<string | null>(null);
+  const [optimizedDataError, setOptimizedDataError] = useState<string | null>(
+    null,
+  );
+  const [optimizedDataSuccess, setOptimizedDataSuccess] = useState<
+    string | null
+  >(null);
 
   // Check if optimized data is available
   useEffect(() => {
     const checkOptimizedData = async () => {
       if (!originalIntersectionId) return;
-      
-      console.log("Checking optimized data for intersection:", originalIntersectionId);
+
+      console.log(
+        "Checking optimized data for intersection:",
+        originalIntersectionId,
+      );
       setIsLoadingOptimized(true);
       setOptimizedDataError(null);
-      
+
       try {
         const authToken = localStorage.getItem("authToken");
         if (!authToken) {
@@ -55,7 +61,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
           `http://localhost:9090/intersections/${originalIntersectionId}/optimise`,
           {
             headers: { Authorization: `Bearer ${authToken}` },
-          }
+          },
         );
 
         console.log("Optimization API response status:", response.status);
@@ -63,14 +69,22 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
         if (response.ok) {
           const data = await response.json();
           console.log("Optimization API response data:", data);
-          
-          if (data.output && data.output.vehicles && data.output.vehicles.length > 0) {
-            console.log("Optimized data found, setting hasOptimizedData to true");
+
+          if (
+            data.output &&
+            data.output.vehicles &&
+            data.output.vehicles.length > 0
+          ) {
+            console.log(
+              "Optimized data found, setting hasOptimizedData to true",
+            );
             setHasOptimizedData(true);
             setOptimizedIntersectionId(originalIntersectionId); // Use same ID for optimized data
-            setOptimizedDataSuccess("Optimized data found! Loading simulation...");
+            setOptimizedDataSuccess(
+              "Optimized data found! Loading simulation...",
+            );
             setOptimizedDataError(null);
-            
+
             // Clear success message after 3 seconds
             setTimeout(() => {
               setOptimizedDataSuccess(null);
@@ -105,22 +119,22 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   // Set document title
   useEffect(() => {
     document.title = `Traffic Simulation Comparison - ${originalIntersectionName}`;
-    
+
     // Store original body styles
     const originalBodyStyle = window.getComputedStyle(document.body);
     const originalOverflow = originalBodyStyle.overflow;
     const originalMargin = originalBodyStyle.margin;
     const originalPadding = originalBodyStyle.padding;
-    
+
     // Add keyboard shortcut for escape key
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         handleExit();
       }
     };
-    
-    document.addEventListener('keydown', handleKeyDown);
-    
+
+    document.addEventListener("keydown", handleKeyDown);
+
     return () => {
       document.title = "Swift Signals";
       // Restore original body styles
@@ -128,7 +142,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
       document.body.style.margin = originalMargin;
       document.body.style.padding = originalPadding;
       // Remove keyboard event listener
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [originalIntersectionName]);
 
@@ -251,7 +265,9 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
       setExpanded((prev) => (prev === "right" ? "none" : "right"));
     } else {
       // Show info about no optimization available
-      alert("No optimization available for this simulation. Run an optimization first to enable comparison.");
+      alert(
+        "No optimization available for this simulation. Run an optimization first to enable comparison.",
+      );
     }
   };
 
@@ -265,10 +281,10 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
 
   const handleRefreshOptimizedData = async () => {
     if (!originalIntersectionId) return;
-    
+
     setIsLoadingOptimized(true);
     setOptimizedDataError(null);
-    
+
     try {
       const authToken = localStorage.getItem("authToken");
       if (!authToken) {
@@ -281,18 +297,24 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
         `http://localhost:9090/intersections/${originalIntersectionId}/optimise`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
-        }
+        },
       );
 
       if (response.ok) {
         const data = await response.json();
-        
-        if (data.output && data.output.vehicles && data.output.vehicles.length > 0) {
+
+        if (
+          data.output &&
+          data.output.vehicles &&
+          data.output.vehicles.length > 0
+        ) {
           setHasOptimizedData(true);
           setOptimizedIntersectionId(originalIntersectionId);
-          setOptimizedDataSuccess("Optimized data found! Loading simulation...");
+          setOptimizedDataSuccess(
+            "Optimized data found! Loading simulation...",
+          );
           setOptimizedDataError(null);
-          
+
           // Clear success message after 3 seconds
           setTimeout(() => {
             setOptimizedDataSuccess(null);
@@ -546,7 +568,9 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
               >
                 <div>
                   <div className="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent rounded-full mb-4 mx-auto"></div>
-                  <h3 className="text-xl font-bold mb-2">Checking Optimization Status</h3>
+                  <h3 className="text-xl font-bold mb-2">
+                    Checking Optimization Status
+                  </h3>
                   <p className="text-sm text-gray-300">
                     Verifying if optimized data is available...
                   </p>
@@ -568,7 +592,11 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                 {optimizedIntersectionName}
               </div>
               <div className="comparison-button">
-                <ModernButton side="right" onClick={toggleRight} position="right" />
+                <ModernButton
+                  side="right"
+                  onClick={toggleRight}
+                  position="right"
+                />
               </div>
             </>
           ) : (
@@ -586,12 +614,15 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                 }}
               >
                 <div>
-                  <h3 className="text-2xl font-bold mb-4">No Optimization Available</h3>
+                  <h3 className="text-2xl font-bold mb-4">
+                    No Optimization Available
+                  </h3>
                   <p className="text-lg text-gray-300 mb-6">
                     This simulation hasn't been optimized yet.
                   </p>
                   <p className="text-sm text-gray-400 mb-4">
-                    Run an optimization from the Simulation Results page to compare results side-by-side.
+                    Run an optimization from the Simulation Results page to
+                    compare results side-by-side.
                   </p>
                   <button
                     onClick={handleRefreshOptimizedData}

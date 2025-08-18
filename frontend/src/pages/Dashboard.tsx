@@ -8,13 +8,7 @@ import { Chart, registerables } from "chart.js";
 import MapModal from "../components/MapModal";
 import { useState } from "react";
 
-import {
-  FaRoad,
-  FaPlay,
-  FaChartLine,
-  FaPlus,
-  FaMap,
-} from "react-icons/fa";
+import { FaRoad, FaPlay, FaChartLine, FaPlus, FaMap } from "react-icons/fa";
 
 Chart.register(...registerables);
 
@@ -66,7 +60,8 @@ const Dashboard: React.FC = () => {
   const [totalIntersections, setTotalIntersections] = useState<number>(0);
   const [loadingTotal, setLoadingTotal] = useState(false);
   const [activeSimulations, setActiveSimulations] = useState<number>(0);
-  const [loadingActiveSimulations, setLoadingActiveSimulations] = useState(false);
+  const [loadingActiveSimulations, setLoadingActiveSimulations] =
+    useState(false);
 
   const fetchAllIntersections = async () => {
     setLoadingTotal(true);
@@ -84,7 +79,8 @@ const Dashboard: React.FC = () => {
 
       // Calculate active simulations (intersections with run_count > 0)
       const activeCount = items.reduce((sum, item) => {
-        const runCount = typeof item.run_count === 'number' ? item.run_count : 0;
+        const runCount =
+          typeof item.run_count === "number" ? item.run_count : 0;
         return sum + (runCount > 0 ? 1 : 0);
       }, 0);
       setActiveSimulations(activeCount);
@@ -164,10 +160,10 @@ const Dashboard: React.FC = () => {
               stepSize: 1,
               font: { size: 12, family: "'Inter', sans-serif" },
               padding: 10,
-              callback: function(value) {
+              callback: function (value) {
                 const densityLabels = ["", "Low", "Medium", "High"];
                 return densityLabels[value as number] || value;
-              }
+              },
             },
             border: { display: false },
             min: 0,
@@ -197,7 +193,8 @@ const Dashboard: React.FC = () => {
               },
               label: function (context) {
                 const densityLabels = ["", "Low", "Medium", "High"];
-                const densityValue = densityLabels[context.parsed.y as number] || context.parsed.y;
+                const densityValue =
+                  densityLabels[context.parsed.y as number] || context.parsed.y;
                 return `Traffic Density: ${densityValue}`;
               },
             },
@@ -214,27 +211,29 @@ const Dashboard: React.FC = () => {
 
     // Map traffic density categories to numeric values based on actual API response
     const densityMap: { [key: string]: number } = {
-      "TRAFFIC_DENSITY_LOW": 1,
-      "TRAFFIC_DENSITY_MEDIUM": 2,
-      "TRAFFIC_DENSITY_HIGH": 3
+      TRAFFIC_DENSITY_LOW: 1,
+      TRAFFIC_DENSITY_MEDIUM: 2,
+      TRAFFIC_DENSITY_HIGH: 3,
     };
 
     // Process intersections and map their traffic density to numeric values
     const densityData = intersections.map((intersection) => {
       const density = intersection.traffic_density || "TRAFFIC_DENSITY_MEDIUM";
       const mappedValue = densityMap[density] || 2; // Default to medium (2) if density is unknown
-      
+
       // Debug logging
-      console.log(`Intersection: ${intersection.name}, Raw density: ${density}, Mapped value: ${mappedValue}`);
-      
+      console.log(
+        `Intersection: ${intersection.name}, Raw density: ${density}, Mapped value: ${mappedValue}`,
+      );
+
       return mappedValue;
     });
 
     // Create labels for the x-axis (intersection numbers)
     const labels = intersections.map((_, index) => `Intersection ${index + 1}`);
 
-    console.log('Final density data:', densityData);
-    console.log('Final labels:', labels);
+    console.log("Final density data:", densityData);
+    console.log("Final labels:", labels);
 
     return { labels, data: densityData };
   };
@@ -242,8 +241,6 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     fetchAllIntersections();
   }, []);
-
-
 
   const fetchMapIntersections = async () => {
     setIsLoadingMap(true);
@@ -373,7 +370,6 @@ const Dashboard: React.FC = () => {
     <div className="dashboard-screen min-h-screen bg-gray-100 dark:bg-gray-900">
       <Navbar />
       <main className="main-content">
-        
         <div className="card-grid">
           <div className="card">
             <div className="card-icon-1">
@@ -416,16 +412,16 @@ const Dashboard: React.FC = () => {
         <div className="dashboard-main-grid">
           <div className="main-column">
             <div className="grid grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-              <button 
+              <button
                 className="newInt quick-action-button bg-[#0F5BA7] dark:bg-[#388BFD] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2 hover:bg-[#0D4A8A] dark:hover:bg-[#2D7BD8] transition-colors duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-                onClick={() => navigate('/intersections')}
+                onClick={() => navigate("/intersections")}
                 title="Go to Intersections page to create new intersections"
               >
                 <FaPlus /> New Intersection
               </button>
-              <button 
+              <button
                 className="runSim quick-action-button bg-[#2B9348] dark:bg-[#2DA44E] text-white dark:text-[#E6EDF3] flex items-center justify-center gap-2 hover:bg-[#237A3A] dark:hover:bg-[#238636] transition-colors duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
-                onClick={() => navigate('/simulations')}
+                onClick={() => navigate("/simulations")}
                 title="Go to Simulations page to run new simulations"
               >
                 <FaPlay /> Run Simulation
@@ -590,7 +586,7 @@ const Dashboard: React.FC = () => {
                             {
                               month: "short",
                               day: "numeric",
-                            }
+                            },
                           )
                         : "";
 
@@ -640,7 +636,10 @@ const Dashboard: React.FC = () => {
 
               {/* Card Footer */}
               <div className="inter-card-footer p-2 border-t border-gray-200 dark:border-gray-700 mt-auto">
-                <button className="w-full text-center text-sm font-medium text-[#0F5BA7] dark:text-[#388BFD] bg-white dark:bg-transparent hover:underline p-2 rounded-md transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-gray-200 dark:border-transparent" onClick={() => navigate('/intersections')}>
+                <button
+                  className="w-full text-center text-sm font-medium text-[#0F5BA7] dark:text-[#388BFD] bg-white dark:bg-transparent hover:underline p-2 rounded-md transition-colors hover:bg-blue-50 dark:hover:bg-blue-900/20 border border-gray-200 dark:border-transparent"
+                  onClick={() => navigate("/intersections")}
+                >
                   View All ({totalIntersections})
                 </button>
               </div>

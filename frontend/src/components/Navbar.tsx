@@ -29,7 +29,7 @@ function Navbar() {
 
         const res = await fetch("http://localhost:9090/me", {
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -53,7 +53,11 @@ function Navbar() {
       </div>
 
       <button className="mobile-menu-toggle" onClick={toggleMobileMenu}>
-        {isMobileMenuOpen ? <IoClose size={30} /> : <GiHamburgerMenu size={30} />}
+        {isMobileMenuOpen ? (
+          <IoClose size={30} />
+        ) : (
+          <GiHamburgerMenu size={30} />
+        )}
       </button>
 
       <div className={`navbar-center ${isMobileMenuOpen ? "active" : ""}`}>

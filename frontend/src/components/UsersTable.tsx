@@ -44,7 +44,9 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onDelete }) => {
               className="border-b hover:bg-gray-50 dark:border-[#30363D]"
             >
               {/* MODIFIED: Display the simple number ID */}
-              <td className="px-4 py-3 text-black text-center">{user.displayId}</td> 
+              <td className="px-4 py-3 text-black text-center">
+                {user.displayId}
+              </td>
               <td className="px-4 py-3 text-black">{user.name}</td>
               <td className="px-4 py-3 text-black">{user.email}</td>
               <td className="px-4 py-3 text-black text-center">{user.role}</td>

@@ -1,6 +1,6 @@
 import "./Footer.css";
 import ThemeToggle from "./ThemeToggle";
-import southernCrossLogo from "../../src/assets/scs-logo.png"
+import southernCrossLogo from "../../src/assets/scs-logo.png";
 
 const Footer: React.FC = () => {
   return (

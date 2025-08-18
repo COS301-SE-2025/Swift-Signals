@@ -64,17 +64,28 @@ const LoadingAnimation: React.FC = () => (
         <div className="w-4 h-4 bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full animate-pulse"></div>
       </div>
     </div>
-    
+
     {/* Loading text with animated dots */}
     <div className="text-center">
-      <div className="text-xl font-semibold text-gray-300 mb-2">Loading Simulation Data</div>
+      <div className="text-xl font-semibold text-gray-300 mb-2">
+        Loading Simulation Data
+      </div>
       <div className="flex items-center justify-center space-x-1">
-        <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-        <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-        <div className="w-2 h-2 bg-teal-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+        <div
+          className="w-2 h-2 bg-teal-400 rounded-full animate-bounce"
+          style={{ animationDelay: "0ms" }}
+        ></div>
+        <div
+          className="w-2 h-2 bg-teal-400 rounded-full animate-bounce"
+          style={{ animationDelay: "150ms" }}
+        ></div>
+        <div
+          className="w-2 h-2 bg-teal-400 rounded-full animate-bounce"
+          style={{ animationDelay: "300ms" }}
+        ></div>
       </div>
     </div>
-    
+
     {/* Progress bar */}
     <div className="w-64 h-2 bg-gray-700 rounded-full overflow-hidden">
       <div className="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full animate-pulse"></div>
@@ -84,21 +95,36 @@ const LoadingAnimation: React.FC = () => (
 // #endregion
 
 // #region Error Component
-const ErrorDisplay: React.FC<{ error: string; onRetry: () => void }> = ({ error, onRetry }) => (
+const ErrorDisplay: React.FC<{ error: string; onRetry: () => void }> = ({
+  error,
+  onRetry,
+}) => (
   <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6 text-center">
     {/* Error icon */}
     <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center">
-      <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <svg
+        className="w-8 h-8 text-red-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
     </div>
-    
+
     {/* Error message */}
     <div className="max-w-md">
-      <h3 className="text-xl font-semibold text-red-400 mb-2">Failed to Load Data</h3>
+      <h3 className="text-xl font-semibold text-red-400 mb-2">
+        Failed to Load Data
+      </h3>
       <p className="text-gray-400 mb-6">{error}</p>
     </div>
-    
+
     {/* Retry button */}
     <button
       onClick={onRetry}
@@ -107,8 +133,18 @@ const ErrorDisplay: React.FC<{ error: string; onRetry: () => void }> = ({ error,
                  hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50 
                  hover:shadow-xl hover:shadow-red-500/40 flex items-center space-x-2"
     >
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+        />
       </svg>
       <span>Retry</span>
     </button>
@@ -118,7 +154,10 @@ const ErrorDisplay: React.FC<{ error: string; onRetry: () => void }> = ({ error,
 
 // #region Helper Functions
 function computeStats(vehicles: Vehicle[]) {
-  let totalSpeed = 0, maxSpeed = -Infinity, minSpeed = Infinity, speedCount = 0;
+  let totalSpeed = 0,
+    maxSpeed = -Infinity,
+    minSpeed = Infinity,
+    speedCount = 0;
   let totalDistance = 0;
   const finalSpeeds: number[] = [];
 
@@ -166,7 +205,8 @@ function getAverageSpeedOverTime(
   allTimes: number[],
 ): number[] {
   return allTimes.map((t) => {
-    let sum = 0, count = 0;
+    let sum = 0,
+      count = 0;
     vehicles.forEach((veh) => {
       const pos = veh.positions.find((p) => p.time === t);
       if (pos) {
@@ -226,7 +266,9 @@ function getHistogramData(
   });
 
   for (let i = 0; i < bins; i++) {
-    labels.push(`${(i * binSize).toFixed(0)}-${((i + 1) * binSize).toFixed(0)}`);
+    labels.push(
+      `${(i * binSize).toFixed(0)}-${((i + 1) * binSize).toFixed(0)}`,
+    );
   }
   return { counts, labels };
 }
@@ -252,10 +294,16 @@ function downsampleData<TLabel, TData>(
 
 const SimulationResults: React.FC = () => {
   const [simData, setSimData] = useState<SimulationOutput | null>(null);
-  const [optimizedData, setOptimizedData] = useState<SimulationOutput | null>(null);
-  const [apiResults, setApiResults] = useState<ApiSimulationResults | null>(null);
-  const [optimizedApiResults, setOptimizedApiResults] = useState<ApiSimulationResults | null>(null);
-  const [intersectionData, setIntersectionData] = useState<ApiIntersection | null>(null);
+  const [optimizedData, setOptimizedData] = useState<SimulationOutput | null>(
+    null,
+  );
+  const [apiResults, setApiResults] = useState<ApiSimulationResults | null>(
+    null,
+  );
+  const [optimizedApiResults, setOptimizedApiResults] =
+    useState<ApiSimulationResults | null>(null);
+  const [intersectionData, setIntersectionData] =
+    useState<ApiIntersection | null>(null);
 
   const [showOptimized, setShowOptimized] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -286,7 +334,7 @@ const SimulationResults: React.FC = () => {
 
     setIsOptimizing(true);
     setOptimizationStatus("Running optimization...");
-    
+
     try {
       const authToken = getAuthToken();
       if (!authToken) {
@@ -302,7 +350,7 @@ const SimulationResults: React.FC = () => {
             Authorization: `Bearer ${authToken}`,
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!optResponse.ok) {
@@ -311,7 +359,9 @@ const SimulationResults: React.FC = () => {
         } else if (optResponse.status === 404) {
           throw new Error("Intersection not found for optimization.");
         } else {
-          throw new Error(`Failed to run optimization: ${optResponse.statusText}`);
+          throw new Error(
+            `Failed to run optimization: ${optResponse.statusText}`,
+          );
         }
       }
 
@@ -319,29 +369,40 @@ const SimulationResults: React.FC = () => {
       console.log("Optimization result:", optResult);
 
       if (optResult.improved) {
-        setOptimizationStatus("Optimization completed successfully! Fetching optimized data...");
-        
+        setOptimizationStatus(
+          "Optimization completed successfully! Fetching optimized data...",
+        );
+
         // Step 2: Fetch optimized simulation data
         const optDataResponse = await fetch(
           `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
           {
             headers: { Authorization: `Bearer ${authToken}` },
-          }
+          },
         );
 
         if (!optDataResponse.ok) {
-          throw new Error(`Failed to fetch optimized data: ${optDataResponse.statusText}`);
+          throw new Error(
+            `Failed to fetch optimized data: ${optDataResponse.statusText}`,
+          );
         }
 
         const optData: ApiSimulationResponse = await optDataResponse.json();
-        
+
         if (!optData.output) {
-          throw new Error("Invalid optimized simulation data received from server");
+          throw new Error(
+            "Invalid optimized simulation data received from server",
+          );
         }
 
         // Process traffic lights for optimized data if they exist
-        if (optData.output.intersection && optData.output.intersection.trafficLights) {
-          const processedTrafficLights = processTrafficLights(optData.output.intersection.trafficLights);
+        if (
+          optData.output.intersection &&
+          optData.output.intersection.trafficLights
+        ) {
+          const processedTrafficLights = processTrafficLights(
+            optData.output.intersection.trafficLights,
+          );
           const newOptData = {
             ...optData.output,
             intersection: {
@@ -358,13 +419,13 @@ const SimulationResults: React.FC = () => {
         setCanBeOptimized(true);
         setShowOptimized(true);
         setOptimizationStatus("Optimization completed successfully!");
-        
+
         // Update the intersection status to "optimised" in the backend
         await updateIntersectionStatus(intersectionId, "optimised");
-        
+
         // Refresh intersection data to get updated status
         await fetchIntersectionData();
-        
+
         setTimeout(() => {
           setOptimizationStatus("");
         }, 3000);
@@ -376,7 +437,9 @@ const SimulationResults: React.FC = () => {
       }
     } catch (error) {
       console.error("Error running optimization:", error);
-      setOptimizationStatus(`Optimization failed: ${error instanceof Error ? error.message : "Unknown error"}`);
+      setOptimizationStatus(
+        `Optimization failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
       setTimeout(() => {
         setOptimizationStatus("");
       }, 5000);
@@ -386,20 +449,22 @@ const SimulationResults: React.FC = () => {
   };
 
   // Helper function to process traffic lights (extracted from existing code)
-  const processTrafficLights = (trafficLights: { phases?: { duration?: number }[] }[]) => {
+  const processTrafficLights = (
+    trafficLights: { phases?: { duration?: number }[] }[],
+  ) => {
     // This would need to be updated based on your actual connection structure
     // For now, using a simplified approach
-    
+
     const maxSignalIndex = 11; // Default value, adjust as needed
     const stateArrayLength = maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
-    
+
     const newPhases = [
       { duration: 30, state: "G".repeat(stateArrayLength) }, // North-South green
-      { duration: 5, state: "y".repeat(stateArrayLength) },  // North-South yellow
+      { duration: 5, state: "y".repeat(stateArrayLength) }, // North-South yellow
       { duration: 30, state: "G".repeat(stateArrayLength) }, // East-West green
-      { duration: 5, state: "y".repeat(stateArrayLength) },  // East-West yellow
+      { duration: 5, state: "y".repeat(stateArrayLength) }, // East-West yellow
     ];
-    
+
     return trafficLights.map((light) => {
       let time = 0;
       const newStates = newPhases.map((phase) => {
@@ -434,19 +499,22 @@ const SimulationResults: React.FC = () => {
   // Function to fetch intersection data (including status)
   const fetchIntersectionData = async () => {
     if (!intersectionId) return;
-    
+
     try {
       const authToken = getAuthToken();
       if (!authToken) return;
 
-      const response = await fetch(`${API_BASE_URL}/intersections/${intersectionId}`, {
-        headers: { Authorization: `Bearer ${authToken}` },
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/intersections/${intersectionId}`,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        },
+      );
 
       if (response.ok) {
         const data = await response.json();
         setIntersectionData(data);
-        
+
         // Check if intersection has been optimized
         if (data.status === "optimised") {
           setCanBeOptimized(true);
@@ -472,22 +540,33 @@ const SimulationResults: React.FC = () => {
 
       // Fetch all three pieces of data in parallel
       const [simRes, optRes, intersectionRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/intersections/${intersectionId}/simulate`, { headers }),
-        fetch(`${API_BASE_URL}/intersections/${intersectionId}/optimise`, { headers }),
-        fetch(`${API_BASE_URL}/intersections/${intersectionId}`, { headers })
+        fetch(`${API_BASE_URL}/intersections/${intersectionId}/simulate`, {
+          headers,
+        }),
+        fetch(`${API_BASE_URL}/intersections/${intersectionId}/optimise`, {
+          headers,
+        }),
+        fetch(`${API_BASE_URL}/intersections/${intersectionId}`, { headers }),
       ]);
 
       // Process simulation data
-      if (!simRes.ok) throw new Error(`Failed to fetch simulation data: ${simRes.statusText}`);
+      if (!simRes.ok)
+        throw new Error(
+          `Failed to fetch simulation data: ${simRes.statusText}`,
+        );
       const simResponseData: ApiSimulationResponse = await simRes.json();
       setSimData(simResponseData.output);
       setApiResults(simResponseData.results);
-      
+
       // Process intersection details
-      if (!intersectionRes.ok) throw new Error(`Failed to fetch intersection details: ${intersectionRes.statusText}`);
-      const intersectionResponseData: ApiIntersection = await intersectionRes.json();
+      if (!intersectionRes.ok)
+        throw new Error(
+          `Failed to fetch intersection details: ${intersectionRes.statusText}`,
+        );
+      const intersectionResponseData: ApiIntersection =
+        await intersectionRes.json();
       setIntersectionData(intersectionResponseData);
-      
+
       // Check if intersection has been optimized
       if (intersectionResponseData.status === "optimised") {
         setCanBeOptimized(true);
@@ -507,7 +586,11 @@ const SimulationResults: React.FC = () => {
         setCanBeOptimized(false);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Failed to load data from the API.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to load data from the API.",
+      );
       console.error(err);
     } finally {
       setLoading(false);
@@ -517,7 +600,7 @@ const SimulationResults: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, [intersectionId, type]);
-  
+
   // Fetch intersection data on mount to get latest status
   useEffect(() => {
     if (intersectionId) {
@@ -529,15 +612,15 @@ const SimulationResults: React.FC = () => {
   useEffect(() => {
     chartInstances.current.forEach((c) => c?.destroy());
     chartInstances.current = [];
- 
+
     if (!simData || !simData.vehicles) return;
- 
+
     const stats = computeStats(simData.vehicles);
     const optStats =
       showOptimized && optimizedData && optimizedData.vehicles
         ? computeStats(optimizedData.vehicles)
         : null;
- 
+
     const allTimes = getAllTimes(simData.vehicles);
     const avgSpeedOverTime = getAverageSpeedOverTime(
       simData.vehicles,
@@ -548,7 +631,7 @@ const SimulationResults: React.FC = () => {
       allTimes,
     );
     const totalDistPerVeh = getTotalDistancePerVehicle(simData.vehicles);
- 
+
     const optAvgSpeedOverTime =
       showOptimized && optimizedData && optimizedData.vehicles
         ? getAverageSpeedOverTime(optimizedData.vehicles, allTimes)
@@ -561,7 +644,7 @@ const SimulationResults: React.FC = () => {
       showOptimized && optimizedData && optimizedData.vehicles
         ? getTotalDistancePerVehicle(optimizedData.vehicles)
         : [];
- 
+
     const MAX_TIME_POINTS = 100;
     const {
       downsampledLabels: timeLabels,
@@ -582,14 +665,14 @@ const SimulationResults: React.FC = () => {
       optVehCountOverTime,
       MAX_TIME_POINTS,
     );
- 
+
     const { counts: finalSpeedHist, labels: finalSpeedHistLabels } =
       getHistogramData(stats.finalSpeeds, 2, 40);
     const maxDist =
       totalDistPerVeh.length > 0 ? Math.max(...totalDistPerVeh) : 0;
     const { counts: totalDistHist, labels: totalDistHistLabels } =
       getHistogramData(totalDistPerVeh, 50, Math.ceil(maxDist / 50) * 50);
- 
+
     const optFinalSpeedHist = optStats
       ? getHistogramData(optStats.finalSpeeds, 2, 40)
       : null;
@@ -601,7 +684,7 @@ const SimulationResults: React.FC = () => {
             Math.ceil(Math.max(...optTotalDistPerVeh) / 50) * 50,
           )
         : null;
- 
+
     const baseOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -635,7 +718,7 @@ const SimulationResults: React.FC = () => {
         },
       },
     };
- 
+
     const createChart = (
       ref: React.RefObject<HTMLCanvasElement | null>,
       config: ChartConfiguration,
@@ -645,7 +728,7 @@ const SimulationResults: React.FC = () => {
         chartInstances.current.push(chart);
       }
     };
- 
+
     const avgSpeedDatasets = [
       {
         label: "Original Average Speed",
@@ -656,7 +739,7 @@ const SimulationResults: React.FC = () => {
         tension: 0.3,
       },
     ];
- 
+
     const vehCountDatasets = [
       {
         label: "Original Vehicle Count",
@@ -667,7 +750,7 @@ const SimulationResults: React.FC = () => {
         tension: 0.3,
       },
     ];
- 
+
     const finalSpeedDatasets = [
       {
         label: "Original Final Speed Distribution",
@@ -675,7 +758,7 @@ const SimulationResults: React.FC = () => {
         backgroundColor: "#0F5BA7",
       },
     ];
- 
+
     const totalDistDatasets = [
       {
         label: "Original Total Distance Distribution",
@@ -683,7 +766,7 @@ const SimulationResults: React.FC = () => {
         backgroundColor: "#0F5BA7",
       },
     ];
- 
+
     if (showOptimized && downsampledOptAvgSpeed.length > 0) {
       avgSpeedDatasets.push({
         label: "Optimized Average Speed",
@@ -694,7 +777,7 @@ const SimulationResults: React.FC = () => {
         tension: 0.3,
       });
     }
- 
+
     if (showOptimized && downsampledOptVehCount.length > 0) {
       vehCountDatasets.push({
         label: "Optimized Vehicle Count",
@@ -705,7 +788,7 @@ const SimulationResults: React.FC = () => {
         tension: 0.3,
       });
     }
- 
+
     if (showOptimized && optFinalSpeedHist) {
       finalSpeedDatasets.push({
         label: "Optimized Final Speed Distribution",
@@ -713,7 +796,7 @@ const SimulationResults: React.FC = () => {
         backgroundColor: "#2B9348",
       });
     }
- 
+
     if (showOptimized && optTotalDistHist) {
       totalDistDatasets.push({
         label: "Optimized Total Distance Distribution",
@@ -721,7 +804,7 @@ const SimulationResults: React.FC = () => {
         backgroundColor: "#2B9348",
       });
     }
- 
+
     createChart(chartRefs.avgSpeedRef, {
       type: "line",
       data: { labels: timeLabels, datasets: avgSpeedDatasets },
@@ -749,7 +832,7 @@ const SimulationResults: React.FC = () => {
         },
       },
     });
- 
+
     createChart(chartRefs.vehCountRef, {
       type: "line",
       data: { labels: timeLabels, datasets: vehCountDatasets },
@@ -777,7 +860,7 @@ const SimulationResults: React.FC = () => {
         },
       },
     });
- 
+
     createChart(chartRefs.finalSpeedHistRef, {
       type: "bar",
       data: { labels: finalSpeedHistLabels, datasets: finalSpeedDatasets },
@@ -808,7 +891,7 @@ const SimulationResults: React.FC = () => {
         },
       },
     });
- 
+
     createChart(chartRefs.totalDistHistRef, {
       type: "bar",
       data: { labels: totalDistHistLabels, datasets: totalDistDatasets },
@@ -839,7 +922,7 @@ const SimulationResults: React.FC = () => {
         },
       },
     });
- 
+
     return () => {
       chartInstances.current.forEach((c) => c?.destroy());
       chartInstances.current = [];
@@ -890,7 +973,9 @@ const SimulationResults: React.FC = () => {
       <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
         <Navbar />
         <div className="simRes-main-content py-8 px-6 overflow-y-auto">
-          <div className="text-center text-gray-700 dark:text-gray-300 py-10">No simulation data found.</div>
+          <div className="text-center text-gray-700 dark:text-gray-300 py-10">
+            No simulation data found.
+          </div>
         </div>
         <Footer />
         <HelpMenu />
@@ -902,15 +987,18 @@ const SimulationResults: React.FC = () => {
     ? {
         numPhases: simData.intersection.trafficLights[0].phases.length,
         totalCycle: simData.intersection.trafficLights[0].phases.reduce(
-          (sum: number, p: { duration?: number }) => sum + (p.duration ?? 0), 0,
+          (sum: number, p: { duration?: number }) => sum + (p.duration ?? 0),
+          0,
         ),
       }
     : { numPhases: 0, totalCycle: 0 };
-    
-  const trafficDensityLabel = 
-    intersectionData?.traffic_density.replace('TRAFFIC_DENSITY_', '').replace('_', ' ').toLowerCase() 
-    || 'N/A';
-  
+
+  const trafficDensityLabel =
+    intersectionData?.traffic_density
+      .replace("TRAFFIC_DENSITY_", "")
+      .replace("_", " ")
+      .toLowerCase() || "N/A";
+
   return (
     <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
       <Navbar />
@@ -921,7 +1009,11 @@ const SimulationResults: React.FC = () => {
               <h1 className="simName text-4xl font-extrabold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-2 text-left">
                 {name || intersectionData?.name || "Simulation Results"}
               </h1>
-              {description && <p className="simDesc text-lg text-gray-400 mb-4 leading-relaxed text-left">{description}</p>}
+              {description && (
+                <p className="simDesc text-lg text-gray-400 mb-4 leading-relaxed text-left">
+                  {description}
+                </p>
+              )}
             </div>
             <div className="flex flex-col gap-3 lg:min-w-[280px]">
               <button
@@ -930,7 +1022,7 @@ const SimulationResults: React.FC = () => {
               >
                 View Rendering
               </button>
-              
+
               {/* Optimization Button */}
               <button
                 onClick={runOptimization}
@@ -939,8 +1031,8 @@ const SimulationResults: React.FC = () => {
                   isOptimizing
                     ? "bg-gray-600 cursor-not-allowed"
                     : canBeOptimized
-                    ? "bg-green-600 cursor-not-allowed"
-                    : "bg-gradient-to-r from-orange-600 to-orange-700 shadow-orange-500/50 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/60 focus:ring-orange-300"
+                      ? "bg-green-600 cursor-not-allowed"
+                      : "bg-gradient-to-r from-orange-600 to-orange-700 shadow-orange-500/50 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/60 focus:ring-orange-300"
                 }`}
               >
                 {isOptimizing ? (
@@ -954,7 +1046,7 @@ const SimulationResults: React.FC = () => {
                   "Run Optimization"
                 )}
               </button>
-              
+
               {/* Show Optimization Results Button */}
               {canBeOptimized && (
                 <button
@@ -969,11 +1061,14 @@ const SimulationResults: React.FC = () => {
 
           {/* Optimization Status Message */}
           {optimizationStatus && (
-            <div className={`mb-6 p-4 rounded-lg text-center ${
-              optimizationStatus.includes("failed") || optimizationStatus.includes("No improvement")
-                ? "bg-red-500/20 border border-red-500/30 text-red-300"
-                : "bg-green-500/20 border border-green-500/30 text-green-300"
-            }`}>
+            <div
+              className={`mb-6 p-4 rounded-lg text-center ${
+                optimizationStatus.includes("failed") ||
+                optimizationStatus.includes("No improvement")
+                  ? "bg-red-500/20 border border-red-500/30 text-red-300"
+                  : "bg-green-500/20 border border-green-500/30 text-green-300"
+              }`}
+            >
               <p className="font-semibold">{optimizationStatus}</p>
             </div>
           )}
@@ -982,48 +1077,108 @@ const SimulationResults: React.FC = () => {
             <h2 className="text-2xl font-semibold mb-8">
               {showOptimized ? (
                 <>
-                  <span className="bg-[#0F5BA7] bg-clip-text text-transparent">Simulation Results</span>
+                  <span className="bg-[#0F5BA7] bg-clip-text text-transparent">
+                    Simulation Results
+                  </span>
                   <span className="text-gray-400"> vs </span>
-                  <span className="bg-[#2B9348] bg-clip-text text-transparent">Optimized Results</span>
+                  <span className="bg-[#2B9348] bg-clip-text text-transparent">
+                    Optimized Results
+                  </span>
                 </>
               ) : (
-                <span className="bg-[#0F5BA7] bg-clip-text text-transparent">Simulation Results</span>
+                <span className="bg-[#0F5BA7] bg-clip-text text-transparent">
+                  Simulation Results
+                </span>
               )}
             </h2>
 
             <div className="statGrid grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-2 mb-8 justify-items-center">
               {/* Stat cubes */}
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
-                <div className="text-sm font-bold text-gray-600 mb-1">Avg Speed</div>
-                <div className="text-xl font-bold text-[#0F5BA7]">{apiResults ? apiResults.average_speed.toFixed(2) : "..."} <span className="text-sm font-normal">m/s</span></div>
-                {showOptimized && optimizedApiResults && <div className="text-lg font-semibold text-[#2B9348] mt-1">{optimizedApiResults.average_speed.toFixed(2)} <span className="text-xs font-normal">m/s</span></div>}
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  Avg Speed
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {apiResults ? apiResults.average_speed.toFixed(2) : "..."}{" "}
+                  <span className="text-sm font-normal">m/s</span>
+                </div>
+                {showOptimized && optimizedApiResults && (
+                  <div className="text-lg font-semibold text-[#2B9348] mt-1">
+                    {optimizedApiResults.average_speed.toFixed(2)}{" "}
+                    <span className="text-xs font-normal">m/s</span>
+                  </div>
+                )}
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
-                <div className="text-sm font-bold text-gray-600 mb-1">Avg Travel Time</div>
-                <div className="text-xl font-bold text-[#0F5BA7]">{apiResults ? apiResults.average_travel_time.toFixed(2) : "..."} <span className="text-sm font-normal">s</span></div>
-                {showOptimized && optimizedApiResults && <div className="text-lg font-semibold text-[#2B9348] mt-1">{optimizedApiResults.average_travel_time.toFixed(2)} <span className="text-xs font-normal">s</span></div>}
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  Avg Travel Time
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {apiResults
+                    ? apiResults.average_travel_time.toFixed(2)
+                    : "..."}{" "}
+                  <span className="text-sm font-normal">s</span>
+                </div>
+                {showOptimized && optimizedApiResults && (
+                  <div className="text-lg font-semibold text-[#2B9348] mt-1">
+                    {optimizedApiResults.average_travel_time.toFixed(2)}{" "}
+                    <span className="text-xs font-normal">s</span>
+                  </div>
+                )}
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
-                <div className="text-sm font-bold text-gray-600 mb-1">Avg Wait Time</div>
-                <div className="text-xl font-bold text-[#0F5BA7]">{apiResults ? apiResults.average_waiting_time.toFixed(2) : "..."} <span className="text-sm font-normal">s</span></div>
-                {showOptimized && optimizedApiResults && <div className="text-lg font-semibold text-[#2B9348] mt-1">{optimizedApiResults.average_waiting_time.toFixed(2)} <span className="text-xs font-normal">s</span></div>}
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  Avg Wait Time
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {apiResults
+                    ? apiResults.average_waiting_time.toFixed(2)
+                    : "..."}{" "}
+                  <span className="text-sm font-normal">s</span>
+                </div>
+                {showOptimized && optimizedApiResults && (
+                  <div className="text-lg font-semibold text-[#2B9348] mt-1">
+                    {optimizedApiResults.average_waiting_time.toFixed(2)}{" "}
+                    <span className="text-xs font-normal">s</span>
+                  </div>
+                )}
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
-                <div className="text-sm font-bold text-gray-600 mb-1"># Vehicles</div>
-                <div className="text-xl font-bold text-[#0F5BA7]">{apiResults ? apiResults.total_vehicles : "..."}</div>
-                {showOptimized && optimizedApiResults && <div className="text-lg font-semibold text-[#2B9348] mt-1">{optimizedApiResults.total_vehicles}</div>}
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  # Vehicles
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {apiResults ? apiResults.total_vehicles : "..."}
+                </div>
+                {showOptimized && optimizedApiResults && (
+                  <div className="text-lg font-semibold text-[#2B9348] mt-1">
+                    {optimizedApiResults.total_vehicles}
+                  </div>
+                )}
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
-                <div className="text-sm font-bold text-gray-600 mb-1"># TL Phases</div>
-                <div className="text-xl font-bold text-[#0F5BA7]">{numPhases}</div>
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  # TL Phases
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {numPhases}
+                </div>
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
-                <div className="text-sm font-bold text-gray-600 mb-1">TL Cycle</div>
-                <div className="text-xl font-bold text-[#0F5BA7]">{totalCycle} <span className="text-sm font-normal">s</span></div>
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  TL Cycle
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7]">
+                  {totalCycle} <span className="text-sm font-normal">s</span>
+                </div>
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-purple-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
-                <div className="text-sm font-bold text-gray-600 mb-1">Traffic Density</div>
-                <div className="text-xl font-bold text-[#0F5BA7] capitalize">{trafficDensityLabel}</div>
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  Traffic Density
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7] capitalize">
+                  {trafficDensityLabel}
+                </div>
               </div>
             </div>
 
@@ -1035,10 +1190,16 @@ const SimulationResults: React.FC = () => {
                 <canvas ref={chartRefs.vehCountRef} className="w-full h-full" />
               </div>
               <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-80 w-full flex items-center justify-center">
-                <canvas ref={chartRefs.finalSpeedHistRef} className="w-full h-full"/>
+                <canvas
+                  ref={chartRefs.finalSpeedHistRef}
+                  className="w-full h-full"
+                />
               </div>
               <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-80 w-full flex items-center justify-center">
-                <canvas ref={chartRefs.totalDistHistRef} className="w-full h-full"/>
+                <canvas
+                  ref={chartRefs.totalDistHistRef}
+                  className="w-full h-full"
+                />
               </div>
             </div>
           </section>
