@@ -15,6 +15,15 @@ Traffic congestion remains one of South Africa’s most costly infrastructure ch
 
 ## Key Links
 
+### Demo 3
+- [Functional Requirements (SRS)](docs/Demo2/SRSV2.pdf)
+- [Technical Installation Manual](https://drive.google.com/file/d/17fJ2Nr7wpZfoAyZ_EtdLOnJ1-j1JsDyZ/view?usp=sharing)
+- [User Manual](docs/Demo2/UserManual.pdf)
+- [Architectural Requirements Document](docs/Demo2/ArchitecturalRequirements.pdf)
+- [Coding Standards and Practices](/docs/Demo2/CodingStandardsPractices.pdf)
+- [GitHub Project Board](https://github.com/orgs/COS301-SE-2025/projects/116)
+- [Team Wiki](https://github.com/COS301-SE-2025/Swift-Signals/wiki)
+
 ### Demo 2
 - [Functional Requirements (SRS)](docs/Demo2/SRSV2.pdf)
 - [User Manual](docs/Demo2/UserManual.pdf)
