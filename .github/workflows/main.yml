@@ -31,6 +31,29 @@ jobs:
           with:
             version: v2.1
             working-directory: ./api-gateway
+            
+  run-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.24.3'  # Adjust to match Go version
+
+      - name: Display Go version
+        run: go version
+
+      - name: Run unit tests in api-gateway
+        working-directory: ./api-gateway  #Change to ./test if need be
+        run: |
+          go install github.com/vektra/mockery/v2@latest
+          mockery
+          go mod tidy
+          go test -v ./...
 
   python-standard-check:
     # needs: go-standard-check
