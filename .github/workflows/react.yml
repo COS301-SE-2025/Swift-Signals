@@ -2,9 +2,9 @@ name: React Frontend
 
 on:
   push:
-    branches: [main, dev, frontend, feature/ChatBot]
+    branches: [main, dev, frontend, feature/ChatBot, feature/frontend-api-integration]
   pull_request:
-    branches: [main, dev, frontend, feature/ChatBot]
+    branches: [main, dev, frontend, feature/ChatBot, feature/frontend-api-integration]
 
 jobs:
   lint-format-test:
@@ -32,4 +32,5 @@ jobs:
 
 
     - name: Run Jest tests
+      working-directory: frontend
       run: npx jest --passWithNoTests

@@ -1,18 +1,9 @@
 basePath: /
 definitions:
-  model.AuthResponse:
-    properties:
-      message:
-        example: Login successful
-        type: string
-      token:
-        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-        type: string
-    type: object
   model.CreateIntersectionRequest:
     properties:
       default_parameters:
-        $ref: '#/definitions/model.simulationParameters'
+        $ref: '#/definitions/model.SimulationParameters'
       details:
         properties:
           address:
@@ -27,10 +18,14 @@ definitions:
         type: object
       name:
         example: My Intersection
+        maxLength: 256
         type: string
       traffic_density:
         example: high
         type: string
+    required:
+    - default_parameters
+    - name
     type: object
   model.CreateIntersectionResponse:
     properties:
@@ -38,38 +33,40 @@ definitions:
         example: "2"
         type: string
     type: object
+  model.Details:
+    properties:
+      address:
+        example: Corner of Foo and Bar
+        type: string
+      city:
+        example: Pretoria
+        type: string
+      province:
+        example: Gauteng
+        type: string
+    type: object
   model.ErrorResponse:
     properties:
       code:
-        example: BAD_REQUEST
-        type: string
+        example: 404
+        type: integer
       message:
-        example: ERROR_MSG
+        example: resource not found
         type: string
     type: object
   model.Intersection:
     properties:
       best_parameters:
-        $ref: '#/definitions/model.optimisationParameters'
+        $ref: '#/definitions/model.OptimisationParameters'
       created_at:
         example: "2025-06-24T15:04:05Z"
         type: string
       current_parameters:
-        $ref: '#/definitions/model.optimisationParameters'
+        $ref: '#/definitions/model.OptimisationParameters'
       default_parameters:
-        $ref: '#/definitions/model.optimisationParameters'
+        $ref: '#/definitions/model.OptimisationParameters'
       details:
-        properties:
-          address:
-            example: Corner of Foo and Bar
-            type: string
-          city:
-            example: Pretoria
-            type: string
-          province:
-            example: Gauteng
-            type: string
-        type: object
+        $ref: '#/definitions/model.Details'
       id:
         example: "1"
         type: string
@@ -99,14 +96,23 @@ definitions:
   model.LoginRequest:
     properties:
       email:
-        example: user@example.com
+        example: testuser@example.com
         type: string
       password:
-        example: StrongPassword123
+        example: testpass1234
         type: string
     required:
     - email
     - password
+    type: object
+  model.LoginResponse:
+    properties:
+      message:
+        example: Login successful
+        type: string
+      token:
+        example: header.payload.signature
+        type: string
     type: object
   model.LogoutResponse:
     properties:
@@ -114,21 +120,68 @@ definitions:
         example: Logout successful
         type: string
     type: object
+  model.NodeType:
+    enum:
+    - PRIORITY
+    - TRAFFIC_LIGHT
+    type: string
+    x-enum-varnames:
+    - NodeTypePriority
+    - NodeTypeTrafficLight
+  model.OptimisationParameters:
+    properties:
+      optimisation_type:
+        example: grid_search
+        type: string
+      simulation_parameters:
+        $ref: '#/definitions/model.SimulationParameters'
+    type: object
+  model.OptimisationResponse:
+    properties:
+      improved:
+        example: true
+        type: boolean
+    type: object
+  model.Position:
+    properties:
+      speed:
+        example: 50
+        type: number
+      time:
+        example: 0
+        type: integer
+      x:
+        example: 100
+        type: number
+      "y":
+        example: 200
+        type: number
+    type: object
   model.RegisterRequest:
     properties:
       email:
-        example: newuser@example.com
+        example: testuser@example.com
         type: string
       password:
-        example: VeryStrongPassword456
+        example: testpass1234
+        maxLength: 64
+        minLength: 8
         type: string
       username:
-        example: johndoe
+        example: tester
+        maxLength: 32
+        minLength: 3
         type: string
     required:
     - email
     - password
     - username
+    type: object
+  model.RegisterResponse:
+    properties:
+      user_id:
+        example: "1"
+        type: string
     type: object
   model.ResetPasswordRequest:
     properties:
@@ -143,6 +196,189 @@ definitions:
       message:
         example: Password reset instructions sent to your email.
         type: string
+    type: object
+  model.SimulationConn:
+    properties:
+      from:
+        example: node1
+        type: string
+      fromLane:
+        example: 1
+        type: integer
+      tl:
+        type: integer
+      to:
+        example: node2
+        type: string
+      toLane:
+        example: 1
+        type: integer
+    type: object
+  model.SimulationEdge:
+    properties:
+      from:
+        example: node1
+        type: string
+      id:
+        example: edge1
+        type: string
+      lanes:
+        example: 2
+        type: integer
+      speed:
+        example: 50
+        type: number
+      to:
+        example: node2
+        type: string
+    type: object
+  model.SimulationIntersection:
+    properties:
+      connections:
+        items:
+          $ref: '#/definitions/model.SimulationConn'
+        type: array
+      edges:
+        items:
+          $ref: '#/definitions/model.SimulationEdge'
+        type: array
+      nodes:
+        items:
+          $ref: '#/definitions/model.SimulationNode'
+        type: array
+      trafficLights:
+        items:
+          $ref: '#/definitions/model.SimulationTrafficLight'
+        type: array
+    type: object
+  model.SimulationNode:
+    properties:
+      id:
+        example: node1
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/model.NodeType'
+        example: PRIORITY
+      x:
+        example: 100
+        type: number
+      "y":
+        example: 200
+        type: number
+    type: object
+  model.SimulationOutput:
+    properties:
+      intersection:
+        $ref: '#/definitions/model.SimulationIntersection'
+      vehicles:
+        items:
+          $ref: '#/definitions/model.SimulationVehicle'
+        type: array
+    type: object
+  model.SimulationParameters:
+    properties:
+      green:
+        example: 10
+        minimum: 1
+        type: integer
+      intersection_type:
+        example: t-junction
+        type: string
+      red:
+        example: 6
+        minimum: 1
+        type: integer
+      seed:
+        example: 3247128304
+        type: integer
+      speed:
+        example: 60
+        minimum: 1
+        type: integer
+      yellow:
+        example: 2
+        minimum: 1
+        type: integer
+    required:
+    - green
+    - intersection_type
+    - red
+    - seed
+    - speed
+    - yellow
+    type: object
+  model.SimulationPhase:
+    properties:
+      duration:
+        example: 30
+        type: integer
+      state:
+        example: GREEN
+        type: string
+    type: object
+  model.SimulationResponse:
+    properties:
+      output:
+        $ref: '#/definitions/model.SimulationOutput'
+      results:
+        $ref: '#/definitions/model.SimulationResults'
+    type: object
+  model.SimulationResults:
+    properties:
+      average_speed:
+        example: 50
+        type: number
+      average_travel_time:
+        example: 300
+        type: number
+      average_waiting_time:
+        example: 60
+        type: number
+      emergency_brakes:
+        example: 5
+        type: integer
+      emergency_stops:
+        example: 3
+        type: integer
+      generated_vehicles:
+        example: 120
+        type: integer
+      near_collisions:
+        example: 2
+        type: integer
+      total_travel_time:
+        example: 30000
+        type: number
+      total_vehicles:
+        example: 100
+        type: integer
+      total_waiting_time:
+        example: 6000
+        type: number
+    type: object
+  model.SimulationTrafficLight:
+    properties:
+      id:
+        example: tl1
+        type: string
+      phases:
+        items:
+          $ref: '#/definitions/model.SimulationPhase'
+        type: array
+      type:
+        example: FIXED
+        type: string
+    type: object
+  model.SimulationVehicle:
+    properties:
+      id:
+        example: vehicle1
+        type: string
+      positions:
+        items:
+          $ref: '#/definitions/model.Position'
+        type: array
     type: object
   model.UpdateIntersectionRequest:
     properties:
@@ -162,34 +398,39 @@ definitions:
         example: My Updated Intersection
         type: string
     type: object
-  model.optimisationParameters:
+  model.UpdateUserRequest:
     properties:
-      optimisation_type:
-        example: grid_search
+      email:
+        example: user@example.com
         type: string
-      simulation_parameters:
-        $ref: '#/definitions/model.simulationParameters'
+      username:
+        example: newusername
+        maxLength: 32
+        minLength: 3
+        type: string
     type: object
-  model.simulationParameters:
+  model.User:
     properties:
-      green:
-        example: 10
-        type: integer
-      intersection_type:
-        example: t-junction
+      email:
+        example: user@example.com
         type: string
-      red:
-        example: 6
-        type: integer
-      seed:
-        example: 3247128304
-        type: integer
-      speed:
-        example: 60
-        type: integer
-      yellow:
-        example: 2
-        type: integer
+      id:
+        example: "1"
+        type: string
+      intersection_ids:
+        example:
+        - '[1'
+        - "2"
+        - 3]
+        items:
+          type: string
+        type: array
+      is_admin:
+        example: false
+        type: boolean
+      username:
+        example: johndoe
+        type: string
     type: object
 host: localhost:9090
 info:
@@ -197,13 +438,155 @@ info:
     email: insideinsights2025@gmail.com
     name: Inside Insights Team
     url: https://swagger.io/
-  description: |-
-    This is the API Gateway for the Swift-Signals project,
-    forwarding requests to backend gRPC microservices.
+  description: This is the API Gateway for the Swift-Signals project, forwarding requests
+    to backend gRPC microservices.
   termsOfService: http://example.com/terms/
   title: Authentication API Gateway
   version: "1.0"
 paths:
+  /admin/users:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a paginated list of all users. Only accessible by admins.
+      parameters:
+      - description: Page number (default is 1)
+        in: query
+        name: page
+        type: integer
+      - description: Number of users per page (default is 100 and max is 100)
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of users
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+        "403":
+          description: Forbidden - Only admins can access this endpoint
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get All Users
+      tags:
+      - Admin
+  /admin/users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a user by their ID. Only accessible by admins.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: User deleted successfully
+        "403":
+          description: Forbidden - Only admins can access this endpoint
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete User by ID
+      tags:
+      - Admin
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a user by their ID. Only accessible by admins.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User details
+          schema:
+            $ref: '#/definitions/model.User'
+        "403":
+          description: Forbidden - Only admins can access this endpoint
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get User by ID
+      tags:
+      - Admin
+    patch:
+      consumes:
+      - application/json
+      description: Updates a user's details by their ID. Only accessible by admins.
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated user details
+        in: body
+        name: updateUserRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated user details
+          schema:
+            $ref: '#/definitions/model.User'
+        "403":
+          description: Forbidden - Only admins can access this endpoint
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update User by ID
+      tags:
+      - Admin
   /intersections:
     get:
       consumes:
@@ -224,6 +607,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get All Intersections
       tags:
       - Intersections
@@ -257,10 +642,48 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Create Intersection
       tags:
       - Intersections
   /intersections/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes the intersection with the given ID.
+      parameters:
+      - description: Intersection ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: 'Bad Request: Invalid input'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: 'Not Found: Intersection does not exist'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete Intersection
+      tags:
+      - Intersections
     get:
       consumes:
       - application/json
@@ -294,6 +717,8 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Get Intersection by ID
       tags:
       - Intersections
@@ -336,9 +761,129 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
       summary: Update Intersection
       tags:
       - Intersections
+  /intersections/{id}/optimise:
+    get:
+      consumes:
+      - application/json
+      description: Generates and returns optimised simulation data for a specific
+        intersection.
+      parameters:
+      - description: Intersection ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful optimised simulation data retrieval
+          schema:
+            $ref: '#/definitions/model.SimulationResponse'
+        "400":
+          description: 'Bad Request: Invalid input parameters'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: 'Not Found: Intersection not found'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Optimised Simulation Data
+      tags:
+      - Simulation
+    post:
+      consumes:
+      - application/json
+      description: Runs optimisation for a specific intersection and returns if there
+        was an improvement.
+      parameters:
+      - description: Intersection ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful optimisation run
+          schema:
+            $ref: '#/definitions/model.OptimisationResponse'
+        "400":
+          description: 'Bad Request: Invalid input parameters'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: 'Not Found: Intersection not found'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Run Optimisation
+      tags:
+      - Simulation
+  /intersections/{id}/simulate:
+    get:
+      consumes:
+      - application/json
+      description: Generates and returns simulation data for a specific intersection.
+      parameters:
+      - description: Intersection ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful simulation data retrieval
+          schema:
+            $ref: '#/definitions/model.SimulationResponse'
+        "400":
+          description: 'Bad Request: Invalid input parameters'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: 'Unauthorized: Token missing or invalid'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: 'Not Found: Intersection not found'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get Simulation Data
+      tags:
+      - Simulation
   /login:
     post:
       consumes:
@@ -357,7 +902,7 @@ paths:
         "200":
           description: Successful login
           schema:
-            $ref: '#/definitions/model.AuthResponse'
+            $ref: '#/definitions/model.LoginResponse'
         "400":
           description: Invalid request payload or credentials
           schema:
@@ -394,6 +939,84 @@ paths:
       summary: User Logout
       tags:
       - Authentication
+  /me:
+    delete:
+      description: Deletes the profile of the currently authenticated user.
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "401":
+          description: Unauthorized access
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Delete User Profile
+      tags:
+      - Profile
+    get:
+      description: Retrieves the profile of the currently authenticated user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile retrieved successfully
+          schema:
+            $ref: '#/definitions/model.User'
+        "401":
+          description: Unauthorized access
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Get User Profile
+      tags:
+      - Profile
+    patch:
+      consumes:
+      - application/json
+      description: Updates the profile of the currently authenticated user.
+      parameters:
+      - description: User profile data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User profile updated successfully
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: 'Bad request: Validation error'
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized access
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Update User Profile
+      tags:
+      - Profile
   /register:
     post:
       consumes:
@@ -412,7 +1035,7 @@ paths:
         "201":
           description: User successfully registered
           schema:
-            $ref: '#/definitions/model.AuthResponse'
+            $ref: '#/definitions/model.RegisterResponse'
         "400":
           description: Invalid request payload or missing fields
           schema:
@@ -428,7 +1051,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Resets a user's password in case they forgot it.
+      description: Reset's a user's password in case they forgot it.
       parameters:
       - description: User Email
         in: body

@@ -7,44 +7,56 @@ on:
     branches: [main, dev, quality-assurance]
 
 jobs:
-  go-standard-check:
+  golangci:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-go@v4
+          with:
+            go-version: '1.24.3'
+
+        - name: Generate Proto Files
+          working-directory: ./protos
+          run: |
+            make install-protoc
+            make generate
+        - name: Generate Mockery Files
+          working-directory: ./api-gateway
+          run: |
+            go install github.com/vektra/mockery/v2@latest
+            mockery
+            go mod tidy
+        - name: golangci-lint
+          uses: golangci/golangci-lint-action@v8
+          with:
+            version: v2.1
+            working-directory: ./api-gateway
+            
+  run-tests:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.24.3'
+          go-version: '1.24.3'  # Adjust to match Go version
 
-      - name: Install Protobuf Compiler
-        run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
-
-      - name: Install protoc-gen-go and protoc-gen-go-grpc
-        run: |
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.36.0
-          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.3.0
-
-      - name: Add Go bin to PATH
-        run: echo "${HOME}/go/bin" >> $GITHUB_PATH
-
-      - name: Generate Proto Files
-        working-directory: ./protos
-        run: protoc --go_out=gen --go-grpc_out=gen *.proto
+      - name: Display Go version
+        run: go version
 
       - name: Run unit tests in api-gateway
-        working-directory: ./api-gateway
+        working-directory: ./api-gateway  #Change to ./test if need be
         run: |
+          go install github.com/vektra/mockery/v2@latest
+          mockery
           go mod tidy
           go test -v ./...
 
   python-standard-check:
-    needs: go-standard-check
+    # needs: go-standard-check
     runs-on: ubuntu-latest
 
     steps:
@@ -79,3 +91,32 @@ jobs:
 
       - name: Run Tests with coverage using Pytest
         run: pytest --cov=SimLoad --cov-report=term-missing simulation-service/tests/
+
+  react-standard-check:
+    needs: python-standard-check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: frontend
+        run: npx eslint "src/**/*.{js,jsx,ts,tsx}"
+
+      - name: Check Prettier formatting
+        working-directory: frontend
+        run: npx prettier --check "**/*.{js,jsx,ts,tsx,css,md}"
+
+      - name: Run Jest tests
+        working-directory: frontend
+        run: npx jest --passWithNoTests

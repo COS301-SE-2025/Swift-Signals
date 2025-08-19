@@ -4,25 +4,22 @@ import (
 	// Un/comment for Postgresql
 	"database/sql"
 	"fmt"
-
 	"log"
 	"net"
 	"os"
 
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	"github.com/COS301-SE-2025/Swift-Signals/shared/jwt"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/service"
-	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection" //for development using grpcurl
+	"google.golang.org/grpc/reflection" // for development using grpcurl
 )
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
+	jwtSecret := "a-string-secret-at-least-256-bits-long"
+	jwt.Init([]byte(jwtSecret))
 
 	// Postgresql Connection
 	dbHost := os.Getenv("DB_HOST")
@@ -38,12 +35,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to DB: %v", err)
 	}
-	defer dbConn.Close()
+	defer func() {
+		if err := dbConn.Close(); err != nil {
+			log.Printf("Failed to close DB connection: %v", err)
+		}
+	}()
 
 	repo := db.NewPostgresUserRepo(dbConn)
 
-	svc := service.NewService(repo)
-	handler := handler.NewHandler(svc)
+	svc := service.NewUserService(repo)
+	handler := handler.NewUserHandler(svc)
 
 	lis, err := net.Listen("tcp", ":"+os.Getenv("APP_PORT"))
 	if err != nil {
@@ -52,10 +53,12 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 
-	reflection.Register(grpcServer) //for development using grpcurl
+	reflection.Register(grpcServer) // for development using grpcurl
 
 	userpb.RegisterUserServiceServer(grpcServer, handler)
 
 	log.Println("gRPC server running on :" + os.Getenv("APP_PORT"))
-	grpcServer.Serve(lis)
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Printf("gRPC server exited with error: %v", err)
+	}
 }

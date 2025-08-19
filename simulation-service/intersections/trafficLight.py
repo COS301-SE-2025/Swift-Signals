@@ -5,10 +5,10 @@ import xml.etree.ElementTree as ET
 
 def generate(params):
     allowedSpeeds = [40, 60, 80, 100, 120]
-    speedKm = params.get("Speed", 40)
+    speedKm = params.get("Speed", 60)
     if speedKm not in allowedSpeeds:
-        print(f"Warnig: Speed {speedKm}km/h not allowed. Using default 40km/h.")
-        speedKm = 40
+        print(f"Warning: Speed {speedKm}km/h not allowed. Using default 60km/h.")
+        speedKm = 60
     speedInMs = speedKm * (1000 / 3600)
 
     base = "tl_intersection"
@@ -26,9 +26,9 @@ def generate(params):
     writeEdgeFile(edgeFile, speedInMs)
     writeConnectionFile(conFile)
 
-    print("Generating traffic light intersection with params:", params)
+    # print("Generating traffic light intersection with params:", params)
 
-    writeTrafficLightLogic(tllFile, params["Green"], params["Yellow"], params["Red"])
+    writeTrafficLightLogic(tllFile, params["green"], params["yellow"], params["red"])
 
     subprocess.run(
         [
@@ -42,7 +42,7 @@ def generate(params):
         check=True,
     )
 
-    generateTrips(netFile, routeFile, params["Traffic Density"], params)
+    generateTrips(netFile, routeFile, params["traffic_density"], params)
 
     with open(configFile, "w") as cfg:
         cfg.write(
@@ -83,7 +83,7 @@ def generate(params):
             stderr=log,
         )
 
-    print("Simulation finished. Parsing results...")
+    # print("Simulation finished. Parsing results...")
 
     emergency_brakes = 0
     emergency_stops = 0
@@ -147,16 +147,16 @@ def generate(params):
     avg_travel_time = total_travel_time / total_vehicles if total_vehicles > 0 else 0
 
     results = {
-        "Total Vehicles": total_vehicles,
-        "Average Travel Time": avg_travel_time,
-        "Total Travel Time": total_travel_time,
-        "Average Speed": avg_speed,
-        "Average Waiting Time": avg_waiting_time,
-        "Total Waiting Time": total_waiting_time,
-        "Generated Vehicles": total_vehicles,
-        "Emergency Brakes": emergency_brakes,
-        "Emergency Stops": emergency_stops,
-        "Near collisions": len(near_collisions),
+        "total_vehicles": total_vehicles,
+        "average_travel_time": avg_travel_time,
+        "total_travel_time": total_travel_time,
+        "average_speed": avg_speed,
+        "average_waiting_time": avg_waiting_time,
+        "total_waiting_time": total_waiting_time,
+        "generated_vehicles": total_vehicles,
+        "emergency_brakes": emergency_brakes,
+        "emergency_stops": emergency_stops,
+        "near_collisions": len(near_collisions),
     }
 
     trajectories = extractTrajectories(fcdOutputFile)
@@ -201,7 +201,7 @@ def parseNodes(filename):
             "id": n.get("id"),
             "x": float(n.get("x")),
             "y": float(n.get("y")),
-            "type": n.get("type"),
+            "type": n.get("type", "").upper(),
         }
         for n in root.findall("node")
     ]
@@ -412,4 +412,4 @@ def generateTrips(netFile, tripFile, density, params):
 
     with open(os.devnull, "w") as devnull:
         subprocess.run(cmd, check=True, stderr=devnull)
-    print("Trips generated.")
+    # print("Trips generated.")

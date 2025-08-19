@@ -1,21 +1,54 @@
 import "./Navbar.css";
 import { FaCircleUser } from "react-icons/fa6";
 import { IoIosLogOut } from "react-icons/io";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoClose } from "react-icons/io5";
+import { useLocation } from "react-router-dom";
+import logo from "../../src/assets/logo.png";
 
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [username, setUsername] = useState("");
+  const location = useLocation();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
+  interface IsActiveFn {
+    (path: string): boolean;
+  }
+  const isActive: IsActiveFn = (path) => location.pathname === path;
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) return;
+
+        const res = await fetch("http://localhost:9090/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch user profile");
+
+        const data = await res.json();
+        setUsername(data.username || "User");
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <img src="/src/assets/logo.png" alt="Logo" className="logo-image" />
+        <img src={logo} alt="Logo" className="logo-image" />
         <div className="logo">Swift Signals</div>
       </div>
 
@@ -30,29 +63,45 @@ function Navbar() {
       <div className={`navbar-center ${isMobileMenuOpen ? "active" : ""}`}>
         <ul className="nav-links">
           <li>
-            <a href="/dashboard" onClick={toggleMobileMenu}>
+            <a
+              href="/dashboard"
+              className={isActive("/dashboard") ? "active" : ""}
+              onClick={toggleMobileMenu}
+            >
               Dashboard
             </a>
           </li>
           <li>
-            <a href="/intersections" onClick={toggleMobileMenu}>
+            <a
+              href="/intersections"
+              className={isActive("/intersections") ? "active" : ""}
+              onClick={toggleMobileMenu}
+            >
               Intersections
             </a>
           </li>
           <li>
-            <a href="/simulations" onClick={toggleMobileMenu}>
+            <a
+              href="/simulations"
+              className={isActive("/simulations") ? "active" : ""}
+              onClick={toggleMobileMenu}
+            >
               Simulations
             </a>
           </li>
           <li>
-            <a href="/users" onClick={toggleMobileMenu}>
+            <a
+              href="/users"
+              className={isActive("/users") ? "active" : ""}
+              onClick={toggleMobileMenu}
+            >
               Users
             </a>
           </li>
         </ul>
         <div className="mobile-user-profile">
           <FaCircleUser size={45} />
-          <span>John Doe</span>
+          <span>{username || "Loading..."}</span>
           <a href="/" className="logout-icon" onClick={toggleMobileMenu}>
             <IoIosLogOut size={35} />
           </a>
@@ -62,7 +111,7 @@ function Navbar() {
       <div className="navbar-right">
         <div className="user-profile">
           <FaCircleUser size={45} />
-          <span>John Doe</span>
+          <span>{username || "Loading..."}</span>
           <a href="/" className="logout-icon">
             <IoIosLogOut size={35} />
           </a>

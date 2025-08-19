@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
 import Footer from "../components/Footer";
+import logo from "../../src/assets/logo.png";
 
 const API_BASE_URL = "http://localhost:9090";
 
@@ -92,7 +93,7 @@ const Login = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: username, password: password }),
       });
-      
+
       const responseText = await response.text();
       if (!response.ok) {
         let serverMessage = `Status: ${response.status}`;
@@ -100,11 +101,15 @@ const Login = () => {
           const errorData = JSON.parse(responseText);
           serverMessage = errorData?.message || serverMessage;
         } catch (e) {
-          console.error("Could not parse error response as JSON:", responseText);
+          console.error(e);
+          console.error(
+            "Could not parse error response as JSON:",
+            responseText,
+          );
         }
         throw new Error(`Login failed. Server says: "${serverMessage}"`);
       }
-      
+
       const data = JSON.parse(responseText);
 
       if (data?.token) {
@@ -125,7 +130,9 @@ const Login = () => {
     }
   };
 
-  const handleForgotPasswordSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleForgotPasswordSubmit = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
     event.preventDefault();
     setResetError(null);
     setResetSuccessMessage(null);
@@ -144,8 +151,14 @@ const Login = () => {
         try {
           data = JSON.parse(responseText);
         } catch (e) {
-          console.error("Failed to parse JSON from reset-password:", responseText);
-          throw new Error("An unexpected response was received from the server.");
+          console.error(e);
+          console.error(
+            "Failed to parse JSON from reset-password:",
+            responseText,
+          );
+          throw new Error(
+            "An unexpected response was received from the server.",
+          );
         }
       }
 
@@ -153,7 +166,9 @@ const Login = () => {
         throw new Error(data?.message || "Failed to send reset link.");
       }
 
-      setResetSuccessMessage(data?.message || "Password reset instructions sent to your email.");
+      setResetSuccessMessage(
+        data?.message || "Password reset instructions sent to your email.",
+      );
 
       setTimeout(() => {
         setIsModalOpen(false);
@@ -179,7 +194,7 @@ const Login = () => {
         style={{ minWidth: 350 }}
       >
         <img
-          src="/src/assets/logo.png"
+          src={logo}
           alt="Swift Signals Logo"
           className="loginLogo h-20 w-20 object-contain drop-shadow-lg"
         />
@@ -215,9 +230,12 @@ const Login = () => {
               id="username"
               name="username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Username or Email"
-              className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+              onChange={(e) => {
+                e.preventDefault();
+                setUsername(e.target.value);
+              }}
+              placeholder="Email"
+              className="w-full px-4 py-3 border-2 border-[#388BFD] rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
               disabled={isLoading}
             />
@@ -231,9 +249,12 @@ const Login = () => {
               id="password"
               name="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                e.preventDefault();
+                setPassword(e.target.value);
+              }}
               placeholder="Password"
-              className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
+              className="w-full px-4 py-3 border-2 border-[#388BFD] rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
               disabled={isLoading}
             />
@@ -245,7 +266,7 @@ const Login = () => {
                 e.preventDefault();
                 setIsModalOpen(true);
               }}
-              className="text-sm text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors"
+              className="text-sm text-indigo-600 dark:text-[#388BFD] hover:text-indigo-800 hover:underline transition-colors"
             >
               Forgot Password?
             </a>
@@ -254,7 +275,7 @@ const Login = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg disabled:bg-indigo-400 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full bg-indigo-600 dark:bg-[#388BFD] hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg disabled:bg-indigo-400 disabled:cursor-not-allowed flex items-center justify-center"
             >
               {isLoading && (
                 <svg
@@ -287,7 +308,7 @@ const Login = () => {
           <button
             type="button"
             onClick={() => navigate("/signup")}
-            className="font-medium text-indigo-600 dark:text-indigo-500 hover:text-indigo-800 hover:underline transition-colors bg-transparent border-none p-0 m-0 cursor-pointer"
+            className="font-medium text-indigo-600 dark:text-[#388BFD] hover:text-indigo-800 hover:underline transition-colors bg-transparent border-none p-0 m-0 cursor-pointer"
             style={{ background: "none" }}
           >
             Register Here
@@ -320,7 +341,10 @@ const Login = () => {
                   id="resetEmail"
                   name="resetEmail"
                   value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
+                  onChange={(e) => {
+                    e.preventDefault();
+                    setResetEmail(e.target.value);
+                  }}
                   placeholder="Enter your email"
                   className="w-full px-4 py-3 border border-blue-300 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
                   required
