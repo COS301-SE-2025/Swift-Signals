@@ -6,6 +6,7 @@
 ![API Gateway](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/apiGateway.yml/badge.svg)
 ![React Frontend](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/react.yml/badge.svg)
 ![Simulation Service](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/simulation.yml/badge.svg)
+![Unified Testing](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/simulation.yml/badge.svg)
 
 # Team
 **Team InsideInsights - Swift-Signals**  
