@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	handlerMocks "github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/mocks/service"
 	handlerPkg "github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/handler"
+	handlerMocks "github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/mocks/service"
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

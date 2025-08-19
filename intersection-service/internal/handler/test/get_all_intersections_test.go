@@ -37,8 +37,8 @@ func (f *fakeStream) Context() context.Context {
 func (f *fakeStream) SendHeader(md metadata.MD) error { return nil }
 func (f *fakeStream) SetHeader(md metadata.MD) error  { return nil }
 func (f *fakeStream) SetTrailer(md metadata.MD)       {}
-func (f *fakeStream) SendMsg(m any) error            { return nil }
-func (f *fakeStream) RecvMsg(m any) error            { return nil }
+func (f *fakeStream) SendMsg(m any) error             { return nil }
+func (f *fakeStream) RecvMsg(m any) error             { return nil }
 
 func TestGetAllIntersections_Success(t *testing.T) {
 	mockService := new(serviceMocks.MockIntersectionService)
