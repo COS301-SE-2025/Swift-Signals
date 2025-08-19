@@ -21,7 +21,8 @@ Traffic congestion remains one of South Africa’s most costly infrastructure ch
 - [User Manual](https://drive.google.com/file/d/1z-FT_3awCm1LnvJwVxOEWf0r-joXVsnt/view?usp=sharing)
 - [Architectural Requirements Document](https://drive.google.com/file/d/1OxmRs2dRNmEX-NihPSPqyHUDEKuKiap3/view?usp=drive_link)
 - [Coding Standards and Practices](https://drive.google.com/file/d/1DfAsEvpF1EfQdDXj03C5d7_qYyphNjEi/view?usp=drive_link)
-- [GitHub Project Board](https://github.com/orgs/COS301-SE-2025/projects/116)
+- [General Project Board](https://github.com/orgs/COS301-SE-2025/projects/257)
+- [Backend Project Board](https://github.com/orgs/COS301-SE-2025/projects/257)
 - [Team Wiki](https://github.com/COS301-SE-2025/Swift-Signals/wiki)
 
 ### Demo 2
