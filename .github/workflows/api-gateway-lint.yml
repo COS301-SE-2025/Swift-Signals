@@ -2,9 +2,9 @@ name: API Linting
 
 on:
   push:
-    branches: [api-gateway]
+    branches: [main, dev, api-gateway]
   pull_request:
-    branches: [api-gateway]
+    branches: [main, dev, api-gateway]
   workflow_dispatch:
 
 permissions:
