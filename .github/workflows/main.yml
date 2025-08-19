@@ -7,19 +7,30 @@ on:
     branches: [main, dev, quality-assurance]
 
 jobs:
-  # TODO: Add integration tests for api-gateway
-  # go-standard-check:
-  #   runs-on: ubuntu-latest
-  #
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
-  #
-  #     - name: Set up Go
-  #       uses: actions/setup-go@v4
-  #       with:
-  #         go-version: '1.24.3'
-  #
+  golangci:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-go@v4
+          with:
+            go-version: '1.24.3'
+
+        - name: Generate Proto Files
+          working-directory: ./protos
+          run: |
+            make install-protoc
+            make generate
+        - name: Generate Mockery Files
+          working-directory: ./api-gateway
+          run: |
+            go install github.com/vektra/mockery/v2@latest
+            mockery
+            go mod tidy
+        - name: golangci-lint
+          uses: golangci/golangci-lint-action@v8
+          with:
+            version: v2.1
+            working-directory: ./api-gateway
 
   python-standard-check:
     # needs: go-standard-check
