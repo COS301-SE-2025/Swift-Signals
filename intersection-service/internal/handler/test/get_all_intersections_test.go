@@ -11,6 +11,7 @@ import (
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -66,7 +67,7 @@ func TestGetAllIntersections_Success(t *testing.T) {
 	stream := &fakeStream{ctx: ctx}
 
 	err := h.GetAllIntersections(req, stream)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Len(t, stream.sent, 2)
 	assert.Equal(t, intersections[0].ID, stream.sent[0].GetId())
 	assert.Equal(t, intersections[1].ID, stream.sent[1].GetId())
@@ -91,7 +92,7 @@ func TestGetAllIntersections_ServiceError(t *testing.T) {
 	stream := &fakeStream{ctx: ctx}
 
 	err := h.GetAllIntersections(req, stream)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Empty(t, stream.sent)
 
 	mockService.AssertExpectations(t)
@@ -121,7 +122,7 @@ func TestGetAllIntersections_StreamError(t *testing.T) {
 	}
 
 	err := h.GetAllIntersections(req, stream)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Empty(t, stream.sent) // nothing successfully sent
 
 	mockService.AssertExpectations(t)
@@ -145,7 +146,7 @@ func TestGetAllIntersections_ContextCancelled(t *testing.T) {
 	stream := &fakeStream{ctx: ctx}
 
 	err := h.GetAllIntersections(req, stream)
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Equal(t, context.Canceled, err)
 
 	mockService.AssertExpectations(t)
@@ -167,10 +168,10 @@ func TestGetAllIntersections_ResponseNil(t *testing.T) {
 	req := &intersectionpb.GetAllIntersectionsRequest{}
 
 	err := h.GetAllIntersections(req, stream)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// Since the only element is nil, stream.sent should remain empty
-	assert.Len(t, stream.sent, 0)
+	assert.Empty(t, stream.sent)
 
 	mockService.AssertExpectations(t)
 }

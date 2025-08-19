@@ -11,6 +11,7 @@ import (
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetIntersection_Success(t *testing.T) {
@@ -38,7 +39,7 @@ func TestGetIntersection_Success(t *testing.T) {
 
 	resp, err := h.GetIntersection(ctx, req)
 
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.Equal(t, expectedModel.ID, resp.GetId())
 	mockService.AssertExpectations(t)
@@ -58,7 +59,7 @@ func TestGetIntersection_NotFound(t *testing.T) {
 
 	resp, err := h.GetIntersection(ctx, req)
 
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Nil(t, resp)
 	mockService.AssertExpectations(t)
 }
@@ -77,7 +78,7 @@ func TestGetIntersection_DatabaseError(t *testing.T) {
 
 	resp, err := h.GetIntersection(ctx, req)
 
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Nil(t, resp)
 	mockService.AssertExpectations(t)
 }

@@ -1,61 +1,62 @@
 package test
 
 import (
-    "context"
-    "testing"
+	"context"
+	"testing"
 
-    "github.com/stretchr/testify/assert"
-    "go.mongodb.org/mongo-driver/mongo/integration/mtest"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.mongodb.org/mongo-driver/mongo/integration/mtest"
 
-    db "github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/db"
-    "github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/model"
+	db "github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/db"
+	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/model"
 )
 
 func TestCreateIntersection(t *testing.T) {
-    mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 
-    mt.Run("insert intersection", func(mt *mtest.T) {
-        mt.AddMockResponses(mtest.CreateSuccessResponse())
+	mt.Run("insert intersection", func(mt *mtest.T) {
+		mt.AddMockResponses(mtest.CreateSuccessResponse())
 
-        repo := db.NewMongoIntersectionRepo(mt.Coll) // ✅ use db.
+		repo := db.NewMongoIntersectionRepo(mt.Coll) // ✅ use db.
 
-        intersection := &model.Intersection{
-            ID:   "123",
-            Name: "Test Intersection",
-        }
+		intersection := &model.Intersection{
+			ID:   "123",
+			Name: "Test Intersection",
+		}
 
-        result, err := repo.CreateIntersection(context.Background(), intersection)
+		result, err := repo.CreateIntersection(context.Background(), intersection)
 
-        assert.NoError(t, err)
-        assert.Equal(t, "123", result.ID)
-    })
+		require.NoError(t, err)
+		assert.Equal(t, "123", result.ID)
+	})
 }
 
 func TestCreateIntersection_Error(t *testing.T) {
-    mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
+	mt := mtest.New(t, mtest.NewOptions().ClientType(mtest.Mock))
 
-    mt.Run("insert intersection error", func(mt *mtest.T) {
-        // Simulate an insert error
-        mt.AddMockResponses(mtest.CreateWriteErrorsResponse(
-            mtest.WriteError{
-                Index:   0,
-                Code:    12345,
-                Message: "simulated insert error",
-            },
-        ))
+	mt.Run("insert intersection error", func(mt *mtest.T) {
+		// Simulate an insert error
+		mt.AddMockResponses(mtest.CreateWriteErrorsResponse(
+			mtest.WriteError{
+				Index:   0,
+				Code:    12345,
+				Message: "simulated insert error",
+			},
+		))
 
-        repo := db.NewMongoIntersectionRepo(mt.Coll)
+		repo := db.NewMongoIntersectionRepo(mt.Coll)
 
-        intersection := &model.Intersection{
-            ID:   "999",
-            Name: "Error Intersection",
-        }
+		intersection := &model.Intersection{
+			ID:   "999",
+			Name: "Error Intersection",
+		}
 
-        result, err := repo.CreateIntersection(context.Background(), intersection)
+		result, err := repo.CreateIntersection(context.Background(), intersection)
 
-        // Assert that error is returned and result is nil
-        assert.Nil(t, result)
-        assert.Error(t, err)
-        assert.Contains(t, err.Error(), "failed to insert intersection")
-    })
+		// Assert that error is returned and result is nil
+		assert.Nil(t, result)
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "failed to insert intersection")
+	})
 }
