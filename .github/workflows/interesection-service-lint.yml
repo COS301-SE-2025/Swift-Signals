@@ -38,10 +38,6 @@ jobs:
           working-directory: ./intersection-service
           run: make mocks
 
-        - name: Run go mod tidy
-          working-directory: ./intersection-service
-          run: go mod tidy
-
         - name: Run golangci-lint
           working-directory: ./intersection-service
           run: make lint
