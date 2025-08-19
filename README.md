@@ -105,7 +105,3 @@ design.
 ## Getting Started
 
 [Technical Installation Manual](https://drive.google.com/file/d/17fJ2Nr7wpZfoAyZ_EtdLOnJ1-j1JsDyZ/view?usp=sharing)
-
-## Documentation
-
-See the [Development Guide](docs/development-guide.md) for detailed setup and contribution steps.
