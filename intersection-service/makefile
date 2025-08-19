@@ -22,7 +22,7 @@ mocks: tools
 	mkdir -p internal/mocks/{db,service,grpc}
 	@echo "Generating mocks..."
 	mockery --version
-	mockery
+	mockery --config .mockery.yml
 
 lint: tools
 	@echo "Running golangci-lint $(GOLANGCI_LINT_VERSION)..."
