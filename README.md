@@ -16,7 +16,7 @@ Traffic congestion remains one of South Africa’s most costly infrastructure ch
 ## Key Links
 
 ### Demo 3
-- [Functional Requirements (SRS)](docs/Demo2/SRSV2.pdf)
+- [Functional Requirements (SRS)](https://drive.google.com/file/d/131mOBRRm1XoIGXXQAerh4kBFtj-BwIQk/view?usp=drive_link)
 - [Technical Installation Manual](https://drive.google.com/file/d/17fJ2Nr7wpZfoAyZ_EtdLOnJ1-j1JsDyZ/view?usp=sharing)
 - [User Manual](https://drive.google.com/file/d/1z-FT_3awCm1LnvJwVxOEWf0r-joXVsnt/view?usp=sharing)
 - [Architectural Requirements Document](https://drive.google.com/file/d/1OxmRs2dRNmEX-NihPSPqyHUDEKuKiap3/view?usp=drive_link)
