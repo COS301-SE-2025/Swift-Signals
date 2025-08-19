@@ -32,6 +32,10 @@ jobs:
           make install-protoc
           make generate
 
+      - name: Run go mod tidy
+        working-directory: ./intersection-service
+        run: go mod tidy
+
       - name: Run unit tests
         working-directory: ./intersection-service
         run: make unit-test
