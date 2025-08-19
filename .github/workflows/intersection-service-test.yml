@@ -34,4 +34,9 @@ jobs:
 
       - name: Run unit tests
         working-directory: ./intersection-service
-        run: make test
+        run: make unit-test
+
+      - name: Run integration tests
+        working-directory: ./intersection-service
+        run: make integration-test
+

@@ -28,13 +28,22 @@ lint: tools
 	@echo "Running golangci-lint $(GOLANGCI_LINT_VERSION)..."
 	golangci-lint run
 
-test: mocks
-	@echo "Running tests..."
+unit-test: mocks
+	@echo "Running unit tests..."
 	go test -v ./internal/db/test ./internal/service/test ./internal/handler/test
 
-test-coverage: mocks
-	@echo "Running tests with coverage..."
+unit-test-coverage: mocks
+	@echo "Running unit tests with coverage..."
 	go test -v -coverprofile=coverage.out -coverpkg=./internal/db/,./internal/service/,./internal/handler/ ./internal/db/test ./internal/service/test ./internal/handler/test
+	go tool cover -html=coverage.out 
+
+integration-test: 
+	@echo "Running integration tests..."
+	go test -v ./internal/test 
+
+integration-test-coverage: 
+	@echo "Running integration tests with coverage..."
+	go test -v -coverprofile=coverage.out -coverpkg=./internal/db/,./internal/service/,./internal/handler/ ./internal/test
 	go tool cover -html=coverage.out 
 
 clean:
