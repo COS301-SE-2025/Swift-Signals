@@ -28,15 +28,27 @@ jobs:
             curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v27.2/protoc-27.2-linux-x86_64.zip
             sudo unzip -o protoc-27.2-linux-x86_64.zip -d /usr/local
 
+        - name: Run go mod tidy
+          working-directory: ./protos
+          run: go mod tidy
+
         - name: Generate Proto Files
           working-directory: ./protos
           run: |
             make install-protoc
             make generate
 
+        - name: Run go mod tidy
+          working-directory: ./intersection-service
+          run: go mod tidy
+
         - name: Generate Mocks
           working-directory: ./intersection-service
           run: make mocks
+
+        - name: Run go mod tidy
+          working-directory: ./intersection-service
+          run: go mod tidy
 
         - name: Run golangci-lint
           working-directory: ./intersection-service
