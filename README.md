@@ -6,6 +6,7 @@
 ![API Gateway](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/apiGateway.yml/badge.svg)
 ![React Frontend](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/react.yml/badge.svg)
 ![Simulation Service](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/simulation.yml/badge.svg)
+![Unified Testing](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/simulation.yml/badge.svg)
 
 # Team
 **Team InsideInsights - Swift-Signals**  
@@ -14,6 +15,17 @@ Swift Signals is a data-driven, simulation-powered traffic light optimization pl
 Traffic congestion remains one of South Africa’s most costly infrastructure challenges, with the South African Road Federation estimating annual productivity losses of approximately R1 billion. Swift Signals tackles this issue by providing a modular, web-based platform capable of simulating real-world intersection behaviour and dynamically optimizing traffic light phase configurations using historical traffic data. The system leverages modern software engineering principles—microservices, containerization, and continuous deployment pipelines—to deliver a scalable and maintainable solution.
 
 ## Key Links
+
+### Demo 3
+- [Functional Requirements (SRS)](https://drive.google.com/file/d/131mOBRRm1XoIGXXQAerh4kBFtj-BwIQk/view?usp=drive_link)
+- [Technical Installation Manual](https://drive.google.com/file/d/17fJ2Nr7wpZfoAyZ_EtdLOnJ1-j1JsDyZ/view?usp=sharing)
+- [User Manual](https://drive.google.com/file/d/1z-FT_3awCm1LnvJwVxOEWf0r-joXVsnt/view?usp=sharing)
+- [Architectural Requirements Document](https://drive.google.com/file/d/1OxmRs2dRNmEX-NihPSPqyHUDEKuKiap3/view?usp=drive_link)
+- [Coding Standards and Practices](https://drive.google.com/file/d/1DfAsEvpF1EfQdDXj03C5d7_qYyphNjEi/view?usp=drive_link)
+- [General Project Board](https://github.com/orgs/COS301-SE-2025/projects/116)
+- [Backend Project Board](https://github.com/orgs/COS301-SE-2025/projects/257)
+- [Team Wiki](https://github.com/COS301-SE-2025/Swift-Signals/wiki)
+- [Demo 3 Video]
 
 ### Demo 2
 - [Functional Requirements (SRS)](docs/Demo2/SRSV2.pdf)
@@ -82,18 +94,17 @@ design.
 
 ## Services Overview
 
-- **frontend**: Web dashboard for visualization and control
 - **api-gateway**: API Gateway for routing requests  
 - **user-service**: User management and authentication  
-- **intersection-service**: Intersection control and management  
 - **simulation-service**: Simulation engine  
 - **optimization-service**: Machine learning and AI capabilities  
+- **intersection-service**: Intersection control and management  
+- **metrics-service**: Monitoring and metrics collection  
+- **frontend**: Web dashboard for visualization and control
 
 ## Getting Started
 
-1. Clone this repository  
-2. Run `./scripts/setup.sh` to set up the development environment  
-3. Run `docker-compose -f deployments/docker-compose.yml up` to start local development
+[Technical Installation Manual](https://drive.google.com/file/d/17fJ2Nr7wpZfoAyZ_EtdLOnJ1-j1JsDyZ/view?usp=sharing)
 
 ## Documentation
 
