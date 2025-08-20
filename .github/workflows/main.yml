@@ -1,4 +1,4 @@
-name: Combined CI Workflow
+name: Microservice Backend Unified Testing
 
 on:
   push:
