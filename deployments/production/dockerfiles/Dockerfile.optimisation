@@ -1,5 +1,4 @@
-FROM python:3
-
+FROM python:3 AS build
 WORKDIR /app
 
 COPY optimization-service/requirements.txt .
@@ -13,8 +12,22 @@ RUN mkdir -p gen/python && \
         --python_out=gen/python/ \
         --grpc_python_out=gen/python/ \
         protos/optimisation.proto
-ENV PYTHONPATH="/app/gen/python:$PYTHONPATH"
 
 COPY optimization-service/ .
 
-CMD ["python", "server/server.py"]
+RUN python -m venv /app/venv
+ENV PATH="/app/venv/bin:$PATH"
+RUN pip install --no-cache-dir -r requirements.txt
+
+FROM gcr.io/distroless/python3-debian11:nonroot
+
+WORKDIR /app
+
+COPY --from=build /app/venv/lib/python3.*/site-packages /app/site-packages
+COPY --from=build /app/gen /app/gen
+COPY --from=build /app/server /app/server
+COPY --from=build /app/*.py /app/
+
+ENV PYTHONPATH="/app/site-packages:/app/gen/python"
+
+ENTRYPOINT ["python", "server/server.py"]
