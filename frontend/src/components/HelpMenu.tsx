@@ -744,6 +744,7 @@ const HelpMenu: React.FC = () => {
           message: text,
           event: event,
           sessionId: sessionId,
+          token: localStorage.getItem('authToken'),
         }),
       });
 
@@ -779,9 +780,9 @@ const HelpMenu: React.FC = () => {
 
       if (
         data.action === "start.tutorial" &&
-        data.parameters?.fields?.tutorialtopic
+        data.parameters?.fields?.tutorial_topic
       ) {
-        const tutorialType = data.parameters.fields.tutorialtopic
+        const tutorialType = data.parameters.fields.tutorial_topic
           .stringValue as TutorialType;
 
         if (tutorialType) {
