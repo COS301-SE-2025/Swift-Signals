@@ -105,14 +105,98 @@ app.post("/api/chatbot", async (req, res) => {
           console.log("✅ API call successful.", { data: apiResponse.data });
 
           const intersections = apiResponse.data.intersections;
-          let responseText = "Here are your intersections:\n";
-          intersections.forEach(intersection => {
-            responseText += `\n- ${intersection.name} (Status: ${intersection.status})`;
-          });
-          result.fulfillmentText = responseText;
+          if (intersections && intersections.length > 0) {
+            let responseText = "Here are your intersections:\n";
+            intersections.forEach(intersection => {
+              responseText += `\n- ${intersection.name}`;
+            });
+            responseText += "\n\nTo get more details about a specific intersection, please say something like 'Tell me about [intersection name]' or 'Show details for [intersection name]'.";
+            result.fulfillmentText = responseText;
+          } else {
+            result.fulfillmentText = "You don't have any intersections yet.";
+          }
         } catch (apiError) {
           console.error("❌ API Gateway Error on /intersections:", apiError.message);
           result.fulfillmentText = "I was unable to fetch your intersections at the moment. Please try again later.";
+        }
+      }
+    }
+
+    // NEW LOGIC FOR Get_Intersection_Details
+    if (result.intent && result.intent.displayName === "Get_Intersection_Details") {
+      console.log("✅ Matched intent: Get_Intersection_Details");
+      const intersectionIdentifier = result.parameters.fields.intersection_identifier.stringValue;
+
+      if (!token) {
+        result.fulfillmentText = "I can't get intersection details without knowing who you are. Please make sure you are logged in.";
+      } else if (!intersectionIdentifier) {
+        result.fulfillmentText = "Which intersection are you interested in? Please provide its name.";
+      } else {
+        try {
+          console.log(`Attempting to get details for: ${intersectionIdentifier}`);
+          // First, get all intersections to find the matching one by name or ID
+          const allIntersectionsResponse = await axios.get("http://api-gateway:9090/intersections", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const allIntersections = allIntersectionsResponse.data.intersections;
+
+          let targetIntersection = null;
+          // Try to find by ID first (assuming ID is a string)
+          targetIntersection = allIntersections.find(
+            (int) => int.id === intersectionIdentifier
+          );
+
+          // If not found by ID, try to find by name (case-insensitive)
+          if (!targetIntersection) {
+            targetIntersection = allIntersections.find(
+              (int) => int.name.toLowerCase() === intersectionIdentifier.toLowerCase()
+            );
+          }
+
+          if (targetIntersection) {
+            let fulfillmentText = `--- Details for ${targetIntersection.name} ---
+`;
+            fulfillmentText += `
+ID: ${targetIntersection.id}`;
+            fulfillmentText += `
+Status: ${targetIntersection.status}`;
+
+            if (targetIntersection.details) {
+              fulfillmentText += `
+
+--- Location Details ---`;
+              if (targetIntersection.details.address) {
+                fulfillmentText += `
+Address: ${targetIntersection.details.address}`;
+              }
+              if (targetIntersection.details.city) {
+                fulfillmentText += `
+City: ${targetIntersection.details.city}`;
+              }
+              if (targetIntersection.details.province) {
+                fulfillmentText += `
+Province: ${targetIntersection.details.province}`;
+              }
+            }
+
+            fulfillmentText += `
+
+--- Simulation Info ---`;
+            fulfillmentText += `
+Traffic Density: ${targetIntersection.traffic_density}`;
+            fulfillmentText += `
+Run Count: ${targetIntersection.run_count}`;
+            fulfillmentText += `
+Last Run: ${new Date(targetIntersection.last_run_at).toLocaleString()}`;
+            fulfillmentText += `
+Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
+            result.fulfillmentText = fulfillmentText;
+          } else {
+            result.fulfillmentText = `I couldn't find an intersection named or with ID '${intersectionIdentifier}'. Please check the name and try again.`;
+          }
+        } catch (apiError) {
+          console.error("❌ API Gateway Error on Get_Intersection_Details:", apiError.message);
+          result.fulfillmentText = "I encountered an error while trying to retrieve the intersection details. Please try again later.";
         }
       }
     }
@@ -192,6 +276,63 @@ app.post("/api/chatbot", async (req, res) => {
   } catch (error) {
     console.error("Dialogflow Error:", error);
     res.status(500).send({ error: "Internal Server Error" });
+  }
+});
+
+app.get("/api/reverse-geocode", async (req, res) => {
+  const { lat, lon } = req.query;
+
+  if (!lat || !lon) {
+    return res.status(400).send({ error: "Latitude and longitude are required" });
+  }
+
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+
+  try {
+    const response = await axios.get(url, {
+        headers: {
+            'User-Agent': 'Swift-Signals/1.0'
+        }
+    });
+    res.status(200).send(response.data);
+  } catch (error) {
+    console.error("Nominatim Error:", error.message);
+    res.status(500).send({ error: "Failed to fetch data from Nominatim" });
+  }
+});
+
+app.get("/api/search-streets", async (req, res) => {
+  const { q, type } = req.query;
+
+  if (!q) {
+    return res.status(400).send({ error: "Query is required" });
+  }
+
+  const params = new URLSearchParams({
+    format: "json",
+    addressdetails: "1",
+    limit: "20",
+    countrycodes: "za",
+    q: q,
+    extratags: "1",
+  });
+
+  if (type === "road") {
+    params.append("class", "highway");
+  }
+
+  const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
+
+  try {
+    const response = await axios.get(url, {
+        headers: {
+            'User-Agent': 'Swift-Signals/1.0'
+        }
+    });
+    res.status(200).send(response.data);
+  } catch (error) {
+    console.error("Nominatim Error:", error.message);
+    res.status(500).send({ error: "Failed to fetch data from Nominatim" });
   }
 });
 

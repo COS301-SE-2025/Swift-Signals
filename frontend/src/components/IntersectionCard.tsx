@@ -54,9 +54,9 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
           <h3 className="intersectionName text-3xl font-extrabold text-black dark:text-[#E6EDF3] mb-2">
             {name}
           </h3>
-          <p className="intersectionID text-xl text-gray-700 dark:text-[#8B949E]">
+          {/* <p className="intersectionID text-xl text-gray-700 dark:text-[#8B949E]">
             ID: {id}
-          </p>
+          </p> */}
           <p className="intersectionLocation text-xl text-gray-700 dark:text-[#8B949E]">
             Location: {location}
           </p>
