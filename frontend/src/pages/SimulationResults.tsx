@@ -420,7 +420,7 @@ const SimulationResults: React.FC = () => {
       setOptimizationStatus("Optimization completed successfully!");
 
       // Update the intersection status to "optimised" in the backend
-      await updateIntersectionStatus(intersectionId, "optimised");
+      await updateIntersectionStatus(intersectionId, "INTERSECTION_STATUS_OPTIMISED");
 
       setTimeout(() => {
         setOptimizationStatus("");
@@ -526,7 +526,7 @@ const SimulationResults: React.FC = () => {
       setIntersectionData(intersectionResponseData);
 
       // If intersection is optimized, fetch optimization data
-      if (intersectionResponseData.status === "optimised") {
+      if (intersectionResponseData.status === "INTERSECTION_STATUS_OPTIMISED") {
         setIsOptimized(true);
         const optRes = await fetch(
           `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
