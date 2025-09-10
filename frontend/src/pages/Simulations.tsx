@@ -2010,7 +2010,7 @@ const Simulations: React.FC = () => {
     }));
 
     //  UPDATED: Filter optimizations based on actual "optimised" status
-    const opts = allSims.filter((sim) => sim.status === "optimised");
+    const opts = allSims.filter((sim) => sim.status === "Optimised");
 
     return { sims: allSims, opts };
   };

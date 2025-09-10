@@ -62,10 +62,12 @@ const Dashboard: React.FC = () => {
   const [activeSimulations, setActiveSimulations] = useState<number>(0);
   const [loadingActiveSimulations, setLoadingActiveSimulations] =
     useState(false);
+  const [totalSimulationsRun, setTotalSimulationsRun] = useState<number>(0);
+  const [totalOptimizationsRun, setTotalOptimizationsRun] = useState<number>(0);
 
   const fetchAllIntersections = async () => {
     setLoadingTotal(true);
-    setLoadingActiveSimulations(true);
+    // setLoadingActiveSimulations(true); // This line will be removed as activeSimulations is no longer used in the same way
     try {
       const token = localStorage.getItem("authToken");
       const response = await fetch("http://localhost:9090/intersections", {
@@ -77,25 +79,34 @@ const Dashboard: React.FC = () => {
 
       setTotalIntersections(items.length);
 
-      // Calculate active simulations (intersections with run_count > 0)
-      const activeCount = items.reduce((sum, item) => {
-        const runCount =
-          typeof item.run_count === "number" ? item.run_count : 0;
-        return sum + (runCount > 0 ? 1 : 0);
-      }, 0);
-      setActiveSimulations(activeCount);
+      let totalSims = 0;
+      let totalOptimizations = 0;
+
+      items.forEach(item => {
+        const runCount = typeof item.run_count === "number" ? item.run_count : 0;
+        totalSims += runCount;
+
+        if (item.status === "INTERSECTION_STATUS_OPTIMISED") {
+          totalOptimizations += runCount;
+        }
+      });
+
+      setTotalSimulationsRun(totalSims);
+      setTotalOptimizationsRun(totalOptimizations);
 
       updateChart(items);
     } catch (err: unknown) {
       console.error("Failed to fetch intersections:", err);
       setTotalIntersections(0);
+      setTotalSimulationsRun(0); // Reset on error
+      setTotalOptimizationsRun(0); // Reset on error
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
         chartInstanceRef.current = null;
       }
     } finally {
       setLoadingTotal(false);
-      setLoadingActiveSimulations(false);
+      setLoadingActiveSimulations(false); // Keep this to ensure loading state is cleared
     }
   };
 
@@ -393,7 +404,7 @@ const Dashboard: React.FC = () => {
             <div>
               <h3 className="card-h3">Active Simulations</h3>
               <p className="card-p">
-                {loadingActiveSimulations ? "..." : activeSimulations}
+                {loadingActiveSimulations ? "..." : totalSimulationsRun}
               </p>
             </div>
           </div>
@@ -405,7 +416,9 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <h3 className="card-h3">Optimization Runs</h3>
-              <p className="card-p">156</p>
+              <p className="card-p">
+                {loadingActiveSimulations ? "..." : totalOptimizationsRun}
+              </p>
             </div>
           </div>
         </div>
