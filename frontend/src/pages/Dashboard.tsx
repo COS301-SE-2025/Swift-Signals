@@ -330,12 +330,12 @@ const Dashboard: React.FC = () => {
 
   const getStatusStyles = (status?: string) => {
     switch (status) {
-      case "optimised":
+      case "Optimised":
         return {
           statusColor: "bg-statusGreen",
           textColor: "text-statusTextGreen",
         };
-      case "unoptimised":
+      case "Unoptimised":
         return {
           statusColor: "bg-statusYellow",
           textColor: "text-statusTextYellow",
@@ -355,14 +355,14 @@ const Dashboard: React.FC = () => {
 
   const mapApiStatus = (status?: string): string => {
     switch (status) {
-      case "optimised":
-        return "optimised";
+      case "INTERSECTION_STATUS_OPTIMISED":
+        return "Optimised";
       case "unoptimised":
-        return "unoptimised";
+        return "Unoptimised";
       case "Failed":
         return "Failed";
       default:
-        return "unoptimised";
+        return "Unoptimised";
     }
   };
 

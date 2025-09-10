@@ -979,28 +979,26 @@ const SimulationResults: React.FC = () => {
               </button>
 
               {/* Optimization Button */}
-              <button
-                onClick={runOptimization}
-                disabled={isOptimizing || isOptimized}
-                className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
-                  isOptimizing
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : isOptimized
-                      ? "bg-green-600 cursor-not-allowed"
+              {!isOptimized && (
+                <button
+                  onClick={runOptimization}
+                  disabled={isOptimizing}
+                  className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
+                    isOptimizing
+                      ? "bg-gray-600 cursor-not-allowed"
                       : "bg-gradient-to-r from-orange-600 to-orange-700 shadow-orange-500/50 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/60 focus:ring-orange-300"
-                }`}
-              >
-                {isOptimizing ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
-                    <span>Optimizing...</span>
-                  </div>
-                ) : isOptimized ? (
-                  "Already Optimized"
-                ) : (
-                  "Run Optimization"
-                )}
-              </button>
+                  }`}
+                >
+                  {isOptimizing ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                      <span>Optimizing...</span>
+                    </div>
+                  ) : (
+                    "Run Optimization"
+                  )}
+                </button>
+              )}
 
               {/* Show Optimization Results Button */}
               {isOptimized && (
@@ -1008,7 +1006,7 @@ const SimulationResults: React.FC = () => {
                   onClick={() => setShowOptimized(!showOptimized)}
                   className="px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-4 bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
                 >
-                  {showOptimized ? "Hide Optimization" : "Show Optimization"}
+                  Show/Hide Optimization
                 </button>
               )}
             </div>
