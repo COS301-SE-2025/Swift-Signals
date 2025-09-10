@@ -308,7 +308,7 @@ const SimulationResults: React.FC = () => {
   const [showOptimized, setShowOptimized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [canBeOptimized, setCanBeOptimized] = useState(false);
+  const [isOptimized, setIsOptimized] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizationStatus, setOptimizationStatus] = useState<string>("");
 
@@ -368,73 +368,63 @@ const SimulationResults: React.FC = () => {
       const optResult = await optResponse.json();
       console.log("Optimization result:", optResult);
 
-      if (optResult.improved) {
-        setOptimizationStatus(
-          "Optimization completed successfully! Fetching optimized data...",
+      setOptimizationStatus(
+        "Optimization completed successfully! Fetching optimized data...",
+      );
+
+      // Step 2: Fetch optimized simulation data
+      const optDataResponse = await fetch(
+        `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        },
+      );
+
+      if (!optDataResponse.ok) {
+        throw new Error(
+          `Failed to fetch optimized data: ${optDataResponse.statusText}`,
         );
-
-        // Step 2: Fetch optimized simulation data
-        const optDataResponse = await fetch(
-          `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
-          {
-            headers: { Authorization: `Bearer ${authToken}` },
-          },
-        );
-
-        if (!optDataResponse.ok) {
-          throw new Error(
-            `Failed to fetch optimized data: ${optDataResponse.statusText}`,
-          );
-        }
-
-        const optData: ApiSimulationResponse = await optDataResponse.json();
-
-        if (!optData.output) {
-          throw new Error(
-            "Invalid optimized simulation data received from server",
-          );
-        }
-
-        // Process traffic lights for optimized data if they exist
-        if (
-          optData.output.intersection &&
-          optData.output.intersection.trafficLights
-        ) {
-          const processedTrafficLights = processTrafficLights(
-            optData.output.intersection.trafficLights,
-          );
-          const newOptData = {
-            ...optData.output,
-            intersection: {
-              ...optData.output.intersection,
-              trafficLights: processedTrafficLights,
-            },
-          };
-          setOptimizedData(newOptData);
-        } else {
-          setOptimizedData(optData.output);
-        }
-
-        setOptimizedApiResults(optData.results);
-        setCanBeOptimized(true);
-        setShowOptimized(true);
-        setOptimizationStatus("Optimization completed successfully!");
-
-        // Update the intersection status to "optimised" in the backend
-        await updateIntersectionStatus(intersectionId, "optimised");
-
-        // Refresh intersection data to get updated status
-        await fetchIntersectionData();
-
-        setTimeout(() => {
-          setOptimizationStatus("");
-        }, 3000);
-      } else {
-        setOptimizationStatus("No improvement found in optimization.");
-        setTimeout(() => {
-          setOptimizationStatus("");
-        }, 3000);
       }
+
+      const optData: ApiSimulationResponse = await optDataResponse.json();
+
+      if (!optData.output) {
+        throw new Error(
+          "Invalid optimized simulation data received from server",
+        );
+      }
+
+      // Process traffic lights for optimized data if they exist
+      if (
+        optData.output.intersection &&
+        optData.output.intersection.trafficLights
+      ) {
+        const processedTrafficLights = processTrafficLights(
+          optData.output.intersection.trafficLights,
+        );
+        const newOptData = {
+          ...optData.output,
+          intersection: {
+            ...optData.output.intersection,
+            trafficLights: processedTrafficLights,
+          },
+        };
+        setOptimizedData(newOptData);
+      } else {
+        setOptimizedData(optData.output);
+      }
+
+      setOptimizedApiResults(optData.results);
+      setIsOptimized(true);
+      setShowOptimized(true);
+      setOptimizationStatus("Optimization completed successfully!");
+
+      // Update the intersection status to "optimised" in the backend
+      await updateIntersectionStatus(intersectionId, "optimised");
+
+      setTimeout(() => {
+        setOptimizationStatus("");
+      }, 3000);
     } catch (error) {
       console.error("Error running optimization:", error);
       setOptimizationStatus(
@@ -496,35 +486,6 @@ const SimulationResults: React.FC = () => {
     }
   };
 
-  // Function to fetch intersection data (including status)
-  const fetchIntersectionData = async () => {
-    if (!intersectionId) return;
-
-    try {
-      const authToken = getAuthToken();
-      if (!authToken) return;
-
-      const response = await fetch(
-        `${API_BASE_URL}/intersections/${intersectionId}`,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        },
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setIntersectionData(data);
-
-        // Check if intersection has been optimized
-        if (data.status === "optimised") {
-          setCanBeOptimized(true);
-        }
-      }
-    } catch (error) {
-      console.error("Failed to fetch intersection data:", error);
-    }
-  };
-
   const fetchData = async () => {
     if (!intersectionId) {
       setError("No intersection ID provided.");
@@ -538,12 +499,9 @@ const SimulationResults: React.FC = () => {
       const authToken = getAuthToken();
       const headers = { Authorization: `Bearer ${authToken}` };
 
-      // Fetch all three pieces of data in parallel
-      const [simRes, optRes, intersectionRes] = await Promise.all([
+      // Fetch simulation and intersection data in parallel
+      const [simRes, intersectionRes] = await Promise.all([
         fetch(`${API_BASE_URL}/intersections/${intersectionId}/simulate`, {
-          headers,
-        }),
-        fetch(`${API_BASE_URL}/intersections/${intersectionId}/optimise`, {
           headers,
         }),
         fetch(`${API_BASE_URL}/intersections/${intersectionId}`, { headers }),
@@ -567,23 +525,27 @@ const SimulationResults: React.FC = () => {
         await intersectionRes.json();
       setIntersectionData(intersectionResponseData);
 
-      // Check if intersection has been optimized
+      // If intersection is optimized, fetch optimization data
       if (intersectionResponseData.status === "optimised") {
-        setCanBeOptimized(true);
-      }
+        setIsOptimized(true);
+        const optRes = await fetch(
+          `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
+          {
+            headers,
+          },
+        );
 
-      // Process optimization data if available
-      if (optRes.ok) {
-        const optResponseData: ApiSimulationResponse = await optRes.json();
-        setOptimizedData(optResponseData.output);
-        setOptimizedApiResults(optResponseData.results);
-        setCanBeOptimized(true);
-        // If the user came from the "Optimizations" table, show the comparison by default
-        if (type === "optimizations") {
-          setShowOptimized(true);
+        if (optRes.ok) {
+          const optResponseData: ApiSimulationResponse = await optRes.json();
+          setOptimizedData(optResponseData.output);
+          setOptimizedApiResults(optResponseData.results);
+          // If the user came from the "Optimizations" table, show the comparison by default
+          if (type === "optimizations") {
+            setShowOptimized(true);
+          }
         }
       } else {
-        setCanBeOptimized(false);
+        setIsOptimized(false);
       }
     } catch (err: unknown) {
       setError(
@@ -599,13 +561,6 @@ const SimulationResults: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [intersectionId, type]);
-
-  // Fetch intersection data on mount to get latest status
-  useEffect(() => {
-    if (intersectionId) {
-      fetchIntersectionData();
-    }
   }, [intersectionId]);
 
   // Chart creation and updates
@@ -1026,11 +981,11 @@ const SimulationResults: React.FC = () => {
               {/* Optimization Button */}
               <button
                 onClick={runOptimization}
-                disabled={isOptimizing || canBeOptimized}
+                disabled={isOptimizing || isOptimized}
                 className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
                   isOptimizing
                     ? "bg-gray-600 cursor-not-allowed"
-                    : canBeOptimized
+                    : isOptimized
                       ? "bg-green-600 cursor-not-allowed"
                       : "bg-gradient-to-r from-orange-600 to-orange-700 shadow-orange-500/50 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/60 focus:ring-orange-300"
                 }`}
@@ -1040,7 +995,7 @@ const SimulationResults: React.FC = () => {
                     <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
                     <span>Optimizing...</span>
                   </div>
-                ) : canBeOptimized ? (
+                ) : isOptimized ? (
                   "Already Optimized"
                 ) : (
                   "Run Optimization"
@@ -1048,7 +1003,7 @@ const SimulationResults: React.FC = () => {
               </button>
 
               {/* Show Optimization Results Button */}
-              {canBeOptimized && (
+              {isOptimized && (
                 <button
                   onClick={() => setShowOptimized(!showOptimized)}
                   className="px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-4 bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
