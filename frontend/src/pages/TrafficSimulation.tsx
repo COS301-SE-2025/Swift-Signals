@@ -94,17 +94,18 @@ const getRandomCarColor = () =>
   realisticCarColors[Math.floor(Math.random() * realisticCarColors.length)];
 
 // 3D Scene Components
-const GroundPlane: FC = () => (
+const GroundPlane: FC<{ isDarkMode?: boolean }> = ({ isDarkMode }) => (
   <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
     <planeGeometry args={[2000, 2000]} />
-    <meshStandardMaterial color={0xaaaaaa} />
+    <meshStandardMaterial color={isDarkMode ? 0x282828 : 0xaaaaaa} />
   </mesh>
 );
 
-const Roads: FC<{ edges: Edge[]; nodes: Node[]; center: THREE.Vector2 }> = ({
+const Roads: FC<{ edges: Edge[]; nodes: Node[]; center: THREE.Vector2; isDarkMode?: boolean }> = ({
   edges,
   nodes,
   center,
+  isDarkMode,
 }) => {
   return (
     <group>
@@ -134,7 +135,7 @@ const Roads: FC<{ edges: Edge[]; nodes: Node[]; center: THREE.Vector2 }> = ({
           <group key={edge.id} position={position} rotation={[0, -angle, 0]}>
             <mesh rotation={[-Math.PI / 2, 0, 0]}>
               <planeGeometry args={[length, roadWidth]} />
-              <meshStandardMaterial color={0x282828} />
+              <meshStandardMaterial color={isDarkMode ? 0x666666 : 0x282828} />
             </mesh>
             {Array.from({ length: edge.lanes === 1 ? 1 : edge.lanes - 1 }).map(
               (_, laneIndex) => {
@@ -428,6 +429,7 @@ const SimulationController: FC<{
   onTimeUpdate: (time: number) => void;
   roadDirections: { [key: string]: string };
   onTrafficLightStateUpdate: (states: { [key: string]: string }) => void;
+  isDarkMode?: boolean;
 }> = ({
   simulationData,
   isPlaying,
@@ -437,6 +439,7 @@ const SimulationController: FC<{
   onTimeUpdate,
   roadDirections,
   onTrafficLightStateUpdate,
+  isDarkMode,
 }) => {
   const [simulationTime, setSimulationTime] = useState(0);
   const vehicleColors = useMemo(
@@ -463,11 +466,12 @@ const SimulationController: FC<{
 
   return (
     <>
-      <GroundPlane />
+      <GroundPlane isDarkMode={isDarkMode} />
       <Roads
         edges={simulationData.intersection.edges}
         nodes={simulationData.intersection.nodes}
         center={roadCenter}
+        isDarkMode={isDarkMode}
       />
       {simulationData.vehicles.map((vehicle, index) => (
         <Vehicle
@@ -507,6 +511,7 @@ interface TrafficSimulationProps {
   isExpanded: boolean;
   endpoint?: "simulate" | "optimise";
   simulationData?: SimulationData | null;
+  isDarkMode?: boolean;
 }
 
 // Hook to detect mobile screen size
@@ -533,6 +538,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
   isExpanded,
   endpoint = "simulate",
   simulationData: propSimulationData,
+  isDarkMode,
 }) => {
   const [simulationData, setSimulationData] = useState<SimulationData | null>(
     null,
@@ -838,7 +844,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           height: "100vh",
           display: "grid",
           placeContent: "center",
-          backgroundColor: "#3d3d3d",
+          backgroundColor: "transparent",
           color: "white",
         }}
       >
@@ -857,7 +863,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           height: "100vh",
           display: "grid",
           placeContent: "center",
-          backgroundColor: "#3d3d3d",
+          backgroundColor: "transparent",
           color: "white",
         }}
       >
@@ -881,7 +887,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           height: "100vh",
           display: "grid",
           placeContent: "center",
-          backgroundColor: "#3d3d3d",
+          backgroundColor: "transparent",
           color: "white",
         }}
       >
@@ -901,7 +907,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
       style={{
         position: "relative",
         height: "100vh",
-        backgroundColor: "#3d3d3d",
+        backgroundColor: "transparent",
         border: "none",
         boxShadow: "none",
       }}
@@ -940,7 +946,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           <OrthographicCamera
             makeDefault
             position={[roadCenter.x, 100, roadCenter.y]}
-            zoom={4}
+            zoom={5}
           />
 
           <SimulationController
@@ -953,6 +959,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
             onTimeUpdate={setSimulationTime}
             roadDirections={roadDirections}
             onTrafficLightStateUpdate={setTrafficLightStates}
+            isDarkMode={isDarkMode}
           />
         </Canvas>
       </div>
