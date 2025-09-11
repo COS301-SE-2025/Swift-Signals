@@ -252,7 +252,7 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
               yellow: params['yellow-light'].numberValue,
               red: params['red-light'].numberValue,
               speed: params['vehicle-speed'] ? params['vehicle-speed'].numberValue : 0,
-              intersection_type: "default", // Placeholder, needs to be added to Dialogflow if dynamic
+              intersection_type: "traffic_light", // Defaulting to a standard traffic light intersection
               seed: Math.floor(Math.random() * 1000000000) // Add a random seed, as it's required
             }
           };
