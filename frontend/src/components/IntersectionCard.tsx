@@ -1,6 +1,7 @@
 import { PlayCircle, PencilLine, Trash2 } from "lucide-react";
 import React from "react";
 import "../styles/IntersectionCard.css";
+import placeholderImage from "../assets/placeholder.png";
 
 interface IntersectionCardProps {
   id: string;
@@ -26,28 +27,12 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
   return (
     <div className="intersectionCard bg-white p-8 rounded-2xl shadow-lg flex justify-between items-center">
       <div className="flex items-center space-x-8">
-        <div className="cardImage w-36 h-36 bg-gray-200 rounded-lg flex items-center justify-center">
-          {image ? (
-            <img
-              src={image}
-              alt={name}
-              className="w-full h-full object-cover rounded-lg"
-            />
-          ) : (
-            <svg
-              className="cardImageSVG w-20 h-20 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          )}
+        <div className="cardImage w-36 h-36 rounded-lg flex items-center justify-center">
+          <img
+            src={image || placeholderImage}
+            alt={name}
+            className="w-full h-32 object-contain rounded-t-lg"
+          />
         </div>
 
         <div>
