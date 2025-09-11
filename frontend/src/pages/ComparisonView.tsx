@@ -3,6 +3,17 @@ import { useLocation } from "react-router-dom";
 import TrafficSimulation from "./TrafficSimulation";
 import HelpMenu from "../components/HelpMenu";
 
+// Define SimulationData interface to match the structure from TrafficSimulation.tsx
+interface SimulationData {
+  intersection: {
+    nodes: any[];
+    edges: any[];
+    trafficLights?: any[];
+    connections: any[];
+  };
+  vehicles: any[];
+}
+
 interface ComparisonViewProps {
   originalIntersectionId?: string;
   optimizedIntersectionId?: string;
@@ -13,7 +24,14 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   optimizedIntersectionId: propOptimizedId,
 }) => {
   const location = useLocation();
-  // const navigate = useNavigate();
+
+  // Get simulation data from location state
+  const simulationData = location.state?.simulationData as
+    | SimulationData
+    | undefined;
+  const optimizedData = location.state?.optimizedData as
+    | SimulationData
+    | undefined;
 
   // Get intersection IDs from props or location state
   const [originalIntersectionId, setOriginalIntersectionId] = useState<string>(
@@ -21,14 +39,18 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   );
   const [optimizedIntersectionId, setOptimizedIntersectionId] =
     useState<string>(
-      propOriginalId || location.state?.originalIntersectionId || "1",
+      propOptimizedId ||
+        location.state?.optimizedIntersectionId ||
+        originalIntersectionId,
     );
   const [originalIntersectionName] = useState<string>(
     location.state?.originalIntersectionName || "Original Simulation",
   );
   const [optimizedIntersectionName] = useState<string>("Optimized Simulation");
   const [expanded, setExpanded] = useState<"none" | "left" | "right">("none");
-  const [hasOptimizedData, setHasOptimizedData] = useState<boolean>(false);
+  const [hasOptimizedData, setHasOptimizedData] = useState<boolean>(
+    !!optimizedData,
+  );
   const [isLoadingOptimized, setIsLoadingOptimized] = useState<boolean>(false);
   const [optimizedDataError, setOptimizedDataError] = useState<string | null>(
     null,
@@ -37,78 +59,13 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     string | null
   >(null);
 
-  // Check if optimized data is available
+  // Check for optimized data when the component mounts or data changes
   useEffect(() => {
-    const checkOptimizedData = async () => {
-      if (!originalIntersectionId) return;
-
-      console.log(
-        "Checking optimized data for intersection:",
-        originalIntersectionId,
-      );
-      setIsLoadingOptimized(true);
-      setOptimizedDataError(null);
-
-      try {
-        const authToken = localStorage.getItem("authToken");
-        if (!authToken) {
-          setOptimizedDataError("Authentication token not found");
-          return;
-        }
-
-        // Try to fetch optimized data
-        const response = await fetch(
-          `http://localhost:9090/intersections/${originalIntersectionId}/optimise`,
-          {
-            headers: { Authorization: `Bearer ${authToken}` },
-          },
-        );
-
-        console.log("Optimization API response status:", response.status);
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Optimization API response data:", data);
-
-          if (
-            data.output &&
-            data.output.vehicles &&
-            data.output.vehicles.length > 0
-          ) {
-            console.log(
-              "Optimized data found, setting hasOptimizedData to true",
-            );
-            setHasOptimizedData(true);
-            setOptimizedIntersectionId(originalIntersectionId); // Use same ID for optimized data
-            setOptimizedDataSuccess(
-              "Optimized data found! Loading simulation...",
-            );
-            setOptimizedDataError(null);
-
-            // Clear success message after 3 seconds
-            setTimeout(() => {
-              setOptimizedDataSuccess(null);
-            }, 3000);
-          } else {
-            console.log("No optimized data found in response");
-            setHasOptimizedData(false);
-            setOptimizedDataSuccess(null);
-          }
-        } else {
-          console.log("Optimization API request failed");
-          setHasOptimizedData(false);
-        }
-      } catch (error) {
-        console.error("Error checking optimized data:", error);
-        setOptimizedDataError("Failed to check optimization status");
-        setHasOptimizedData(false);
-      } finally {
-        setIsLoadingOptimized(false);
-      }
-    };
-
-    checkOptimizedData();
-  }, [originalIntersectionId]);
+    setHasOptimizedData(!!optimizedData);
+    if (optimizedData) {
+      setOptimizedIntersectionId(originalIntersectionId);
+    }
+  }, [optimizedData, originalIntersectionId]);
 
   // Update IDs if props change
   useEffect(() => {
@@ -279,60 +236,10 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     }
   };
 
-  const handleRefreshOptimizedData = async () => {
-    if (!originalIntersectionId) return;
-
-    setIsLoadingOptimized(true);
-    setOptimizedDataError(null);
-
-    try {
-      const authToken = localStorage.getItem("authToken");
-      if (!authToken) {
-        setOptimizedDataError("Authentication token not found");
-        return;
-      }
-
-      // Try to fetch optimized data
-      const response = await fetch(
-        `http://localhost:9090/intersections/${originalIntersectionId}/optimise`,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        },
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-
-        if (
-          data.output &&
-          data.output.vehicles &&
-          data.output.vehicles.length > 0
-        ) {
-          setHasOptimizedData(true);
-          setOptimizedIntersectionId(originalIntersectionId);
-          setOptimizedDataSuccess(
-            "Optimized data found! Loading simulation...",
-          );
-          setOptimizedDataError(null);
-
-          // Clear success message after 3 seconds
-          setTimeout(() => {
-            setOptimizedDataSuccess(null);
-          }, 3000);
-        } else {
-          setHasOptimizedData(false);
-          setOptimizedDataSuccess(null);
-        }
-      } else {
-        setHasOptimizedData(false);
-      }
-    } catch (error) {
-      console.error("Error refreshing optimized data:", error);
-      setOptimizedDataError("Failed to refresh optimization status");
-      setHasOptimizedData(false);
-    } finally {
-      setIsLoadingOptimized(false);
-    }
+  const handleRefreshOptimizedData = () => {
+    setOptimizedDataError(
+      "Refresh not available. Please go back and re-run the optimization.",
+    );
   };
 
   const getDynamicStyles = (side: "left" | "right") => {
@@ -533,6 +440,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
             scale={expanded === "left" ? 1.0 : 0.65}
             isExpanded={expanded === "left"}
             endpoint="simulate"
+            simulationData={simulationData}
           />
           <div style={labelStyle} className="comparison-label">
             {originalIntersectionName}
@@ -587,6 +495,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                 scale={expanded === "right" ? 1.0 : 0.65}
                 isExpanded={expanded === "right"}
                 endpoint="optimise"
+                simulationData={optimizedData}
               />
               <div style={labelStyle} className="comparison-label">
                 {optimizedIntersectionName}

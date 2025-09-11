@@ -506,6 +506,7 @@ interface TrafficSimulationProps {
   scale?: number;
   isExpanded: boolean;
   endpoint?: "simulate" | "optimise";
+  simulationData?: SimulationData | null;
 }
 
 // Hook to detect mobile screen size
@@ -531,6 +532,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
   scale,
   isExpanded,
   endpoint = "simulate",
+  simulationData: propSimulationData,
 }) => {
   const [simulationData, setSimulationData] = useState<SimulationData | null>(
     null,
@@ -558,6 +560,115 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
 
   // Fetch simulation data from API
   useEffect(() => {
+    const processData = (data: SimulationData) => {
+      if (!data) {
+        throw new Error("Invalid simulation data received");
+      }
+
+      // Process traffic lights if they exist
+      if (data.intersection.trafficLights) {
+        const directionToSignalIndices: { [key: string]: number[] } = {
+          North: [],
+          South: [],
+          East: [],
+          West: [],
+        };
+        const allConnectionIndices = new Set<number>();
+
+        data.intersection.connections.forEach((conn) => {
+          if (conn.from.indexOf(":") === -1) {
+            const direction = roadDirections[conn.from];
+            const signalIndex = parseInt(conn.tl, 10);
+            if (
+              direction &&
+              !directionToSignalIndices[direction].includes(signalIndex)
+            ) {
+              directionToSignalIndices[direction].push(signalIndex);
+            }
+            allConnectionIndices.add(signalIndex);
+          }
+        });
+
+        const maxSignalIndex = Math.max(...Array.from(allConnectionIndices));
+        const stateArrayLength =
+          maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
+        const newPhases: TrafficLightPhase[] = [];
+        const nsGreenDuration = 30;
+        const nsGreenState = Array(stateArrayLength).fill("r");
+        directionToSignalIndices["North"].forEach((index) => {
+          nsGreenState[index] = "G";
+        });
+        directionToSignalIndices["South"].forEach((index) => {
+          nsGreenState[index] = "G";
+        });
+        newPhases.push({
+          duration: nsGreenDuration,
+          state: nsGreenState.join(""),
+        });
+        const nsYellowDuration = 5;
+        const nsYellowState = Array(stateArrayLength).fill("r");
+        directionToSignalIndices["North"].forEach((index) => {
+          nsYellowState[index] = "y";
+        });
+        directionToSignalIndices["South"].forEach((index) => {
+          nsYellowState[index] = "y";
+        });
+        newPhases.push({
+          duration: nsYellowDuration,
+          state: nsYellowState.join(""),
+        });
+        const ewGreenDuration = 30;
+        const ewGreenState = Array(stateArrayLength).fill("r");
+        directionToSignalIndices["East"].forEach((index) => {
+          ewGreenState[index] = "G";
+        });
+        directionToSignalIndices["West"].forEach((index) => {
+          ewGreenState[index] = "G";
+        });
+        newPhases.push({
+          duration: ewGreenDuration,
+          state: ewGreenState.join(""),
+        });
+        const ewYellowDuration = 5;
+        const ewYellowState = Array(stateArrayLength).fill("r");
+        directionToSignalIndices["East"].forEach((index) => {
+          ewYellowState[index] = "y";
+        });
+        directionToSignalIndices["West"].forEach((index) => {
+          ewYellowState[index] = "y";
+        });
+        newPhases.push({
+          duration: ewYellowDuration,
+          state: ewYellowState.join(""),
+        });
+
+        const processedTrafficLights = data.intersection.trafficLights.map(
+          (light) => {
+            let time = 0;
+            const newStates = newPhases.map((phase) => {
+              const state = { time: time, state: phase.state };
+              time += phase.duration;
+              return state;
+            });
+            newStates.push({ time: time, state: newPhases[0].state });
+            return { ...light, phases: newPhases, states: newStates };
+          },
+        );
+
+        const newSimData = {
+          ...data,
+          intersection: {
+            ...data.intersection,
+            trafficLights: processedTrafficLights,
+          },
+        };
+        setSimulationData(newSimData);
+      } else {
+        setSimulationData(data);
+      }
+      setIsLoading(false);
+    };
+
     const fetchSimulationData = async () => {
       if (!intersectionId) {
         setError("No intersection ID provided");
@@ -598,112 +709,8 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           }
         }
 
-        const data: SimulationResponse = await response.json();
-
-        if (!data.output) {
-          throw new Error("Invalid simulation data received from server");
-        }
-
-        // Process traffic lights if they exist
-        if (data.output.intersection.trafficLights) {
-          const directionToSignalIndices: { [key: string]: number[] } = {
-            North: [],
-            South: [],
-            East: [],
-            West: [],
-          };
-          const allConnectionIndices = new Set<number>();
-
-          data.output.intersection.connections.forEach((conn) => {
-            if (conn.from.indexOf(":") === -1) {
-              const direction = roadDirections[conn.from];
-              const signalIndex = parseInt(conn.tl, 10);
-              if (
-                direction &&
-                !directionToSignalIndices[direction].includes(signalIndex)
-              ) {
-                directionToSignalIndices[direction].push(signalIndex);
-              }
-              allConnectionIndices.add(signalIndex);
-            }
-          });
-
-          const maxSignalIndex = Math.max(...Array.from(allConnectionIndices));
-          const stateArrayLength =
-            maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
-          const newPhases: TrafficLightPhase[] = [];
-          const nsGreenDuration = 30;
-          const nsGreenState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["North"].forEach((index) => {
-            nsGreenState[index] = "G";
-          });
-          directionToSignalIndices["South"].forEach((index) => {
-            nsGreenState[index] = "G";
-          });
-          newPhases.push({
-            duration: nsGreenDuration,
-            state: nsGreenState.join(""),
-          });
-          const nsYellowDuration = 5;
-          const nsYellowState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["North"].forEach((index) => {
-            nsYellowState[index] = "y";
-          });
-          directionToSignalIndices["South"].forEach((index) => {
-            nsYellowState[index] = "y";
-          });
-          newPhases.push({
-            duration: nsYellowDuration,
-            state: nsYellowState.join(""),
-          });
-          const ewGreenDuration = 30;
-          const ewGreenState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["East"].forEach((index) => {
-            ewGreenState[index] = "G";
-          });
-          directionToSignalIndices["West"].forEach((index) => {
-            ewGreenState[index] = "G";
-          });
-          newPhases.push({
-            duration: ewGreenDuration,
-            state: ewGreenState.join(""),
-          });
-          const ewYellowDuration = 5;
-          const ewYellowState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["East"].forEach((index) => {
-            ewYellowState[index] = "y";
-          });
-          directionToSignalIndices["West"].forEach((index) => {
-            ewYellowState[index] = "y";
-          });
-          newPhases.push({
-            duration: ewYellowDuration,
-            state: ewYellowState.join(""),
-          });
-
-          const processedTrafficLights =
-            data.output.intersection.trafficLights.map((light) => {
-              let time = 0;
-              const newStates = newPhases.map((phase) => {
-                const state = { time: time, state: phase.state };
-                time += phase.duration;
-                return state;
-              });
-              newStates.push({ time: time, state: newPhases[0].state });
-              return { ...light, phases: newPhases, states: newStates };
-            });
-
-          const newSimData = {
-            ...data.output,
-            intersection: {
-              ...data.output.intersection,
-              trafficLights: processedTrafficLights,
-            },
-          };
-          setSimulationData(newSimData);
-        } else {
-          setSimulationData(data.output);
-        }
+        const responseData: SimulationResponse = await response.json();
+        processData(responseData.output);
       } catch (error) {
         console.error("Error fetching simulation data:", error);
         setError(
@@ -711,13 +718,22 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
             ? error.message
             : "Failed to fetch simulation data",
         );
-      } finally {
         setIsLoading(false);
       }
     };
 
-    fetchSimulationData();
-  }, [intersectionId, roadDirections, endpoint]);
+    if (propSimulationData) {
+      try {
+        setIsLoading(true);
+        processData(propSimulationData);
+      } catch (e) {
+        setError("Failed to process provided simulation data.");
+        setIsLoading(false);
+      }
+    } else {
+      fetchSimulationData();
+    }
+  }, [intersectionId, roadDirections, endpoint, propSimulationData]);
 
   const metrics = useMemo(() => {
     if (!simulationData)

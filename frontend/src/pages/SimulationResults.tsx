@@ -890,6 +890,8 @@ const SimulationResults: React.FC = () => {
         state: {
           originalIntersectionId: intersectionId,
           originalIntersectionName: intersectionData?.name || "Simulation",
+          simulationData: simData,
+          optimizedData: optimizedData,
         },
       });
     } else {
