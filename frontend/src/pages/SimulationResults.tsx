@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 import "../styles/SimulationResults.css";
 import HelpMenu from "../components/HelpMenu";
 import { Chart, registerables } from "chart.js";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import type { ChartConfiguration } from "chart.js";
 
 Chart.register(...registerables);
@@ -314,8 +314,11 @@ const SimulationResults: React.FC = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const params = useParams();
   const { intersectionIds, name, description, type } = location.state || {};
-  const intersectionId = intersectionIds?.[0];
+
+  // Get intersectionId from URL params first, then fall back to location.state
+  const intersectionId = params.intersectionId || intersectionIds?.[0];
 
   const chartInstances = useRef<Chart[]>([]);
   const chartRefs = {

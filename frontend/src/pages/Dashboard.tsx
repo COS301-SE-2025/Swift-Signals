@@ -455,7 +455,7 @@ const Dashboard: React.FC = () => {
                   <thead>
                     <tr className="text-gray-600 dark:text-[#C9D1D9]">
                       <th className="p-2">#</th>
-                      <th className="p-2">Intersection</th>
+                      <th className="p-2">Location</th>
                       <th className="p-2">Status</th>
                       <th className="p-2">Actions</th>
                     </tr>

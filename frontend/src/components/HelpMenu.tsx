@@ -752,6 +752,27 @@ const HelpMenu: React.FC = () => {
 
       const data = await response.json();
 
+      // --- HANDLE NAVIGATION PAYLOAD ---
+      if (data.fulfillmentMessages) {
+        const navigationPayload = data.fulfillmentMessages.find(
+          (msg: any) => msg.payload && msg.payload.fields && msg.payload.fields.action
+        );
+
+        if (navigationPayload) {
+          const action = navigationPayload.payload.fields.action.stringValue;
+          const path = navigationPayload.payload.fields.path.stringValue;
+
+          if (action === 'NAVIGATE' && path) {
+            console.log(`%c✅ ACTION HANDLER PASSED: Navigating to [${path}]`,
+            "color: green; font-weight: bold;");
+            setTimeout(() => {
+              navigate(path);
+              setIsOpen(false); // Close the help menu on navigation
+            }, 1000); // Wait 1 second for the user to read the message
+          }
+        }
+      }
+
       let quickReplies: QuickReply[] = [];
       if (data.fulfillmentMessages) {
         const payload = data.fulfillmentMessages.find(

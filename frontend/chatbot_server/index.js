@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dialogflow = require("@google-cloud/dialogflow").v2beta1;
+const Fuse = require('fuse.js');
 const axios = require("axios");
 require("dotenv").config();
 
@@ -134,24 +135,20 @@ app.post("/api/chatbot", async (req, res) => {
       } else {
         try {
           console.log(`Attempting to get details for: ${intersectionIdentifier}`);
-          // First, get all intersections to find the matching one by name or ID
           const allIntersectionsResponse = await axios.get("http://api-gateway:9090/intersections", {
             headers: { Authorization: `Bearer ${token}` },
           });
           const allIntersections = allIntersectionsResponse.data.intersections;
 
-          let targetIntersection = null;
-          // Try to find by ID first (assuming ID is a string)
-          targetIntersection = allIntersections.find(
-            (int) => int.id === intersectionIdentifier
-          );
+          // Fuzzy search with Fuse.js
+          const fuse = new Fuse(allIntersections, {
+            keys: ['name', 'id'],
+            includeScore: true,
+            threshold: 0.4, // Adjust this for more or less strict matching
+          });
 
-          // If not found by ID, try to find by name (case-insensitive)
-          if (!targetIntersection) {
-            targetIntersection = allIntersections.find(
-              (int) => int.name.toLowerCase() === intersectionIdentifier.toLowerCase()
-            );
-          }
+          const searchResult = fuse.search(intersectionIdentifier);
+          const targetIntersection = searchResult.length > 0 ? searchResult[0].item : null;
 
           if (targetIntersection) {
             let fulfillmentText = `--- Details for ${targetIntersection.name} ---
@@ -197,6 +194,69 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
         } catch (apiError) {
           console.error("❌ API Gateway Error on Get_Intersection_Details:", apiError.message);
           result.fulfillmentText = "I encountered an error while trying to retrieve the intersection details. Please try again later.";
+        }
+      }
+    }
+
+    // --- NEW LOGIC FOR Run_Simulation ---
+    if (result.intent && result.intent.displayName === "Run_Simulation") {
+      console.log("✅ Matched intent: Run_Simulation");
+      const intersectionIdentifier = result.parameters.fields.intersection_identifier.stringValue;
+
+      if (!token) {
+        result.fulfillmentText = "I can't run a simulation without knowing who you are. Please make sure you are logged in.";
+      } else if (!intersectionIdentifier) {
+        result.fulfillmentText = "Which intersection do you want to simulate? Please provide its name or ID.";
+      } else {
+        try {
+          console.log(`Attempting to run simulation for: ${intersectionIdentifier}`);
+          
+          const allIntersectionsResponse = await axios.get("http://api-gateway:9090/intersections", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const allIntersections = allIntersectionsResponse.data.intersections;
+
+          // Fuzzy search with Fuse.js
+          const fuse = new Fuse(allIntersections, {
+            keys: ['name', 'id'],
+            includeScore: true,
+            threshold: 0.4, // Adjust this for more or less strict matching
+          });
+
+          const searchResult = fuse.search(intersectionIdentifier);
+          const targetIntersection = searchResult.length > 0 ? searchResult[0].item : null;
+
+          if (targetIntersection) {
+            console.log(`Found intersection with ID: ${targetIntersection.id}. Triggering simulation.`);
+            
+            // The server's job is just to tell the frontend where to go.
+            // The frontend will be responsible for fetching the simulation data.
+            result.fulfillmentText = `Okay, navigating to the simulation results for ${targetIntersection.name}.`;
+            
+            // --- ADD CUSTOM PAYLOAD FOR NAVIGATION ---
+            result.fulfillmentMessages = [
+              {
+                platform: "PLATFORM_UNSPECIFIED",
+                payload: {
+                  fields: {
+                    action: { stringValue: "NAVIGATE" },
+                    path: { stringValue: `/simulation-results/${targetIntersection.id}` }
+                  }
+                }
+              },
+              {
+                text: {
+                  text: [result.fulfillmentText]
+                }
+              }
+            ];
+
+          } else {
+            result.fulfillmentText = `I couldn't find an intersection named or with ID '${intersectionIdentifier}'. Please check the name and try again.`;
+          }
+        } catch (apiError) {
+          console.error("❌ API Gateway Error on Run_Simulation:", apiError.message);
+          result.fulfillmentText = "I encountered an error while trying to run the simulation. The simulation service may be offline. Please try again later.";
         }
       }
     }
