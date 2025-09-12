@@ -14,12 +14,12 @@
         "status": 0,
         "run_count": 0,
         "simulation_parameters": {
-            "Intersection Type": 1,
+            "intersection_type": 1,
             "Green": 30,
             "Yellow": 5,
             "Red": 35,
             "Speed": 60,
-            "seed": 1408
+            "Seed": 1408
         }, 
         "simulation_results": {
             "$oid": "34d45aba0b1a4b70b8fea92d"
