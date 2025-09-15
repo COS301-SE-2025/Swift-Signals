@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -40,3 +41,48 @@ spec:
             name: chatbot-server
             port:
               number: 3001
+||||||| parent of 933a840e (Add ingress for manifests)
+=======
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: swift-signals-ingress
+  namespace: swift-signals
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: swift-signals.local  # Change this to your domain
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend
+            port:
+              number: 80
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api-gateway
+            port:
+              number: 9090
+      - path: /chatbot
+        pathType: Prefix
+        backend:
+          service:
+            name: chatbot-server
+            port:
+              number: 3001
+>>>>>>> 933a840e (Add ingress for manifests)
