@@ -63,3 +63,4 @@ spec:
     targetPort: 50052
     protocol: TCP
   type: ClusterIP
+
