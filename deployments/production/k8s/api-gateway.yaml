@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: api-gateway
-        image: myregistry/swift-signals/api-gateway:latest
+        image: insideinsights/repo:api-gateway-1.0.0
         ports:
         - containerPort: 9090
         env:

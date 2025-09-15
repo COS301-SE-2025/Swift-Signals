@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: user-service
-        image: myregistry/swift-signals/user-service:latest
+        image: insideinsights/repo:user-1.0.0
         ports:
         - containerPort: 50051
         env:

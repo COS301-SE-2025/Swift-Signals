@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: simulation-service
-        image: myregistry/swift-signals/simulation-service:latest
+        image: insideinsights/repo:simulation-1.0.0
         ports:
         - containerPort: 50053
         env:

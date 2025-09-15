@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: myregistry/swift-signals/frontend:latest
+        image: insideinsights/repo:frontend-1.0.0
         ports:
         - containerPort: 80
         readinessProbe:

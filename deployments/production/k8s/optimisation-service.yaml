@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: optimisation-service
-        image: myregistry/swift-signals/optimisation-service:latest
+        image: insideinsights/repo:optimisation-1.0.0
         ports:
         - containerPort: 50054
         env:

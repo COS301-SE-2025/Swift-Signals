@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: chatbot-server
-        image: myregistry/swift-signals/chatbot-server:latest
+        image: insideinsights/repo:chatbot-1.0.0
         ports:
         - containerPort: 3001
         env:
