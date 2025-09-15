@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: simulation-service
+  namespace: swift-signals
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: simulation-service
+  template:
+    metadata:
+      labels:
+        app: simulation-service
+    spec:
+      containers:
+      - name: simulation-service
+        image: myregistry/swift-signals/simulation-service:latest
+        ports:
+        - containerPort: 50053
+        env:
+        - name: APP_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: swift-signals-config
+              key: SIMULATION_APP_PORT
+        readinessProbe:
+          tcpSocket:
+            port: 50053
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 50053
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: simulation-service
+  namespace: swift-signals
+spec:
+  selector:
+    app: simulation-service
+  ports:
+  - port: 50053
+    targetPort: 50053
+    protocol: TCP
+  type: ClusterIP
