@@ -1,11 +1,9 @@
-FROM golang:1.24.6-alpine
+FROM golang:1.24.6-alpine AS build
 
-# Install tools
 RUN apk add --no-cache protobuf protobuf-dev && \
     rm -rf /var/cache/apk/* && \
     go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
-    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest && \
-    go install github.com/vektra/mockery/v2@latest
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
 WORKDIR /app
 COPY protos/ protos/
@@ -22,12 +20,19 @@ RUN mkdir -p /app/protos/gen/intersection/ && \
 WORKDIR /app
 COPY shared/ shared/
 COPY intersection-service/ intersection-service/
+RUN find . -name "test" -type d -exec rm -rf {} + || true
 
 WORKDIR /app/intersection-service/
-RUN mockery && \
-    go mod tidy && \
+RUN go mod tidy && \
     go mod download
 
-WORKDIR cmd/
-RUN go build -o main 
-CMD ["./main"]
+WORKDIR /app/intersection-service/cmd/
+RUN go build -o main .
+
+FROM alpine:edge
+
+WORKDIR /app
+
+COPY --from=build /app/intersection-service/cmd/main .
+
+ENTRYPOINT ["/app/main"]
