@@ -4,7 +4,7 @@ metadata:
   name: chatbot-server
   namespace: swift-signals
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: chatbot-server
@@ -13,6 +13,8 @@ spec:
       labels:
         app: chatbot-server
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: chatbot-server
         image: insideinsights/repo:chatbot-1.0.0
@@ -39,18 +41,6 @@ spec:
             configMapKeyRef:
               name: swift-signals-config
               key: CHATBOT_PORT
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 3001
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3001
-          initialDelaySeconds: 15
-          periodSeconds: 10
         resources:
           requests:
             memory: "256Mi"

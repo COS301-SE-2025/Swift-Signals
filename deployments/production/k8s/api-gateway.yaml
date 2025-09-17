@@ -4,7 +4,7 @@ metadata:
   name: api-gateway
   namespace: swift-signals
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: api-gateway
@@ -13,6 +13,8 @@ spec:
       labels:
         app: api-gateway
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: api-gateway
         image: insideinsights/repo:api-gateway-1.0.0
@@ -44,18 +46,6 @@ spec:
             configMapKeyRef:
               name: swift-signals-config
               key: OPTI_GRPC_ADDR
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 9090
-          initialDelaySeconds: 10
-          periodSeconds: 5
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 9090
-          initialDelaySeconds: 15
-          periodSeconds: 10
         resources:
           requests:
             memory: "256Mi"

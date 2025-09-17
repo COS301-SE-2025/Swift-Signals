@@ -4,7 +4,7 @@ metadata:
   name: intersection-service
   namespace: swift-signals
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: intersection-service
@@ -13,9 +13,11 @@ spec:
       labels:
         app: intersection-service
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: intersection-service
-        image: myregistry/swift-signals/intersection-service:latest
+        image: insideinsights/repo:intersection-1.0.0
         ports:
         - containerPort: 50052
         env:

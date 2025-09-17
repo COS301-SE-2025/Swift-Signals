@@ -4,7 +4,7 @@ metadata:
   name: optimisation-service
   namespace: swift-signals
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: optimisation-service
@@ -13,6 +13,8 @@ spec:
       labels:
         app: optimisation-service
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: optimisation-service
         image: insideinsights/repo:optimisation-1.0.0

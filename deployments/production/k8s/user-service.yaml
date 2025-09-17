@@ -4,7 +4,7 @@ metadata:
   name: user-service
   namespace: swift-signals
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: user-service
@@ -13,6 +13,8 @@ spec:
       labels:
         app: user-service
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: user-service
         image: insideinsights/repo:user-1.0.0

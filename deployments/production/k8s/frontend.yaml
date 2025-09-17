@@ -4,7 +4,7 @@ metadata:
   name: frontend
   namespace: swift-signals
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: frontend
@@ -13,6 +13,8 @@ spec:
       labels:
         app: frontend
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: frontend
         image: insideinsights/repo:frontend-1.0.0

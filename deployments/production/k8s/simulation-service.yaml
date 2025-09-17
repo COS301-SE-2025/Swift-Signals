@@ -4,7 +4,7 @@ metadata:
   name: simulation-service
   namespace: swift-signals
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: simulation-service
@@ -13,6 +13,8 @@ spec:
       labels:
         app: simulation-service
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - name: simulation-service
         image: insideinsights/repo:simulation-1.0.0

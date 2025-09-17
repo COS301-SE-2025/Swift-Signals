@@ -4,14 +4,14 @@ metadata:
   name: swift-signals-config
   namespace: swift-signals
 data:
-  DB_HOST: "192.000.0.000" # Replace with external VM IP 
+  DB_HOST: "localhost" # Replace with external VM IP 
   DB_PORT: "5432"
   DB_USER: "user_service"
   DB_NAME: "user_service_db"
   USER_APP_PORT: "50051"
   
   INTERSECTION_APP_PORT: "50052"
-  MONGO_URI: "mongodb://192.000.0.000:27017"  # Replace with external VM IP
+  MONGO_URI: "mongodb://localhost:27017"  # Replace with external VM IP
   
   SIMULATION_APP_PORT: "50053"
   
