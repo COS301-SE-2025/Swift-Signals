@@ -1,39 +1,44 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: simulation-service
+  name: optimisation-service
   namespace: swift-signals
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: simulation-service
+      app: optimisation-service
   template:
     metadata:
       labels:
-        app: simulation-service
+        app: optimisation-service
     spec:
       imagePullSecrets:
       - name: regcred
       containers:
-      - name: simulation-service
-        image: insideinsights/repo:simulation-1.0.0
+      - name: optimisation-service
+        image: insideinsights/repo:optimisation-1.0.0
         ports:
-        - containerPort: 50053
+        - containerPort: 50054
         env:
         - name: APP_PORT
           valueFrom:
             configMapKeyRef:
               name: swift-signals-config
-              key: SIMULATION_APP_PORT
+              key: OPTIMISATION_APP_PORT
+        - name: SIMU_GRPC_ADDR
+          valueFrom:
+            configMapKeyRef:
+              name: swift-signals-config
+              key: SIMU_GRPC_ADDR
         readinessProbe:
           tcpSocket:
-            port: 50053
+            port: 50054
           initialDelaySeconds: 10
           periodSeconds: 5
         livenessProbe:
           tcpSocket:
-            port: 50053
+            port: 50054
           initialDelaySeconds: 15
           periodSeconds: 10
         resources:
@@ -48,13 +53,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: simulation-service
+  name: optimisation-service
   namespace: swift-signals
 spec:
   selector:
-    app: simulation-service
+    app: optimisation-service
   ports:
-  - port: 50053
-    targetPort: 50053
+  - port: 50054
+    targetPort: 50054
     protocol: TCP
   type: ClusterIP
+
