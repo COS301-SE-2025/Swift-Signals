@@ -2000,14 +2000,19 @@ const Simulations: React.FC = () => {
     });
 
     //  UPDATED: Mapped API data to the new SimulationData structure
-    const allSims = sortedIntersections.map((intersection, index) => ({
-      id: index + 1,
-      backendId: intersection.id,
-      intersection: intersection.details?.address || intersection.name,
-      trafficDensity: formatTrafficDensity(intersection.traffic_density),
-      speed: intersection.default_parameters?.simulation_parameters?.speed || 0,
-      status: mapApiStatus(intersection.status),
-    }));
+    const allSims = sortedIntersections.map((intersection, index) => {
+      const displayName = (intersection.name || "Unnamed Intersection").split(' [')[0];
+      const displayAddress = (intersection.details?.address || displayName).split(',')[0];
+
+      return {
+        id: index + 1,
+        backendId: intersection.id,
+        intersection: displayAddress,
+        trafficDensity: formatTrafficDensity(intersection.traffic_density),
+        speed: intersection.default_parameters?.simulation_parameters?.speed || 0,
+        status: mapApiStatus(intersection.status),
+      }
+    });
 
     //  UPDATED: Filter optimizations based on actual "optimised" status
     const opts = allSims.filter((sim) => sim.status === "Optimised");

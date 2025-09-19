@@ -24,6 +24,8 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
   onEdit,
   onDelete,
 }) => {
+  const displayName = name.split(' [')[0];
+  const displayLocation = location.split(',')[0];
   return (
     <div className="intersectionCard bg-white p-8 rounded-2xl shadow-lg flex justify-between items-center">
       <div className="flex items-center space-x-8">
@@ -37,13 +39,13 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
 
         <div>
           <h3 className="intersectionName text-3xl font-extrabold text-black dark:text-[#E6EDF3] mb-2">
-            {name}
+            {displayName}
           </h3>
           {/* <p className="intersectionID text-xl text-gray-700 dark:text-[#8B949E]">
             ID: {id}
           </p> */}
           <p className="intersectionLocation text-xl text-gray-700 dark:text-[#8B949E]">
-            Location: {location}
+            Location: {displayLocation}
           </p>
           <p className="intersectionLanes text-xl text-gray-700 dark:text-[#8B949E]">
             Type: {lanes}

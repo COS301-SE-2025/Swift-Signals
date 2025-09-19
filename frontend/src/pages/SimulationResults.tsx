@@ -951,13 +951,13 @@ const SimulationResults: React.FC = () => {
           0,
         ),
       }
-    : { numPhases: 0, totalCycle: 0 };
+    : { numPhases: undefined, totalCycle: undefined };
 
+  // Define trafficDensityLabel from intersectionData
   const trafficDensityLabel =
     intersectionData?.traffic_density
-      .replace("TRAFFIC_DENSITY_", "")
-      .replace("_", " ")
-      .toLowerCase() || "N/A";
+      ? intersectionData.traffic_density.replace(/_/g, " ").toLowerCase()
+      : "unknown";
 
   return (
     <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">

@@ -102,7 +102,7 @@ type IntersectionWithDistance = Intersection & {
 // =================================================================
 
 const LocationMarker: React.FC<{
-  setSelectedLocation: (location: { address: string; city: string; province: string; }) => void;
+  setSelectedLocation: (location: { address: string; city: string; province: string; lat: number; lng: number; }) => void;
   setCoordinates: (coords: string) => void;
   setIsSnapping?: (snapping: boolean) => void;
 }> = ({ setSelectedLocation, setCoordinates, setIsSnapping }) => {
@@ -273,7 +273,9 @@ const LocationMarker: React.FC<{
           const newAddress = { 
               address: nearestIntersection.address,
               city: nearestIntersection.city,
-              province: nearestIntersection.province
+              province: nearestIntersection.province,
+              lat: nearestIntersection.lat,
+              lng: nearestIntersection.lon
             };
           setSelectedLocation(newAddress);
           setSnappedAddress(newAddress);
@@ -291,7 +293,7 @@ const LocationMarker: React.FC<{
           const coordinates = `${e.latlng.lat.toFixed(
             6,
           )}, ${e.latlng.lng.toFixed(6)}`;
-          setSelectedLocation({ address: coordinates, city: '', province: '' });
+          setSelectedLocation({ address: coordinates, city: '', province: '', lat: e.latlng.lat, lng: e.latlng.lng });
           setCoordinates(coordinates);
 
           console.log("No intersection found, using clicked coordinates");
@@ -301,7 +303,7 @@ const LocationMarker: React.FC<{
         const coordinates = `${e.latlng.lat.toFixed(
           6,
         )}, ${e.latlng.lng.toFixed(6)}`;
-        setSelectedLocation({ address: coordinates, city: '', province: '' });
+        setSelectedLocation({ address: coordinates, city: '', province: '', lat: e.latlng.lat, lng: e.latlng.lng });
         setCoordinates(coordinates);
       }
     },
@@ -526,22 +528,28 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
     });
   };
 
-  const handleMapSelection = (location: { address: string; city: string; province: string; }) => {
+  const handleMapSelection = (location: { address: string; city: string; province: string; lat: number; lng: number; }) => {
     setFormData((prev) => ({
       ...prev,
       name: location.address,
       details: { 
           ...prev.details, 
-          address: location.address,
+          address: `${location.address}, ${location.city}, ${location.province}`,
           city: location.city,
-          province: location.province
+          province: location.province,
+          latitude: location.lat,
+          longitude: location.lng
         },
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    const newFormData = { ...formData };
+    if (newFormData.details.latitude && newFormData.details.longitude) {
+      newFormData.name = `${newFormData.name} [${newFormData.details.latitude},${newFormData.details.longitude}]`;
+    }
+    onSubmit(newFormData);
   };
 
   const inputClasses =

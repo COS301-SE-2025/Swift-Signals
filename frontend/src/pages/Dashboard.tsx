@@ -263,19 +263,30 @@ const Dashboard: React.FC = () => {
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");
       const data = await response.json();
-      const intersectionsWithCoords: Intersection[] = (
-        data.intersections || []
-      ).map((intr: ApiIntersection, idx: number) => ({
-        id: String(intr.id),
-        name: intr.name ?? "Unnamed",
-        details: {
-          address: intr.details?.address ?? "",
-          city: intr.details?.city ?? "",
-          province: intr.details?.province ?? "",
-          latitude: intr.details?.latitude ?? -25.7479 + 0.01 * idx,
-          longitude: intr.details?.longitude ?? 28.2293 + 0.01 * idx,
-        },
-      }));
+
+      const intersectionsWithCoords = (data.intersections || [])
+        .map((intr: ApiIntersection) => {
+          const name = intr.name ?? "";
+          const match = name.match(/\[(-?\d+\.?\d*),(-?\d+\.?\d*)\]/);
+          if (match) {
+            const lat = parseFloat(match[1]);
+            const lng = parseFloat(match[2]);
+            return {
+              id: String(intr.id),
+              name: name.split(" [")[0],
+              details: {
+                address: intr.details?.address ?? "",
+                city: intr.details?.city ?? "",
+                province: intr.details?.province ?? "",
+                latitude: lat,
+                longitude: lng,
+              },
+            };
+          }
+          return null;
+        })
+        .filter((intr): intr is Intersection => intr !== null);
+
       setMapIntersections(intersectionsWithCoords);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
@@ -326,6 +337,18 @@ const Dashboard: React.FC = () => {
     fetchMapIntersections();
   };
   const handleCloseMapModal = () => setIsMapModalOpen(false);
+
+  const handleSimulateFromMap = (id: string, name: string) => {
+    navigate("/simulation-results", {
+      state: {
+        name: `Simulation Results for ${name}`,
+        description: `Viewing simulation results for ${name}`,
+        intersections: [name],
+        intersectionIds: [id],
+        type: "simulations",
+      },
+    });
+  };
 
   const handleViewDetails = (intersection: ApiIntersection) => {
     navigate("/simulation-results", {
@@ -501,9 +524,7 @@ const Dashboard: React.FC = () => {
                               {index + 1}
                             </td>
                             <td className="p-2 text-gray-700 dark:text-[#F0F6FC]">
-                              {intr.details?.address ||
-                                intr.name ||
-                                "Unnamed Intersection"}
+                              {(intr.details?.address || intr.name || "Unnamed Intersection").split(',')[0]}
                             </td>
                             <td className="p-2">
                               <span
@@ -584,12 +605,13 @@ const Dashboard: React.FC = () => {
                 {!loadingRecent && !recentError && (
                   <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                     {recentIntersections.map((intr) => {
+                      const displayName = (intr.name || "Unnamed Intersection").split(' [')[0];
                       const address =
-                        intr.details?.address ||
+                        (intr.details?.address ||
                         [intr.details?.city, intr.details?.province]
                           .filter(Boolean)
                           .join(", ") ||
-                        "No address provided";
+                        "No address provided").split(',')[0];
 
                       const displayStatus = mapApiStatus(intr.status);
                       const styles = getStatusStyles(displayStatus);
@@ -616,7 +638,7 @@ const Dashboard: React.FC = () => {
                               </div>
                               <div className="min-w-0">
                                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-                                  {intr.name || "Unnamed Intersection"}
+                                  {displayName}
                                 </p>
                                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                                   {address}
@@ -667,6 +689,7 @@ const Dashboard: React.FC = () => {
         isOpen={isMapModalOpen}
         onClose={handleCloseMapModal}
         intersections={mapIntersections}
+        onSimulate={handleSimulateFromMap}
       />
       {isLoadingMap && isMapModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">
