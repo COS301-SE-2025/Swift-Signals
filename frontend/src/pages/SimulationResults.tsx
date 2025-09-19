@@ -317,6 +317,9 @@ const SimulationResults: React.FC = () => {
   const params = useParams();
   const { intersectionIds, name, description, type } = location.state || {};
 
+  console.log("name from location.state:", name);
+  console.log("intersectionData?.name:", intersectionData?.name);
+
   // Get intersectionId from URL params first, then fall back to location.state
   const intersectionId = params.intersectionId || intersectionIds?.[0];
 
@@ -959,6 +962,28 @@ const SimulationResults: React.FC = () => {
       ? intersectionData.traffic_density.replace(/_/g, " ").toLowerCase()
       : "unknown";
 
+  // Helper function to extract street name from a string that might contain coordinates
+  const getStreetName = (fullName: string | undefined | null): string => {
+    if (!fullName) return "Simulation Results";
+    // Remove 'Simulation Results for ' prefix
+    let cleanedName = fullName.replace(/^Simulation Results for\s*/, "");
+    // Remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
+    cleanedName = cleanedName.replace(/\s*\[[^\]]*\]$/, "");
+    return cleanedName.trim();
+  };
+
+  const displayedName = getStreetName(name || intersectionData?.name);
+
+  // Helper function to clean the description string
+  const cleanDescription = (desc: string | undefined | null): string | undefined => {
+    if (!desc) return undefined;
+    // Only remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
+    const cleanedDesc = desc.replace(/\s*\[[^\]]*\]$/, "");
+    return cleanedDesc.trim();
+  };
+
+  const displayedDescription = cleanDescription(description);
+
   return (
     <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
       <Navbar />
@@ -967,11 +992,11 @@ const SimulationResults: React.FC = () => {
           <div className="mb-10 flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
             <div className="flex-1 text-left">
               <h1 className="simName text-4xl font-extrabold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-2 text-left">
-                {name || intersectionData?.name || "Simulation Results"}
+                {displayedName}
               </h1>
-              {description && (
+              {displayedDescription && (
                 <p className="simDesc text-lg text-gray-400 mb-4 leading-relaxed text-left">
-                  {description}
+                  {displayedDescription}
                 </p>
               )}
             </div>
