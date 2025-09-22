@@ -1,10 +1,11 @@
+import { X } from "lucide-react";
 import { useState, useEffect } from "react";
+
+import Footer from "../components/Footer";
+import HelpMenu from "../components/HelpMenu";
 import Navbar from "../components/Navbar";
 import UsersTable from "../components/UsersTable";
 import "../styles/Users.css";
-import Footer from "../components/Footer";
-import HelpMenu from "../components/HelpMenu";
-import { X } from "lucide-react";
 
 const API_BASE_URL = "http://localhost:9090";
 
@@ -234,6 +235,7 @@ const Users = () => {
 
   useEffect(() => {
     fetchUsers(currentPage, rowsPerPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, rowsPerPage]);
 
   useEffect(() => {

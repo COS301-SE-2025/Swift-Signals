@@ -1,14 +1,14 @@
+import { Chart, registerables } from "chart.js";
+import { useState } from "react";
 import React, { useEffect, useRef } from "react";
+import { FaRoad, FaPlay, FaChartLine, FaPlus, FaMap } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
-import "../styles/Dashboard.css";
-import { Chart, registerables } from "chart.js";
 import MapModal from "../components/MapModal";
-import { useState } from "react";
-
-import { FaRoad, FaPlay, FaChartLine, FaPlus, FaMap } from "react-icons/fa";
+import Navbar from "../components/Navbar";
+import "../styles/Dashboard.css";
 
 Chart.register(...registerables);
 
@@ -59,7 +59,8 @@ const Dashboard: React.FC = () => {
 
   const [totalIntersections, setTotalIntersections] = useState<number>(0);
   const [loadingTotal, setLoadingTotal] = useState(false);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [activeSimulations, setActiveSimulations] = useState<number>(0);
   const [loadingActiveSimulations, setLoadingActiveSimulations] =
     useState(false);
   const [totalSimulationsRun, setTotalSimulationsRun] = useState<number>(0);
@@ -82,9 +83,8 @@ const Dashboard: React.FC = () => {
       let totalSims = 0;
       let totalOptimizations = 0;
 
-      items.forEach((item) => {
-        const runCount =
-          typeof item.run_count === "number" ? item.run_count : 0;
+      items.forEach(item => {
+        const runCount = typeof item.run_count === "number" ? item.run_count : 0;
         totalSims += runCount;
 
         if (item.status === "INTERSECTION_STATUS_OPTIMISED") {
@@ -97,6 +97,7 @@ const Dashboard: React.FC = () => {
 
       updateChart(items);
     } catch (err: unknown) {
+      // eslint-disable-next-line no-console
       console.error("Failed to fetch intersections:", err);
       setTotalIntersections(0);
       setTotalSimulationsRun(0); // Reset on error
@@ -234,6 +235,7 @@ const Dashboard: React.FC = () => {
       const mappedValue = densityMap[density] || 2; // Default to medium (2) if density is unknown
 
       // Debug logging
+      // eslint-disable-next-line no-console
       console.log(
         `Intersection: ${intersection.name}, Raw density: ${density}, Mapped value: ${mappedValue}`,
       );
@@ -244,7 +246,9 @@ const Dashboard: React.FC = () => {
     // Create labels for the x-axis (intersection numbers)
     const labels = intersections.map((_, index) => `Intersection ${index + 1}`);
 
+    // eslint-disable-next-line no-console
     console.log("Final density data:", densityData);
+    // eslint-disable-next-line no-console
     console.log("Final labels:", labels);
 
     return { labels, data: densityData };
@@ -252,6 +256,7 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchAllIntersections();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchMapIntersections = async () => {
@@ -525,13 +530,7 @@ const Dashboard: React.FC = () => {
                               {index + 1}
                             </td>
                             <td className="p-2 text-gray-700 dark:text-[#F0F6FC]">
-                              {
-                                (
-                                  intr.details?.address ||
-                                  intr.name ||
-                                  "Unnamed Intersection"
-                                ).split(",")[0]
-                              }
+                              {(intr.details?.address || intr.name || "Unnamed Intersection").split(',')[0]}
                             </td>
                             <td className="p-2">
                               <span
@@ -612,16 +611,13 @@ const Dashboard: React.FC = () => {
                 {!loadingRecent && !recentError && (
                   <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                     {recentIntersections.map((intr) => {
-                      const displayName = (
-                        intr.name || "Unnamed Intersection"
-                      ).split(" [")[0];
-                      const address = (
-                        intr.details?.address ||
+                      const displayName = (intr.name || "Unnamed Intersection").split(' [')[0];
+                      const address =
+                        (intr.details?.address ||
                         [intr.details?.city, intr.details?.province]
                           .filter(Boolean)
                           .join(", ") ||
-                        "No address provided"
-                      ).split(",")[0];
+                        "No address provided").split(',')[0];
 
                       const displayStatus = mapApiStatus(intr.status);
                       const styles = getStatusStyles(displayStatus);

@@ -429,8 +429,7 @@
 }
 
 @keyframes pulse-width {
-  0%,
-  100% {
+  0%, 100% {
     width: 0%;
   }
   50% {

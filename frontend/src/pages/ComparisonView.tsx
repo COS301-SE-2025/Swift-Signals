@@ -1,60 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+
 import TrafficSimulation from "./TrafficSimulation";
 import HelpMenu from "../components/HelpMenu";
 
 // Define SimulationData interface to match the structure from TrafficSimulation.tsx
-interface Node {
-  id: string;
-  x: number;
-  y: number;
-  type: string;
-}
-interface Edge {
-  id: string;
-  from: string;
-  to: string;
-  speed: number;
-  lanes: number;
-}
-interface Position {
-  time: number;
-  x: number;
-  y: number;
-  speed: number;
-}
-interface VehicleData {
-  id: string;
-  positions: Position[];
-}
-interface TrafficLightPhase {
-  duration: number;
-  state: string;
-}
-interface TrafficLightState {
-  time: number;
-  state: string;
-}
-interface TrafficLightData {
-  id: string;
-  phases: TrafficLightPhase[];
-  states?: TrafficLightState[];
-}
-interface Connection {
-  from: string;
-  to: string;
-  fromLane: number;
-  toLane: number;
-  tl: string;
-}
 interface SimulationData {
   intersection: {
-    nodes: Node[];
-    edges: Edge[];
-    trafficLights?: TrafficLightData[];
-    connections: Connection[];
+    nodes: any[];
+    edges: any[];
+    trafficLights?: any[];
+    connections: any[];
   };
-  vehicles: VehicleData[];
+  vehicles: any[];
 }
 
 interface ComparisonViewProps {
@@ -91,13 +49,18 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   );
   const [optimizedIntersectionName] = useState<string>("Optimized Simulation");
   const [expanded, setExpanded] = useState<"none" | "left" | "right">("none");
-  const [hasOptimizedData, setHasOptimizedData] =
-    useState<boolean>(!!optimizedData);
-  const [isLoadingOptimized] = useState<boolean>(false);
+  const [hasOptimizedData, setHasOptimizedData] = useState<boolean>(
+    !!optimizedData,
+  );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isLoadingOptimized, setIsLoadingOptimized] = useState<boolean>(false);
   const [optimizedDataError, setOptimizedDataError] = useState<string | null>(
     null,
   );
-  const [optimizedDataSuccess] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [optimizedDataSuccess, setOptimizedDataSuccess] = useState<
+    string | null
+  >(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -206,13 +169,12 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     position: "absolute",
     top: "24px",
     zIndex: 10,
-    background: isDarkMode
-      ? "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)"
-      : "linear-gradient(135deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.05) 100%)",
+    background:
+      isDarkMode
+        ? "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)"
+        : "linear-gradient(135deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.05) 100%)",
     backdropFilter: "blur(16px)",
-    border: isDarkMode
-      ? "1px solid rgba(255,255,255,0.18)"
-      : "1px solid rgba(0,0,0,0.1)",
+    border: isDarkMode ? "1px solid rgba(255,255,255,0.18)" : "1px solid rgba(0,0,0,0.1)",
     borderRadius: "16px",
     padding: "12px 20px",
     cursor: "pointer",
@@ -223,24 +185,19 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    boxShadow: isDarkMode
-      ? "0 8px 32px rgba(0,0,0,0.3)"
-      : "0 8px 32px rgba(0,0,0,0.1)",
+    boxShadow: isDarkMode ? "0 8px 32px rgba(0,0,0,0.3)" : "0 8px 32px rgba(0,0,0,0.1)",
     minWidth: "140px",
     justifyContent: "center",
   };
 
   const buttonHoverStyle: React.CSSProperties = {
-    background: isDarkMode
-      ? "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.15) 100%)"
-      : "linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 100%)",
+    background:
+      isDarkMode
+        ? "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.15) 100%)"
+        : "linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 100%)",
     transform: "translateY(-2px)",
-    boxShadow: isDarkMode
-      ? "0 12px 40px rgba(0,0,0,0.4)"
-      : "0 12px 40px rgba(0,0,0,0.2)",
-    border: isDarkMode
-      ? "1px solid rgba(255,255,255,0.3)"
-      : "1px solid rgba(0,0,0,0.2)",
+    boxShadow: isDarkMode ? "0 12px 40px rgba(0,0,0,0.4)" : "0 12px 40px rgba(0,0,0,0.2)",
+    border: isDarkMode ? "1px solid rgba(255,255,255,0.3)" : "1px solid rgba(0,0,0,0.2)",
   };
 
   const iconStyle: React.CSSProperties = {
@@ -254,9 +211,10 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     left: "50%",
     transform: "translateX(-50%)",
     zIndex: 1001,
-    background: isDarkMode
-      ? "linear-gradient(135deg, rgba(220,38,38,0.9) 0%, rgba(185,28,28,0.8) 100%)"
-      : "linear-gradient(135deg, rgba(255,100,100,0.9) 0%, rgba(230,80,80,0.8) 100%)",
+    background:
+      isDarkMode
+        ? "linear-gradient(135deg, rgba(220,38,38,0.9) 0%, rgba(185,28,28,0.8) 100%)"
+        : "linear-gradient(135deg, rgba(255,100,100,0.9) 0%, rgba(230,80,80,0.8) 100%)",
     backdropFilter: "blur(16px)",
     border: "1px solid rgba(255,255,255,0.18)",
     borderRadius: "16px",
@@ -269,21 +227,18 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    boxShadow: isDarkMode
-      ? "0 8px 32px rgba(220,38,38,0.3)"
-      : "0 8px 32px rgba(220,38,38,0.2)",
+    boxShadow: isDarkMode ? "0 8px 32px rgba(220,38,38,0.3)" : "0 8px 32px rgba(220,38,38,0.2)",
     minWidth: "120px",
     justifyContent: "center",
   };
 
   const exitButtonHoverStyle: React.CSSProperties = {
-    background: isDarkMode
-      ? "linear-gradient(135deg, rgba(239,68,68,0.95) 0%, rgba(220,38,38,0.9) 100%)"
-      : "linear-gradient(135deg, rgba(255,120,120,0.95) 0%, rgba(240,100,100,0.9) 100%)",
+    background:
+      isDarkMode
+        ? "linear-gradient(135deg, rgba(239,68,68,0.95) 0%, rgba(220,38,38,0.9) 100%)"
+        : "linear-gradient(135deg, rgba(255,120,120,0.95) 0%, rgba(240,100,100,0.9) 100%)",
     transform: "translateX(-50%) translateY(2px)",
-    boxShadow: isDarkMode
-      ? "0 12px 40px rgba(220,38,38,0.4)"
-      : "0 12px 40px rgba(220,38,38,0.3)",
+    boxShadow: isDarkMode ? "0 12px 40px rgba(220,38,38,0.4)" : "0 12px 40px rgba(220,38,38,0.3)",
     border: "1px solid rgba(255,255,255,0.3)",
   };
 
@@ -600,14 +555,10 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                   <h3 className="text-2xl font-bold mb-4">
                     No Optimization Available
                   </h3>
-                  <p
-                    className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"} mb-6`}
-                  >
-                    This simulation hasn't been optimized yet.
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mb-6`}>
+                    This simulation hasn&apos;t been optimized yet.
                   </p>
-                  <p
-                    className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"} mb-4`}
-                  >
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} mb-4`}>
                     Run an optimization from the Simulation Results page to
                     compare results side-by-side.
                   </p>

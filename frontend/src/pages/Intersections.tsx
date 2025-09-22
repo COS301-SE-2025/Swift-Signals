@@ -1,21 +1,18 @@
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import type { LatLng } from "leaflet";
+import L from 'leaflet';
 import { Search, X, FileText, MapPin, TrafficCone } from "lucide-react";
-import IntersectionCard from "../components/IntersectionCard";
-import "../styles/Intersections.css";
+import { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Marker, useMapEvents, Popup } from "react-leaflet";
+import { useNavigate } from "react-router-dom";
+
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  useMapEvents,
-  Popup,
-} from "react-leaflet";
+import IntersectionCard from "../components/IntersectionCard";
+import Navbar from "../components/Navbar";
+import "../styles/Intersections.css";
+
 import "leaflet/dist/leaflet.css";
-import type { LatLng } from "leaflet";
-import L from "leaflet";
+
 
 // =================================================================
 // DATA STRUCTURES & INTERFACES
@@ -94,19 +91,13 @@ interface OverpassElement {
   };
 }
 
-interface FoundIntersection {
+// Type for intersection with calculated distance
+type IntersectionWithDistance = Intersection & {
+  distance: number;
+  intersection: string;
   lat: number;
   lon: number;
-  roads: string[];
-  intersection: string;
-  distance: number;
-}
-
-interface NearestIntersection extends FoundIntersection {
-  address: string;
-  city: string;
-  province: string;
-}
+};
 // #endregion
 
 // =================================================================
@@ -114,23 +105,13 @@ interface NearestIntersection extends FoundIntersection {
 // =================================================================
 
 const LocationMarker: React.FC<{
-  setSelectedLocation: (location: {
-    address: string;
-    city: string;
-    province: string;
-    lat: number;
-    lng: number;
-  }) => void;
+  setSelectedLocation: (location: { address: string; city: string; province: string; lat: number; lng: number; }) => void;
   setCoordinates: (coords: string) => void;
   setIsSnapping?: (snapping: boolean) => void;
 }> = ({ setSelectedLocation, setCoordinates, setIsSnapping }) => {
   const [position, setPosition] = useState<LatLng | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [snappedAddress, setSnappedAddress] = useState<{
-    address: string;
-    city: string;
-    province: string;
-  } | null>(null);
+  const [snappedAddress, setSnappedAddress] = useState<{ address: string; city: string; province: string; } | null>(null);
   const markerRef = useRef<L.Marker>(null);
 
   useEffect(() => {
@@ -143,7 +124,7 @@ const LocationMarker: React.FC<{
   const findNearestIntersection = async (
     lat: number,
     lon: number,
-  ): Promise<NearestIntersection | null> => {
+  ): Promise<any | null> => {
     try {
       setIsSnapping?.(true);
       setIsLoading(true);
@@ -170,6 +151,7 @@ const LocationMarker: React.FC<{
       });
 
       if (!response.ok) {
+        // eslint-disable-next-line no-console
         console.warn("Overpass API failed:", response.status);
         return null;
       }
@@ -210,7 +192,7 @@ const LocationMarker: React.FC<{
         }
       });
 
-      const intersections: FoundIntersection[] = [];
+      const intersections: IntersectionWithDistance[] = [];
 
       for (const [nodeId, nodeWays] of nodeWaysMap.entries()) {
         if (nodeWays.length >= 2) {
@@ -236,7 +218,7 @@ const LocationMarker: React.FC<{
                 roads: uniqueRoads.slice(0, 2),
                 intersection: `${uniqueRoads[0]} & ${uniqueRoads[1]}`,
                 distance,
-              });
+              } as any);
             }
           }
         }
@@ -251,19 +233,20 @@ const LocationMarker: React.FC<{
         const reverseGeocodeData = await reverseGeocodeResponse.json();
         const address = reverseGeocodeData.address;
         const streetName = closestIntersection.intersection;
-        const city = address.city || address.town || "";
-        const province = address.state || address.province || "";
+        const city = address.city || address.town || '';
+        const province = address.state || address.province || '';
 
         return {
-          ...closestIntersection,
-          address: streetName,
-          city: city,
-          province: province,
+            ...closestIntersection,
+            address: streetName,
+            city: city,
+            province: province,
         };
       }
 
       return null;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error finding nearest intersection:", error);
       return null;
     } finally {
@@ -274,6 +257,7 @@ const LocationMarker: React.FC<{
 
   useMapEvents({
     async click(e) {
+      // eslint-disable-next-line no-console
       console.log("Map clicked at:", e.latlng);
 
       setPosition(e.latlng);
@@ -292,13 +276,13 @@ const LocationMarker: React.FC<{
           } as LatLng;
 
           setPosition(snappedPosition);
-          const newAddress = {
-            address: nearestIntersection.address,
-            city: nearestIntersection.city,
-            province: nearestIntersection.province,
-            lat: nearestIntersection.lat,
-            lng: nearestIntersection.lon,
-          };
+          const newAddress = { 
+              address: nearestIntersection.address,
+              city: nearestIntersection.city,
+              province: nearestIntersection.province,
+              lat: nearestIntersection.lat,
+              lng: nearestIntersection.lon
+            };
           setSelectedLocation(newAddress);
           setSnappedAddress(newAddress);
           setCoordinates(
@@ -307,6 +291,7 @@ const LocationMarker: React.FC<{
             )}, ${nearestIntersection.lon.toFixed(6)}`,
           );
 
+          // eslint-disable-next-line no-console
           console.log(
             "Snapped to intersection:",
             nearestIntersection.intersection,
@@ -315,29 +300,19 @@ const LocationMarker: React.FC<{
           const coordinates = `${e.latlng.lat.toFixed(
             6,
           )}, ${e.latlng.lng.toFixed(6)}`;
-          setSelectedLocation({
-            address: coordinates,
-            city: "",
-            province: "",
-            lat: e.latlng.lat,
-            lng: e.latlng.lng,
-          });
+          setSelectedLocation({ address: coordinates, city: '', province: '', lat: e.latlng.lat, lng: e.latlng.lng });
           setCoordinates(coordinates);
 
+          // eslint-disable-next-line no-console
           console.log("No intersection found, using clicked coordinates");
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error("Error processing map click:", error);
         const coordinates = `${e.latlng.lat.toFixed(
           6,
         )}, ${e.latlng.lng.toFixed(6)}`;
-        setSelectedLocation({
-          address: coordinates,
-          city: "",
-          province: "",
-          lat: e.latlng.lat,
-          lng: e.latlng.lng,
-        });
+        setSelectedLocation({ address: coordinates, city: '', province: '', lat: e.latlng.lat, lng: e.latlng.lng });
         setCoordinates(coordinates);
       }
     },
@@ -421,10 +396,10 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
 
           <div className="space-y-2">
             <p className="text-gray-700 dark:text-[#C9D1D9]">
-              You're about to permanently delete
+              You&apos;re about to permanently delete
             </p>
             <p className="text-lg font-semibold text-gray-900 dark:text-[#E6EDF3] bg-gray-50 dark:bg-[#21262D] px-3 py-2 rounded-lg border border-gray-200 dark:border-[#30363D]">
-              "{intersectionName}"
+              &quot;{intersectionName}&quot;
             </p>
             <p className="text-sm text-red-600 dark:text-red-400 font-medium mt-3">
               This action cannot be undone
@@ -515,7 +490,9 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
 
   const [formData, setFormData] =
     useState<IntersectionFormData>(getDefaultFormData());
-  const [activeTab, setActiveTab] = useState<"Manual" | "Map">("Manual");
+  const [activeTab, setActiveTab] = useState<"Manual" | "Map">(
+    "Manual",
+  );
   const [coordinates, setCoordinates] = useState<string | null>(null);
   const [isSnapping, setIsSnapping] = useState(false);
 
@@ -560,24 +537,18 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
     });
   };
 
-  const handleMapSelection = (location: {
-    address: string;
-    city: string;
-    province: string;
-    lat: number;
-    lng: number;
-  }) => {
+  const handleMapSelection = (location: { address: string; city: string; province: string; lat: number; lng: number; }) => {
     setFormData((prev) => ({
       ...prev,
       name: location.address,
-      details: {
-        ...prev.details,
-        address: `${location.address}, ${location.city}, ${location.province}`,
-        city: location.city,
-        province: location.province,
-        latitude: location.lat,
-        longitude: location.lng,
-      },
+      details: { 
+          ...prev.details, 
+          address: `${location.address}, ${location.city}, ${location.province}`,
+          city: location.city,
+          province: location.province,
+          latitude: location.lat,
+          longitude: location.lng
+        },
     }));
   };
 
@@ -627,13 +598,8 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
         <h2 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-[#E6EDF3]">
           {isEditing ? "Edit Intersection" : "Create New Intersection"}
         </h2>
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col flex-grow overflow-y-auto"
-        >
-          <div
-            className={`grid grid-cols-1 lg:grid-cols-2 gap-x-12 ${activeTab === "Map" ? "gap-y-4" : "gap-y-8"}`}
-          >
+        <form onSubmit={handleSubmit} className="flex flex-col flex-grow overflow-y-auto">
+          <div className={`grid grid-cols-1 lg:grid-cols-2 gap-x-12 ${activeTab === 'Map' ? 'gap-y-4' : 'gap-y-8'}`}>
             <div className="space-y-8">
               <div className="space-y-5">
                 <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">

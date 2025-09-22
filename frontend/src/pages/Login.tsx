@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Login.css";
-import Footer from "../components/Footer";
+
 import logo from "../../src/assets/logo.png";
+import Footer from "../components/Footer";
+import "../styles/Login.css";
 
 const API_BASE_URL = "http://localhost:9090";
 
@@ -101,7 +102,9 @@ const Login = () => {
           const errorData = JSON.parse(responseText);
           serverMessage = errorData?.message || serverMessage;
         } catch (e) {
+          // eslint-disable-next-line no-console
           console.error(e);
+          // eslint-disable-next-line no-console
           console.error(
             "Could not parse error response as JSON:",
             responseText,
@@ -114,6 +117,7 @@ const Login = () => {
 
       if (data?.token) {
         localStorage.setItem("authToken", data.token);
+        // eslint-disable-next-line no-console
         console.log("Login successful:", data.message);
         navigate("/dashboard");
       } else {
@@ -151,7 +155,9 @@ const Login = () => {
         try {
           data = JSON.parse(responseText);
         } catch (e) {
+          // eslint-disable-next-line no-console
           console.error(e);
+          // eslint-disable-next-line no-console
           console.error(
             "Failed to parse JSON from reset-password:",
             responseText,
@@ -176,6 +182,7 @@ const Login = () => {
         setResetSuccessMessage(null);
       }, 3000);
     } catch (err: unknown) {
+      // eslint-disable-next-line no-console
       console.error("Password reset error:", err);
       if (err instanceof Error) {
         setResetError(err.message);
@@ -304,7 +311,7 @@ const Login = () => {
           </div>
         </form>
         <p className="regLink mt-8 text-center text-sm text-gray-600">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <button
             type="button"
             onClick={() => navigate("/signup")}

@@ -1,8 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/SignUp.css";
-import Footer from "../components/Footer";
+
 import logo from "../../src/assets/logo.png";
+import Footer from "../components/Footer";
+import "../styles/SignUp.css";
 
 const API_BASE_URL = "http://localhost:9090";
 
@@ -102,9 +103,12 @@ const SignUp = () => {
       if (responseText) {
         try {
           data = JSON.parse(responseText);
+          // eslint-disable-next-line no-console
           console.log("JSON RESPONSE:", data);
         } catch (e) {
+          // eslint-disable-next-line no-console
           console.error(e);
+          // eslint-disable-next-line no-console
           console.error("Failed to parse JSON:", responseText);
           throw new Error(
             `An unexpected response was received from the server.`,
@@ -118,6 +122,7 @@ const SignUp = () => {
         throw new Error(errorMessage);
       }
 
+      // eslint-disable-next-line no-console
       console.log("Registration successful:", data);
       setSuccessMessage("Registration successful! Redirecting to login...");
 
@@ -125,6 +130,7 @@ const SignUp = () => {
         navigate("/login");
       }, 2000);
     } catch (err: unknown) {
+      // eslint-disable-next-line no-console
       console.error("Sign-up error:", err);
       if (err instanceof Error) {
         setError(err.message);

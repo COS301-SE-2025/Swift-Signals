@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from "react";
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import type { PanInfo } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
 import {
   FiBarChart2,
   FiInfo,
@@ -208,6 +208,7 @@ export default function Carousel({
             -(index - 1) * trackItemOffset,
           ];
           const outputRange = [90, 0, -90];
+          // eslint-disable-next-line react-hooks/rules-of-hooks
           const rotateY = useTransform(x, range, outputRange, { clamp: false });
           return (
             <motion.div

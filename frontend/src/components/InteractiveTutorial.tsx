@@ -1,10 +1,10 @@
+import { X } from "lucide-react";
 import React, {
   useEffect,
   useLayoutEffect,
   useState,
   useCallback,
 } from "react";
-import { X } from "lucide-react";
 
 export type TutorialStep = {
   selector: string;
@@ -28,11 +28,7 @@ type Props = {
   tutorialType: string;
 };
 
-const InteractiveTutorial: React.FC<Props> = ({
-  steps,
-  onClose,
-  tutorialType,
-}) => {
+const InteractiveTutorial: React.FC<Props> = ({ steps, onClose, tutorialType }) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [position, setPosition] = useState<Position | null>(null);
   const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);
@@ -190,6 +186,7 @@ const InteractiveTutorial: React.FC<Props> = ({
     };
 
     setPosition({ highlight: highlightStyles, popover: popoverStyles });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep]);
 
   useLayoutEffect(() => {

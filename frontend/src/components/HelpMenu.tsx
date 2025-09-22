@@ -1,8 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-import "../styles/HelpMenu.css";
-import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
 import {
   FaTimes,
   FaCommentDots,
@@ -11,6 +7,11 @@ import {
   FaChevronDown,
 } from "react-icons/fa";
 import { IoSend } from "react-icons/io5";
+import { useLocation, useNavigate } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
+
+import "../styles/HelpMenu.css";
+import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
 
 type QuickReply = { text: string; payload: string };
 type ChatMessage = {
@@ -29,9 +30,7 @@ type TutorialType =
 type DialogflowMessage = {
   payload?: {
     fields?: {
-      action?: { stringValue: string };
-      path?: { stringValue: string };
-      richContent?: {
+      richContent: {
         listValue: {
           values: {
             listValue: {
@@ -405,6 +404,8 @@ const simulationResultsTutorialSteps: TutorialStep[] = [
   },
 ];
 
+
+
 const faqData = [
   {
     question: "What is Swift Signals?",
@@ -528,7 +529,7 @@ const HelpMenu: React.FC = () => {
           message: text,
           event: event,
           sessionId: sessionId,
-          token: localStorage.getItem("authToken"),
+          token: localStorage.getItem('authToken'),
         }),
       });
 
@@ -539,19 +540,17 @@ const HelpMenu: React.FC = () => {
       // --- HANDLE NAVIGATION PAYLOAD ---
       if (data.fulfillmentMessages) {
         const navigationPayload = data.fulfillmentMessages.find(
-          (msg: DialogflowMessage) =>
-            msg.payload && msg.payload.fields && msg.payload.fields.action,
+          (msg: any) => msg.payload && msg.payload.fields && msg.payload.fields.action
         );
 
         if (navigationPayload) {
-          const action = navigationPayload.payload?.fields?.action?.stringValue;
-          const path = navigationPayload.payload?.fields?.path?.stringValue;
+          const action = navigationPayload.payload.fields.action.stringValue;
+          const path = navigationPayload.payload.fields.path.stringValue;
 
-          if (action === "NAVIGATE" && path) {
-            console.log(
-              `%c✅ ACTION HANDLER PASSED: Navigating to [${path}]`,
-              "color: green; font-weight: bold;",
-            );
+          if (action === 'NAVIGATE' && path) {
+            // eslint-disable-next-line no-console
+            console.log(`%c✅ ACTION HANDLER PASSED: Navigating to [${path}]`,
+            "color: green; font-weight: bold;");
             setTimeout(() => {
               navigate(path);
               setIsOpen(false); // Close the help menu on navigation
@@ -594,6 +593,7 @@ const HelpMenu: React.FC = () => {
           .stringValue as TutorialType;
 
         if (tutorialType) {
+          // eslint-disable-next-line no-console
           console.log(
             `%c✅ ACTION HANDLER PASSED: Starting tutorial for [${tutorialType}]`,
             "color: green; font-weight: bold;",
@@ -604,6 +604,7 @@ const HelpMenu: React.FC = () => {
         }
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error communicating with chatbot backend:", error);
       const errorResponse: ChatMessage = {
         text: "Sorry, I'm having trouble connecting to my brain right now. Please try again later.",
@@ -619,6 +620,7 @@ const HelpMenu: React.FC = () => {
     if (isOpen && messages.length === 0) {
       sendQueryToBot({ event: "WELCOME" });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const startTutorial = (tutorialType: TutorialType) => {
@@ -722,6 +724,7 @@ const HelpMenu: React.FC = () => {
           onClose={() => setActiveTutorial(null)}
         />
       )}
+      
 
       {confirmationDetails && (
         <div className="confirmation-overlay">
@@ -855,7 +858,7 @@ const HelpMenu: React.FC = () => {
                   <div className="accordion-item tutorial-launcher">
                     <button onClick={() => startTutorial("navigation")}>
                       <h4>Navigation Tutorial</h4>
-                      <p>Learn how to use the site's navbar and footer.</p>
+                      <p>Learn how to use the site&apos;s navbar and footer.</p>
                     </button>
                   </div>
                   <div className="accordion-item tutorial-launcher">
@@ -891,6 +894,7 @@ const HelpMenu: React.FC = () => {
                       </p>
                     </button>
                   </div>
+                  
                 </div>
               </div>
               <div className="accordion-section">

@@ -1,8 +1,9 @@
-import React, { useRef, useState, useEffect, useMemo } from "react";
-import type { FC } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
 import { MapControls, OrthographicCamera } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import type { FC } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
+
 import { SimulationUI } from "../components/SimulationUI";
 
 // Data Interfaces & Helpers
@@ -101,12 +102,12 @@ const GroundPlane: FC<{ isDarkMode?: boolean }> = ({ isDarkMode }) => (
   </mesh>
 );
 
-const Roads: FC<{
-  edges: Edge[];
-  nodes: Node[];
-  center: THREE.Vector2;
-  isDarkMode?: boolean;
-}> = ({ edges, nodes, center, isDarkMode }) => {
+const Roads: FC<{ edges: Edge[]; nodes: Node[]; center: THREE.Vector2; isDarkMode?: boolean }> = ({
+  edges,
+  nodes,
+  center,
+  isDarkMode,
+}) => {
   return (
     <group>
       {edges.map((edge) => {
@@ -596,7 +597,8 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
         });
 
         const maxSignalIndex = Math.max(...Array.from(allConnectionIndices));
-        const stateArrayLength = maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
+        const stateArrayLength =
+          maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
         const newPhases: TrafficLightPhase[] = [];
         const nsGreenDuration = 30;
         const nsGreenState = Array(stateArrayLength).fill("r");
@@ -717,7 +719,8 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
         const responseData: SimulationResponse = await response.json();
         processData(responseData.output);
       } catch (error) {
-        console.error("Error fetching simulation data:", error);
+        // eslint-disable-next-line no-console
+        console.error("Error fetching simulation data:", error); 
         setError(
           error instanceof Error
             ? error.message

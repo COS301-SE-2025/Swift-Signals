@@ -1,3 +1,4 @@
+
 interface NominatimResult {
   place_id: number;
   osm_type: string;
@@ -101,22 +102,20 @@ const searchNominatim = async (
     const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
     const response = await fetch(url);
     if (!response.ok) {
-      console.warn(`Nominatim request failed: ${response.status}`);
+      console.warn(`Nominatim request failed: ${response.status}`); // eslint-disable-line no-console
       return [];
     }
 
     const data: NominatimResult[] = await response.json();
     return data;
   } catch (error) {
-    console.error("Error in searchNominatim:", error);
+    console.error("Error in searchNominatim:", error); // eslint-disable-line no-console
     return [];
   }
 };
 
 // Process Nominatim results to a more usable Street format
-const processNominatimResults = (
-  data: NominatimResult[],
-): GeocodedLocation[] => {
+const processNominatimResults = (data: NominatimResult[]): GeocodedLocation[] => {
   if (!Array.isArray(data)) return [];
 
   const processed = data
@@ -145,10 +144,7 @@ const processNominatimResults = (
       return isInSA && isRoad && validType;
     })
     .map((item: NominatimResult) => {
-      const streetName =
-        item.address?.road ||
-        item.name ||
-        item.display_name.split(",")[0].trim();
+      const streetName = item.address?.road || item.name || item.display_name.split(',')[0].trim();
       const coordinates = getCoordinates(item);
 
       return {
@@ -184,24 +180,18 @@ const processNominatimResults = (
  * @param address The address string to geocode.
  * @returns A Promise that resolves to GeocodedLocation (with lat/lon) or null if not found.
  */
-export const geocodeAddress = async (
-  address: string,
-): Promise<GeocodedLocation | null> => {
+export const geocodeAddress = async (address: string): Promise<GeocodedLocation | null> => {
   if (!address || address.length < 3) return null;
 
   try {
     const results = await searchNominatim(address, "road");
     const processed = processNominatimResults(results);
-    if (
-      processed.length > 0 &&
-      processed[0].lat !== null &&
-      processed[0].lon !== null
-    ) {
+    if (processed.length > 0 && processed[0].lat !== null && processed[0].lon !== null) {
       return processed[0];
     }
     return null;
   } catch (error) {
-    console.error("Error geocoding address:", error);
+    console.error("Error geocoding address:", error); // eslint-disable-line no-console
     return null;
   }
 };
