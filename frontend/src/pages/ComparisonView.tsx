@@ -3,6 +3,60 @@ import { useLocation } from "react-router-dom";
 import TrafficSimulation from "./TrafficSimulation";
 import HelpMenu from "../components/HelpMenu";
 
+// Define SimulationData interface to match the structure from TrafficSimulation.tsx
+interface Node {
+  id: string;
+  x: number;
+  y: number;
+  type: string;
+}
+interface Edge {
+  id: string;
+  from: string;
+  to: string;
+  speed: number;
+  lanes: number;
+}
+interface Position {
+  time: number;
+  x: number;
+  y: number;
+  speed: number;
+}
+interface VehicleData {
+  id: string;
+  positions: Position[];
+}
+interface TrafficLightPhase {
+  duration: number;
+  state: string;
+}
+interface TrafficLightState {
+  time: number;
+  state: string;
+}
+interface TrafficLightData {
+  id: string;
+  phases: TrafficLightPhase[];
+  states?: TrafficLightState[];
+}
+interface Connection {
+  from: string;
+  to: string;
+  fromLane: number;
+  toLane: number;
+  tl: string;
+}
+interface SimulationData {
+  intersection: {
+    nodes: Node[];
+    edges: Edge[];
+    trafficLights?: TrafficLightData[];
+    connections: Connection[];
+  };
+  vehicles: VehicleData[];
+}
+
 interface ComparisonViewProps {
   originalIntersectionId?: string;
   optimizedIntersectionId?: string;
@@ -13,7 +67,14 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   optimizedIntersectionId: propOptimizedId,
 }) => {
   const location = useLocation();
-  // const navigate = useNavigate();
+
+  // Get simulation data from location state
+  const simulationData = location.state?.simulationData as
+    | SimulationData
+    | undefined;
+  const optimizedData = location.state?.optimizedData as
+    | SimulationData
+    | undefined;
 
   // Get intersection IDs from props or location state
   const [originalIntersectionId, setOriginalIntersectionId] = useState<string>(
@@ -21,94 +82,46 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   );
   const [optimizedIntersectionId, setOptimizedIntersectionId] =
     useState<string>(
-      propOriginalId || location.state?.originalIntersectionId || "1",
+      propOptimizedId ||
+        location.state?.optimizedIntersectionId ||
+        originalIntersectionId,
     );
   const [originalIntersectionName] = useState<string>(
     location.state?.originalIntersectionName || "Original Simulation",
   );
   const [optimizedIntersectionName] = useState<string>("Optimized Simulation");
   const [expanded, setExpanded] = useState<"none" | "left" | "right">("none");
-  const [hasOptimizedData, setHasOptimizedData] = useState<boolean>(false);
-  const [isLoadingOptimized, setIsLoadingOptimized] = useState<boolean>(false);
+  const [hasOptimizedData, setHasOptimizedData] =
+    useState<boolean>(!!optimizedData);
+  const [isLoadingOptimized] = useState<boolean>(false);
   const [optimizedDataError, setOptimizedDataError] = useState<string | null>(
     null,
   );
-  const [optimizedDataSuccess, setOptimizedDataSuccess] = useState<
-    string | null
-  >(null);
+  const [optimizedDataSuccess] = useState<string | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Check if optimized data is available
   useEffect(() => {
-    const checkOptimizedData = async () => {
-      if (!originalIntersectionId) return;
-
-      console.log(
-        "Checking optimized data for intersection:",
-        originalIntersectionId,
-      );
-      setIsLoadingOptimized(true);
-      setOptimizedDataError(null);
-
-      try {
-        const authToken = localStorage.getItem("authToken");
-        if (!authToken) {
-          setOptimizedDataError("Authentication token not found");
-          return;
-        }
-
-        // Try to fetch optimized data
-        const response = await fetch(
-          `http://localhost:9090/intersections/${originalIntersectionId}/optimise`,
-          {
-            headers: { Authorization: `Bearer ${authToken}` },
-          },
-        );
-
-        console.log("Optimization API response status:", response.status);
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log("Optimization API response data:", data);
-
-          if (
-            data.output &&
-            data.output.vehicles &&
-            data.output.vehicles.length > 0
-          ) {
-            console.log(
-              "Optimized data found, setting hasOptimizedData to true",
-            );
-            setHasOptimizedData(true);
-            setOptimizedIntersectionId(originalIntersectionId); // Use same ID for optimized data
-            setOptimizedDataSuccess(
-              "Optimized data found! Loading simulation...",
-            );
-            setOptimizedDataError(null);
-
-            // Clear success message after 3 seconds
-            setTimeout(() => {
-              setOptimizedDataSuccess(null);
-            }, 3000);
-          } else {
-            console.log("No optimized data found in response");
-            setHasOptimizedData(false);
-            setOptimizedDataSuccess(null);
-          }
-        } else {
-          console.log("Optimization API request failed");
-          setHasOptimizedData(false);
-        }
-      } catch (error) {
-        console.error("Error checking optimized data:", error);
-        setOptimizedDataError("Failed to check optimization status");
-        setHasOptimizedData(false);
-      } finally {
-        setIsLoadingOptimized(false);
-      }
+    const checkTheme = () => {
+      const savedTheme = localStorage.getItem("theme");
+      setIsDarkMode(savedTheme === "dark");
     };
 
-    checkOptimizedData();
-  }, [originalIntersectionId]);
+    checkTheme();
+
+    window.addEventListener("storage", checkTheme);
+
+    return () => {
+      window.removeEventListener("storage", checkTheme);
+    };
+  }, []);
+
+  // Check for optimized data when the component mounts or data changes
+  useEffect(() => {
+    setHasOptimizedData(!!optimizedData);
+    if (optimizedData) {
+      setOptimizedIntersectionId(originalIntersectionId);
+    }
+  }, [optimizedData, originalIntersectionId]);
 
   // Update IDs if props change
   useEffect(() => {
@@ -151,7 +164,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     flexDirection: "row",
     width: "100vw",
     height: "100vh",
-    backgroundColor: "#1e1e1e",
+    backgroundColor: isDarkMode ? "#1e1e1e" : "#f0f0f0",
     paddingBottom: "0",
     margin: "0",
     position: "fixed",
@@ -173,8 +186,8 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     left: "50%",
     transform: "translateX(-50%)",
     zIndex: 1000,
-    backgroundColor: "rgba(0,0,0,0.75)",
-    color: "white",
+    backgroundColor: isDarkMode ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.75)",
+    color: isDarkMode ? "white" : "black",
     padding: "8px 16px",
     borderRadius: "8px",
     fontSize: "1em",
@@ -185,7 +198,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   const dividerStyle: React.CSSProperties = {
     flexShrink: 0,
     width: "2px",
-    backgroundColor: "#333",
+    backgroundColor: isDarkMode ? "#333" : "#ccc",
     transition: "width 0.5s ease-in-out",
   };
 
@@ -193,31 +206,41 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     position: "absolute",
     top: "24px",
     zIndex: 10,
-    background:
-      "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)",
+    background: isDarkMode
+      ? "linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%)"
+      : "linear-gradient(135deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.05) 100%)",
     backdropFilter: "blur(16px)",
-    border: "1px solid rgba(255,255,255,0.18)",
+    border: isDarkMode
+      ? "1px solid rgba(255,255,255,0.18)"
+      : "1px solid rgba(0,0,0,0.1)",
     borderRadius: "16px",
     padding: "12px 20px",
     cursor: "pointer",
     fontWeight: "600",
     fontSize: "14px",
-    color: "rgba(255,255,255,0.95)",
+    color: isDarkMode ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.8)",
     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+    boxShadow: isDarkMode
+      ? "0 8px 32px rgba(0,0,0,0.3)"
+      : "0 8px 32px rgba(0,0,0,0.1)",
     minWidth: "140px",
     justifyContent: "center",
   };
 
   const buttonHoverStyle: React.CSSProperties = {
-    background:
-      "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.15) 100%)",
+    background: isDarkMode
+      ? "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.15) 100%)"
+      : "linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 100%)",
     transform: "translateY(-2px)",
-    boxShadow: "0 12px 40px rgba(0,0,0,0.4)",
-    border: "1px solid rgba(255,255,255,0.3)",
+    boxShadow: isDarkMode
+      ? "0 12px 40px rgba(0,0,0,0.4)"
+      : "0 12px 40px rgba(0,0,0,0.2)",
+    border: isDarkMode
+      ? "1px solid rgba(255,255,255,0.3)"
+      : "1px solid rgba(0,0,0,0.2)",
   };
 
   const iconStyle: React.CSSProperties = {
@@ -231,8 +254,9 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     left: "50%",
     transform: "translateX(-50%)",
     zIndex: 1001,
-    background:
-      "linear-gradient(135deg, rgba(220,38,38,0.9) 0%, rgba(185,28,28,0.8) 100%)",
+    background: isDarkMode
+      ? "linear-gradient(135deg, rgba(220,38,38,0.9) 0%, rgba(185,28,28,0.8) 100%)"
+      : "linear-gradient(135deg, rgba(255,100,100,0.9) 0%, rgba(230,80,80,0.8) 100%)",
     backdropFilter: "blur(16px)",
     border: "1px solid rgba(255,255,255,0.18)",
     borderRadius: "16px",
@@ -245,16 +269,21 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    boxShadow: "0 8px 32px rgba(220,38,38,0.3)",
+    boxShadow: isDarkMode
+      ? "0 8px 32px rgba(220,38,38,0.3)"
+      : "0 8px 32px rgba(220,38,38,0.2)",
     minWidth: "120px",
     justifyContent: "center",
   };
 
   const exitButtonHoverStyle: React.CSSProperties = {
-    background:
-      "linear-gradient(135deg, rgba(239,68,68,0.95) 0%, rgba(220,38,38,0.9) 100%)",
+    background: isDarkMode
+      ? "linear-gradient(135deg, rgba(239,68,68,0.95) 0%, rgba(220,38,38,0.9) 100%)"
+      : "linear-gradient(135deg, rgba(255,120,120,0.95) 0%, rgba(240,100,100,0.9) 100%)",
     transform: "translateX(-50%) translateY(2px)",
-    boxShadow: "0 12px 40px rgba(220,38,38,0.4)",
+    boxShadow: isDarkMode
+      ? "0 12px 40px rgba(220,38,38,0.4)"
+      : "0 12px 40px rgba(220,38,38,0.3)",
     border: "1px solid rgba(255,255,255,0.3)",
   };
 
@@ -279,60 +308,10 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
     }
   };
 
-  const handleRefreshOptimizedData = async () => {
-    if (!originalIntersectionId) return;
-
-    setIsLoadingOptimized(true);
-    setOptimizedDataError(null);
-
-    try {
-      const authToken = localStorage.getItem("authToken");
-      if (!authToken) {
-        setOptimizedDataError("Authentication token not found");
-        return;
-      }
-
-      // Try to fetch optimized data
-      const response = await fetch(
-        `http://localhost:9090/intersections/${originalIntersectionId}/optimise`,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        },
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-
-        if (
-          data.output &&
-          data.output.vehicles &&
-          data.output.vehicles.length > 0
-        ) {
-          setHasOptimizedData(true);
-          setOptimizedIntersectionId(originalIntersectionId);
-          setOptimizedDataSuccess(
-            "Optimized data found! Loading simulation...",
-          );
-          setOptimizedDataError(null);
-
-          // Clear success message after 3 seconds
-          setTimeout(() => {
-            setOptimizedDataSuccess(null);
-          }, 3000);
-        } else {
-          setHasOptimizedData(false);
-          setOptimizedDataSuccess(null);
-        }
-      } else {
-        setHasOptimizedData(false);
-      }
-    } catch (error) {
-      console.error("Error refreshing optimized data:", error);
-      setOptimizedDataError("Failed to refresh optimization status");
-      setHasOptimizedData(false);
-    } finally {
-      setIsLoadingOptimized(false);
-    }
+  const handleRefreshOptimizedData = () => {
+    setOptimizedDataError(
+      "Refresh not available. Please go back and re-run the optimization.",
+    );
   };
 
   const getDynamicStyles = (side: "left" | "right") => {
@@ -450,7 +429,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
             margin: 0 !important;
             padding: 0 !important;
             overflow: hidden !important;
-            background-color: #1e1e1e !important;
+            background-color: ${isDarkMode ? "#1e1e1e" : "#f0f0f0"} !important;
           }
           
           /* Ensure this component takes full control */
@@ -533,6 +512,8 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
             scale={expanded === "left" ? 1.0 : 0.65}
             isExpanded={expanded === "left"}
             endpoint="simulate"
+            simulationData={simulationData}
+            isDarkMode={isDarkMode}
           />
           <div style={labelStyle} className="comparison-label">
             {originalIntersectionName}
@@ -560,8 +541,8 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: "#3d3d3d",
-                  color: "white",
+                  backgroundColor: isDarkMode ? "#3d3d3d" : "#e0e0e0",
+                  color: isDarkMode ? "white" : "black",
                   textAlign: "center",
                   padding: "2rem",
                 }}
@@ -571,7 +552,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                   <h3 className="text-xl font-bold mb-2">
                     Checking Optimization Status
                   </h3>
-                  <p className="text-sm text-gray-300">
+                  <p className="text-sm text-gray-500">
                     Verifying if optimized data is available...
                   </p>
                 </div>
@@ -587,6 +568,8 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                 scale={expanded === "right" ? 1.0 : 0.65}
                 isExpanded={expanded === "right"}
                 endpoint="optimise"
+                simulationData={optimizedData}
+                isDarkMode={isDarkMode}
               />
               <div style={labelStyle} className="comparison-label">
                 {optimizedIntersectionName}
@@ -607,8 +590,8 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: "#3d3d3d",
-                  color: "white",
+                  backgroundColor: isDarkMode ? "#3d3d3d" : "#e0e0e0",
+                  color: isDarkMode ? "white" : "black",
                   textAlign: "center",
                   padding: "2rem",
                 }}
@@ -617,10 +600,14 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                   <h3 className="text-2xl font-bold mb-4">
                     No Optimization Available
                   </h3>
-                  <p className="text-lg text-gray-300 mb-6">
+                  <p
+                    className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"} mb-6`}
+                  >
                     This simulation hasn't been optimized yet.
                   </p>
-                  <p className="text-sm text-gray-400 mb-4">
+                  <p
+                    className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"} mb-4`}
+                  >
                     Run an optimization from the Simulation Results page to
                     compare results side-by-side.
                   </p>

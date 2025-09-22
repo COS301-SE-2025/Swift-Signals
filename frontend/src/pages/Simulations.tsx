@@ -1712,9 +1712,9 @@ const SimulationTable: React.FC<{
 
   const statusClass = (status: string) => {
     switch (status) {
-      case "optimised":
+      case "Optimised":
         return "bg-green-200 text-green-800 border-green-300";
-      case "unoptimised":
+      case "Unoptimised":
         return "bg-yellow-200 text-yellow-800 border-yellow-300";
       case "Failed":
         return "bg-red-200 text-red-800 border-red-300";
@@ -1982,14 +1982,14 @@ const Simulations: React.FC = () => {
 
     const mapApiStatus = (apiStatus?: string): string => {
       switch (apiStatus) {
-        case "optimised":
-          return "optimised";
-        case "unoptimised":
-          return "unoptimised";
+        case "INTERSECTION_STATUS_OPTIMISED":
+          return "Optimised"; // Frontend display string
+        case "unoptimised": // Assuming backend still sends "unoptimised" for unoptimized
+          return "Unoptimised"; // Frontend display string
         case "Failed":
           return "Failed";
         default:
-          return "unoptimised";
+          return "Unoptimised";
       }
     };
 
@@ -2000,17 +2000,27 @@ const Simulations: React.FC = () => {
     });
 
     //  UPDATED: Mapped API data to the new SimulationData structure
-    const allSims = sortedIntersections.map((intersection, index) => ({
-      id: index + 1,
-      backendId: intersection.id,
-      intersection: intersection.details?.address || intersection.name,
-      trafficDensity: formatTrafficDensity(intersection.traffic_density),
-      speed: intersection.default_parameters?.simulation_parameters?.speed || 0,
-      status: mapApiStatus(intersection.status),
-    }));
+    const allSims = sortedIntersections.map((intersection, index) => {
+      const displayName = (intersection.name || "Unnamed Intersection").split(
+        " [",
+      )[0];
+      const displayAddress = (
+        intersection.details?.address || displayName
+      ).split(",")[0];
+
+      return {
+        id: index + 1,
+        backendId: intersection.id,
+        intersection: displayAddress,
+        trafficDensity: formatTrafficDensity(intersection.traffic_density),
+        speed:
+          intersection.default_parameters?.simulation_parameters?.speed || 0,
+        status: mapApiStatus(intersection.status),
+      };
+    });
 
     //  UPDATED: Filter optimizations based on actual "optimised" status
-    const opts = allSims.filter((sim) => sim.status === "optimised");
+    const opts = allSims.filter((sim) => sim.status === "Optimised");
 
     return { sims: allSims, opts };
   };

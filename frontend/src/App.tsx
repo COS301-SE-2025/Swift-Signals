@@ -32,6 +32,10 @@ function App() {
           <Route path="/intersections" element={<Intersections />} />
           <Route path="/Users" element={<Users />} />
           <Route path="/simulation-results" element={<SimulationResults />} />
+          <Route
+            path="/simulation-results/:intersectionId"
+            element={<SimulationResults />}
+          />
           <Route path="/comparison-rendering" element={<ComparisonView />} />
           {/* Add more routes as needed */}
         </Routes>
