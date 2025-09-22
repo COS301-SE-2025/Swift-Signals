@@ -426,7 +426,10 @@ const SimulationResults: React.FC = () => {
       setOptimizationStatus("Optimization completed successfully!");
 
       // Update the intersection status to "optimised" in the backend
-      await updateIntersectionStatus(intersectionId, "INTERSECTION_STATUS_OPTIMISED");
+      await updateIntersectionStatus(
+        intersectionId,
+        "INTERSECTION_STATUS_OPTIMISED",
+      );
 
       setTimeout(() => {
         setOptimizationStatus("");
@@ -957,10 +960,9 @@ const SimulationResults: React.FC = () => {
     : { numPhases: undefined, totalCycle: undefined };
 
   // Define trafficDensityLabel from intersectionData
-  const trafficDensityLabel =
-    intersectionData?.traffic_density
-      ? intersectionData.traffic_density.replace(/_/g, " ").toLowerCase()
-      : "unknown";
+  const trafficDensityLabel = intersectionData?.traffic_density
+    ? intersectionData.traffic_density.replace(/_/g, " ").toLowerCase()
+    : "unknown";
 
   // Helper function to extract street name from a string that might contain coordinates
   const getStreetName = (fullName: string | undefined | null): string => {
@@ -975,7 +977,9 @@ const SimulationResults: React.FC = () => {
   const displayedName = getStreetName(name || intersectionData?.name);
 
   // Helper function to clean the description string
-  const cleanDescription = (desc: string | undefined | null): string | undefined => {
+  const cleanDescription = (
+    desc: string | undefined | null,
+  ): string | undefined => {
     if (!desc) return undefined;
     // Only remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
     const cleanedDesc = desc.replace(/\s*\[[^\]]*\]$/, "");

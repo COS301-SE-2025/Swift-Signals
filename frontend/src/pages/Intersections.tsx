@@ -6,10 +6,16 @@ import IntersectionCard from "../components/IntersectionCard";
 import "../styles/Intersections.css";
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
-import { MapContainer, TileLayer, Marker, useMapEvents, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  Popup,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import type { LatLng } from "leaflet";
-import L from 'leaflet';
+import L from "leaflet";
 
 // =================================================================
 // DATA STRUCTURES & INTERFACES
@@ -88,13 +94,19 @@ interface OverpassElement {
   };
 }
 
-// Type for intersection with calculated distance
-type IntersectionWithDistance = Intersection & {
-  distance: number;
-  intersection: string;
+interface FoundIntersection {
   lat: number;
   lon: number;
-};
+  roads: string[];
+  intersection: string;
+  distance: number;
+}
+
+interface NearestIntersection extends FoundIntersection {
+  address: string;
+  city: string;
+  province: string;
+}
 // #endregion
 
 // =================================================================
@@ -102,13 +114,23 @@ type IntersectionWithDistance = Intersection & {
 // =================================================================
 
 const LocationMarker: React.FC<{
-  setSelectedLocation: (location: { address: string; city: string; province: string; lat: number; lng: number; }) => void;
+  setSelectedLocation: (location: {
+    address: string;
+    city: string;
+    province: string;
+    lat: number;
+    lng: number;
+  }) => void;
   setCoordinates: (coords: string) => void;
   setIsSnapping?: (snapping: boolean) => void;
 }> = ({ setSelectedLocation, setCoordinates, setIsSnapping }) => {
   const [position, setPosition] = useState<LatLng | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [snappedAddress, setSnappedAddress] = useState<{ address: string; city: string; province: string; } | null>(null);
+  const [snappedAddress, setSnappedAddress] = useState<{
+    address: string;
+    city: string;
+    province: string;
+  } | null>(null);
   const markerRef = useRef<L.Marker>(null);
 
   useEffect(() => {
@@ -121,7 +143,7 @@ const LocationMarker: React.FC<{
   const findNearestIntersection = async (
     lat: number,
     lon: number,
-  ): Promise<any | null> => {
+  ): Promise<NearestIntersection | null> => {
     try {
       setIsSnapping?.(true);
       setIsLoading(true);
@@ -188,7 +210,7 @@ const LocationMarker: React.FC<{
         }
       });
 
-      const intersections: IntersectionWithDistance[] = [];
+      const intersections: FoundIntersection[] = [];
 
       for (const [nodeId, nodeWays] of nodeWaysMap.entries()) {
         if (nodeWays.length >= 2) {
@@ -214,7 +236,7 @@ const LocationMarker: React.FC<{
                 roads: uniqueRoads.slice(0, 2),
                 intersection: `${uniqueRoads[0]} & ${uniqueRoads[1]}`,
                 distance,
-              } as any);
+              });
             }
           }
         }
@@ -229,14 +251,14 @@ const LocationMarker: React.FC<{
         const reverseGeocodeData = await reverseGeocodeResponse.json();
         const address = reverseGeocodeData.address;
         const streetName = closestIntersection.intersection;
-        const city = address.city || address.town || '';
-        const province = address.state || address.province || '';
+        const city = address.city || address.town || "";
+        const province = address.state || address.province || "";
 
         return {
-            ...closestIntersection,
-            address: streetName,
-            city: city,
-            province: province,
+          ...closestIntersection,
+          address: streetName,
+          city: city,
+          province: province,
         };
       }
 
@@ -270,13 +292,13 @@ const LocationMarker: React.FC<{
           } as LatLng;
 
           setPosition(snappedPosition);
-          const newAddress = { 
-              address: nearestIntersection.address,
-              city: nearestIntersection.city,
-              province: nearestIntersection.province,
-              lat: nearestIntersection.lat,
-              lng: nearestIntersection.lon
-            };
+          const newAddress = {
+            address: nearestIntersection.address,
+            city: nearestIntersection.city,
+            province: nearestIntersection.province,
+            lat: nearestIntersection.lat,
+            lng: nearestIntersection.lon,
+          };
           setSelectedLocation(newAddress);
           setSnappedAddress(newAddress);
           setCoordinates(
@@ -293,7 +315,13 @@ const LocationMarker: React.FC<{
           const coordinates = `${e.latlng.lat.toFixed(
             6,
           )}, ${e.latlng.lng.toFixed(6)}`;
-          setSelectedLocation({ address: coordinates, city: '', province: '', lat: e.latlng.lat, lng: e.latlng.lng });
+          setSelectedLocation({
+            address: coordinates,
+            city: "",
+            province: "",
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+          });
           setCoordinates(coordinates);
 
           console.log("No intersection found, using clicked coordinates");
@@ -303,7 +331,13 @@ const LocationMarker: React.FC<{
         const coordinates = `${e.latlng.lat.toFixed(
           6,
         )}, ${e.latlng.lng.toFixed(6)}`;
-        setSelectedLocation({ address: coordinates, city: '', province: '', lat: e.latlng.lat, lng: e.latlng.lng });
+        setSelectedLocation({
+          address: coordinates,
+          city: "",
+          province: "",
+          lat: e.latlng.lat,
+          lng: e.latlng.lng,
+        });
         setCoordinates(coordinates);
       }
     },
@@ -481,9 +515,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
 
   const [formData, setFormData] =
     useState<IntersectionFormData>(getDefaultFormData());
-  const [activeTab, setActiveTab] = useState<"Manual" | "Map">(
-    "Manual",
-  );
+  const [activeTab, setActiveTab] = useState<"Manual" | "Map">("Manual");
   const [coordinates, setCoordinates] = useState<string | null>(null);
   const [isSnapping, setIsSnapping] = useState(false);
 
@@ -528,18 +560,24 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
     });
   };
 
-  const handleMapSelection = (location: { address: string; city: string; province: string; lat: number; lng: number; }) => {
+  const handleMapSelection = (location: {
+    address: string;
+    city: string;
+    province: string;
+    lat: number;
+    lng: number;
+  }) => {
     setFormData((prev) => ({
       ...prev,
       name: location.address,
-      details: { 
-          ...prev.details, 
-          address: `${location.address}, ${location.city}, ${location.province}`,
-          city: location.city,
-          province: location.province,
-          latitude: location.lat,
-          longitude: location.lng
-        },
+      details: {
+        ...prev.details,
+        address: `${location.address}, ${location.city}, ${location.province}`,
+        city: location.city,
+        province: location.province,
+        latitude: location.lat,
+        longitude: location.lng,
+      },
     }));
   };
 
@@ -589,8 +627,13 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
         <h2 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-[#E6EDF3]">
           {isEditing ? "Edit Intersection" : "Create New Intersection"}
         </h2>
-        <form onSubmit={handleSubmit} className="flex flex-col flex-grow overflow-y-auto">
-          <div className={`grid grid-cols-1 lg:grid-cols-2 gap-x-12 ${activeTab === 'Map' ? 'gap-y-4' : 'gap-y-8'}`}>
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col flex-grow overflow-y-auto"
+        >
+          <div
+            className={`grid grid-cols-1 lg:grid-cols-2 gap-x-12 ${activeTab === "Map" ? "gap-y-4" : "gap-y-8"}`}
+          >
             <div className="space-y-8">
               <div className="space-y-5">
                 <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">

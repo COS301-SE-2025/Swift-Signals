@@ -24,8 +24,8 @@ const IntersectionCard: React.FC<IntersectionCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const displayName = name.split(' [')[0];
-  const displayLocation = location.split(',')[0];
+  const displayName = name.split(" [")[0];
+  const displayLocation = location.split(",")[0];
   return (
     <div className="intersectionCard bg-white p-8 rounded-2xl shadow-lg flex justify-between items-center">
       <div className="flex items-center space-x-8">

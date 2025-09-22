@@ -29,7 +29,9 @@ type TutorialType =
 type DialogflowMessage = {
   payload?: {
     fields?: {
-      richContent: {
+      action?: { stringValue: string };
+      path?: { stringValue: string };
+      richContent?: {
         listValue: {
           values: {
             listValue: {
@@ -403,8 +405,6 @@ const simulationResultsTutorialSteps: TutorialStep[] = [
   },
 ];
 
-
-
 const faqData = [
   {
     question: "What is Swift Signals?",
@@ -528,7 +528,7 @@ const HelpMenu: React.FC = () => {
           message: text,
           event: event,
           sessionId: sessionId,
-          token: localStorage.getItem('authToken'),
+          token: localStorage.getItem("authToken"),
         }),
       });
 
@@ -539,16 +539,19 @@ const HelpMenu: React.FC = () => {
       // --- HANDLE NAVIGATION PAYLOAD ---
       if (data.fulfillmentMessages) {
         const navigationPayload = data.fulfillmentMessages.find(
-          (msg: any) => msg.payload && msg.payload.fields && msg.payload.fields.action
+          (msg: DialogflowMessage) =>
+            msg.payload && msg.payload.fields && msg.payload.fields.action,
         );
 
         if (navigationPayload) {
-          const action = navigationPayload.payload.fields.action.stringValue;
-          const path = navigationPayload.payload.fields.path.stringValue;
+          const action = navigationPayload.payload?.fields?.action?.stringValue;
+          const path = navigationPayload.payload?.fields?.path?.stringValue;
 
-          if (action === 'NAVIGATE' && path) {
-            console.log(`%c✅ ACTION HANDLER PASSED: Navigating to [${path}]`,
-            "color: green; font-weight: bold;");
+          if (action === "NAVIGATE" && path) {
+            console.log(
+              `%c✅ ACTION HANDLER PASSED: Navigating to [${path}]`,
+              "color: green; font-weight: bold;",
+            );
             setTimeout(() => {
               navigate(path);
               setIsOpen(false); // Close the help menu on navigation
@@ -719,7 +722,6 @@ const HelpMenu: React.FC = () => {
           onClose={() => setActiveTutorial(null)}
         />
       )}
-      
 
       {confirmationDetails && (
         <div className="confirmation-overlay">
@@ -889,7 +891,6 @@ const HelpMenu: React.FC = () => {
                       </p>
                     </button>
                   </div>
-                  
                 </div>
               </div>
               <div className="accordion-section">

@@ -28,7 +28,11 @@ type Props = {
   tutorialType: string;
 };
 
-const InteractiveTutorial: React.FC<Props> = ({ steps, onClose, tutorialType }) => {
+const InteractiveTutorial: React.FC<Props> = ({
+  steps,
+  onClose,
+  tutorialType,
+}) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [position, setPosition] = useState<Position | null>(null);
   const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);

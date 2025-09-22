@@ -101,12 +101,12 @@ const GroundPlane: FC<{ isDarkMode?: boolean }> = ({ isDarkMode }) => (
   </mesh>
 );
 
-const Roads: FC<{ edges: Edge[]; nodes: Node[]; center: THREE.Vector2; isDarkMode?: boolean }> = ({
-  edges,
-  nodes,
-  center,
-  isDarkMode,
-}) => {
+const Roads: FC<{
+  edges: Edge[];
+  nodes: Node[];
+  center: THREE.Vector2;
+  isDarkMode?: boolean;
+}> = ({ edges, nodes, center, isDarkMode }) => {
   return (
     <group>
       {edges.map((edge) => {
@@ -596,8 +596,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
         });
 
         const maxSignalIndex = Math.max(...Array.from(allConnectionIndices));
-        const stateArrayLength =
-          maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
+        const stateArrayLength = maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
         const newPhases: TrafficLightPhase[] = [];
         const nsGreenDuration = 30;
         const nsGreenState = Array(stateArrayLength).fill("r");
@@ -732,7 +731,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
       try {
         setIsLoading(true);
         processData(propSimulationData);
-      } catch (e) {
+      } catch {
         setError("Failed to process provided simulation data.");
         setIsLoading(false);
       }
