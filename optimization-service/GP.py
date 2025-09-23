@@ -30,7 +30,7 @@ toolbox.register("green", random.randint, 10, 60)
 toolbox.register("yellow", random.randint, 3, 20)
 toolbox.register("red", random.randint, 10, 60)
 toolbox.register("speed", lambda: random.choice([60, 80, 100]))
-toolbox.register("seed", lambda: random.randint(0, 2**32 - 1))
+toolbox.register("seed", lambda: random.randint(0, 2 ** 32 - 1))
 toolbox.register(
     "individual",
     tools.initCycle,
@@ -47,6 +47,7 @@ toolbox.register(
 toolbox.register("mate", tools.cxTwoPoint)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
+
 def custom_mutate(individual, indpb=0.2, min_speed=40):
     if random.random() < indpb:
         individual[0] = random.randint(10, 60)  # Green
@@ -59,7 +60,9 @@ def custom_mutate(individual, indpb=0.2, min_speed=40):
         individual[3] = random.choice(allowed_speeds)
     return (individual,)
 
+
 toolbox.register("mutate", custom_mutate)
+
 
 def run_simulation(individual, traffic_density=2):
     green, yellow, red, speed, seed = individual
@@ -99,8 +102,9 @@ def run_simulation(individual, traffic_density=2):
         with open(result_file, "r") as f:
             result_data = json.load(f)
         return result_data["intersection"]["results"]
-    except:
+    except (FileNotFoundError, json.JSONDecodeError, KeyError):
         return None
+
 
 # --- Balanced evaluation function ---
 def evaluate_balanced(individual, traffic_density=2):
@@ -115,17 +119,18 @@ def evaluate_balanced(individual, traffic_density=2):
     # Efficiency metrics
     waiting = result.get("Total Waiting Time", 1e6)
     travel = result.get("Total Travel Time", 1e6)
-    
+
     # Safety metrics
     brakes = result.get("Emergency Brakes", 0)
     stops = result.get("Emergency Stops", 0)
     collisions = result.get("Near collisions", 0)
-    
+
     # Weighted combination
     efficiency_score = 0.7 * (0.9 * waiting + 0.3 * travel)
     safety_score = 0.3 * (1000 * brakes + 1000 * stops + 20000 * collisions)
-    
+
     return (efficiency_score + safety_score,)
+
 
 def log_individual_to_file(individual, generation, ind_id):
     os.makedirs("ga_results", exist_ok=True)
@@ -135,9 +140,10 @@ def log_individual_to_file(individual, generation, ind_id):
             f"{individual[3]},{individual[4]},{individual.fitness.values[0]}\n"
         )
 
+
 def run_ga(pop, hof, ngen, cxpb, mutpb, label="GA"):
     stats = tools.Statistics(lambda ind: ind.fitness.values[0])
-    stats.register("avg", lambda fits: sum(fits)/len(fits))
+    stats.register("avg", lambda fits: sum(fits) / len(fits))
     stats.register("min", min)
 
     logbook = tools.Logbook()
@@ -173,6 +179,7 @@ def run_ga(pop, hof, ngen, cxpb, mutpb, label="GA"):
         hof.update(pop)
         record = stats.compile(pop)
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
+
 
 def run_final_simulation_and_compare(best_params, traffic_density=2):
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
@@ -235,12 +242,14 @@ def run_final_simulation_and_compare(best_params, traffic_density=2):
 
     return final_results
 
+
 def cleanup_files():
     for fpath in generated_param_files + generated_result_files:
         try:
             os.remove(fpath)
         except Exception:
             pass
+
 
 def main():
     random.seed(1408)
@@ -251,7 +260,9 @@ def main():
     traffic_density = 2
 
     # Register balanced evaluation
-    toolbox.register("evaluate", lambda ind: evaluate_balanced(ind, traffic_density=traffic_density))
+    toolbox.register(
+        "evaluate", lambda ind: evaluate_balanced(ind, traffic_density=traffic_density)
+    )
     toolbox.register("mutate", lambda ind: custom_mutate(ind, indpb=0.2, min_speed=60))
 
     pop = toolbox.population(n=pop_size)
@@ -267,9 +278,9 @@ def main():
 
     end_ga = time.time()
     total_time_run = end_ga - start_ga
-    mins = int(total_time_run//60)
-    secs = int(total_time_run%60)
-    
+    mins = int(total_time_run // 60)
+    secs = int(total_time_run % 60)
+
     print(f"GA ran for {mins} minutes and {secs} seconds")
 
     # Save best individual
@@ -290,7 +301,9 @@ def main():
     print(json.dumps(best_params, indent=2))
 
     # Final simulation and comparison
-    final_results = run_final_simulation_and_compare(best_params, traffic_density=traffic_density)
+    final_results = run_final_simulation_and_compare(
+        best_params, traffic_density=traffic_density
+    )
     cleanup_files()
 
     return final_results
