@@ -79,11 +79,14 @@ const MapModal: React.FC<MapModalProps> = ({
                 <Popup>
                   <b>{intersection.name}</b>
                   <br />
-                  {intersection.details.address.split(',')[0]}
+                  {intersection.details.address.split(",")[0]}
                   <br />
-                  <button 
+                  <button
                     className="mt-2 px-3 py-1 bg-[#0F5BA7] text-white text-xs rounded hover:bg-blue-700 transition-colors"
-                    onClick={() => onSimulate(intersection.id, intersection.name)}>
+                    onClick={() =>
+                      onSimulate(intersection.id, intersection.name)
+                    }
+                  >
                     Simulate
                   </button>
                 </Popup>

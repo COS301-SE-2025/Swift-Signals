@@ -404,8 +404,6 @@ const simulationResultsTutorialSteps: TutorialStep[] = [
   },
 ];
 
-
-
 const faqData = [
   {
     question: "What is Swift Signals?",
@@ -529,7 +527,7 @@ const HelpMenu: React.FC = () => {
           message: text,
           event: event,
           sessionId: sessionId,
-          token: localStorage.getItem('authToken'),
+          token: localStorage.getItem("authToken"),
         }),
       });
 
@@ -541,16 +539,19 @@ const HelpMenu: React.FC = () => {
       if (data.fulfillmentMessages) {
         const navigationPayload = data.fulfillmentMessages.find(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          (msg: any) => msg.payload && msg.payload.fields && msg.payload.fields.action
+          (msg: any) =>
+            msg.payload && msg.payload.fields && msg.payload.fields.action,
         );
 
         if (navigationPayload) {
           const action = navigationPayload.payload.fields.action.stringValue;
           const path = navigationPayload.payload.fields.path.stringValue;
 
-          if (action === 'NAVIGATE' && path) {
-            console.log(`%c✅ ACTION HANDLER PASSED: Navigating to [${path}]`,
-            "color: green; font-weight: bold;");
+          if (action === "NAVIGATE" && path) {
+            console.log(
+              `%c✅ ACTION HANDLER PASSED: Navigating to [${path}]`,
+              "color: green; font-weight: bold;",
+            );
             setTimeout(() => {
               navigate(path);
               setIsOpen(false); // Close the help menu on navigation
@@ -721,7 +722,6 @@ const HelpMenu: React.FC = () => {
           onClose={() => setActiveTutorial(null)}
         />
       )}
-      
 
       {confirmationDetails && (
         <div className="confirmation-overlay">
@@ -891,7 +891,6 @@ const HelpMenu: React.FC = () => {
                       </p>
                     </button>
                   </div>
-                  
                 </div>
               </div>
               <div className="accordion-section">

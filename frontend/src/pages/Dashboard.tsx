@@ -83,8 +83,9 @@ const Dashboard: React.FC = () => {
       let totalSims = 0;
       let totalOptimizations = 0;
 
-      items.forEach(item => {
-        const runCount = typeof item.run_count === "number" ? item.run_count : 0;
+      items.forEach((item) => {
+        const runCount =
+          typeof item.run_count === "number" ? item.run_count : 0;
         totalSims += runCount;
 
         if (item.status === "INTERSECTION_STATUS_OPTIMISED") {
@@ -525,7 +526,13 @@ const Dashboard: React.FC = () => {
                               {index + 1}
                             </td>
                             <td className="p-2 text-gray-700 dark:text-[#F0F6FC]">
-                              {(intr.details?.address || intr.name || "Unnamed Intersection").split(',')[0]}
+                              {
+                                (
+                                  intr.details?.address ||
+                                  intr.name ||
+                                  "Unnamed Intersection"
+                                ).split(",")[0]
+                              }
                             </td>
                             <td className="p-2">
                               <span
@@ -606,13 +613,16 @@ const Dashboard: React.FC = () => {
                 {!loadingRecent && !recentError && (
                   <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                     {recentIntersections.map((intr) => {
-                      const displayName = (intr.name || "Unnamed Intersection").split(' [')[0];
-                      const address =
-                        (intr.details?.address ||
+                      const displayName = (
+                        intr.name || "Unnamed Intersection"
+                      ).split(" [")[0];
+                      const address = (
+                        intr.details?.address ||
                         [intr.details?.city, intr.details?.province]
                           .filter(Boolean)
                           .join(", ") ||
-                        "No address provided").split(',')[0];
+                        "No address provided"
+                      ).split(",")[0];
 
                       const displayStatus = mapApiStatus(intr.status);
                       const styles = getStatusStyles(displayStatus);
