@@ -540,6 +540,7 @@ const HelpMenu: React.FC = () => {
       // --- HANDLE NAVIGATION PAYLOAD ---
       if (data.fulfillmentMessages) {
         const navigationPayload = data.fulfillmentMessages.find(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (msg: any) => msg.payload && msg.payload.fields && msg.payload.fields.action
         );
 
@@ -548,7 +549,6 @@ const HelpMenu: React.FC = () => {
           const path = navigationPayload.payload.fields.path.stringValue;
 
           if (action === 'NAVIGATE' && path) {
-            // eslint-disable-next-line no-console
             console.log(`%c✅ ACTION HANDLER PASSED: Navigating to [${path}]`,
             "color: green; font-weight: bold;");
             setTimeout(() => {
@@ -593,7 +593,6 @@ const HelpMenu: React.FC = () => {
           .stringValue as TutorialType;
 
         if (tutorialType) {
-          // eslint-disable-next-line no-console
           console.log(
             `%c✅ ACTION HANDLER PASSED: Starting tutorial for [${tutorialType}]`,
             "color: green; font-weight: bold;",
@@ -604,7 +603,6 @@ const HelpMenu: React.FC = () => {
         }
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error communicating with chatbot backend:", error);
       const errorResponse: ChatMessage = {
         text: "Sorry, I'm having trouble connecting to my brain right now. Please try again later.",
@@ -620,7 +618,6 @@ const HelpMenu: React.FC = () => {
     if (isOpen && messages.length === 0) {
       sendQueryToBot({ event: "WELCOME" });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const startTutorial = (tutorialType: TutorialType) => {

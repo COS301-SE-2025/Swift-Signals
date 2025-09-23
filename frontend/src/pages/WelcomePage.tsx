@@ -9,12 +9,12 @@ const WelcomePage: React.FC = () => {
   const navigate = useNavigate(); // Initialize useNavigate
 
   const handleLoginClick = () => {
-    console.log("Login button clicked!"); // eslint-disable-line no-console
+    console.log("Login button clicked!");
     navigate("/login"); // Navigate to the Login page
   };
 
   const handleRegisterClick = () => {
-    console.log("Register button clicked!"); // eslint-disable-line no-console
+    console.log("Register button clicked!");
     navigate("/signup"); // Navigate to the Signup page
   };
 

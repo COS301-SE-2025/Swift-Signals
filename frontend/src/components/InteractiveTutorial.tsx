@@ -186,7 +186,6 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose, tutorialType }) 
     };
 
     setPosition({ highlight: highlightStyles, popover: popoverStyles });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep]);
 
   useLayoutEffect(() => {

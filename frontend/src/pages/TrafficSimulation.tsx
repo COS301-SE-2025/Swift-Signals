@@ -719,7 +719,6 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
         const responseData: SimulationResponse = await response.json();
         processData(responseData.output);
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Error fetching simulation data:", error); 
         setError(
           error instanceof Error

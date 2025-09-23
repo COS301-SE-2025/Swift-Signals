@@ -319,9 +319,7 @@ const SimulationResults: React.FC = () => {
   const params = useParams();
   const { intersectionIds, name, description, type } = location.state || {};
 
-  // eslint-disable-next-line no-console
   console.log("name from location.state:", name);
-  // eslint-disable-next-line no-console
   console.log("intersectionData?.name:", intersectionData?.name);
 
   // Get intersectionId from URL params first, then fall back to location.state
@@ -376,7 +374,6 @@ const SimulationResults: React.FC = () => {
       }
 
       const optResult = await optResponse.json();
-      // eslint-disable-next-line no-console
       console.log("Optimization result:", optResult);
 
       setOptimizationStatus(
@@ -437,7 +434,6 @@ const SimulationResults: React.FC = () => {
         setOptimizationStatus("");
       }, 3000);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error running optimization:", error);
       setOptimizationStatus(
         `Optimization failed: ${error instanceof Error ? error.message : "Unknown error"}`,
@@ -494,7 +490,6 @@ const SimulationResults: React.FC = () => {
         body: JSON.stringify({ status }),
       });
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Failed to update intersection status:", error);
     }
   };
@@ -566,7 +561,6 @@ const SimulationResults: React.FC = () => {
           ? err.message
           : "Failed to load data from the API.",
       );
-      // eslint-disable-next-line no-console
       console.error(err);
     } finally {
       setLoading(false);
@@ -575,7 +569,6 @@ const SimulationResults: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [intersectionId]);
 
   // Chart creation and updates
@@ -897,7 +890,6 @@ const SimulationResults: React.FC = () => {
       chartInstances.current.forEach((c) => c?.destroy());
       chartInstances.current = [];
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [simData, showOptimized, optimizedData]);
 
   const handleViewRendering = () => {

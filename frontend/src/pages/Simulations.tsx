@@ -162,7 +162,6 @@ const LocationMarker: React.FC<{
       });
 
       if (!response.ok) {
-        // eslint-disable-next-line no-console
         console.warn("Overpass API failed:", response.status);
         return null;
       }
@@ -243,7 +242,6 @@ const LocationMarker: React.FC<{
 
       return null;
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error finding nearest intersection:", error);
       return null;
     } finally {
@@ -254,7 +252,6 @@ const LocationMarker: React.FC<{
 
   useMapEvents({
     async click(e) {
-      // eslint-disable-next-line no-console
       console.log("Map clicked at:", e.latlng);
 
       setPosition(e.latlng);
@@ -279,7 +276,6 @@ const LocationMarker: React.FC<{
             )}, ${nearestIntersection.lon.toFixed(6)}`,
           );
 
-          // eslint-disable-next-line no-console
           console.log(
             "Snapped to intersection:",
             nearestIntersection.intersection,
@@ -291,11 +287,9 @@ const LocationMarker: React.FC<{
           setSelectedLocation(coordinates);
           setCoordinates(coordinates);
 
-          // eslint-disable-next-line no-console
           console.log("No intersection found, using clicked coordinates");
         }
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Error processing map click:", error);
         const coordinates = `${e.latlng.lat.toFixed(
           6,
@@ -351,7 +345,6 @@ const StreetSearchComponent: React.FC<{
 
     try {
       const cleanQuery = query.trim();
-      // eslint-disable-next-line no-console
       console.log("Searching for streets with query:", cleanQuery);
 
       const strategies = [
@@ -372,7 +365,6 @@ const StreetSearchComponent: React.FC<{
       for (const strategy of strategies) {
         const results = await strategy();
         if (results.length > 0) {
-          // eslint-disable-next-line no-console
           console.log("Found streets via strategy:", results);
           return results;
         }
@@ -381,7 +373,6 @@ const StreetSearchComponent: React.FC<{
 
       return getCommonSouthAfricanStreets(query);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error in searchStreets:", error);
       return getCommonSouthAfricanStreets(query);
     }
@@ -407,18 +398,15 @@ const StreetSearchComponent: React.FC<{
       }
 
       const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
-      // eslint-disable-next-line no-console
       console.log("Nominatim URL:", url);
 
       const response = await fetch(url);
       if (!response.ok) {
-        // eslint-disable-next-line no-console
         console.warn(`Nominatim request failed: ${response.status}`);
         return [];
       }
 
       const data: NominatimResult[] = await response.json();
-      // eslint-disable-next-line no-console
       console.log("Nominatim raw results:", data.length);
 
       if (!Array.isArray(data) || data.length === 0) {
@@ -427,7 +415,6 @@ const StreetSearchComponent: React.FC<{
 
       return processSouthAfricanStreets(data);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error in searchNominatimStreets:", error);
       return [];
     }
@@ -492,7 +479,6 @@ const StreetSearchComponent: React.FC<{
       )
       .slice(0, 15);
 
-    // eslint-disable-next-line no-console
     console.log("Processed streets:", processed);
     return processed;
   };
@@ -563,7 +549,6 @@ const StreetSearchComponent: React.FC<{
     if (!street.name) return [];
 
     try {
-      // eslint-disable-next-line no-console
       console.log("Finding intersections for:", street.name, "in", street.city);
 
       if (street.lat && street.lon) {
@@ -573,7 +558,6 @@ const StreetSearchComponent: React.FC<{
           street.name,
         );
         if (coordResults.length > 0) {
-          // eslint-disable-next-line no-console
           console.log(
             "Found intersections via coordinates:",
             coordResults.length,
@@ -584,7 +568,6 @@ const StreetSearchComponent: React.FC<{
 
       const overpassResults = await findIntersectionsViaOverpass(street);
       if (overpassResults.length > 0) {
-        // eslint-disable-next-line no-console
         console.log(
           "Found intersections via Overpass:",
           overpassResults.length,
@@ -597,7 +580,6 @@ const StreetSearchComponent: React.FC<{
         street.city,
       );
       if (nominatimResults.length > 0) {
-        // eslint-disable-next-line no-console
         console.log(
           "Found intersections via Nominatim search:",
           nominatimResults.length,
@@ -607,7 +589,6 @@ const StreetSearchComponent: React.FC<{
 
       return getContextualIntersectingStreets(street);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error finding intersecting streets:", error);
       return getContextualIntersectingStreets(street);
     }
@@ -620,7 +601,6 @@ const StreetSearchComponent: React.FC<{
     streetName: string,
   ): Promise<Street[]> => {
     try {
-      // eslint-disable-next-line no-console
       console.log(
         `Finding intersections at coordinates: ${lat}, ${lon} for ${streetName}`,
       );
@@ -644,7 +624,6 @@ const StreetSearchComponent: React.FC<{
       });
 
       if (!response.ok) {
-        // eslint-disable-next-line no-console
         console.warn("Overpass API failed:", response.status);
         return [];
       }
@@ -652,7 +631,6 @@ const StreetSearchComponent: React.FC<{
       const data = await response.json();
       return extractIntersectionsFromOverpassData(data.elements, streetName);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error finding intersections at coordinates:", error);
       return [];
     }
@@ -682,7 +660,6 @@ const StreetSearchComponent: React.FC<{
     out geom;
    `;
 
-      // eslint-disable-next-line no-console
       console.log("Overpass query for street search:", overpassQuery);
 
       const response = await fetch("https://overpass-api.de/api/interpreter", {
@@ -692,7 +669,6 @@ const StreetSearchComponent: React.FC<{
       });
 
       if (!response.ok) {
-        // eslint-disable-next-line no-console
         console.warn("Overpass API failed:", response.status);
         return [];
       }
@@ -700,14 +676,12 @@ const StreetSearchComponent: React.FC<{
       const data = await response.json();
 
       if (!data.elements || data.elements.length === 0) {
-        // eslint-disable-next-line no-console
         console.log("No ways found for street:", street.name);
         return [];
       }
 
       return await findAllIntersectingWays(data.elements, street.name);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error with Overpass API:", error);
       return [];
     }
@@ -727,12 +701,10 @@ const StreetSearchComponent: React.FC<{
       });
 
       if (targetNodeIds.size === 0) {
-        // eslint-disable-next-line no-console
         console.log("No nodes found in target ways");
         return [];
       }
 
-      // eslint-disable-next-line no-console
       console.log("Target street has", targetNodeIds.size, "nodes");
 
       const nodeList = Array.from(targetNodeIds).slice(0, 100);
@@ -758,7 +730,6 @@ const StreetSearchComponent: React.FC<{
       });
 
       if (!response.ok) {
-        // eslint-disable-next-line no-console
         console.warn("Intersection query failed:", response.status);
         return [];
       }
@@ -766,7 +737,6 @@ const StreetSearchComponent: React.FC<{
       const data = await response.json();
       return extractIntersectionsFromOverpassData(data.elements, streetName);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error finding intersecting ways:", error);
       return [];
     }
@@ -792,7 +762,6 @@ const StreetSearchComponent: React.FC<{
         !originalStreetLower.includes(el.tags.name.toLowerCase()),
     );
 
-    // eslint-disable-next-line no-console
     console.log(
       `Found ${intersectingWays.length} potentially intersecting ways`,
     );
@@ -824,7 +793,6 @@ const StreetSearchComponent: React.FC<{
       )
       .sort((a, b) => a.name.localeCompare(b.name));
 
-    // eslint-disable-next-line no-console
     console.log("Extracted unique intersecting streets:", uniqueStreets.length);
     return uniqueStreets.slice(0, 20);
   };
@@ -853,7 +821,6 @@ const StreetSearchComponent: React.FC<{
             q: query,
           }).toString();
 
-        // eslint-disable-next-line no-console
         console.log("Searching intersection mentions:", query);
 
         const response = await fetch(url);
@@ -873,7 +840,6 @@ const StreetSearchComponent: React.FC<{
 
       return [];
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error searching intersection mentions:", error);
       return [];
     }
@@ -1293,7 +1259,6 @@ const StreetSearchComponent: React.FC<{
           const suggestions = await searchStreets(value);
           setFirstStreetSuggestions(suggestions);
         } catch (error) {
-          // eslint-disable-next-line no-console
           console.error("Error fetching street suggestions:", error);
           setFirstStreetSuggestions(getCommonSouthAfricanStreets(value));
         } finally {
@@ -1315,14 +1280,11 @@ const StreetSearchComponent: React.FC<{
     setIsLoadingSecond(true);
 
     try {
-      // eslint-disable-next-line no-console
       console.log("Finding intersections for selected street:", street);
       const intersecting = await findIntersectingStreets(street);
-      // eslint-disable-next-line no-console
       console.log("Found intersecting streets:", intersecting);
       setSecondStreetSuggestions(intersecting);
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error finding intersecting streets:", error);
       setSecondStreetSuggestions(getContextualIntersectingStreets(street));
     } finally {
@@ -1931,7 +1893,6 @@ const Simulations: React.FC = () => {
       const data = await res.json();
       return data.intersections || [];
     } catch (err: unknown) {
-      // eslint-disable-next-line no-console
       console.error("Error fetching intersections:", err);
       throw err;
     }
@@ -1969,7 +1930,6 @@ const Simulations: React.FC = () => {
       }
       return await res.json();
     } catch (err: unknown) {
-      // eslint-disable-next-line no-console
       console.error("Error creating intersection:", err);
       throw err;
     }
@@ -1987,7 +1947,6 @@ const Simulations: React.FC = () => {
         throw new Error(`Failed to run simulation: ${res.statusText}`);
       return await res.json();
     } catch (err: unknown) {
-      // eslint-disable-next-line no-console
       console.error("Error running simulation:", err);
       throw err;
     }
@@ -2006,7 +1965,6 @@ const Simulations: React.FC = () => {
         throw new Error(`Failed to run optimization: ${res.statusText}`);
       return await res.json();
     } catch (err: unknown) {
-      // eslint-disable-next-line no-console
       console.error("Error running optimization:", err);
       throw err;
     }

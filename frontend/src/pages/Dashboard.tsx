@@ -97,7 +97,6 @@ const Dashboard: React.FC = () => {
 
       updateChart(items);
     } catch (err: unknown) {
-      // eslint-disable-next-line no-console
       console.error("Failed to fetch intersections:", err);
       setTotalIntersections(0);
       setTotalSimulationsRun(0); // Reset on error
@@ -235,7 +234,6 @@ const Dashboard: React.FC = () => {
       const mappedValue = densityMap[density] || 2; // Default to medium (2) if density is unknown
 
       // Debug logging
-      // eslint-disable-next-line no-console
       console.log(
         `Intersection: ${intersection.name}, Raw density: ${density}, Mapped value: ${mappedValue}`,
       );
@@ -246,9 +244,7 @@ const Dashboard: React.FC = () => {
     // Create labels for the x-axis (intersection numbers)
     const labels = intersections.map((_, index) => `Intersection ${index + 1}`);
 
-    // eslint-disable-next-line no-console
     console.log("Final density data:", densityData);
-    // eslint-disable-next-line no-console
     console.log("Final labels:", labels);
 
     return { labels, data: densityData };
@@ -256,7 +252,6 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     fetchAllIntersections();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchMapIntersections = async () => {

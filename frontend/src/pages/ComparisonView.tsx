@@ -7,11 +7,16 @@ import HelpMenu from "../components/HelpMenu";
 // Define SimulationData interface to match the structure from TrafficSimulation.tsx
 interface SimulationData {
   intersection: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     nodes: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     edges: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     trafficLights?: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     connections: any[];
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   vehicles: any[];
 }
 

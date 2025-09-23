@@ -102,14 +102,14 @@ const searchNominatim = async (
     const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
     const response = await fetch(url);
     if (!response.ok) {
-      console.warn(`Nominatim request failed: ${response.status}`); // eslint-disable-line no-console
+      console.warn(`Nominatim request failed: ${response.status}`);
       return [];
     }
 
     const data: NominatimResult[] = await response.json();
     return data;
   } catch (error) {
-    console.error("Error in searchNominatim:", error); // eslint-disable-line no-console
+    console.error("Error in searchNominatim:", error);
     return [];
   }
 };
@@ -191,7 +191,7 @@ export const geocodeAddress = async (address: string): Promise<GeocodedLocation 
     }
     return null;
   } catch (error) {
-    console.error("Error geocoding address:", error); // eslint-disable-line no-console
+    console.error("Error geocoding address:", error);
     return null;
   }
 };

@@ -124,6 +124,7 @@ const LocationMarker: React.FC<{
   const findNearestIntersection = async (
     lat: number,
     lon: number,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ): Promise<any | null> => {
     try {
       setIsSnapping?.(true);
@@ -151,7 +152,6 @@ const LocationMarker: React.FC<{
       });
 
       if (!response.ok) {
-        // eslint-disable-next-line no-console
         console.warn("Overpass API failed:", response.status);
         return null;
       }
@@ -218,6 +218,7 @@ const LocationMarker: React.FC<{
                 roads: uniqueRoads.slice(0, 2),
                 intersection: `${uniqueRoads[0]} & ${uniqueRoads[1]}`,
                 distance,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
               } as any);
             }
           }
@@ -246,7 +247,6 @@ const LocationMarker: React.FC<{
 
       return null;
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error("Error finding nearest intersection:", error);
       return null;
     } finally {
@@ -257,7 +257,6 @@ const LocationMarker: React.FC<{
 
   useMapEvents({
     async click(e) {
-      // eslint-disable-next-line no-console
       console.log("Map clicked at:", e.latlng);
 
       setPosition(e.latlng);
@@ -291,7 +290,6 @@ const LocationMarker: React.FC<{
             )}, ${nearestIntersection.lon.toFixed(6)}`,
           );
 
-          // eslint-disable-next-line no-console
           console.log(
             "Snapped to intersection:",
             nearestIntersection.intersection,
@@ -303,11 +301,9 @@ const LocationMarker: React.FC<{
           setSelectedLocation({ address: coordinates, city: '', province: '', lat: e.latlng.lat, lng: e.latlng.lng });
           setCoordinates(coordinates);
 
-          // eslint-disable-next-line no-console
           console.log("No intersection found, using clicked coordinates");
         }
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Error processing map click:", error);
         const coordinates = `${e.latlng.lat.toFixed(
           6,

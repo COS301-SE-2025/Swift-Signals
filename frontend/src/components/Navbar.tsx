@@ -39,7 +39,6 @@ function Navbar() {
         const data = await res.json();
         setUsername(data.username || "User");
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Error fetching user profile:", error);
       }
     };
