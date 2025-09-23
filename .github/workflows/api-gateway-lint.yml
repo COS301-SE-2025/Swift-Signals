@@ -29,9 +29,16 @@ jobs:
           working-directory: ./api-gateway
           run: |
             go install github.com/vektra/mockery/v2@latest
-            mockery
+            # Generate client mocks
+            mockery --name=UserClientInterface --dir=./internal/client --output=./internal/mocks/client
+            mockery --name=IntersectionClientInterface --dir=./internal/client --output=./internal/mocks/client
+            mockery --name=OptimisationClientInterface --dir=./internal/client --output=./internal/mocks/client
+            # Generate service mocks
+            mockery --name=AdminServiceInterface --dir=./internal/service --output=./internal/mocks/service
+            mockery --name=ProfileServiceInterface --dir=./internal/service --output=./internal/mocks/service
+            mockery --name=AuthServiceInterface --dir=./internal/service --output=./internal/mocks/service
+            mockery --name=IntersectionServiceInterface --dir=./internal/service --output=./internal/mocks/service
             go mod tidy
-
         - name: golangci-lint
           uses: golangci/golangci-lint-action@v8
           with:
