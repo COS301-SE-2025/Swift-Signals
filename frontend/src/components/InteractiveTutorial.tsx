@@ -5,6 +5,7 @@ import React, {
   useState,
   useCallback,
 } from "react";
+import "../styles/InteractiveTutorial.css";
 
 export type TutorialStep = {
   selector: string;

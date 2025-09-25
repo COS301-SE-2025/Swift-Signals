@@ -7,6 +7,7 @@ import { useLocation } from "react-router-dom";
 
 import logo from "../../src/assets/logo.png";
 import { API_BASE_URL } from "../config";
+import "../components/Navbar.css";
 
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

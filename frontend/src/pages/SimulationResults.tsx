@@ -5,10 +5,9 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
-import { Chart, registerables } from "chart.js";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
-import type { ChartConfiguration } from "chart.js";
+import Navbar from "../components/Navbar";
 import { API_BASE_URL } from "../config";
+import "../styles/SimulationResults.css";
 
 Chart.register(...registerables);
 

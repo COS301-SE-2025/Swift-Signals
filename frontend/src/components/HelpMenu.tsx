@@ -8,6 +8,10 @@ import {
 } from "react-icons/fa";
 import { IoSend } from "react-icons/io5";
 import { CHATBOT_BASE_URL } from "../config";
+import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
+import { v4 as uuidv4 } from "uuid";
+import { useLocation, useNavigate } from "react-router-dom";
+import "../styles/HelpMenu.css";
 
 type QuickReply = { text: string; payload: string };
 type ChatMessage = {

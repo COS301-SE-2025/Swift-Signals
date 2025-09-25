@@ -18,8 +18,6 @@ import Navbar from "../components/Navbar";
 import "../styles/Intersections.css";
 
 import "leaflet/dist/leaflet.css";
-import type { LatLng } from "leaflet";
-import L from "leaflet";
 import { API_BASE_URL } from "../config";
 import { CHATBOT_BASE_URL } from "../config";
 
