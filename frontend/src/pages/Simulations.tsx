@@ -9,8 +9,7 @@ import type { LatLng } from "leaflet";
 import "../styles/Simulations.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import HelpMenu from "../components/HelpMenu";
-
-const API_BASE_URL = "http://localhost:9090";
+import { API_BASE_URL } from "../config";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");

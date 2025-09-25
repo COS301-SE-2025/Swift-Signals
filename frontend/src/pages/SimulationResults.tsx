@@ -6,11 +6,9 @@ import HelpMenu from "../components/HelpMenu";
 import { Chart, registerables } from "chart.js";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import type { ChartConfiguration } from "chart.js";
+import { API_BASE_URL } from "../config";
 
 Chart.register(...registerables);
-
-// #region API Integration
-const API_BASE_URL = "http://localhost:9090";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");

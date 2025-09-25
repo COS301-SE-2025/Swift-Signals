@@ -16,6 +16,8 @@ import {
 import "leaflet/dist/leaflet.css";
 import type { LatLng } from "leaflet";
 import L from "leaflet";
+import { API_BASE_URL } from "../config";
+import { CHATBOT_BASE_URL } from "../config";
 
 // =================================================================
 // DATA STRUCTURES & INTERFACES
@@ -246,7 +248,7 @@ const LocationMarker: React.FC<{
 
       if (intersections.length > 0) {
         const closestIntersection = intersections[0];
-        const reverseGeocodeUrl = `http://localhost:3001/api/reverse-geocode?lat=${closestIntersection.lat}&lon=${closestIntersection.lon}`;
+        const reverseGeocodeUrl = `${CHATBOT_BASE_URL}/api/reverse-geocode?lat=${closestIntersection.lat}&lon=${closestIntersection.lon}`;
         const reverseGeocodeResponse = await fetch(reverseGeocodeUrl);
         const reverseGeocodeData = await reverseGeocodeResponse.json();
         const address = reverseGeocodeData.address;
@@ -954,8 +956,6 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
 // =================================================================
 // MAIN PAGE COMPONENT
 // =================================================================
-
-const API_BASE_URL = "http://localhost:9090";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");

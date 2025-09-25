@@ -4,6 +4,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { MapControls, OrthographicCamera } from "@react-three/drei";
 import * as THREE from "three";
 import { SimulationUI } from "../components/SimulationUI";
+import { API_BASE_URL } from "../config";
 
 // Data Interfaces & Helpers
 interface Node {
@@ -75,8 +76,6 @@ interface SimulationResponse {
     total_waiting_time: number;
   };
 }
-
-const API_BASE_URL = "http://localhost:9090";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");
