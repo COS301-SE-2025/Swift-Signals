@@ -5,6 +5,8 @@ const Fuse = require("fuse.js");
 const axios = require("axios");
 require("dotenv").config();
 
+const API_BASE_URL = process.env.API_BASE_URL || "http://api-gateway:9090";
+
 const app = express();
 const port = process.env.PORT || 3001;
 
@@ -106,7 +108,7 @@ app.post("/api/chatbot", async (req, res) => {
         try {
           console.log("Attempting to call API: GET /intersections");
           const apiResponse = await axios.get(
-            "http://api-gateway:9090/intersections",
+            `${API_BASE_URL}/intersections`,
             {
               headers: { Authorization: `Bearer ${token}` },
             },
@@ -157,7 +159,7 @@ app.post("/api/chatbot", async (req, res) => {
             `Attempting to get details for: ${intersectionIdentifier}`,
           );
           const allIntersectionsResponse = await axios.get(
-            "http://api-gateway:9090/intersections",
+            `${API_BASE_URL}/intersections`,
             {
               headers: { Authorization: `Bearer ${token}` },
             },
@@ -246,7 +248,7 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
           );
 
           const allIntersectionsResponse = await axios.get(
-            "http://api-gateway:9090/intersections",
+            `${API_BASE_URL}/intersections`,
             {
               headers: { Authorization: `Bearer ${token}` },
             },
@@ -319,7 +321,7 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
       } else {
         try {
           console.log("Attempting to call API: GET /me");
-          const apiResponse = await axios.get("http://api-gateway:9090/me", {
+          const apiResponse = await axios.get(`${API_BASE_URL}/me`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           console.log("✅ API call successful.", { data: apiResponse.data });
@@ -381,7 +383,7 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
             requestBody,
           );
           const apiResponse = await axios.post(
-            "http://api-gateway:9090/intersections",
+            `${API_BASE_URL}/intersections`,
             requestBody,
             {
               headers: { Authorization: `Bearer ${token}` },
