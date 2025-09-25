@@ -130,10 +130,10 @@ func setupRoutes(
 	// Auth routes
 	authService := service.NewAuthService(userClient)
 	authHandler := handler.NewAuthHandler(authService)
-	mux.HandleFunc("POST /login", authHandler.Login)
-	mux.HandleFunc("POST /register", authHandler.Register)
-	mux.HandleFunc("POST /logout", authHandler.Logout)
-	mux.HandleFunc("POST /reset-password", authHandler.ResetPassword)
+	mux.HandleFunc("POST /api/login", authHandler.Login)
+	mux.HandleFunc("POST /api/register", authHandler.Register)
+	mux.HandleFunc("POST /api/logout", authHandler.Logout)
+	mux.HandleFunc("POST /api/reset-password", authHandler.ResetPassword)
 	log.Println("Initialized Auth Handlers.")
 
 	// Profile routes
@@ -179,9 +179,9 @@ func setupRoutes(
 		middleware.CORS,
 		middleware.AuthMiddleware(
 			JwtSecret,
-			"/login",
-			"/register",
-			"/reset-password",
+			"/api/login",
+			"/api/register",
+			"/api/reset-password",
 			"/docs",
 			"/favicon.ico",
 		),
