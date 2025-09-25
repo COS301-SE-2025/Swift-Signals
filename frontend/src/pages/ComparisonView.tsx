@@ -1,60 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+
 import TrafficSimulation from "./TrafficSimulation";
 import HelpMenu from "../components/HelpMenu";
 
 // Define SimulationData interface to match the structure from TrafficSimulation.tsx
-interface Node {
-  id: string;
-  x: number;
-  y: number;
-  type: string;
-}
-interface Edge {
-  id: string;
-  from: string;
-  to: string;
-  speed: number;
-  lanes: number;
-}
-interface Position {
-  time: number;
-  x: number;
-  y: number;
-  speed: number;
-}
-interface VehicleData {
-  id: string;
-  positions: Position[];
-}
-interface TrafficLightPhase {
-  duration: number;
-  state: string;
-}
-interface TrafficLightState {
-  time: number;
-  state: string;
-}
-interface TrafficLightData {
-  id: string;
-  phases: TrafficLightPhase[];
-  states?: TrafficLightState[];
-}
-interface Connection {
-  from: string;
-  to: string;
-  fromLane: number;
-  toLane: number;
-  tl: string;
-}
 interface SimulationData {
   intersection: {
-    nodes: Node[];
-    edges: Edge[];
-    trafficLights?: TrafficLightData[];
-    connections: Connection[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    nodes: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    edges: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    trafficLights?: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    connections: any[];
   };
-  vehicles: VehicleData[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  vehicles: any[];
 }
 
 interface ComparisonViewProps {
@@ -93,11 +56,15 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   const [expanded, setExpanded] = useState<"none" | "left" | "right">("none");
   const [hasOptimizedData, setHasOptimizedData] =
     useState<boolean>(!!optimizedData);
-  const [isLoadingOptimized] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isLoadingOptimized, setIsLoadingOptimized] = useState<boolean>(false);
   const [optimizedDataError, setOptimizedDataError] = useState<string | null>(
     null,
   );
-  const [optimizedDataSuccess] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [optimizedDataSuccess, setOptimizedDataSuccess] = useState<
+    string | null
+  >(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
@@ -603,7 +570,7 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
                   <p
                     className={`text-sm ${isDarkMode ? "text-gray-300" : "text-gray-600"} mb-6`}
                   >
-                    This simulation hasn't been optimized yet.
+                    This simulation hasn&apos;t been optimized yet.
                   </p>
                   <p
                     className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"} mb-4`}

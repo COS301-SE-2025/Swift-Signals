@@ -1,8 +1,9 @@
-import React, { useRef, useState, useEffect, useMemo } from "react";
-import type { FC } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
 import { MapControls, OrthographicCamera } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import type { FC } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
+
 import { SimulationUI } from "../components/SimulationUI";
 
 // Data Interfaces & Helpers

@@ -1,17 +1,18 @@
 //import { useState } from 'react';
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 //import Navbar from './components/Navbar';
 // import Footer from './components/Footer';
+import ErrorBoundary from "./components/ErrorBoundary";
+import ComparisonView from "./pages/ComparisonView";
+import Dashboard from "./pages/Dashboard";
+import Intersections from "./pages/Intersections";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
-import Dashboard from "./pages/Dashboard";
-import Simulations from "./pages/Simulations";
-import Intersections from "./pages/Intersections";
-import Users from "./pages/Users";
 import SimulationResults from "./pages/SimulationResults";
-import ComparisonView from "./pages/ComparisonView";
-import ErrorBoundary from "./components/ErrorBoundary";
+import Simulations from "./pages/Simulations";
+import Users from "./pages/Users";
 import WelcomePage from "./pages/WelcomePage";
 //import reactLogo from './assets/react.svg';
 //import viteLogo from '/vite.svg';

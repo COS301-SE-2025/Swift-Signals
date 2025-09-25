@@ -1,14 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Eye, Trash2, ChevronDown } from "lucide-react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import type { LatLng } from "leaflet";
-import "../styles/Simulations.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+import { Eye, Trash2, ChevronDown } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { useNavigate } from "react-router-dom";
+
+import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
+import Navbar from "../components/Navbar";
+
+import "leaflet/dist/leaflet.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import "../styles/Simulations.css";
 
 const API_BASE_URL = "http://localhost:9090";
 
@@ -1380,7 +1382,8 @@ const StreetSearchComponent: React.FC<{
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Intersecting Street
             <span className="text-xs text-gray-500 block">
-              Streets that actually intersect with "{selectedFirstStreet.name}"
+              Streets that actually intersect with &quot;
+              {selectedFirstStreet.name}&quot;
             </span>
           </label>
           <div className="relative">

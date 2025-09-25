@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Login.css";
-import Footer from "../components/Footer";
+
 import logo from "../../src/assets/logo.png";
+import Footer from "../components/Footer";
+import "../styles/Login.css";
 
 const API_BASE_URL = "http://localhost:9090";
 
@@ -304,7 +305,7 @@ const Login = () => {
           </div>
         </form>
         <p className="regLink mt-8 text-center text-sm text-gray-600">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <button
             type="button"
             onClick={() => navigate("/signup")}

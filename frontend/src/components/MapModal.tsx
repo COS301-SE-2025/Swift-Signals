@@ -1,12 +1,12 @@
-import React from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { X } from "lucide-react";
 import "../styles/MapModal.css";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { X } from "lucide-react";
+import React from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 // --- FIX for default icon issue with webpack ---
 // Deletes the default icon's image paths and resets them after the component is loaded.
