@@ -11,6 +11,7 @@ import {
   FaChevronDown,
 } from "react-icons/fa";
 import { IoSend } from "react-icons/io5";
+import { CHATBOT_BASE_URL } from "../config";
 
 type QuickReply = { text: string; payload: string };
 type ChatMessage = {
@@ -521,7 +522,7 @@ const HelpMenu: React.FC = () => {
     setIsBotTyping(true);
 
     try {
-      const response = await fetch("http://localhost:3001/api/chatbot", {
+      const response = await fetch(`${CHATBOT_BASE_URL}/api/chatbot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
