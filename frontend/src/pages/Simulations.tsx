@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
 import Navbar from "../components/Navbar";
-import "../styles/Simulations.css"
+import "../styles/Simulations.css";
 
 import "leaflet/dist/leaflet.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
