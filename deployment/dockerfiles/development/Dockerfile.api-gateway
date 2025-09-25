@@ -1,6 +1,5 @@
 FROM golang:1.24.6-alpine
 
-# Install tools
 RUN apk add --no-cache protobuf protobuf-dev && \
     rm -rf /var/cache/apk/* && \
     go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
@@ -11,19 +10,29 @@ WORKDIR /app
 COPY protos/ protos/
 
 WORKDIR /app/protos/
-RUN mkdir -p /app/protos/gen/intersection/ && \
+RUN mkdir -p /app/protos/gen/user /app/protos/gen/intersection /app/protos/gen/simulation /app/protos/gen/optimisation && \
+    protoc --go_out=./gen/user/ --go_opt=paths=source_relative \
+           --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative \
+           user.proto && \
     protoc --go_out=./gen/intersection/ --go_opt=paths=source_relative \
            --go-grpc_out=./gen/intersection/ --go-grpc_opt=paths=source_relative \
            intersection.proto && \
+    protoc --go_out=./gen/simulation/ --go_opt=paths=source_relative \
+           --go-grpc_out=./gen/simulation/ --go-grpc_opt=paths=source_relative \
+           simulation.proto && \
+    protoc --go_out=./gen/optimisation/ --go_opt=paths=source_relative \
+           --go-grpc_out=./gen/optimisation/ --go-grpc_opt=paths=source_relative \
+           optimisation.proto && \
     cd gen/ && \
     go mod init "github.com/COS301-SE-2025/Swift-Signals/protos/gen" && \
     go mod tidy
 
+
 WORKDIR /app
 COPY shared/ shared/
-COPY intersection-service/ intersection-service/
+COPY api-gateway/ api-gateway/
 
-WORKDIR /app/intersection-service/
+WORKDIR /app/api-gateway/
 RUN mockery && \
     go mod tidy && \
     go mod download
