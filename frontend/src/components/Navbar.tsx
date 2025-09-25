@@ -1,10 +1,10 @@
-import "./Navbar.css";
-import { FaCircleUser } from "react-icons/fa6";
-import { IoIosLogOut } from "react-icons/io";
 import { useState, useEffect } from "react";
+import { FaCircleUser } from "react-icons/fa6";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { IoIosLogOut } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
+
 import logo from "../../src/assets/logo.png";
 import { API_BASE_URL } from "../config";
 

@@ -1,10 +1,11 @@
+import { Chart, registerables } from "chart.js";
+import { useState } from "react";
 import React, { useEffect, useRef } from "react";
+import { FaRoad, FaPlay, FaChartLine, FaPlus, FaMap } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
-import "../styles/Dashboard.css";
-import { Chart, registerables } from "chart.js";
 import MapModal from "../components/MapModal";
 import { useState } from "react";
 import { API_BASE_URL } from "../config";
@@ -60,7 +61,8 @@ const Dashboard: React.FC = () => {
 
   const [totalIntersections, setTotalIntersections] = useState<number>(0);
   const [loadingTotal, setLoadingTotal] = useState(false);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [activeSimulations, setActiveSimulations] = useState<number>(0);
   const [loadingActiveSimulations, setLoadingActiveSimulations] =
     useState(false);
   const [totalSimulationsRun, setTotalSimulationsRun] = useState<number>(0);

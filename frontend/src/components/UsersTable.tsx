@@ -1,5 +1,5 @@
-import React from "react";
 import { PencilLine, Trash2 } from "lucide-react";
+import React from "react";
 import "../styles/UsersTable.css";
 
 interface User {

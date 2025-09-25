@@ -1,10 +1,10 @@
+import { X } from "lucide-react";
 import React, {
   useEffect,
   useLayoutEffect,
   useState,
   useCallback,
 } from "react";
-import { X } from "lucide-react";
 
 export type TutorialStep = {
   selector: string;

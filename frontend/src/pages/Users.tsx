@@ -1,4 +1,8 @@
+import { X } from "lucide-react";
 import { useState, useEffect } from "react";
+
+import Footer from "../components/Footer";
+import HelpMenu from "../components/HelpMenu";
 import Navbar from "../components/Navbar";
 import UsersTable from "../components/UsersTable";
 import "../styles/Users.css";

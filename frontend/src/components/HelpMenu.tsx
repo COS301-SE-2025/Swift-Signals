@@ -1,8 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-import "../styles/HelpMenu.css";
-import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
 import {
   FaTimes,
   FaCommentDots,
@@ -30,9 +26,7 @@ type TutorialType =
 type DialogflowMessage = {
   payload?: {
     fields?: {
-      action?: { stringValue: string };
-      path?: { stringValue: string };
-      richContent?: {
+      richContent: {
         listValue: {
           values: {
             listValue: {
@@ -540,13 +534,14 @@ const HelpMenu: React.FC = () => {
       // --- HANDLE NAVIGATION PAYLOAD ---
       if (data.fulfillmentMessages) {
         const navigationPayload = data.fulfillmentMessages.find(
-          (msg: DialogflowMessage) =>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (msg: any) =>
             msg.payload && msg.payload.fields && msg.payload.fields.action,
         );
 
         if (navigationPayload) {
-          const action = navigationPayload.payload?.fields?.action?.stringValue;
-          const path = navigationPayload.payload?.fields?.path?.stringValue;
+          const action = navigationPayload.payload.fields.action.stringValue;
+          const path = navigationPayload.payload.fields.path.stringValue;
 
           if (action === "NAVIGATE" && path) {
             console.log(
@@ -856,7 +851,7 @@ const HelpMenu: React.FC = () => {
                   <div className="accordion-item tutorial-launcher">
                     <button onClick={() => startTutorial("navigation")}>
                       <h4>Navigation Tutorial</h4>
-                      <p>Learn how to use the site's navbar and footer.</p>
+                      <p>Learn how to use the site&apos;s navbar and footer.</p>
                     </button>
                   </div>
                   <div className="accordion-item tutorial-launcher">

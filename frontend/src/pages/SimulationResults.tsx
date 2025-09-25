@@ -1,7 +1,9 @@
+import { Chart, registerables } from "chart.js";
+import type { ChartConfiguration } from "chart.js";
 import React, { useEffect, useState, useRef } from "react";
-import Navbar from "../components/Navbar";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+
 import Footer from "../components/Footer";
-import "../styles/SimulationResults.css";
 import HelpMenu from "../components/HelpMenu";
 import { Chart, registerables } from "chart.js";
 import { useLocation, useNavigate, useParams } from "react-router-dom";

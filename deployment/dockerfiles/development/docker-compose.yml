@@ -155,7 +155,6 @@ services:
 volumes:
   user_pgdata:
   intersection_mongodata:
-  # metric_pgdata:
 
 networks:
   app-network:

@@ -1,5 +1,6 @@
 import { PlayCircle, PencilLine, Trash2 } from "lucide-react";
 import React from "react";
+
 import "../styles/IntersectionCard.css";
 import placeholderImage from "../assets/placeholder.png";
 

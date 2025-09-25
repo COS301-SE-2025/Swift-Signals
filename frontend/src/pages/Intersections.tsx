@@ -1,11 +1,7 @@
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import type { LatLng } from "leaflet";
+import L from "leaflet";
 import { Search, X, FileText, MapPin, TrafficCone } from "lucide-react";
-import IntersectionCard from "../components/IntersectionCard";
-import "../styles/Intersections.css";
-import Footer from "../components/Footer";
-import HelpMenu from "../components/HelpMenu";
+import { useState, useEffect, useRef } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -13,6 +9,14 @@ import {
   useMapEvents,
   Popup,
 } from "react-leaflet";
+import { useNavigate } from "react-router-dom";
+
+import Footer from "../components/Footer";
+import HelpMenu from "../components/HelpMenu";
+import IntersectionCard from "../components/IntersectionCard";
+import Navbar from "../components/Navbar";
+import "../styles/Intersections.css";
+
 import "leaflet/dist/leaflet.css";
 import type { LatLng } from "leaflet";
 import L from "leaflet";
@@ -96,19 +100,13 @@ interface OverpassElement {
   };
 }
 
-interface FoundIntersection {
+// Type for intersection with calculated distance
+type IntersectionWithDistance = Intersection & {
+  distance: number;
+  intersection: string;
   lat: number;
   lon: number;
-  roads: string[];
-  intersection: string;
-  distance: number;
-}
-
-interface NearestIntersection extends FoundIntersection {
-  address: string;
-  city: string;
-  province: string;
-}
+};
 // #endregion
 
 // =================================================================
@@ -145,7 +143,8 @@ const LocationMarker: React.FC<{
   const findNearestIntersection = async (
     lat: number,
     lon: number,
-  ): Promise<NearestIntersection | null> => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any | null> => {
     try {
       setIsSnapping?.(true);
       setIsLoading(true);
@@ -212,7 +211,7 @@ const LocationMarker: React.FC<{
         }
       });
 
-      const intersections: FoundIntersection[] = [];
+      const intersections: IntersectionWithDistance[] = [];
 
       for (const [nodeId, nodeWays] of nodeWaysMap.entries()) {
         if (nodeWays.length >= 2) {
@@ -238,7 +237,8 @@ const LocationMarker: React.FC<{
                 roads: uniqueRoads.slice(0, 2),
                 intersection: `${uniqueRoads[0]} & ${uniqueRoads[1]}`,
                 distance,
-              });
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any);
             }
           }
         }
@@ -423,10 +423,10 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
 
           <div className="space-y-2">
             <p className="text-gray-700 dark:text-[#C9D1D9]">
-              You're about to permanently delete
+              You&apos;re about to permanently delete
             </p>
             <p className="text-lg font-semibold text-gray-900 dark:text-[#E6EDF3] bg-gray-50 dark:bg-[#21262D] px-3 py-2 rounded-lg border border-gray-200 dark:border-[#30363D]">
-              "{intersectionName}"
+              &quot;{intersectionName}&quot;
             </p>
             <p className="text-sm text-red-600 dark:text-red-400 font-medium mt-3">
               This action cannot be undone
