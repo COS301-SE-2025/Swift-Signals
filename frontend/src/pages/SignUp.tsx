@@ -1,8 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/SignUp.css";
-import Footer from "../components/Footer";
+
 import logo from "../../src/assets/logo.png";
+import Footer from "../components/Footer";
+import "../styles/SignUp.css";
 
 const API_BASE_URL = "http://localhost:9090";
 

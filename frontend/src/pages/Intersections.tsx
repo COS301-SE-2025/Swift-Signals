@@ -1,11 +1,23 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import type { LatLng } from "leaflet";
+import L from "leaflet";
 import { Search, X, FileText, MapPin, TrafficCone } from "lucide-react";
-import IntersectionCard from "../components/IntersectionCard";
-import "../styles/Intersections.css";
+import { useState, useEffect, useRef } from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  Popup,
+} from "react-leaflet";
+import { useNavigate } from "react-router-dom";
+
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
+import IntersectionCard from "../components/IntersectionCard";
+import Navbar from "../components/Navbar";
+import "../styles/Intersections.css";
+
+import "leaflet/dist/leaflet.css";
 
 // =================================================================
 // DATA STRUCTURES & INTERFACES
@@ -20,6 +32,8 @@ export interface IntersectionFormData {
     address: string;
     city: string;
     province: string;
+    latitude?: number;
+    longitude?: number;
   };
   default_parameters: {
     green: number;
@@ -54,26 +68,305 @@ interface Intersection {
     province: string;
   };
   default_parameters: OptimisationParameters;
-  //  FIX: Changed type to string to accommodate direct API values like "high", "medium", "low"
   traffic_density: string;
   image?: string;
 }
+
+// #region API and Data Types
+// Type for Overpass API elements
+interface OverpassElement {
+  type: "node" | "way" | "relation";
+  id: number;
+  lat?: number;
+  lon?: number;
+  tags?: {
+    [key: string]: string | undefined;
+    name?: string;
+    highway?: string;
+    "addr:city"?: string;
+    "addr:state"?: string;
+    "addr:province"?: string;
+  };
+  nodes?: number[];
+  bounds?: {
+    minlat: number;
+    minlon: number;
+    maxlat: number;
+    maxlon: number;
+  };
+}
+
+// Type for intersection with calculated distance
+type IntersectionWithDistance = Intersection & {
+  distance: number;
+  intersection: string;
+  lat: number;
+  lon: number;
+};
+// #endregion
 
 // =================================================================
 // MAPPING & MODAL COMPONENTS
 // =================================================================
 
-//  FIX: Removed apiToUiDensityMap and uiToApiDensityMap as they are no longer needed.
+const LocationMarker: React.FC<{
+  setSelectedLocation: (location: {
+    address: string;
+    city: string;
+    province: string;
+    lat: number;
+    lng: number;
+  }) => void;
+  setCoordinates: (coords: string) => void;
+  setIsSnapping?: (snapping: boolean) => void;
+}> = ({ setSelectedLocation, setCoordinates, setIsSnapping }) => {
+  const [position, setPosition] = useState<LatLng | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [snappedAddress, setSnappedAddress] = useState<{
+    address: string;
+    city: string;
+    province: string;
+  } | null>(null);
+  const markerRef = useRef<L.Marker>(null);
 
-interface CreateIntersectionModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: IntersectionFormData) => void;
-  isLoading: boolean;
-  error: string | null;
-  initialData?: IntersectionFormData | null;
-  isEditing: boolean;
-}
+  useEffect(() => {
+    if (markerRef.current && snappedAddress) {
+      markerRef.current.openPopup();
+    }
+  }, [snappedAddress]);
+
+  // Function to find nearest intersection using Overpass API
+  const findNearestIntersection = async (
+    lat: number,
+    lon: number,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any | null> => {
+    try {
+      setIsSnapping?.(true);
+      setIsLoading(true);
+
+      const radius = 0.005;
+      const bbox = `${lat - radius},${lon - radius},${lat + radius},${
+        lon + radius
+      }`;
+
+      const overpassQuery = `
+    [out:json][timeout:30];
+    (
+     way["highway"~"^(primary|secondary|tertiary|residential|trunk|motorway|unclassified)$"](${bbox});
+    );
+    (._;>;);
+    out geom;
+   `;
+
+      const overpassUrl = "https://overpass-api.de/api/interpreter";
+      const response = await fetch(overpassUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `data=${encodeURIComponent(overpassQuery)}`,
+      });
+
+      if (!response.ok) {
+        console.warn("Overpass API failed:", response.status);
+        return null;
+      }
+
+      const data = await response.json();
+
+      if (!data.elements || data.elements.length === 0) {
+        return null;
+      }
+
+      const ways = data.elements.filter(
+        (el: OverpassElement) => el.type === "way" && el.tags?.name,
+      );
+      const nodes = data.elements.filter(
+        (el: OverpassElement) => el.type === "node",
+      );
+
+      if (ways.length < 2) {
+        return null;
+      }
+
+      const nodeMap = new Map<number, { lat: number; lon: number }>();
+      nodes.forEach((node: OverpassElement) => {
+        if (node.id && node.lat && node.lon) {
+          nodeMap.set(node.id, { lat: node.lat, lon: node.lon });
+        }
+      });
+
+      const nodeWaysMap = new Map<number, OverpassElement[]>();
+      ways.forEach((way: OverpassElement) => {
+        if (way.nodes) {
+          way.nodes.forEach((nodeId: number) => {
+            if (!nodeWaysMap.has(nodeId)) {
+              nodeWaysMap.set(nodeId, []);
+            }
+            nodeWaysMap.get(nodeId)!.push(way);
+          });
+        }
+      });
+
+      const intersections: IntersectionWithDistance[] = [];
+
+      for (const [nodeId, nodeWays] of nodeWaysMap.entries()) {
+        if (nodeWays.length >= 2) {
+          const uniqueRoads = [
+            ...new Set(
+              nodeWays
+                .map((way) => way.tags?.name)
+                .filter((name): name is string => !!name),
+            ),
+          ];
+
+          if (uniqueRoads.length >= 2) {
+            const nodeCoords = nodeMap.get(nodeId);
+            if (nodeCoords) {
+              const distance = Math.sqrt(
+                Math.pow(nodeCoords.lat - lat, 2) +
+                  Math.pow(nodeCoords.lon - lon, 2),
+              );
+
+              intersections.push({
+                lat: nodeCoords.lat,
+                lon: nodeCoords.lon,
+                roads: uniqueRoads.slice(0, 2),
+                intersection: `${uniqueRoads[0]} & ${uniqueRoads[1]}`,
+                distance,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any);
+            }
+          }
+        }
+      }
+
+      intersections.sort((a, b) => a.distance - b.distance);
+
+      if (intersections.length > 0) {
+        const closestIntersection = intersections[0];
+        const reverseGeocodeUrl = `http://localhost:3001/api/reverse-geocode?lat=${closestIntersection.lat}&lon=${closestIntersection.lon}`;
+        const reverseGeocodeResponse = await fetch(reverseGeocodeUrl);
+        const reverseGeocodeData = await reverseGeocodeResponse.json();
+        const address = reverseGeocodeData.address;
+        const streetName = closestIntersection.intersection;
+        const city = address.city || address.town || "";
+        const province = address.state || address.province || "";
+
+        return {
+          ...closestIntersection,
+          address: streetName,
+          city: city,
+          province: province,
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error finding nearest intersection:", error);
+      return null;
+    } finally {
+      setIsLoading(false);
+      setIsSnapping?.(false);
+    }
+  };
+
+  useMapEvents({
+    async click(e) {
+      console.log("Map clicked at:", e.latlng);
+
+      setPosition(e.latlng);
+      setSnappedAddress(null);
+
+      try {
+        const nearestIntersection = await findNearestIntersection(
+          e.latlng.lat,
+          e.latlng.lng,
+        );
+
+        if (nearestIntersection) {
+          const snappedPosition = {
+            lat: nearestIntersection.lat,
+            lng: nearestIntersection.lon,
+          } as LatLng;
+
+          setPosition(snappedPosition);
+          const newAddress = {
+            address: nearestIntersection.address,
+            city: nearestIntersection.city,
+            province: nearestIntersection.province,
+            lat: nearestIntersection.lat,
+            lng: nearestIntersection.lon,
+          };
+          setSelectedLocation(newAddress);
+          setSnappedAddress(newAddress);
+          setCoordinates(
+            `${nearestIntersection.lat.toFixed(
+              6,
+            )}, ${nearestIntersection.lon.toFixed(6)}`,
+          );
+
+          console.log(
+            "Snapped to intersection:",
+            nearestIntersection.intersection,
+          );
+        } else {
+          const coordinates = `${e.latlng.lat.toFixed(
+            6,
+          )}, ${e.latlng.lng.toFixed(6)}`;
+          setSelectedLocation({
+            address: coordinates,
+            city: "",
+            province: "",
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+          });
+          setCoordinates(coordinates);
+
+          console.log("No intersection found, using clicked coordinates");
+        }
+      } catch (error) {
+        console.error("Error processing map click:", error);
+        const coordinates = `${e.latlng.lat.toFixed(
+          6,
+        )}, ${e.latlng.lng.toFixed(6)}`;
+        setSelectedLocation({
+          address: coordinates,
+          city: "",
+          province: "",
+          lat: e.latlng.lat,
+          lng: e.latlng.lng,
+        });
+        setCoordinates(coordinates);
+      }
+    },
+  });
+
+  return (
+    <>
+      {position && (
+        <Marker ref={markerRef} position={position}>
+          {snappedAddress && (
+            <Popup>
+              <b>{snappedAddress.address}</b>
+              <br />
+              {snappedAddress.city}, {snappedAddress.province}
+            </Popup>
+          )}
+        </Marker>
+      )}
+      {isLoading && (
+        <div className="absolute top-2 left-2 bg-white dark:bg-gray-800 px-3 py-1 rounded-md shadow-md z-10">
+          <div className="flex items-center space-x-2">
+            <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              Finding nearest intersection...
+            </span>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
 
 interface DeleteConfirmationModalProps {
   isOpen: boolean;
@@ -126,10 +419,10 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
 
           <div className="space-y-2">
             <p className="text-gray-700 dark:text-[#C9D1D9]">
-              You're about to permanently delete
+              You&apos;re about to permanently delete
             </p>
             <p className="text-lg font-semibold text-gray-900 dark:text-[#E6EDF3] bg-gray-50 dark:bg-[#21262D] px-3 py-2 rounded-lg border border-gray-200 dark:border-[#30363D]">
-              "{intersectionName}"
+              &quot;{intersectionName}&quot;
             </p>
             <p className="text-sm text-red-600 dark:text-red-400 font-medium mt-3">
               This action cannot be undone
@@ -185,6 +478,16 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
   );
 };
 
+interface CreateIntersectionModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (formData: IntersectionFormData) => void;
+  isLoading: boolean;
+  error: string | null;
+  initialData?: IntersectionFormData | null;
+  isEditing: boolean;
+}
+
 const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   isOpen,
   onClose,
@@ -210,6 +513,9 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
 
   const [formData, setFormData] =
     useState<IntersectionFormData>(getDefaultFormData());
+  const [activeTab, setActiveTab] = useState<"Manual" | "Map">("Manual");
+  const [coordinates, setCoordinates] = useState<string | null>(null);
+  const [isSnapping, setIsSnapping] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -252,9 +558,34 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
     });
   };
 
+  const handleMapSelection = (location: {
+    address: string;
+    city: string;
+    province: string;
+    lat: number;
+    lng: number;
+  }) => {
+    setFormData((prev) => ({
+      ...prev,
+      name: location.address,
+      details: {
+        ...prev.details,
+        address: `${location.address}, ${location.city}, ${location.province}`,
+        city: location.city,
+        province: location.province,
+        latitude: location.lat,
+        longitude: location.lng,
+      },
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    const newFormData = { ...formData };
+    if (newFormData.details.latitude && newFormData.details.longitude) {
+      newFormData.name = `${newFormData.name} [${newFormData.details.latitude},${newFormData.details.longitude}]`;
+    }
+    onSubmit(newFormData);
   };
 
   const inputClasses =
@@ -283,8 +614,8 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   );
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex justify-center items-center z-50 p-4">
-      <div className="bg-white dark:bg-[#161B22] p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-4xl relative border border-gray-200 dark:border-[#30363D]">
+    <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex justify-center items-center z-50 px-2 py-8">
+      <div className="bg-white dark:bg-[#161B22] p-4 sm:p-8 md:p-6 rounded-xl shadow-2xl w-full sm:max-w-xl md:max-w-2xl lg:max-w-4xl create-intersection-modal relative border border-gray-200 dark:border-[#30363D] flex flex-col max-h-[90vh] overflow-y-auto [\@media(min-width:1025px)_and_\(max-width:1400px\)]\:max-w-\[850px\] [\@media(min-width:769px)_and_\(max-width:1024px\)]\:max-w-\[800px\]">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 dark:text-[#7D8590] hover:text-gray-600 dark:hover:text-[#E6EDF3] transition-colors duration-150"
@@ -294,8 +625,13 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
         <h2 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-[#E6EDF3]">
           {isEditing ? "Edit Intersection" : "Create New Intersection"}
         </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-8">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col flex-grow overflow-y-auto"
+        >
+          <div
+            className={`grid grid-cols-1 lg:grid-cols-2 gap-x-12 ${activeTab === "Map" ? "gap-y-4" : "gap-y-8"}`}
+          >
             <div className="space-y-8">
               <div className="space-y-5">
                 <h3 className="flex items-center gap-3 text-xl font-semibold text-gray-800 dark:text-[#E6EDF3] border-b border-gray-200 dark:border-[#30363D] pb-3">
@@ -336,60 +672,125 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                   <MapPin size={20} className="text-[#0f5ba7]" />
                   Location Details
                 </h3>
-                <div>
-                  <label
-                    htmlFor="details.address"
-                    className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1"
+                <div className="flex space-x-2 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("Manual")}
+                    className={`px-3 py-1 rounded-md text-sm font-medium ${
+                      activeTab === "Manual"
+                        ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]"
+                        : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+                    } transition-all duration-300`}
                   >
-                    Address / Cross Streets
-                  </label>
-                  <input
-                    type="text"
-                    name="details.address"
-                    id="details.address"
-                    required
-                    className={inputClasses}
-                    value={formData.details.address}
-                    onChange={handleChange}
-                    placeholder="Corner of Lynnwood Rd and Atterbury Rd"
-                  />
+                    Manual
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("Map")}
+                    className={`px-3 py-1 rounded-md text-sm font-medium ${
+                      activeTab === "Map"
+                        ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]"
+                        : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+                    } transition-all duration-300`}
+                  >
+                    Map
+                  </button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label
-                      htmlFor="details.city"
-                      className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1"
+                {activeTab === "Manual" && (
+                  <>
+                    <div>
+                      <label
+                        htmlFor="details.address"
+                        className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1"
+                      >
+                        Address / Cross Streets
+                      </label>
+                      <input
+                        type="text"
+                        name="details.address"
+                        id="details.address"
+                        required
+                        className={inputClasses}
+                        value={formData.details.address}
+                        onChange={handleChange}
+                        placeholder="Corner of Lynnwood Rd and Atterbury Rd"
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor="details.city"
+                          className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1"
+                        >
+                          City
+                        </label>
+                        <input
+                          type="text"
+                          name="details.city"
+                          id="details.city"
+                          required
+                          className={inputClasses}
+                          value={formData.details.city}
+                          onChange={handleChange}
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="details.province"
+                          className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1"
+                        >
+                          Province
+                        </label>
+                        <input
+                          type="text"
+                          name="details.province"
+                          id="details.province"
+                          required
+                          className={inputClasses}
+                          value={formData.details.province}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+                {activeTab === "Map" && (
+                  <div className="relative">
+                    <MapContainer
+                      center={[-25.7479, 28.2293]}
+                      zoom={12}
+                      style={{ height: "180px", width: "100%" }}
                     >
-                      City
-                    </label>
-                    <input
-                      type="text"
-                      name="details.city"
-                      id="details.city"
-                      required
-                      className={inputClasses}
-                      value={formData.details.city}
-                      onChange={handleChange}
-                    />
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution=' <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      />
+                      <LocationMarker
+                        setSelectedLocation={handleMapSelection}
+                        setCoordinates={setCoordinates}
+                        setIsSnapping={setIsSnapping}
+                      />
+                    </MapContainer>
+                    <div className="mt-2 space-y-1">
+                      {isSnapping && (
+                        <div className="flex items-center text-sm text-blue-600 dark:text-blue-400">
+                          <div className="animate-spin inline-block w-3 h-3 border-2 border-current border-t-transparent rounded-full mr-2"></div>
+                          Snapping to nearest intersection...
+                        </div>
+                      )}
+                      {coordinates && (
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                          <span className="font-medium">Coordinates:</span>{" "}
+                          {coordinates}
+                        </p>
+                      )}
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Click anywhere on the map to automatically find the
+                        nearest road intersection
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <label
-                      htmlFor="details.province"
-                      className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-1"
-                    >
-                      Province
-                    </label>
-                    <input
-                      type="text"
-                      name="details.province"
-                      id="details.province"
-                      required
-                      className={inputClasses}
-                      value={formData.details.province}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
+                )}
               </div>
             </div>
             <div className="space-y-8">
@@ -499,7 +900,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
           {error && (
             <p className="text-red-500 text-sm text-center mt-6">{error}</p>
           )}
-          <div className="flex justify-end space-x-4 pt-8 border-t border-gray-200 dark:border-[#30363D] mt-8">
+          <div className="flex justify-end space-x-4 pt-0 border-t border-gray-200 dark:border-[#30363D] mt-4">
             <button
               type="button"
               onClick={onClose}

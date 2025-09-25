@@ -1,8 +1,9 @@
-import React, { useRef, useState, useEffect, useMemo } from "react";
-import type { FC } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
 import { MapControls, OrthographicCamera } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import type { FC } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
+
 import { SimulationUI } from "../components/SimulationUI";
 
 // Data Interfaces & Helpers
@@ -94,18 +95,19 @@ const getRandomCarColor = () =>
   realisticCarColors[Math.floor(Math.random() * realisticCarColors.length)];
 
 // 3D Scene Components
-const GroundPlane: FC = () => (
+const GroundPlane: FC<{ isDarkMode?: boolean }> = ({ isDarkMode }) => (
   <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.5, 0]} receiveShadow>
     <planeGeometry args={[2000, 2000]} />
-    <meshStandardMaterial color={0xaaaaaa} />
+    <meshStandardMaterial color={isDarkMode ? 0x282828 : 0xaaaaaa} />
   </mesh>
 );
 
-const Roads: FC<{ edges: Edge[]; nodes: Node[]; center: THREE.Vector2 }> = ({
-  edges,
-  nodes,
-  center,
-}) => {
+const Roads: FC<{
+  edges: Edge[];
+  nodes: Node[];
+  center: THREE.Vector2;
+  isDarkMode?: boolean;
+}> = ({ edges, nodes, center, isDarkMode }) => {
   return (
     <group>
       {edges.map((edge) => {
@@ -134,7 +136,7 @@ const Roads: FC<{ edges: Edge[]; nodes: Node[]; center: THREE.Vector2 }> = ({
           <group key={edge.id} position={position} rotation={[0, -angle, 0]}>
             <mesh rotation={[-Math.PI / 2, 0, 0]}>
               <planeGeometry args={[length, roadWidth]} />
-              <meshStandardMaterial color={0x282828} />
+              <meshStandardMaterial color={isDarkMode ? 0x666666 : 0x282828} />
             </mesh>
             {Array.from({ length: edge.lanes === 1 ? 1 : edge.lanes - 1 }).map(
               (_, laneIndex) => {
@@ -428,6 +430,7 @@ const SimulationController: FC<{
   onTimeUpdate: (time: number) => void;
   roadDirections: { [key: string]: string };
   onTrafficLightStateUpdate: (states: { [key: string]: string }) => void;
+  isDarkMode?: boolean;
 }> = ({
   simulationData,
   isPlaying,
@@ -437,6 +440,7 @@ const SimulationController: FC<{
   onTimeUpdate,
   roadDirections,
   onTrafficLightStateUpdate,
+  isDarkMode,
 }) => {
   const [simulationTime, setSimulationTime] = useState(0);
   const vehicleColors = useMemo(
@@ -463,11 +467,12 @@ const SimulationController: FC<{
 
   return (
     <>
-      <GroundPlane />
+      <GroundPlane isDarkMode={isDarkMode} />
       <Roads
         edges={simulationData.intersection.edges}
         nodes={simulationData.intersection.nodes}
         center={roadCenter}
+        isDarkMode={isDarkMode}
       />
       {simulationData.vehicles.map((vehicle, index) => (
         <Vehicle
@@ -506,6 +511,8 @@ interface TrafficSimulationProps {
   scale?: number;
   isExpanded: boolean;
   endpoint?: "simulate" | "optimise";
+  simulationData?: SimulationData | null;
+  isDarkMode?: boolean;
 }
 
 // Hook to detect mobile screen size
@@ -531,6 +538,8 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
   scale,
   isExpanded,
   endpoint = "simulate",
+  simulationData: propSimulationData,
+  isDarkMode,
 }) => {
   const [simulationData, setSimulationData] = useState<SimulationData | null>(
     null,
@@ -558,6 +567,114 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
 
   // Fetch simulation data from API
   useEffect(() => {
+    const processData = (data: SimulationData) => {
+      if (!data) {
+        throw new Error("Invalid simulation data received");
+      }
+
+      // Process traffic lights if they exist
+      if (data.intersection.trafficLights) {
+        const directionToSignalIndices: { [key: string]: number[] } = {
+          North: [],
+          South: [],
+          East: [],
+          West: [],
+        };
+        const allConnectionIndices = new Set<number>();
+
+        data.intersection.connections.forEach((conn) => {
+          if (conn.from.indexOf(":") === -1) {
+            const direction = roadDirections[conn.from];
+            const signalIndex = parseInt(conn.tl, 10);
+            if (
+              direction &&
+              !directionToSignalIndices[direction].includes(signalIndex)
+            ) {
+              directionToSignalIndices[direction].push(signalIndex);
+            }
+            allConnectionIndices.add(signalIndex);
+          }
+        });
+
+        const maxSignalIndex = Math.max(...Array.from(allConnectionIndices));
+        const stateArrayLength = maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
+        const newPhases: TrafficLightPhase[] = [];
+        const nsGreenDuration = 30;
+        const nsGreenState = Array(stateArrayLength).fill("r");
+        directionToSignalIndices["North"].forEach((index) => {
+          nsGreenState[index] = "G";
+        });
+        directionToSignalIndices["South"].forEach((index) => {
+          nsGreenState[index] = "G";
+        });
+        newPhases.push({
+          duration: nsGreenDuration,
+          state: nsGreenState.join(""),
+        });
+        const nsYellowDuration = 5;
+        const nsYellowState = Array(stateArrayLength).fill("r");
+        directionToSignalIndices["North"].forEach((index) => {
+          nsYellowState[index] = "y";
+        });
+        directionToSignalIndices["South"].forEach((index) => {
+          nsYellowState[index] = "y";
+        });
+        newPhases.push({
+          duration: nsYellowDuration,
+          state: nsYellowState.join(""),
+        });
+        const ewGreenDuration = 30;
+        const ewGreenState = Array(stateArrayLength).fill("r");
+        directionToSignalIndices["East"].forEach((index) => {
+          ewGreenState[index] = "G";
+        });
+        directionToSignalIndices["West"].forEach((index) => {
+          ewGreenState[index] = "G";
+        });
+        newPhases.push({
+          duration: ewGreenDuration,
+          state: ewGreenState.join(""),
+        });
+        const ewYellowDuration = 5;
+        const ewYellowState = Array(stateArrayLength).fill("r");
+        directionToSignalIndices["East"].forEach((index) => {
+          ewYellowState[index] = "y";
+        });
+        directionToSignalIndices["West"].forEach((index) => {
+          ewYellowState[index] = "y";
+        });
+        newPhases.push({
+          duration: ewYellowDuration,
+          state: ewYellowState.join(""),
+        });
+
+        const processedTrafficLights = data.intersection.trafficLights.map(
+          (light) => {
+            let time = 0;
+            const newStates = newPhases.map((phase) => {
+              const state = { time: time, state: phase.state };
+              time += phase.duration;
+              return state;
+            });
+            newStates.push({ time: time, state: newPhases[0].state });
+            return { ...light, phases: newPhases, states: newStates };
+          },
+        );
+
+        const newSimData = {
+          ...data,
+          intersection: {
+            ...data.intersection,
+            trafficLights: processedTrafficLights,
+          },
+        };
+        setSimulationData(newSimData);
+      } else {
+        setSimulationData(data);
+      }
+      setIsLoading(false);
+    };
+
     const fetchSimulationData = async () => {
       if (!intersectionId) {
         setError("No intersection ID provided");
@@ -598,112 +715,8 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           }
         }
 
-        const data: SimulationResponse = await response.json();
-
-        if (!data.output) {
-          throw new Error("Invalid simulation data received from server");
-        }
-
-        // Process traffic lights if they exist
-        if (data.output.intersection.trafficLights) {
-          const directionToSignalIndices: { [key: string]: number[] } = {
-            North: [],
-            South: [],
-            East: [],
-            West: [],
-          };
-          const allConnectionIndices = new Set<number>();
-
-          data.output.intersection.connections.forEach((conn) => {
-            if (conn.from.indexOf(":") === -1) {
-              const direction = roadDirections[conn.from];
-              const signalIndex = parseInt(conn.tl, 10);
-              if (
-                direction &&
-                !directionToSignalIndices[direction].includes(signalIndex)
-              ) {
-                directionToSignalIndices[direction].push(signalIndex);
-              }
-              allConnectionIndices.add(signalIndex);
-            }
-          });
-
-          const maxSignalIndex = Math.max(...Array.from(allConnectionIndices));
-          const stateArrayLength =
-            maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
-          const newPhases: TrafficLightPhase[] = [];
-          const nsGreenDuration = 30;
-          const nsGreenState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["North"].forEach((index) => {
-            nsGreenState[index] = "G";
-          });
-          directionToSignalIndices["South"].forEach((index) => {
-            nsGreenState[index] = "G";
-          });
-          newPhases.push({
-            duration: nsGreenDuration,
-            state: nsGreenState.join(""),
-          });
-          const nsYellowDuration = 5;
-          const nsYellowState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["North"].forEach((index) => {
-            nsYellowState[index] = "y";
-          });
-          directionToSignalIndices["South"].forEach((index) => {
-            nsYellowState[index] = "y";
-          });
-          newPhases.push({
-            duration: nsYellowDuration,
-            state: nsYellowState.join(""),
-          });
-          const ewGreenDuration = 30;
-          const ewGreenState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["East"].forEach((index) => {
-            ewGreenState[index] = "G";
-          });
-          directionToSignalIndices["West"].forEach((index) => {
-            ewGreenState[index] = "G";
-          });
-          newPhases.push({
-            duration: ewGreenDuration,
-            state: ewGreenState.join(""),
-          });
-          const ewYellowDuration = 5;
-          const ewYellowState = Array(stateArrayLength).fill("r");
-          directionToSignalIndices["East"].forEach((index) => {
-            ewYellowState[index] = "y";
-          });
-          directionToSignalIndices["West"].forEach((index) => {
-            ewYellowState[index] = "y";
-          });
-          newPhases.push({
-            duration: ewYellowDuration,
-            state: ewYellowState.join(""),
-          });
-
-          const processedTrafficLights =
-            data.output.intersection.trafficLights.map((light) => {
-              let time = 0;
-              const newStates = newPhases.map((phase) => {
-                const state = { time: time, state: phase.state };
-                time += phase.duration;
-                return state;
-              });
-              newStates.push({ time: time, state: newPhases[0].state });
-              return { ...light, phases: newPhases, states: newStates };
-            });
-
-          const newSimData = {
-            ...data.output,
-            intersection: {
-              ...data.output.intersection,
-              trafficLights: processedTrafficLights,
-            },
-          };
-          setSimulationData(newSimData);
-        } else {
-          setSimulationData(data.output);
-        }
+        const responseData: SimulationResponse = await response.json();
+        processData(responseData.output);
       } catch (error) {
         console.error("Error fetching simulation data:", error);
         setError(
@@ -711,13 +724,22 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
             ? error.message
             : "Failed to fetch simulation data",
         );
-      } finally {
         setIsLoading(false);
       }
     };
 
-    fetchSimulationData();
-  }, [intersectionId, roadDirections, endpoint]);
+    if (propSimulationData) {
+      try {
+        setIsLoading(true);
+        processData(propSimulationData);
+      } catch {
+        setError("Failed to process provided simulation data.");
+        setIsLoading(false);
+      }
+    } else {
+      fetchSimulationData();
+    }
+  }, [intersectionId, roadDirections, endpoint, propSimulationData]);
 
   const metrics = useMemo(() => {
     if (!simulationData)
@@ -822,7 +844,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           height: "100vh",
           display: "grid",
           placeContent: "center",
-          backgroundColor: "#3d3d3d",
+          backgroundColor: "transparent",
           color: "white",
         }}
       >
@@ -841,7 +863,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           height: "100vh",
           display: "grid",
           placeContent: "center",
-          backgroundColor: "#3d3d3d",
+          backgroundColor: "transparent",
           color: "white",
         }}
       >
@@ -865,7 +887,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           height: "100vh",
           display: "grid",
           placeContent: "center",
-          backgroundColor: "#3d3d3d",
+          backgroundColor: "transparent",
           color: "white",
         }}
       >
@@ -885,7 +907,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
       style={{
         position: "relative",
         height: "100vh",
-        backgroundColor: "#3d3d3d",
+        backgroundColor: "transparent",
         border: "none",
         boxShadow: "none",
       }}
@@ -924,7 +946,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
           <OrthographicCamera
             makeDefault
             position={[roadCenter.x, 100, roadCenter.y]}
-            zoom={4}
+            zoom={5}
           />
 
           <SimulationController
@@ -937,6 +959,7 @@ const TrafficSimulation: FC<TrafficSimulationProps> = ({
             onTimeUpdate={setSimulationTime}
             roadDirections={roadDirections}
             onTrafficLightStateUpdate={setTrafficLightStates}
+            isDarkMode={isDarkMode}
           />
         </Canvas>
       </div>
