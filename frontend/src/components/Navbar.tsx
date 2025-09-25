@@ -6,7 +6,8 @@ import { IoClose } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
 
 import logo from "../../src/assets/logo.png";
-import "./Navbar.css";
+import { API_BASE_URL } from "../config";
+import "../components/Navbar.css";
 
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -28,7 +29,7 @@ function Navbar() {
         const token = localStorage.getItem("authToken");
         if (!token) return;
 
-        const res = await fetch("http://localhost:9090/me", {
+        const res = await fetch(`${API_BASE_URL}/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

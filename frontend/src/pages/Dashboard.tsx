@@ -9,6 +9,7 @@ import HelpMenu from "../components/HelpMenu";
 import MapModal from "../components/MapModal";
 import Navbar from "../components/Navbar";
 import "../styles/Dashboard.css";
+import { API_BASE_URL } from "../config";
 
 Chart.register(...registerables);
 
@@ -71,7 +72,7 @@ const Dashboard: React.FC = () => {
     // setLoadingActiveSimulations(true); // This line will be removed as activeSimulations is no longer used in the same way
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:9090/intersections", {
+      const response = await fetch(`${API_BASE_URL}/intersections`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");
@@ -260,7 +261,7 @@ const Dashboard: React.FC = () => {
     setMapError(null);
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:9090/intersections", {
+      const response = await fetch(`${API_BASE_URL}/intersections`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");
@@ -304,7 +305,7 @@ const Dashboard: React.FC = () => {
     setRecentError(null);
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:9090/intersections", {
+      const response = await fetch(`${API_BASE_URL}/intersections`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");

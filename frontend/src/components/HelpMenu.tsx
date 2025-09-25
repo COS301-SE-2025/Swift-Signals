@@ -7,11 +7,11 @@ import {
   FaChevronDown,
 } from "react-icons/fa";
 import { IoSend } from "react-icons/io5";
-import { useLocation, useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-
-import "../styles/HelpMenu.css";
+import { CHATBOT_BASE_URL } from "../config";
 import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
+import { v4 as uuidv4 } from "uuid";
+import { useLocation, useNavigate } from "react-router-dom";
+import "../styles/HelpMenu.css";
 
 type QuickReply = { text: string; payload: string };
 type ChatMessage = {
@@ -520,7 +520,7 @@ const HelpMenu: React.FC = () => {
     setIsBotTyping(true);
 
     try {
-      const response = await fetch("http://localhost:3001/api/chatbot", {
+      const response = await fetch(`${CHATBOT_BASE_URL}/api/chatbot`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

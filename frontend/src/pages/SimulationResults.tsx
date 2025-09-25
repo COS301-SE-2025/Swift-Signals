@@ -6,13 +6,10 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
 import Navbar from "../components/Navbar";
-
+import { API_BASE_URL } from "../config";
 import "../styles/SimulationResults.css";
 
 Chart.register(...registerables);
-
-// #region API Integration
-const API_BASE_URL = "http://localhost:9090";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");
