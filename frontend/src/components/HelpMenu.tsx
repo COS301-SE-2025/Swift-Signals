@@ -520,7 +520,7 @@ const HelpMenu: React.FC = () => {
     setIsBotTyping(true);
 
     try {
-      const response = await fetch(`${CHATBOT_BASE_URL}/api/chatbot`, {
+      const response = await fetch(`${CHATBOT_BASE_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
