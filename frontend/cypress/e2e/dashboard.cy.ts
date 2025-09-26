@@ -53,7 +53,11 @@ describe("Dashboard Page", () => {
     cy.contains("Recent Intersections").should("exist");
 
     cy.get(".inter-card").within(() => {
-      
+      cy.contains("Albertus & Simon Vermooten").should("exist");
+      cy.contains("Unoptimised").should("exist");
+
+      cy.contains("Lynnwood & Jan Shoba").should("exist");
+      cy.contains("Unoptimised").should("exist");
     });
   });
   
