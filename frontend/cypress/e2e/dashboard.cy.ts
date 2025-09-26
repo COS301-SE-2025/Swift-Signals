@@ -42,7 +42,7 @@ describe("Dashboard Page", () => {
       cy.contains("#1232").should("exist");
       cy.contains("Failed").should("exist");
 
-      cy.get("button").contains("View Details").should("have.length.at.least", 1);
+      cy.get("button").contains("View Details").should("have.length.at.least", 2);
     });
   });
 
