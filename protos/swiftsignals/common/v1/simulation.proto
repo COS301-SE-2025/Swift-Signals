@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package swiftsignals.common.v1;
+
+import "swiftsignals/common/v1/types.proto";
+
+option go_package = "protos/gen/common/v1";
+
+message SimulationParameters {
+  IntersectionType intersection_type = 1;
+  int32 green = 2;
+  int32 yellow = 3;
+  int32 red = 4;
+  int32 speed = 5;
+  int32 seed = 6;
+  TrafficDensity traffic_density = 7;
+}

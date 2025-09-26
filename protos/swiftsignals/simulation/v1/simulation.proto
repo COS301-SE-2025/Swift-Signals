@@ -1,7 +1,11 @@
 syntax = "proto3";
-package swiftsignals.simulation;
 
-option go_package = "protos/gen/simulation";
+package swiftsignals.simulation.v1;
+
+import "swiftsignals/common/v1/simulation.proto";
+import "swiftsignals/common/v1/types.proto";
+
+option go_package = "protos/gen/simulation/v1";
 
 service SimulationService {
   rpc GetSimulationResults(SimulationRequest)
@@ -11,24 +15,7 @@ service SimulationService {
 
 message SimulationRequest {
   string intersection_id = 1;
-  SimulationParameters simulation_parameters = 2;
-}
-
-message SimulationParameters {
-  IntersectionType intersection_type = 1;
-  int32 green = 2;
-  int32 yellow = 3;
-  int32 red = 4;
-  int32 speed = 5;
-  int32 seed = 6;
-}
-
-enum IntersectionType {
-  INTERSECTION_TYPE_UNSPECIFIED = 0;
-  INTERSECTION_TYPE_TRAFFICLIGHT = 1;
-  INTERSECTION_TYPE_TJUNCTION = 2;
-  INTERSECTION_TYPE_ROUNDABOUT = 3;
-  INTERSECTION_TYPE_STOP_SIGN = 4;
+  swiftsignals.common.v1.SimulationParameters simulation_parameters = 2;
 }
 
 message SimulationResultsResponse {

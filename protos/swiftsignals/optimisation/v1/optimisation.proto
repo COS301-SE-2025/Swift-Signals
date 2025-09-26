@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package swiftsignals.optimisation.v1;
+
+import "swiftsignals/common/v1/types.proto";
+import "swiftsignals/common/v1/simulation.proto";
+
+option go_package = "protos/gen/optimisation/v1";
+
+service OptimisationService {
+  rpc RunOptimisation(OptimisationParameters) returns (OptimisationParameters);
+}
+
+message OptimisationParameters {
+  swiftsignals.common.v1.OptimisationType optimisation_type = 1;
+  swiftsignals.common.v1.SimulationParameters parameters = 2;
+}

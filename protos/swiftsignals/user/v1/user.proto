@@ -1,33 +1,29 @@
 syntax = "proto3";
 
-package swiftsignals.user;
+package swiftsignals.user.v1;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "protos/gen/user";
+option go_package = "protos/gen/user/v1";
 
 service UserService {
   rpc RegisterUser(RegisterUserRequest) returns (UserResponse);
   rpc LoginUser(LoginUserRequest) returns (LoginUserResponse);
   rpc LogoutUser(UserIDRequest) returns (google.protobuf.Empty);
-
   rpc GetUserByID(UserIDRequest) returns (UserResponse);
   rpc GetUserByEmail(GetUserByEmailRequest) returns (UserResponse);
   rpc GetAllUsers(GetAllUsersRequest) returns (stream UserResponse);
   rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
   rpc DeleteUser(UserIDRequest) returns (google.protobuf.Empty);
-
   rpc GetUserIntersectionIDs(UserIDRequest)
       returns (stream IntersectionIDResponse);
   rpc AddIntersectionID(AddIntersectionIDRequest)
       returns (google.protobuf.Empty);
   rpc RemoveIntersectionIDs(RemoveIntersectionIDRequest)
       returns (google.protobuf.Empty);
-
   rpc ChangePassword(ChangePasswordRequest) returns (google.protobuf.Empty);
   rpc ResetPassword(ResetPasswordRequest) returns (google.protobuf.Empty);
-
   rpc MakeAdmin(AdminRequest) returns (google.protobuf.Empty);
   rpc RemoveAdmin(AdminRequest) returns (google.protobuf.Empty);
 }
