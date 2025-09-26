@@ -27,7 +27,9 @@ describe("Users Page", () => {
     cy.wait("@getUsers");
   });
 
-  
+  it("should display users in the table", () => {
+    
+  });
 
   // it("displays correct user information", () => {
   //   cy.get("table.usersTable tbody")
