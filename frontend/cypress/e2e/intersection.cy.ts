@@ -54,7 +54,8 @@ describe("Intersections Page", () => {
 
     cy.contains("Create Intersection");
     cy.wait("@createIntersection");
-    
+
+    cy.contains("New Intersection").should("exist");
   });
 });
 
