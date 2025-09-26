@@ -7,10 +7,17 @@ describe("Users Page", () => {
 
     // Mock users API
     cy.intercept("GET", `${API_BASE_URL}/admin/users*`, [
-      {
+        {
         id: "1",
         username: "Bob Johnson",
         email: "bob@example.com",
+        is_admin: false,
+        intersection_ids: [],
+      },
+      {
+        id: "2",
+        username: "Alice Smith",
+        email: "alice@example.com",
         is_admin: false,
         intersection_ids: [],
       },
