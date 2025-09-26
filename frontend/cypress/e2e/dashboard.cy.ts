@@ -43,6 +43,7 @@ describe("Dashboard Page", () => {
   });
 
   it("renders traffic density distribution chart", () => {
+    cy.contains("Traffic Density Distribution").should("exist");
    
   });
 
