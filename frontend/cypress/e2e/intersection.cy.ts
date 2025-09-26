@@ -93,6 +93,9 @@ describe("Intersections Page", () => {
   it("should search by intersection ID", () => {
     cy.intercept("GET", `${API_BASE_URL}/intersections/123`, {
       statusCode: 200,
+      body: {
+        
+      },
     }).as("searchIntersection");
   });
 });
