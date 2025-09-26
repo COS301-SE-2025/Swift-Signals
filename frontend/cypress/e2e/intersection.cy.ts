@@ -73,7 +73,7 @@ describe("Intersections Page", () => {
     cy.contains("Update Intersection").click();
     cy.wait("@updateIntersection");
 
-    cy.contains("Updated Intersection");
+    cy.contains("Updated Intersection").should("exist");
   });
 });
 
