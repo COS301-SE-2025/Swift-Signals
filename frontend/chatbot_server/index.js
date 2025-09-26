@@ -107,12 +107,9 @@ app.post("/api/chatbot", async (req, res) => {
       } else {
         try {
           console.log("Attempting to call API: GET /intersections");
-          const apiResponse = await axios.get(
-            `${API_BASE_URL}/intersections`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            },
-          );
+          const apiResponse = await axios.get(`${API_BASE_URL}/intersections`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           console.log("✅ API call successful.", { data: apiResponse.data });
 
           const intersections = apiResponse.data.intersections;
