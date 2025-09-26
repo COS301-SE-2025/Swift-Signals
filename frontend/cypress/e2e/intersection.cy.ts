@@ -80,7 +80,7 @@ describe("Intersections Page", () => {
       cy.contains("Delete").click();
     });
     
-    cy.contains("Delete Intersection");
+    cy.contains("Delete Intersection").click();
   });
   
 });
