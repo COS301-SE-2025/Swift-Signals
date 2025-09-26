@@ -34,5 +34,9 @@ describe("Intersections Page", () => {
     cy.visit("/intersections");
     cy.wait("@getIntersections");
   });
+
+  it("should display fetched intersections", () => {
+    
+  });
 });
 
