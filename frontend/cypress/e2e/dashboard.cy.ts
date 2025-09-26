@@ -48,6 +48,10 @@ describe("Dashboard Page", () => {
     // Ensure chart SVG or canvas is present
     cy.get(".traffic-chart-container").find("svg, canvas").should("exist");
   });
+
+  it("renders recent intersections with statuses", () => {
+    
+  });
   
 });
 
