@@ -48,21 +48,6 @@ describe("Dashboard Page", () => {
     // Ensure chart SVG or canvas is present
     cy.get(".traffic-chart-container").find("svg, canvas").should("exist");
   });
-
-  // it("renders top intersections with progress bars", () => {
-  //   cy.contains("Top Intersections").should("exist");
-
-  //   cy.get(".intersection-item").should("have.length", 3);
-
-  //   cy.get(".intersection-item").first().within(() => {
-  //     cy.contains("Main St & 5th Ave").should("exist");
-  //     cy.contains("15,000 vehicles").should("exist");
-  //     cy.get(".progress-bar").should("have.css", "width");
-  //   });
-
-  //   cy.contains("Avg Daily Volume").should("exist");
-  //   cy.contains("12,000 vehicles").should("exist");
-  // });
   
 });
 
