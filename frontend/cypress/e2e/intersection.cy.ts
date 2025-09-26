@@ -43,6 +43,7 @@ describe("Intersections Page", () => {
     cy.contains("Create New Intersection").click();
 
     cy.get("input[name='name']");
+    cy.get("input[name='details.address']");
     
   });
 });
