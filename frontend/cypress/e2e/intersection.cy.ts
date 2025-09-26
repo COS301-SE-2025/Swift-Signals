@@ -99,6 +99,7 @@ describe("Intersections Page", () => {
         traffic_density: "low",
         details: { address: "Search Rd", city: "Pretoria", province: "Gauteng" },
         default_parameters: {
+          optimisation_type: "default",
           
         },
       },
