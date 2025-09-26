@@ -103,6 +103,7 @@ describe("Intersections Page", () => {
           simulation_parameters: {
             intersection_type: "trafficlight",
             green: 20,
+            yellow: ,
             
           },
         },
