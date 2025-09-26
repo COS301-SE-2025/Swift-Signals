@@ -94,7 +94,7 @@ describe("Intersections Page", () => {
     cy.intercept("GET", `${API_BASE_URL}/intersections/123`, {
       statusCode: 200,
       body: {
-        
+        id: "123",
       },
     }).as("searchIntersection");
   });
