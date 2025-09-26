@@ -30,6 +30,7 @@ describe("Users Page", () => {
   it("should display users in the table", () => {
     cy.contains("User Management").should("exist");
     cy.contains("Bob Johnson").should("exist");
+    cy.contains("Alice Smith").should("exist");
   });
 
   // it("displays correct user information", () => {
