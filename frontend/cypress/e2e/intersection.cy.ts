@@ -69,6 +69,8 @@ describe("Intersections Page", () => {
       statusCode: 200,
       body: { id: "123", name: "Updated Intersection" },
     }).as("updateIntersection");
+
+    cy.contains("Update Intersection");
     
   });
 });
