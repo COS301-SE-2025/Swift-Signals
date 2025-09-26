@@ -87,7 +87,7 @@ describe("Intersections Page", () => {
     }).as("deleteIntersection");
 
     cy.wait("@deleteIntersection");
-    
+    cy.contains("Test Intersection");
   });
   
 });
