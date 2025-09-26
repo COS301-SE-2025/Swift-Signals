@@ -101,6 +101,7 @@ describe("Intersections Page", () => {
         default_parameters: {
           optimisation_type: "default",
           simulation_parameters: {
+            intersection_type: "trafficlight",
             
           },
         },
