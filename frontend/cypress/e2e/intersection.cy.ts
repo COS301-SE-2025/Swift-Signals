@@ -48,9 +48,10 @@ describe("Intersections Page", () => {
     cy.get("input[name='details.province']").clear().type("Gauteng");
 
     cy.intercept("POST", `${API_BASE_URL}/intersections`, {
-      statusCode: 201
-      
+      statusCode: 201,
+      body: { id: "456", name: "New Intersection" },
     }).as("createIntersection");
+    
   });
 });
 
