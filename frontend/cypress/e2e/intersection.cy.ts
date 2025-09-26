@@ -6,6 +6,9 @@ describe("Intersections Page", () => {
   beforeEach(() => {
     // Stub auth token in localStorage
     window.localStorage.setItem("authToken", "fake-jwt-token");
+    cy.intercept("GET", `${API_BASE_URL}/intersections`, {
+      
+    }).as("getIntersections");
   });
 });
 
