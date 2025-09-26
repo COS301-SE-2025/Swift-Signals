@@ -51,7 +51,10 @@ describe("Dashboard Page", () => {
 
   it("renders recent intersections with statuses", () => {
     cy.contains("Recent Intersections").should("exist");
-    
+
+    cy.get(".inter-card").within(() => {
+      
+    });
   });
   
 });
