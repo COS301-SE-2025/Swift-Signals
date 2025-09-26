@@ -1,6 +1,10 @@
 describe("Users Page", () => {
     const API_BASE_URL = "http://localhost:9090";
+    
   beforeEach(() => {
+      // Stub token
+    window.localStorage.setItem("authToken", "fake-admin-token");
+      
     cy.visit("/users"); // Adjust path as necessary
   });
 
