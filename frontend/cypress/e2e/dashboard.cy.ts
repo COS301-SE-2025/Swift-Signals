@@ -59,6 +59,8 @@ describe("Dashboard Page", () => {
       cy.contains("Lynnwood & Jan Shoba").should("exist");
       cy.contains("Unoptimised").should("exist");
     });
+
+    cy.contains("View All (2)").should("exist");
   });
   
 });
