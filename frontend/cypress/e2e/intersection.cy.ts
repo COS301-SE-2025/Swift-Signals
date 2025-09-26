@@ -7,7 +7,7 @@ describe("Intersections Page", () => {
     // Stub auth token in localStorage
     window.localStorage.setItem("authToken", "fake-jwt-token");
     cy.intercept("GET", `${API_BASE_URL}/intersections`, {
-      statusCode: 200
+      statusCode: 200,
      
     }).as("getIntersections");
   });
