@@ -20,7 +20,7 @@ describe("Dashboard Page", () => {
 
     
     cy.contains("Run Simulation").should("exist");
-
+    cy.url().should("include", "/simulations/run"); // adjust route if different
 
     
     cy.contains("View Map").should("exist");
