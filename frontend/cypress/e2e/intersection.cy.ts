@@ -59,6 +59,9 @@ describe("Intersections Page", () => {
   });
 
   it("should edit an intersection", () => {
+    cy.contains("Test Intersection").parent().within(() => {
+      
+    });
     
   });
 });
