@@ -100,7 +100,9 @@ describe("Intersections Page", () => {
         details: { address: "Search Rd", city: "Pretoria", province: "Gauteng" },
         default_parameters: {
           optimisation_type: "default",
-          
+          simulation_parameters: {
+            
+          },
         },
       },
     }).as("searchIntersection");
