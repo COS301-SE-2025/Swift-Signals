@@ -30,6 +30,8 @@ describe("Intersections Page", () => {
         ],
       },
     }).as("getIntersections");
+
+    cy.visit("/intersections");
   });
 });
 
