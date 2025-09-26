@@ -42,7 +42,7 @@ describe("Intersections Page", () => {
   it("should open create intersection modal and submit form", () => {
     cy.contains("Create New Intersection").click();
 
-    cy.get("input[name='name']");
+    cy.get("input[name='name']").type("New Intersection");
     cy.get("input[name='details.address']");
     cy.get("input[name='details.city']");
     cy.get("input[name='details.province']");
