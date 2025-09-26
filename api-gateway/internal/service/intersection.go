@@ -43,6 +43,9 @@ func (s *IntersectionService) GetAllIntersections(
 	if err != nil {
 		return model.Intersections{}, err
 	}
+	if len(idList) == 0 {
+		return model.Intersections{Intersections: []model.Intersection{}}, nil
+	}
 
 	ids := strings.Join(idList, ",")
 
