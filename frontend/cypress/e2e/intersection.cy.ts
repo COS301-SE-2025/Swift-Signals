@@ -45,7 +45,7 @@ describe("Intersections Page", () => {
     cy.get("input[name='name']").type("New Intersection");
     cy.get("input[name='details.address']").type("Corner of Lynnwood & Atterbury");;
     cy.get("input[name='details.city']").clear();
-    cy.get("input[name='details.province']");
+    cy.get("input[name='details.province']").clear();
   });
 });
 
