@@ -95,6 +95,7 @@ describe("Intersections Page", () => {
       statusCode: 200,
       body: {
         id: "123",
+        name: "Search Result",
       },
     }).as("searchIntersection");
   });
