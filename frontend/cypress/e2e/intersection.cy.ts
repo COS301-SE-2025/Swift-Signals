@@ -104,6 +104,7 @@ describe("Intersections Page", () => {
             intersection_type: "trafficlight",
             green: 20,
             yellow: 3,
+            red: ,
             
           },
         },
