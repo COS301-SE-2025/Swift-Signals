@@ -24,7 +24,7 @@ describe("Dashboard Page", () => {
 
     
     cy.contains("View Map").should("exist");
-
+    cy.url().should("include", "/map"); // adjust route if different
     
   });
 
