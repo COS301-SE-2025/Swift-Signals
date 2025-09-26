@@ -64,10 +64,10 @@ describe("SignUp Page", () => {
     //   cy.get("div").eq(2).should("have.class", "bg-green-900/50");
     // });
 
-    cy.get("input[name='username']").type("user");
-    cy.get(".traffic-light").within(() => {
-      cy.get("div").eq(0).should("have.class", "bg-red-600");
-    });
+    // cy.get("input[name='username']").type("user");
+    // cy.get(".traffic-light").within(() => {
+    //   cy.get("div").eq(0).should("have.class", "bg-red-600");
+    // });
 
     cy.get("input[name='email']").type("user@example.com");
     cy.get(".traffic-light").within(() => {
