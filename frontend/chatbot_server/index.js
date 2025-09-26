@@ -410,7 +410,7 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
   }
 });
 
-app.get("/api/reverse-geocode", async (req, res) => {
+app.get("/api/chatbot/reverse-geocode", async (req, res) => {
   const { lat, lon } = req.query;
 
   if (!lat || !lon) {
@@ -434,7 +434,7 @@ app.get("/api/reverse-geocode", async (req, res) => {
   }
 });
 
-app.get("/api/search-streets", async (req, res) => {
+app.get("/api/chatbot/search-streets", async (req, res) => {
   const { q, type } = req.query;
 
   if (!q) {
