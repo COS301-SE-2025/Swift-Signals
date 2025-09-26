@@ -57,5 +57,9 @@ describe("Intersections Page", () => {
 
     cy.contains("New Intersection").should("exist");
   });
+
+  it("should edit an intersection", () => {
+    
+  });
 });
 
