@@ -114,6 +114,7 @@ describe("Intersections Page", () => {
 
     cy.get("input[placeholder='Search intersections']").type("123{enter}");
     cy.wait("@searchIntersection");
+    cy.contains("Search Result");
   });
 });
 
