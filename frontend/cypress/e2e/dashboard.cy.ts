@@ -16,7 +16,7 @@ describe("Dashboard Page", () => {
 
   it("shows quick action buttons and they are clickable", () => {
     cy.contains("New Intersection").should("exist");
-
+    cy.url().should("include", "/intersections/new"); // adjust route if different
 
     
     cy.contains("Run Simulation").should("exist");
