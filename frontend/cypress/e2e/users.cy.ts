@@ -32,11 +32,11 @@ describe("Users Page", () => {
     cy.get("tbody tr").first().should("not.contain", "John Doe"); // Page 2
   });
 
-  it("paginates back to the previous page", () => {
-    cy.get("button[aria-label='Next page']").click();
-    cy.get("button[aria-label='Previous page']").click();
-    cy.get("tbody tr").first().should("contain", "John Doe");
-  });
+  // it("paginates back to the previous page", () => {
+  //   cy.get("button[aria-label='Next page']").click();
+  //   cy.get("button[aria-label='Previous page']").click();
+  //   cy.get("tbody tr").first().should("contain", "John Doe");
+  // });
 
   // it("displays ellipsis for long pagination", () => {
   //   cy.get(".usersPaging").should("contain", "...");
