@@ -74,5 +74,12 @@ describe("Intersections Page", () => {
     cy.wait("@updateIntersection");
     cy.contains("Updated Intersection").should("exist");
   });
+
+  it("should delete an intersection", () => {
+    cy.contains("Test Intersection").parent().within(() => {
+      
+    });
+  });
+  
 });
 
