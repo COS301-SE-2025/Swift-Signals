@@ -79,6 +79,8 @@ describe("Intersections Page", () => {
     cy.contains("Test Intersection").parent().within(() => {
       cy.contains("Delete").click();
     });
+    
+    cy.contains("Delete Intersection");
   });
   
 });
