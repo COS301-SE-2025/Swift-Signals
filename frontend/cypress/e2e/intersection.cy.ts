@@ -111,6 +111,8 @@ describe("Intersections Page", () => {
         },
       },
     }).as("searchIntersection");
+
+    cy.get("input[placeholder='Search intersections']");
   });
 });
 
