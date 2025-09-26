@@ -70,7 +70,7 @@ describe("Intersections Page", () => {
       body: { id: "123", name: "Updated Intersection" },
     }).as("updateIntersection");
 
-    cy.contains("Update Intersection");
+    cy.contains("Update Intersection").click();
     cy.wait("@updateIntersection");
 
     cy.contains("Updated Intersection");
