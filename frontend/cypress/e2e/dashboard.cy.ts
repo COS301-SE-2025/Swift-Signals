@@ -38,7 +38,7 @@ describe("Dashboard Page", () => {
       cy.contains("Corner of Lynnwood & Jan Shoba").should("exist");
       cy.contains("unoptimised").should("exist");
 
-      cy.get("button").contains("View Details").should("have.length.at.least", 2);
+      cy.get("a, button").contains("View Details").should("have.length.at.least", 2);
     });
   });
 
