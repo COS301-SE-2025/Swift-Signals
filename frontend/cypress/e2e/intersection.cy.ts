@@ -96,6 +96,7 @@ describe("Intersections Page", () => {
       body: {
         id: "123",
         name: "Search Result",
+        traffic_density: "low",
       },
     }).as("searchIntersection");
   });
