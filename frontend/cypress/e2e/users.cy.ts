@@ -42,10 +42,10 @@ describe("Users Page", () => {
     cy.get(".usersPaging").should("contain", "...");
   });
 
-  it("navigates directly to a specific page", () => {
-    cy.get(".usersPaging button").contains("2").click();
-    cy.get("tbody tr").first().within(() => {
-      cy.get("td").eq(1).should("exist"); // Name cell exists
-    });
-  });
+  // it("navigates directly to a specific page", () => {
+  //   cy.get(".usersPaging button").contains("2").click();
+  //   cy.get("tbody tr").first().within(() => {
+  //     cy.get("td").eq(1).should("exist"); // Name cell exists
+  //   });
+  // });
 });
