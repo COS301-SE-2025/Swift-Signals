@@ -39,7 +39,7 @@ describe("Intersections Page", () => {
     cy.contains("Test Intersection").should("exist");
   });
 
-  it("", () => {
+  it("should open create intersection modal and submit form", () => {
     
   });
 });
