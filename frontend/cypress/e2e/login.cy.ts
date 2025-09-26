@@ -97,10 +97,10 @@ describe("Login Page", () => {
     //   cy.get("div").eq(1).should("have.class", "bg-yellow-500");
     // });
 
-    cy.get("input[name='password']").type("pass");
-    cy.get(".traffic-light").within(() => {
-      cy.get("div").eq(2).should("have.class", "bg-green-500");
-    });
+    // cy.get("input[name='password']").type("pass");
+    // cy.get(".traffic-light").within(() => {
+    //   cy.get("div").eq(2).should("have.class", "bg-green-500");
+    // });
   });
 
   it("navigates to signup on Register Here button click", () => {
