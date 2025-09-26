@@ -77,7 +77,7 @@ describe("Intersections Page", () => {
 
   it("should delete an intersection", () => {
     cy.contains("Test Intersection").parent().within(() => {
-      
+      cy.contains("Delete").click();
     });
   });
   
