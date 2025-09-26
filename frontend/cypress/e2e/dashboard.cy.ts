@@ -44,7 +44,9 @@ describe("Dashboard Page", () => {
 
   it("renders traffic density distribution chart", () => {
     cy.contains("Traffic Density Distribution").should("exist");
-   
+    
+    // Ensure chart SVG or canvas is present
+    cy.get(".traffic-chart-container").find("svg, canvas").should("exist");
   });
 
   // it("renders top intersections with progress bars", () => {
