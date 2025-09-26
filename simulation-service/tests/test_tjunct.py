@@ -255,11 +255,11 @@ class TestTJunction(unittest.TestCase):
         </root>"""
         mock_et_parse.return_value = ET.ElementTree(ET.fromstring(tripinfo_xml))
 
-        params = {"speed": 999, "traffic_density": "low", "seed": 1}
+        params = {"Speed": 999, "traffic_density": "low", "seed": 1}
         tJunction.generate(params)
 
         mock_print.assert_any_call(
-            "Warning: Speed 999km/h not allowed. Using default 40km/h."
+            "Warning: Speed 999km/h not allowed. Using default 60km/h."
         )
 
 

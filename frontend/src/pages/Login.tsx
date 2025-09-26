@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/Login.css";
-import Footer from "../components/Footer";
 
-const API_BASE_URL = "/api";
+import logo from "../../src/assets/logo.png";
+import Footer from "../components/Footer";
+import "../styles/Login.css";
+
+import { API_BASE_URL } from "../config";
 
 interface TrafficLightProps {
   redActive: boolean;
@@ -193,7 +195,7 @@ const Login = () => {
         style={{ minWidth: 350 }}
       >
         <img
-          src="/src/assets/logo.png"
+          src={logo}
           alt="Swift Signals Logo"
           className="loginLogo h-20 w-20 object-contain drop-shadow-lg"
         />
@@ -233,7 +235,7 @@ const Login = () => {
                 e.preventDefault();
                 setUsername(e.target.value);
               }}
-              placeholder="Username or Email"
+              placeholder="Email"
               className="w-full px-4 py-3 border-2 border-[#388BFD] rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
               required
               disabled={isLoading}
@@ -303,7 +305,7 @@ const Login = () => {
           </div>
         </form>
         <p className="regLink mt-8 text-center text-sm text-gray-600">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <button
             type="button"
             onClick={() => navigate("/signup")}

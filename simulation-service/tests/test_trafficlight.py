@@ -221,7 +221,7 @@ class TestTLIntersection(unittest.TestCase):
         mock_open_file.side_effect = open_side_effect
 
         params = {
-            "speed": 999,
+            "Speed": 999,
             "traffic_density": "medium",
             "seed": 1,
             "green": 30,
@@ -231,7 +231,7 @@ class TestTLIntersection(unittest.TestCase):
         trafficLight.generate(params)
 
         mock_print.assert_any_call(
-            "Warning: Speed 999km/h not allowed. Using default 40km/h."
+            "Warning: Speed 999km/h not allowed. Using default 60km/h."
         )
 
     @patch("trafficLight.os.makedirs")

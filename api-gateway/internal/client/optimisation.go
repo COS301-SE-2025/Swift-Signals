@@ -43,7 +43,10 @@ func (oc *OptimisationClient) RunOptimisation(
 			Seed:   int32(params.SimulationParameters.Seed),
 		},
 	}
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(
+		ctx,
+		5*time.Hour,
+	) // NOTE: This time depends on the hardware and should be adjusted accordingly
 	defer cancel()
 
 	resp, err := oc.client.RunOptimisation(ctx, req)

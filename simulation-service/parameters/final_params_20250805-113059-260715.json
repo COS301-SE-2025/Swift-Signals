@@ -1,0 +1,1 @@
+{"intersection": {"name": "Trafficlight", "Traffic Density": 2, "simulation_parameters": {"Intersection Type": 1, "Green": 32, "Yellow": 3, "Red": 13, "Speed": 60, "seed": 1408}, "output_path": "../simulation-service/out/results/final_simulation_result_20250805-113059-260715.json"}}

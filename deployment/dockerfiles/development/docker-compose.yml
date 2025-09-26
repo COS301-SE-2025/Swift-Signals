@@ -1,0 +1,161 @@
+services:
+  user-service:
+    build:
+      context: ../..
+      dockerfile: deployments/development/dockerfiles/Dockerfile.user
+    image: swift-signals/user-service:dev
+    container_name: user-service
+    environment:
+      DB_HOST: user-postgres
+      DB_PORT: 5432
+      DB_USER: user_service
+      DB_PASSWORD: password
+      DB_NAME: user_service_db
+      DEFAULT_USER_NAME: ${DEFAULT_USER_NAME}
+      DEFAULT_USER_EMAIL: ${DEFAULT_USER_EMAIL}
+      DEFAULT_USER_PASSWORD: ${DEFAULT_USER_PASSWORD}
+      APP_PORT: 50051
+    depends_on:
+      user-postgres:
+        condition: service_healthy
+    ports:
+      - "50051:50051"
+    networks:
+      - app-network
+
+  user-postgres:
+    image: postgres:16
+    container_name: user-postgres
+    environment:
+      POSTGRES_USER: user_service
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: user_service_db
+    volumes:
+      - user_pgdata:/var/lib/postgresql/data
+      - ../../user-service/internal/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user_service -d user_service_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  intersection-service:
+    build:
+      context: ../..
+      dockerfile: deployments/development/dockerfiles/Dockerfile.intersection
+    image: swift-signals/intersection-service:dev
+    container_name: intersection-service
+    environment:
+      APP_PORT: 50052
+      MONGO_URI: mongodb://intersection-mongo:27017
+    depends_on:
+      - intersection-mongo
+    ports:
+      - "50052:50052"
+    networks:
+      - app-network
+
+  intersection-mongo:
+    image: mongo:6.0
+    container_name: intersection-mongo
+    environment:
+      MONGO_INITDB_DATABASE: IntersectionService
+    volumes:
+      - intersection_mongodata:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - app-network
+
+
+  simulation-service:
+    build:
+      context: ../..
+      dockerfile: deployments/development/dockerfiles/Dockerfile.simulation
+    image: swift-signals/simulation-service:dev
+    container_name: simulation-service
+    environment:
+      APP_PORT: 50053
+    ports:
+      - "50053:50053"
+    networks:
+      - app-network
+
+
+  optimisation-service:
+    build:
+      context: ../..
+      dockerfile: deployments/development/dockerfiles/Dockerfile.optimisation
+    image: swift-signals/optimisation-service:dev
+    container_name: optimisation-service
+    environment:
+      APP_PORT: 50054
+      SIMU_GRPC_ADDR: simulation-service:50053
+    ports:
+      - "50054:50054"
+    networks:
+      - app-network
+
+
+  api-gateway:
+    build:
+      context: ../..
+      dockerfile: deployments/development/dockerfiles/Dockerfile.api-gateway
+    image: swift-signals/api-gateway:dev
+    container_name: api-gateway
+    depends_on:
+      - user-service
+      - intersection-service
+    environment:
+      APP_PORT: 9090
+      USER_GRPC_ADDR: user-service:50051
+      INTR_GRPC_ADDR: intersection-service:50052
+      SIMU_GRPC_ADDR: simulation-service:50053
+      OPTI_GRPC_ADDR: optimisation-service:50054
+
+    ports:
+      - "9090:9090"
+    networks:
+      - app-network
+
+  chatbot-server:
+    build:
+      context: ../../frontend/chatbot_server
+      dockerfile: ../../deployments/development/dockerfiles/Dockerfile.chatbot
+    image: swift-signals/chatbot-server:dev
+    container_name: chatbot-server
+    environment:
+      DIALOGFLOW_PROJECT_ID: swift-signals
+      DIALOGFLOW_CLIENT_EMAIL: swift-signals-api-user@swift-signals.iam.gserviceaccount.com
+      DIALOGFLOW_PRIVATE_KEY: ${DIALOGFLOW_PRIVATE_KEY}
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ../../frontend/
+      dockerfile: ../deployments/development/dockerfiles/Dockerfile.frontend
+    image: swift-signals/frontend:dev
+    container_name: frontend
+    depends_on:
+      - chatbot-server
+      - api-gateway
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
+volumes:
+  user_pgdata:
+  intersection_mongodata:
+
+networks:
+  app-network:
+    driver: bridge

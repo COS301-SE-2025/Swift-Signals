@@ -1,13 +1,17 @@
-import "./Navbar.css";
+import { useState, useEffect } from "react";
 import { FaCircleUser } from "react-icons/fa6";
-import { IoIosLogOut } from "react-icons/io";
-import { useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { IoIosLogOut } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
 
+import logo from "../../src/assets/logo.png";
+import { API_BASE_URL } from "../config";
+import "../components/Navbar.css";
+
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [username, setUsername] = useState("");
   const location = useLocation();
 
   const toggleMobileMenu = () => {
@@ -17,13 +21,36 @@ function Navbar() {
   interface IsActiveFn {
     (path: string): boolean;
   }
-
   const isActive: IsActiveFn = (path) => location.pathname === path;
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        if (!token) return;
+
+        const res = await fetch(`${API_BASE_URL}/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed to fetch user profile");
+
+        const data = await res.json();
+        setUsername(data.username || "User");
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <img src="/src/assets/logo.png" alt="Logo" className="logo-image" />
+        <img src={logo} alt="Logo" className="logo-image" />
         <div className="logo">Swift Signals</div>
       </div>
 
@@ -76,7 +103,7 @@ function Navbar() {
         </ul>
         <div className="mobile-user-profile">
           <FaCircleUser size={45} />
-          <span>John Doe</span>
+          <span>{username || "Loading..."}</span>
           <a href="/" className="logout-icon" onClick={toggleMobileMenu}>
             <IoIosLogOut size={35} />
           </a>
@@ -86,7 +113,7 @@ function Navbar() {
       <div className="navbar-right">
         <div className="user-profile">
           <FaCircleUser size={45} />
-          <span>John Doe</span>
+          <span>{username || "Loading..."}</span>
           <a href="/" className="logout-icon">
             <IoIosLogOut size={35} />
           </a>

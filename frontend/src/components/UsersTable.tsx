@@ -1,10 +1,10 @@
-import React from "react";
 import { PencilLine, Trash2 } from "lucide-react";
+import React from "react";
 import "../styles/UsersTable.css";
 
-// TypeScript interface for user data
 interface User {
-  id: number;
+  displayId: number;
+  id: string;
   name: string;
   email: string;
   role: string;
@@ -13,15 +13,15 @@ interface User {
 
 interface UsersTableProps {
   users: User[];
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onDelete }) => {
   return (
     <div className="usersTablePage bg-white dark:bg-[#161B22] rounded-lg shadow-sm overflow-hidden">
       <table className="usersTable w-full border-collapse">
-        <thead className="border-b bg-gray-50 dark:border-[#30363D]">
+        <thead className="border-b bg-gray-50 dark:bg-[#21262D] dark:border-[#30363D]">
           <tr>
             <th className="px-4 py-3 font-bold text-black text-center">ID</th>
             <th className="px-4 py-3 font-bold text-black text-center">Name</th>
@@ -43,7 +43,10 @@ const UsersTable: React.FC<UsersTableProps> = ({ users, onEdit, onDelete }) => {
               key={user.id}
               className="border-b hover:bg-gray-50 dark:border-[#30363D]"
             >
-              <td className="px-4 py-3 text-black text-center">{user.id}</td>
+              {/* MODIFIED: Display the simple number ID */}
+              <td className="px-4 py-3 text-black text-center">
+                {user.displayId}
+              </td>
               <td className="px-4 py-3 text-black">{user.name}</td>
               <td className="px-4 py-3 text-black">{user.email}</td>
               <td className="px-4 py-3 text-black text-center">{user.role}</td>

@@ -1,109 +1,21 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Eye, Trash2, ChevronDown } from "lucide-react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import { Bar } from "react-chartjs-2";
-import { Chart, registerables } from "chart.js";
-import type { ChartOptions } from "chart.js";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import type { LatLng } from "leaflet";
-import "../styles/Simulations.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
+import { Eye, Trash2, ChevronDown } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { useNavigate } from "react-router-dom";
+
+import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
+import Navbar from "../components/Navbar";
+import "../styles/Simulations.css";
 
-Chart.register(...registerables);
+import "leaflet/dist/leaflet.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import { API_BASE_URL } from "../config";
 
-const simulationsTable1 = [
-  {
-    id: "SIM001",
-    intersection: "Main St & 1st Ave",
-    avgWaitTime: 45.2,
-    vehicleThroughput: 1200,
-    status: "Complete",
-  },
-  {
-    id: "SIM002",
-    intersection: "Broadway & 5th St",
-    avgWaitTime: 30.8,
-    vehicleThroughput: 1500,
-    status: "Running",
-  },
-  {
-    id: "SIM003",
-    intersection: "Elm St & Park Rd",
-    avgWaitTime: 52.1,
-    vehicleThroughput: 900,
-    status: "Failed",
-  },
-  {
-    id: "SIM004",
-    intersection: "Main St & 1st Ave",
-    avgWaitTime: 45.2,
-    vehicleThroughput: 1200,
-    status: "Complete",
-  },
-  {
-    id: "SIM005",
-    intersection: "Broadway & 5th St",
-    avgWaitTime: 30.8,
-    vehicleThroughput: 1500,
-    status: "Running",
-  },
-  {
-    id: "SIM006",
-    intersection: "Elm St & Park Rd",
-    avgWaitTime: 52.1,
-    vehicleThroughput: 900,
-    status: "Failed",
-  },
-];
-
-const simulationsTable2 = [
-  {
-    id: "SIM004",
-    intersection: "Oak Ave & Central Blvd",
-    avgWaitTime: 28.5,
-    vehicleThroughput: 1800,
-    status: "Complete",
-  },
-  {
-    id: "SIM005",
-    intersection: "Pine St & River Dr",
-    avgWaitTime: 47.3,
-    vehicleThroughput: 1100,
-    status: "Running",
-  },
-  {
-    id: "SIM006",
-    intersection: "Maple Rd & 2nd Ave",
-    avgWaitTime: 35.6,
-    vehicleThroughput: 1300,
-    status: "Failed",
-  },
-  {
-    id: "SIM012",
-    intersection: "Oak Ave & Central Blvd",
-    avgWaitTime: 28.5,
-    vehicleThroughput: 1800,
-    status: "Complete",
-  },
-  {
-    id: "SIM020",
-    intersection: "Pine St & River Dr",
-    avgWaitTime: 47.3,
-    vehicleThroughput: 1100,
-    status: "Running",
-  },
-  {
-    id: "SIM007",
-    intersection: "Maple Rd & 2nd Ave",
-    avgWaitTime: 35.6,
-    vehicleThroughput: 1300,
-    status: "Failed",
-  },
-];
+const getAuthToken = () => {
+  return localStorage.getItem("authToken");
+};
 
 // #region API and Data Types
 // Types for the street search functionality
@@ -153,7 +65,7 @@ interface OverpassElement {
   lat?: number;
   lon?: number;
   tags?: {
-    [key: string]: string | undefined; // The fix is applied here
+    [key: string]: string | undefined;
     name?: string;
     highway?: string;
     "addr:city"?: string;
@@ -167,6 +79,43 @@ interface OverpassElement {
     maxlat: number;
     maxlon: number;
   };
+}
+
+interface ApiIntersection {
+  id: string;
+  name: string;
+  details: {
+    address: string;
+    city: string;
+    province: string;
+  };
+  default_parameters: {
+    // This object contains the nested simulation data
+    optimisation_type: string;
+    simulation_parameters: {
+      green: number;
+      yellow: number;
+      red: number;
+      speed: number;
+      seed: number;
+      intersection_type: string;
+    };
+  };
+  traffic_density: string;
+  status?: string;
+  created_at?: string;
+  run_count?: number;
+  last_run_at?: string;
+}
+
+//  UPDATED: Changed the data structure for the table
+interface SimulationData {
+  id: number;
+  backendId: string;
+  intersection: string;
+  trafficDensity: string; // New: "High", "Medium", or "Low"
+  speed: number; // New: Vehicle speed in km/h
+  status: string;
 }
 
 // Type for intersection with calculated distance
@@ -191,16 +140,18 @@ const LocationMarker: React.FC<{
       setIsLoading(true);
 
       const radius = 0.005;
-      const bbox = `${lat - radius},${lon - radius},${lat + radius},${lon + radius}`;
+      const bbox = `${lat - radius},${lon - radius},${lat + radius},${
+        lon + radius
+      }`;
 
       const overpassQuery = `
-        [out:json][timeout:30];
-        (
-          way["highway"~"^(primary|secondary|tertiary|residential|trunk|motorway|unclassified)$"](${bbox});
-        );
-        (._;>;);
-        out geom;
-      `;
+    [out:json][timeout:30];
+    (
+     way["highway"~"^(primary|secondary|tertiary|residential|trunk|motorway|unclassified)$"](${bbox});
+    );
+    (._;>;);
+    out geom;
+   `;
 
       const overpassUrl = "https://overpass-api.de/api/interpreter";
       const response = await fetch(overpassUrl, {
@@ -254,7 +205,6 @@ const LocationMarker: React.FC<{
 
       for (const [nodeId, nodeWays] of nodeWaysMap.entries()) {
         if (nodeWays.length >= 2) {
-          // Use a more explicit type guard to ensure a string[] type
           const uniqueRoads = [
             ...new Set(
               nodeWays
@@ -274,7 +224,6 @@ const LocationMarker: React.FC<{
               intersections.push({
                 lat: nodeCoords.lat,
                 lon: nodeCoords.lon,
-                // This line will now work correctly
                 roads: uniqueRoads.slice(0, 2),
                 intersection: `${uniqueRoads[0]} & ${uniqueRoads[1]}`,
                 distance,
@@ -304,18 +253,15 @@ const LocationMarker: React.FC<{
     async click(e) {
       console.log("Map clicked at:", e.latlng);
 
-      // First set the clicked position as a temporary marker
       setPosition(e.latlng);
 
       try {
-        // Try to find nearest intersection
         const nearestIntersection = await findNearestIntersection(
           e.latlng.lat,
           e.latlng.lng,
         );
 
         if (nearestIntersection) {
-          // Snap to intersection
           const snappedPosition = {
             lat: nearestIntersection.lat,
             lng: nearestIntersection.lon,
@@ -324,7 +270,9 @@ const LocationMarker: React.FC<{
           setPosition(snappedPosition);
           setSelectedLocation(nearestIntersection.intersection);
           setCoordinates(
-            `${nearestIntersection.lat.toFixed(6)}, ${nearestIntersection.lon.toFixed(6)}`,
+            `${nearestIntersection.lat.toFixed(
+              6,
+            )}, ${nearestIntersection.lon.toFixed(6)}`,
           );
 
           console.log(
@@ -332,8 +280,9 @@ const LocationMarker: React.FC<{
             nearestIntersection.intersection,
           );
         } else {
-          // Fallback to clicked coordinates if no intersection found
-          const coordinates = `${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+          const coordinates = `${e.latlng.lat.toFixed(
+            6,
+          )}, ${e.latlng.lng.toFixed(6)}`;
           setSelectedLocation(coordinates);
           setCoordinates(coordinates);
 
@@ -341,8 +290,9 @@ const LocationMarker: React.FC<{
         }
       } catch (error) {
         console.error("Error processing map click:", error);
-        // Fallback to clicked coordinates
-        const coordinates = `${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`;
+        const coordinates = `${e.latlng.lat.toFixed(
+          6,
+        )}, ${e.latlng.lng.toFixed(6)}`;
         setSelectedLocation(coordinates);
         setCoordinates(coordinates);
       }
@@ -396,13 +346,9 @@ const StreetSearchComponent: React.FC<{
       const cleanQuery = query.trim();
       console.log("Searching for streets with query:", cleanQuery);
 
-      // Use multiple strategies to find streets
       const strategies = [
-        // Strategy 1: Direct road search with South Africa constraint
         () => searchNominatimStreets(cleanQuery, "road"),
-        // Strategy 2: Search with highway tag
         () => searchNominatimStreets(cleanQuery + " highway", "way"),
-        // Strategy 3: Search with street/road suffix if not present
         () => {
           const hasStreetSuffix =
             /\b(street|road|avenue|drive|lane|way|boulevard|crescent)\b/i.test(
@@ -421,11 +367,9 @@ const StreetSearchComponent: React.FC<{
           console.log("Found streets via strategy:", results);
           return results;
         }
-        // Small delay between strategies
         await new Promise((resolve) => setTimeout(resolve, 300));
       }
 
-      // Fallback to common streets
       return getCommonSouthAfricanStreets(query);
     } catch (error) {
       console.error("Error in searchStreets:", error);
@@ -448,7 +392,6 @@ const StreetSearchComponent: React.FC<{
         extratags: "1",
       });
 
-      // Add type-specific parameters
       if (type === "road") {
         params.append("class", "highway");
       }
@@ -482,12 +425,10 @@ const StreetSearchComponent: React.FC<{
 
     const processed = data
       .filter((item: NominatimResult) => {
-        // Must be in South Africa
         const isInSA =
           item.address?.country_code === "za" ||
           item.display_name?.includes("South Africa");
 
-        // Must be a road/highway
         const isRoad =
           item.class === "highway" ||
           item.type === "road" ||
@@ -496,7 +437,6 @@ const StreetSearchComponent: React.FC<{
             item.display_name,
           );
 
-        // Filter out non-road types
         const validType = ![
           "hamlet",
           "village",
@@ -530,7 +470,6 @@ const StreetSearchComponent: React.FC<{
       .filter((street: Street) => street.name && street.name.length > 0)
       .filter(
         (street: Street, index: number, self: Street[]) =>
-          // Remove duplicates based on name and city
           self.findIndex(
             (s) =>
               s.name.toLowerCase() === street.name.toLowerCase() &&
@@ -545,7 +484,6 @@ const StreetSearchComponent: React.FC<{
 
   // street name extraction
   const extractStreetName = (item: NominatimResult): string => {
-    // Priority order for extracting street name
     const candidates = [
       item.address?.road,
       item.name,
@@ -558,7 +496,6 @@ const StreetSearchComponent: React.FC<{
       }
     }
 
-    // Extract from display name if no direct match
     const displayParts = item.display_name?.split(",") || [];
     for (const part of displayParts) {
       const cleaned = part.trim();
@@ -613,7 +550,6 @@ const StreetSearchComponent: React.FC<{
     try {
       console.log("Finding intersections for:", street.name, "in", street.city);
 
-      // Strategy 1: Use coordinates if available
       if (street.lat && street.lon) {
         const coordResults = await findIntersectionsAtCoordinates(
           street.lat,
@@ -629,7 +565,6 @@ const StreetSearchComponent: React.FC<{
         }
       }
 
-      // Strategy 2: Use Overpass API with street name and city
       const overpassResults = await findIntersectionsViaOverpass(street);
       if (overpassResults.length > 0) {
         console.log(
@@ -639,7 +574,6 @@ const StreetSearchComponent: React.FC<{
         return overpassResults;
       }
 
-      // Strategy 3: Search Nominatim for intersection mentions
       const nominatimResults = await searchIntersectionMentions(
         street.name,
         street.city,
@@ -652,7 +586,6 @@ const StreetSearchComponent: React.FC<{
         return nominatimResults;
       }
 
-      // Fallback to contextual intersections
       return getContextualIntersectingStreets(street);
     } catch (error) {
       console.error("Error finding intersecting streets:", error);
@@ -671,18 +604,17 @@ const StreetSearchComponent: React.FC<{
         `Finding intersections at coordinates: ${lat}, ${lon} for ${streetName}`,
       );
 
-      // Create Overpass query to find intersections at specific coordinates
-      const radius = 0.005; // About 500m radius
+      const radius = 0.005;
       const overpassQuery = `
-        [out:json][timeout:30];
-        (
-          way["highway"~"^(primary|secondary|tertiary|residential|trunk|motorway|unclassified|road)$"]
-             ["name"]
-             (${lat - radius},${lon - radius},${lat + radius},${lon + radius});
-        );
-        (._;>;);
-        out geom;
-      `;
+    [out:json][timeout:30];
+    (
+     way["highway"~"^(primary|secondary|tertiary|residential|trunk|motorway|unclassified|road)$"]
+      ["name"]
+      (${lat - radius},${lon - radius},${lat + radius},${lon + radius});
+    );
+    (._;>;);
+    out geom;
+   `;
 
       const response = await fetch("https://overpass-api.de/api/interpreter", {
         method: "POST",
@@ -714,18 +646,18 @@ const StreetSearchComponent: React.FC<{
           : `area["ISO3166-1"="ZA"][admin_level=2];`;
 
       const overpassQuery = `
-        [out:json][timeout:30];
-        (
-          ${searchArea}
-        )->.searchArea;
-        (
-          way["highway"]
-             ["name"~"${street.name}",i]
-             (area.searchArea);
-        );
-        (._;>;);
-        out geom;
-      `;
+    [out:json][timeout:30];
+    (
+     ${searchArea}
+    )->.searchArea;
+    (
+     way["highway"]
+      ["name"~"${street.name}",i]
+      (area.searchArea);
+    );
+    (._;>;);
+    out geom;
+   `;
 
       console.log("Overpass query for street search:", overpassQuery);
 
@@ -774,22 +706,21 @@ const StreetSearchComponent: React.FC<{
 
       console.log("Target street has", targetNodeIds.size, "nodes");
 
-      // Find all ways that share nodes with our target street
       const nodeList = Array.from(targetNodeIds).slice(0, 100);
       const nodeFilter = nodeList.map((id) => `node(${id})`).join("");
 
       const intersectionQuery = `
-        [out:json][timeout:30];
-        (
-          ${nodeFilter}
-        )->.targetNodes;
-        (
-          way["highway"]
-             ["name"]
-             (bn.targetNodes);
-        );
-        out geom;
-      `;
+    [out:json][timeout:30];
+    (
+     ${nodeFilter}
+    )->.targetNodes;
+    (
+     way["highway"]
+      ["name"]
+      (bn.targetNodes);
+    );
+    out geom;
+   `;
 
       const response = await fetch("https://overpass-api.de/api/interpreter", {
         method: "POST",
@@ -820,7 +751,6 @@ const StreetSearchComponent: React.FC<{
     const intersectingStreets: Street[] = [];
     const originalStreetLower = originalStreet.toLowerCase();
 
-    // Filter ways that are different from our original street
     const intersectingWays = elements.filter(
       (el) =>
         el.type === "way" &&
@@ -837,7 +767,6 @@ const StreetSearchComponent: React.FC<{
 
     intersectingWays.forEach((way) => {
       if (way.tags?.name && isValidStreetName(way.tags.name)) {
-        // Calculate center point for the way
         const bounds = way.bounds;
         const centerLat = bounds ? (bounds.minlat + bounds.maxlat) / 2 : null;
         const centerLon = bounds ? (bounds.minlon + bounds.maxlon) / 2 : null;
@@ -854,7 +783,6 @@ const StreetSearchComponent: React.FC<{
       }
     });
 
-    // Remove duplicates and sort by name
     const uniqueStreets = intersectingStreets
       .filter(
         (street, index, self) =>
@@ -906,7 +834,6 @@ const StreetSearchComponent: React.FC<{
           }
         }
 
-        // Delay between requests
         await new Promise((resolve) => setTimeout(resolve, 500));
       }
 
@@ -932,7 +859,6 @@ const StreetSearchComponent: React.FC<{
 
       const displayName = item.display_name.toLowerCase();
 
-      // Look for intersection patterns
       const intersectionPatterns = [
         /(.+?)\s*&\s*(.+?),/,
         /(.+?)\s+and\s+(.+?),/,
@@ -968,7 +894,6 @@ const StreetSearchComponent: React.FC<{
       }
     });
 
-    // Remove duplicates
     const uniqueStreets = intersectingStreets.filter(
       (street, index, self) =>
         self.findIndex(
@@ -986,7 +911,6 @@ const StreetSearchComponent: React.FC<{
     const cleaned = name.trim();
     if (cleaned.length < 3) return false;
 
-    // Must contain street-like suffixes or be a recognized road name
     const streetSuffixes =
       /(street|road|avenue|drive|lane|way|boulevard|crescent|place|close|court|grove|gardens|park|square|circle|terrace|highway|route)$/i;
     const isNamedRoad = /^[A-Za-z][A-Za-z0-9\s-'.]*$/i.test(cleaned);
@@ -1144,7 +1068,6 @@ const StreetSearchComponent: React.FC<{
   const getContextualIntersectingStreets = (street: Street): Street[] => {
     const streetName = street.name.toLowerCase();
 
-    // Known major intersections for specific streets
     const knownIntersections: { [key: string]: Street[] } = {
       "simon vermooten road": [
         {
@@ -1268,7 +1191,6 @@ const StreetSearchComponent: React.FC<{
       ],
     };
 
-    // Check for known intersections
     for (const [knownStreet, intersections] of Object.entries(
       knownIntersections,
     )) {
@@ -1280,7 +1202,6 @@ const StreetSearchComponent: React.FC<{
       }
     }
 
-    // Generic fallback based on location
     const genericIntersections: Street[] = [
       {
         name: "Main Road",
@@ -1377,7 +1298,6 @@ const StreetSearchComponent: React.FC<{
     const intersection = `${firstStreet} & ${street.name}`;
     onIntersectionSelect(intersection);
 
-    // Reset form
     setFirstStreet("");
     setSecondStreet("");
     setSelectedFirstStreet(null);
@@ -1402,7 +1322,6 @@ const StreetSearchComponent: React.FC<{
 
   return (
     <div className="space-y-4">
-      {/* First Street Input */}
       <div className="relative" ref={firstStreetRef}>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           First Street
@@ -1457,13 +1376,13 @@ const StreetSearchComponent: React.FC<{
         )}
       </div>
 
-      {/* Second Street Dropdown */}
       {selectedFirstStreet && (
         <div className="relative" ref={secondStreetRef}>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Intersecting Street
             <span className="text-xs text-gray-500 block">
-              Streets that actually intersect with "{selectedFirstStreet.name}"
+              Streets that actually intersect with &quot;
+              {selectedFirstStreet.name}&quot;
             </span>
           </label>
           <div className="relative">
@@ -1517,7 +1436,7 @@ const StreetSearchComponent: React.FC<{
             secondStreetSuggestions.length === 0 &&
             selectedFirstStreet && (
               <div className="mt-2 text-sm text-yellow-600 dark:text-yellow-400">
-                ⚠️ No intersections found via API. This may be due to:
+                No intersections found via API. This may be due to:
                 <ul className="list-disc list-inside mt-1 text-xs">
                   <li>Limited OpenStreetMap data for this street</li>
                   <li>Street name variations in the database</li>
@@ -1538,7 +1457,9 @@ const StreetSearchComponent: React.FC<{
             {selectedFirstStreet.city && ` (${selectedFirstStreet.city})`}
             {selectedFirstStreet.lat &&
               selectedFirstStreet.lon &&
-              ` - Coords: ${selectedFirstStreet.lat.toFixed(4)}, ${selectedFirstStreet.lon.toFixed(4)}`}
+              ` - Coords: ${selectedFirstStreet.lat.toFixed(
+                4,
+              )}, ${selectedFirstStreet.lon.toFixed(4)}`}
           </div>
           <div className="text-gray-600 dark:text-gray-400">
             Found {secondStreetSuggestions.length} intersecting streets
@@ -1560,7 +1481,6 @@ const NewSimulationModal: React.FC<{
   intersections: string[];
   type: "simulations" | "optimizations";
 }> = ({ isOpen, onClose, onSubmit, intersections, type }) => {
-  const navigate = useNavigate();
   const [simulationName, setSimulationName] = useState("");
   const [simulationDescription, setSimulationDescription] = useState("");
   const [selectedIntersections, setSelectedIntersections] = useState<string[]>(
@@ -1605,7 +1525,6 @@ const NewSimulationModal: React.FC<{
     setSimulationDescription("");
     setSelectedIntersections([]);
     setCoordinates(null);
-    navigate("/simulation-results", { state: simulationData });
   };
 
   if (!isOpen) return null;
@@ -1616,9 +1535,7 @@ const NewSimulationModal: React.FC<{
         <button
           onClick={onClose}
           className="crossBtn absolute top-4 right-4 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100"
-        >
-          ✕
-        </button>
+        ></button>
         <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">
           New {type === "simulations" ? "Simulation" : "Optimization"}
         </h2>
@@ -1661,28 +1578,38 @@ const NewSimulationModal: React.FC<{
                   <button
                     onClick={() => handleRemoveIntersection(intersection)}
                     className="ml-1 text-indigo-600 hover:text-indigo-800 dark:text-indigo-300 dark:hover:text-indigo-100 remove-cross"
-                  >
-                    ✕
-                  </button>
+                  ></button>
                 </div>
               ))}
             </div>
             <div className="intersection-tabs flex space-x-2 mb-3">
               <button
                 onClick={() => setActiveTab("List")}
-                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === "List" ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${
+                  activeTab === "List"
+                    ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]"
+                    : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+                } transition-all duration-300`}
               >
                 List
               </button>
               <button
                 onClick={() => setActiveTab("Search")}
-                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === "Search" ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${
+                  activeTab === "Search"
+                    ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]"
+                    : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+                } transition-all duration-300`}
               >
                 Search
               </button>
               <button
                 onClick={() => setActiveTab("Map")}
-                className={`px-3 py-1 rounded-md text-sm font-medium ${activeTab === "Map" ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${
+                  activeTab === "Map"
+                    ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]"
+                    : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+                } transition-all duration-300`}
               >
                 Map
               </button>
@@ -1715,7 +1642,7 @@ const NewSimulationModal: React.FC<{
                 >
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    attribution=' <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                   />
                   <LocationMarker
                     setSelectedLocation={handleMapSelection}
@@ -1737,8 +1664,8 @@ const NewSimulationModal: React.FC<{
                     </p>
                   )}
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    💡 Click anywhere on the map to automatically find the
-                    nearest road intersection
+                    Click anywhere on the map to automatically find the nearest
+                    road intersection
                   </p>
                 </div>
               </div>
@@ -1765,59 +1692,19 @@ const NewSimulationModal: React.FC<{
 };
 
 const SimulationTable: React.FC<{
-  simulations: Array<{
-    id: string;
-    intersection: string;
-    avgWaitTime: number;
-    vehicleThroughput: number;
-    status: string;
-  }>;
+  simulations: SimulationData[];
   currentPage: number;
   setCurrentPage: (page: number) => void;
-}> = ({ simulations, currentPage, setCurrentPage }) => {
+  onViewResults: (backendId: string, intersectionName: string) => void;
+}> = ({ simulations, currentPage, setCurrentPage, onViewResults }) => {
   const rowsPerPage = 4;
   const totalPages = Math.ceil(simulations.length / rowsPerPage);
   const startIndex = currentPage * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const paginatedSimulations = simulations.slice(startIndex, endIndex);
 
-  const chartOptions: ChartOptions<"bar"> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        cornerRadius: 8,
-        padding: 10,
-        titleFont: { size: 12, weight: "bold" },
-        bodyFont: { size: 12 },
-        displayColors: false,
-      },
-    },
-    scales: {
-      x: { display: false },
-      y: { beginAtZero: true, display: false },
-    },
-    animation: {
-      duration: 1000,
-      easing: "easeOutQuart",
-    },
-    elements: {
-      bar: {
-        borderRadius: 6,
-        borderWidth: 0,
-      },
-    },
-  };
-
-  const handleViewResults = (simId: string) => {
-    alert(`Viewing results for simulation ${simId}`);
-    // Replace with actual logic
-  };
-
-  const handleDelete = (simId: string) => {
-    alert(`Deleting simulation ${simId}`);
+  const handleDelete = (backendId: string) => {
+    alert(`Deleting simulation with backend ID ${backendId}`);
     // Replace with actual delete logic
   };
 
@@ -1827,9 +1714,9 @@ const SimulationTable: React.FC<{
 
   const statusClass = (status: string) => {
     switch (status) {
-      case "Complete":
+      case "Optimised":
         return "bg-green-200 text-green-800 border-green-300";
-      case "Running":
+      case "Unoptimised":
         return "bg-yellow-200 text-yellow-800 border-yellow-300";
       case "Failed":
         return "bg-red-200 text-red-800 border-red-300";
@@ -1840,186 +1727,470 @@ const SimulationTable: React.FC<{
 
   return (
     <div className="simTable bg-white dark:bg-[#161B22] shadow-md rounded-lg overflow-hidden table-fixed-height relative">
-      <table className="simulationTable min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-        <thead className="simTableHead bg-gray-50 dark:bg-[#161B22]">
-          <tr>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Simulation ID
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Intersection
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Avg Wait Time
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Throughput
-            </th>
-            <th className="graphTHead px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Graph
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Status
-            </th>
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white dark:bg-[#161B22] divide-y divide-gray-200 dark:divide-gray-700">
-          {paginatedSimulations.map((sim) => {
-            const chartData = {
-              labels: ["Wait", "Throughput"],
-              datasets: [
-                {
-                  data: [sim.avgWaitTime, sim.vehicleThroughput / 10],
-                  backgroundColor: ["#2B9348", "#0F5BA7"],
-                  hoverBackgroundColor: ["#6EE7B7", "#60A5FA"],
-                  borderWidth: 0,
-                },
-              ],
-            };
-
-            return (
-              <tr key={sim.id}>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                  {sim.id}
-                </td>
-                <td className="intersectionCell px-4 py-3 whitespace-wrap text-sm text-gray-900 dark:text-gray-200">
-                  {sim.intersection}
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                  {sim.avgWaitTime.toFixed(1)}
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
-                  {sim.vehicleThroughput}
-                </td>
-                <td className="chartCell px-4 py-3 whitespace-nowrap text-sm">
-                  <div className="h-16 w-24">
-                    <Bar data={chartData} options={chartOptions} />
-                  </div>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm">
-                  <span
-                    className={`sim-status inline-flex items-center px-3 py-1 rounded-full border ${statusClass(sim.status)}`}
-                  >
-                    {sim.status}
-                  </span>
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm">
-                  <div className="flex flex-col space-y-2">
-                    <button
-                      onClick={() => handleViewResults(sim.id)}
-                      className="viewBtn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium w-full text-center"
-                      title="View Results"
-                    >
-                      <Eye size={18} strokeWidth={2} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(sim.id)}
-                      className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center"
-                      title="Delete Simulation"
-                    >
-                      <Trash2 size={18} strokeWidth={2} />
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      {simulations.length > rowsPerPage && (
-        <div className="pagination absolute bottom-0 left-0 right-0 flex justify-center items-center p-4 space-x-2 bg-white dark:bg-[#161B22] border-t border-gray-200 dark:border-gray-700">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 0}
-            className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            Prev
-          </button>
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index}
-              onClick={() => handlePageChange(index)}
-              className={`px-3 py-1 rounded-full text-sm font-medium ${currentPage === index ? "bg-[#0F5BA7] text-white dark:bg-[#388BFD]" : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"} transition-all duration-300`}
+      {simulations.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <div className="text-gray-400 dark:text-gray-500 mb-4">
+            <svg
+              className="w-16 h-16 mx-auto"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              {index + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages - 1}
-            className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${currentPage === totalPages - 1 ? "opacity-50 cursor-not-allowed" : ""}`}
-          >
-            Next
-          </button>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-600 dark:text-gray-400 mb-2">
+            No Data to Display
+          </h3>
+          <p className="text-sm text-gray-500 dark:text-gray-500 text-center max-w-sm">
+            There are no simulations available at the moment. Create a new
+            simulation to get started.
+          </p>
         </div>
+      ) : (
+        <>
+          <table className="simulationTable min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="simTableHead bg-gray-50 dark:bg-[#161B22]">
+              <tr>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  No.
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Intersection
+                </th>
+                {/*  UPDATED: Changed table headers */}
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Traffic Density
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Speed
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-[#161B22] divide-y divide-gray-200 dark:divide-gray-700">
+              {paginatedSimulations.map((sim) => (
+                <tr key={sim.backendId}>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                    #{sim.id}
+                  </td>
+                  <td className="intersectionCell px-4 py-3 whitespace-wrap text-sm text-gray-900 dark:text-gray-200">
+                    {sim.intersection}
+                  </td>
+                  {/*  UPDATED: Changed table cells to display new data */}
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                    {sim.trafficDensity}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-200">
+                    {sim.speed} km/h
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm">
+                    <span
+                      className={`sim-status inline-flex items-center px-3 py-1 rounded-md border ${statusClass(
+                        sim.status,
+                      )}`}
+                    >
+                      {sim.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap text-sm">
+                    <div className="flex flex-col space-y-2">
+                      <button
+                        onClick={() =>
+                          onViewResults(sim.backendId, sim.intersection)
+                        }
+                        className="viewBtn text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium w-full text-center"
+                        title="View Results"
+                      >
+                        <Eye size={18} strokeWidth={2} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(sim.backendId)}
+                        className="deleteBtn text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium w-full text-center"
+                        title="Delete Simulation"
+                      >
+                        <Trash2 size={18} strokeWidth={2} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {simulations.length > rowsPerPage && (
+            <div className="pagination absolute bottom-0 left-0 right-0 flex justify-center items-center p-4 space-x-2 bg-white dark:bg-[#161B22] border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 0}
+                className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${
+                  currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                Prev
+              </button>
+              {Array.from({ length: totalPages }, (_, index) => (
+                <button
+                  key={index}
+                  onClick={() => handlePageChange(index)}
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    currentPage === index
+                      ? "bg-[#0F5BA7] text-white dark:bg-[#388BFD]"
+                      : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+                  } transition-all duration-300`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages - 1}
+                className={`px-3 py-1 rounded-full text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-indigo-600 hover:to-indigo-700 dark:from-indigo-400 dark:to-indigo-500 dark:hover:from-indigo-500 dark:hover:to-indigo-600 transition-all duration-300 ${
+                  currentPage === totalPages - 1
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
 };
 
 const Simulations: React.FC = () => {
+  const navigate = useNavigate();
   const [filter1, setFilter1] = useState<string>("All Intersections");
   const [filter2, setFilter2] = useState<string>("All Intersections");
   const [page1, setPage1] = useState<number>(0);
   const [page2, setPage2] = useState<number>(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"simulations" | "optimizations">(
-    "simulations",
-  );
+  const modalType: "simulations" | "optimizations" = "simulations";
+  const [simulations, setSimulations] = useState<SimulationData[]>([]);
+  const [optimizations, setOptimizations] = useState<SimulationData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchIntersections = async (): Promise<ApiIntersection[]> => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/intersections`, {
+        headers: { Authorization: `Bearer ${getAuthToken()}` },
+      });
+      if (!res.ok)
+        throw new Error(`Failed to fetch intersections: ${res.statusText}`);
+      const data = await res.json();
+      return data.intersections || [];
+    } catch (err: unknown) {
+      console.error("Error fetching intersections:", err);
+      throw err;
+    }
+  };
+
+  const createIntersection = async (intersectionData: {
+    name: string;
+    traffic_density: string;
+    details: {
+      address: string;
+      city: string;
+      province: string;
+    };
+    default_parameters: {
+      green: number;
+      yellow: number;
+      red: number;
+      speed: number;
+      seed: number;
+      intersection_type: string;
+    };
+  }) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/intersections`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
+        body: JSON.stringify(intersectionData),
+      });
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to create intersection");
+      }
+      return await res.json();
+    } catch (err: unknown) {
+      console.error("Error creating intersection:", err);
+      throw err;
+    }
+  };
+
+  const runSimulation = async (intersectionId: string) => {
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/intersections/${intersectionId}/simulate`,
+        {
+          headers: { Authorization: `Bearer ${getAuthToken()}` },
+        },
+      );
+      if (!res.ok)
+        throw new Error(`Failed to run simulation: ${res.statusText}`);
+      return await res.json();
+    } catch (err: unknown) {
+      console.error("Error running simulation:", err);
+      throw err;
+    }
+  };
+
+  const runOptimization = async (intersectionId: string) => {
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${getAuthToken()}` },
+        },
+      );
+      if (!res.ok)
+        throw new Error(`Failed to run optimization: ${res.statusText}`);
+      return await res.json();
+    } catch (err: unknown) {
+      console.error("Error running optimization:", err);
+      throw err;
+    }
+  };
+
+  const convertToSimulationData = (
+    intersections: ApiIntersection[],
+  ): { sims: SimulationData[]; opts: SimulationData[] } => {
+    //  ADDED: Helper function to format traffic density strings
+    const formatTrafficDensity = (density?: string): string => {
+      if (!density) return "Medium";
+      const lowerCaseDensity = density.toLowerCase();
+      if (lowerCaseDensity.includes("high")) return "High";
+      if (lowerCaseDensity.includes("low")) return "Low";
+      return "Medium";
+    };
+
+    const mapApiStatus = (apiStatus?: string): string => {
+      switch (apiStatus) {
+        case "INTERSECTION_STATUS_OPTIMISED":
+          return "Optimised"; // Frontend display string
+        case "unoptimised": // Assuming backend still sends "unoptimised" for unoptimized
+          return "Unoptimised"; // Frontend display string
+        case "Failed":
+          return "Failed";
+        default:
+          return "Unoptimised";
+      }
+    };
+
+    const sortedIntersections = [...intersections].sort((a, b) => {
+      const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return dateB - dateA;
+    });
+
+    //  UPDATED: Mapped API data to the new SimulationData structure
+    const allSims = sortedIntersections.map((intersection, index) => {
+      const displayName = (intersection.name || "Unnamed Intersection").split(
+        " [",
+      )[0];
+      const displayAddress = (
+        intersection.details?.address || displayName
+      ).split(",")[0];
+
+      return {
+        id: index + 1,
+        backendId: intersection.id,
+        intersection: displayAddress,
+        trafficDensity: formatTrafficDensity(intersection.traffic_density),
+        speed:
+          intersection.default_parameters?.simulation_parameters?.speed || 0,
+        status: mapApiStatus(intersection.status),
+      };
+    });
+
+    //  UPDATED: Filter optimizations based on actual "optimised" status
+    const opts = allSims.filter((sim) => sim.status === "Optimised");
+
+    return { sims: allSims, opts };
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const intersections = await fetchIntersections();
+        const { sims, opts } = convertToSimulationData(intersections);
+
+        setSimulations(sims);
+        setOptimizations(opts);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to load data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  const handleViewResults = (backendId: string, intersectionName: string) => {
+    navigate("/simulation-results", {
+      state: {
+        name: `Results for ${intersectionName}`,
+        description: `Viewing detailed results for simulation run on ${intersectionName}.`,
+        intersections: [intersectionName],
+        intersectionIds: [backendId],
+        type: "simulations",
+      },
+    });
+  };
 
   const filteredSimulations1 =
     filter1 === "All Intersections"
-      ? simulationsTable1
-      : simulationsTable1.filter((sim) => sim.intersection === filter1);
+      ? simulations
+      : simulations.filter((sim) => sim.intersection === filter1);
+
   const filteredSimulations2 =
     filter2 === "All Intersections"
-      ? simulationsTable2
-      : simulationsTable2.filter((sim) => sim.intersection === filter2);
+      ? optimizations
+      : optimizations.filter((sim) => sim.intersection === filter2);
+
   const allIntersections = Array.from(
-    new Set(
-      [...simulationsTable1, ...simulationsTable2].map(
-        (sim) => sim.intersection,
-      ),
-    ),
+    new Set(simulations.map((sim) => sim.intersection)),
   );
 
-  const handleNewSimulation = (type: "simulations" | "optimizations") => {
-    setModalType(type);
-    setIsModalOpen(true);
-  };
-
-  const handleModalSubmit = (data: {
+  const handleModalSubmit = async (data: {
     name: string;
     description: string;
     intersections: string[];
   }) => {
-    console.log(
-      `New ${modalType === "simulations" ? "Simulation" : "Optimization"} Created:`,
-      data,
-    );
-    setIsModalOpen(false);
+    if (data.intersections.length === 0) {
+      alert("Please select at least one intersection");
+      return;
+    }
+
+    try {
+      const createdIntersections = [];
+
+      for (const intersection of data.intersections) {
+        const isCoordinates = /^-?\d+\.\d+,\s*-?\d+\.\d+$/.test(intersection);
+
+        const intersectionData = {
+          name: isCoordinates
+            ? `Intersection at ${intersection}`
+            : intersection,
+          traffic_density: "medium" as const,
+          details: {
+            address: intersection,
+            city: "Pretoria",
+            province: "Gauteng",
+          },
+          default_parameters: {
+            green: 30,
+            yellow: 3,
+            red: 27,
+            speed: 60,
+            seed: Math.floor(Math.random() * 10000000000),
+            intersection_type: "traffic light",
+          },
+        };
+
+        const result = await createIntersection(intersectionData);
+        createdIntersections.push(result.id);
+      }
+
+      const promises = createdIntersections.map((id) =>
+        modalType === "simulations" ? runSimulation(id) : runOptimization(id),
+      );
+
+      await Promise.all(promises);
+
+      const updatedIntersections = await fetchIntersections();
+      const { sims, opts } = convertToSimulationData(updatedIntersections);
+
+      setSimulations(sims);
+      setOptimizations(opts);
+
+      setIsModalOpen(false);
+
+      navigate("/simulation-results", {
+        state: {
+          ...data,
+          intersectionIds: createdIntersections,
+          type: modalType,
+        },
+      });
+    } catch (err: unknown) {
+      alert(
+        `Failed to create ${modalType}: ${err instanceof Error ? err.message : "Unknown error"}`,
+      );
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="simulationBody min-h-screen bg-gray-100 dark:bg-gray-900">
+        <Navbar />
+        <div className="sim-main-content flex-grow p-6 flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin inline-block w-8 h-8 border-4 border-current border-t-transparent rounded-full mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">
+              Loading simulations...
+            </p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="simulationBody min-h-screen bg-gray-100 dark:bg-gray-900">
+        <Navbar />
+        <div className="sim-main-content flex-grow p-6 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-red-600 dark:text-red-400 mb-4">
+              Error: {error}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="simulationBody min-h-screen bg-gray-100 dark:bg-gray-900">
       <Navbar />
       <div className="sim-main-content flex-grow p-6">
-        <div className="simGrid grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="simGrid grid grid-cols-1 lg:grid-cols-2 gap-8 px-4 lg:px-8 w-full max-w-7xl mx-auto">
           <div className="simTableContainer sims">
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-3xl font-bold text-gray-800 dark:text-[#E6EDF3]">
                 Recent Simulations
               </h1>
               <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => handleNewSimulation("simulations")}
-                  className="new-simulation-button px-4 py-2 rounded-md text-sm font-medium bg-[#0F5BA7] dark:bg-[#388BFD] text-white hover:from-green-600 hover:to-green-700 dark:from-green-400 dark:to-green-500 dark:hover:from-green-500 dark:hover:to-green-600 transition-all duration-300 shadow-md hover:shadow-lg"
-                >
-                  New Simulation
-                </button>
                 <select
                   value={filter1}
                   onChange={(e) => {
@@ -2028,16 +2199,13 @@ const Simulations: React.FC = () => {
                   }}
                   className="w-48 p-2 rounded-md border border-gray-300 dark:border-[#388BFD] bg-white dark:bg-[#161B22] text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  {[
-                    "All Intersections",
-                    ...new Set(
-                      simulationsTable1.map((sim) => sim.intersection),
+                  {["All Intersections", ...allIntersections].map(
+                    (intersection) => (
+                      <option key={intersection} value={intersection}>
+                        {intersection}
+                      </option>
                     ),
-                  ].map((intersection) => (
-                    <option key={intersection} value={intersection}>
-                      {intersection}
-                    </option>
-                  ))}
+                  )}
                 </select>
               </div>
             </div>
@@ -2045,6 +2213,7 @@ const Simulations: React.FC = () => {
               simulations={filteredSimulations1}
               currentPage={page1}
               setCurrentPage={setPage1}
+              onViewResults={handleViewResults}
             />
           </div>
           <div className="simTableContainer opts">
@@ -2061,16 +2230,13 @@ const Simulations: React.FC = () => {
                   }}
                   className="w-48 p-2 rounded-md border border-gray-300 dark:border-[#388BFD] bg-white dark:bg-[#161B22] text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  {[
-                    "All Intersections",
-                    ...new Set(
-                      simulationsTable2.map((sim) => sim.intersection),
+                  {["All Intersections", ...allIntersections].map(
+                    (intersection) => (
+                      <option key={intersection} value={intersection}>
+                        {intersection}
+                      </option>
                     ),
-                  ].map((intersection) => (
-                    <option key={intersection} value={intersection}>
-                      {intersection}
-                    </option>
-                  ))}
+                  )}
                 </select>
               </div>
             </div>
@@ -2078,6 +2244,7 @@ const Simulations: React.FC = () => {
               simulations={filteredSimulations2}
               currentPage={page2}
               setCurrentPage={setPage2}
+              onViewResults={handleViewResults}
             />
           </div>
         </div>
