@@ -36,7 +36,7 @@ describe("Intersections Page", () => {
   });
 
   it("should display fetched intersections", () => {
-    cy.contains("Test Intersection")
+    cy.contains("Test Intersection").should("exist");
   });
 });
 
