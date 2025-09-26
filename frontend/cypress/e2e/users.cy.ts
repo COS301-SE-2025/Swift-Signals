@@ -2,12 +2,12 @@ describe("Users Page", () => {
     const API_BASE_URL = "http://localhost:9090";
     
   beforeEach(() => {
-      // Stub token
+    // Stub token
     window.localStorage.setItem("authToken", "fake-admin-token");
 
     // Mock users API
     cy.intercept("GET", `${API_BASE_URL}/admin/users*`, [
-        {
+      {
         id: "1",
         username: "Bob Johnson",
         email: "bob@example.com",
@@ -22,8 +22,8 @@ describe("Users Page", () => {
         intersection_ids: [],
       },
     ]).as("getUsers");
-      
-    cy.visit("/users"); // Adjust path as necessary
+
+    cy.visit("/users");
     cy.wait("@getUsers");
   });
 
