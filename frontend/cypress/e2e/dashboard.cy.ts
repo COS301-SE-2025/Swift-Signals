@@ -42,6 +42,10 @@ describe("Dashboard Page", () => {
     });
   });
 
+  it("renders traffic density distribution chart", () => {
+   
+  });
+
   // it("renders top intersections with progress bars", () => {
   //   cy.contains("Top Intersections").should("exist");
 
