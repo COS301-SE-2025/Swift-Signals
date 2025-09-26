@@ -43,7 +43,7 @@ describe("Intersections Page", () => {
     cy.contains("Create New Intersection").click();
 
     cy.get("input[name='name']").type("New Intersection");
-    cy.get("input[name='details.address']");
+    cy.get("input[name='details.address']").type("Corner of Lynnwood & Atterbury");;
     cy.get("input[name='details.city']");
     cy.get("input[name='details.province']");
   });
