@@ -62,6 +62,8 @@ describe("Intersections Page", () => {
     cy.contains("Test Intersection").parent().within(() => {
       cy.contains("Edit").click();
     });
+
+    cy.get("input[name='name']").clear().type("Updated Intersection");
     
   });
 });
