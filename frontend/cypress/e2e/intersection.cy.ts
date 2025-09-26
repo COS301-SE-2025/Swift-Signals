@@ -81,6 +81,10 @@ describe("Intersections Page", () => {
     });
     
     cy.contains("Delete Intersection").click();
+
+    cy.intercept("DELETE", `${API_BASE_URL}/intersections/123`, {
+      
+    }).as("deleteIntersection");
   });
   
 });
