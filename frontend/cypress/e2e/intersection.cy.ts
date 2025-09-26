@@ -8,6 +8,27 @@ describe("Intersections Page", () => {
     window.localStorage.setItem("authToken", "fake-jwt-token");
     cy.intercept("GET", `${API_BASE_URL}/intersections`, {
       statusCode: 200,
+      body: {
+        intersections: [
+          {
+            id: "123",
+            name: "Test Intersection",
+            traffic_density: "medium",
+            details: { address: "Main Rd", city: "Pretoria", province: "Gauteng" },
+            default_parameters: {
+              optimisation_type: "default",
+              simulation_parameters: {
+                intersection_type: "trafficlight",
+                green: 30,
+                yellow: 3,
+                red: 27,
+                speed: 60,
+                seed: 42,
+              },
+            },
+          },
+        ],
+      }
      
     }).as("getIntersections");
   });
