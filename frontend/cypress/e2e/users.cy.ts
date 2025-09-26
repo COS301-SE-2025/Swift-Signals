@@ -4,6 +4,11 @@ describe("Users Page", () => {
   beforeEach(() => {
       // Stub token
     window.localStorage.setItem("authToken", "fake-admin-token");
+
+    // Mock users API
+    cy.intercept("GET", `${API_BASE_URL}/admin/users*`, [
+      
+    ]).as("getUsers");
       
     cy.visit("/users"); // Adjust path as necessary
   });
