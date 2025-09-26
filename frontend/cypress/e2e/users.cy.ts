@@ -24,6 +24,7 @@ describe("Users Page", () => {
     ]).as("getUsers");
       
     cy.visit("/users"); // Adjust path as necessary
+    cy.wait("@getUsers");
   });
 
   // it("renders a table with 9 user rows", () => {
