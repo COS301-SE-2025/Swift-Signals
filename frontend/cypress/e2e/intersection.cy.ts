@@ -28,8 +28,7 @@ describe("Intersections Page", () => {
             },
           },
         ],
-      }
-     
+      },
     }).as("getIntersections");
   });
 });
