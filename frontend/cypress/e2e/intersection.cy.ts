@@ -51,6 +51,8 @@ describe("Intersections Page", () => {
       statusCode: 201,
       body: { id: "456", name: "New Intersection" },
     }).as("createIntersection");
+
+    cy.contains("Create Intersection");
     
   });
 });
