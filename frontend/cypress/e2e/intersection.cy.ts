@@ -112,7 +112,7 @@ describe("Intersections Page", () => {
       },
     }).as("searchIntersection");
 
-    cy.get("input[placeholder='Search intersections']");
+    cy.get("input[placeholder='Search intersections']").type("123{enter}");
   });
 });
 
