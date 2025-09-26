@@ -53,6 +53,7 @@ describe("Intersections Page", () => {
     }).as("createIntersection");
 
     cy.contains("Create Intersection");
+    cy.wait("@createIntersection");
     
   });
 });
