@@ -89,6 +89,9 @@ describe("Intersections Page", () => {
     cy.wait("@deleteIntersection");
     cy.contains("Test Intersection").should("not.exist");
   });
-  
+
+  it("should search by intersection ID", () => {
+    
+  });
 });
 
