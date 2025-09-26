@@ -46,6 +46,10 @@ describe("Intersections Page", () => {
     cy.get("input[name='details.address']").type("Corner of Lynnwood & Atterbury");;
     cy.get("input[name='details.city']").clear().type("Pretoria");
     cy.get("input[name='details.province']").clear().type("Gauteng");
+
+    cy.intercept("POST", `${API_BASE_URL}/intersections`, {
+     
+    }).as("createIntersection");
   });
 });
 
