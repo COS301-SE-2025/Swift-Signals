@@ -43,7 +43,7 @@ describe("Intersections Page", () => {
     cy.contains("Create New Intersection").click();
 
     cy.get("input[name='name']").type("New Intersection");
-    cy.get("input[name='details.address']").type("Corner of Lynnwood & Atterbury");;
+    cy.get("input[name='details.address']").type("Corner of Lynnwood & Atterbury");
     cy.get("input[name='details.city']").clear().type("Pretoria");
     cy.get("input[name='details.province']").clear().type("Gauteng");
 
@@ -52,7 +52,7 @@ describe("Intersections Page", () => {
       body: { id: "456", name: "New Intersection" },
     }).as("createIntersection");
 
-    cy.contains("Create Intersection");
+    cy.contains("Create Intersection").click();
     cy.wait("@createIntersection");
 
     cy.contains("New Intersection").should("exist");
