@@ -106,7 +106,7 @@ describe("Intersections Page", () => {
             yellow: 3,
             red: 37,
             speed: 50,
-            seed: ,
+            seed: 99,
           },
         },
       },
