@@ -16,8 +16,16 @@ describe("Dashboard Page", () => {
 
   it("shows quick action buttons and they are clickable", () => {
     cy.contains("New Intersection").should("exist");
+
+
+    
     cy.contains("Run Simulation").should("exist");
+
+
+    
     cy.contains("View Map").should("exist");
+
+    
   });
 
   it("displays recent simulations table with correct statuses", () => {
