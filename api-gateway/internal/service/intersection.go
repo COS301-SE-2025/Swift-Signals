@@ -4,6 +4,7 @@ import (
 	"context"
 	"io"
 	"slices"
+	"strings"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
@@ -37,9 +38,16 @@ func (s *IntersectionService) GetAllIntersections(
 	logger := middleware.LoggerFromContext(ctx).With(
 		"service", "intersection",
 	)
+	logger.Debug("calling user service to retrieve user's intersection list")
+	idList, err := s.GetUserIntersectionIDs(ctx, userID)
+	if err != nil {
+		return model.Intersections{}, err
+	}
+
+	ids := strings.Join(idList, ",")
 
 	logger.Debug("starting grpc stream")
-	stream, err := s.intrClient.GetAllIntersections(ctx)
+	stream, err := s.intrClient.GetAllIntersections(ctx, ids)
 	if err != nil {
 		return model.Intersections{}, err
 	}
