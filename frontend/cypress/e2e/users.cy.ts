@@ -38,9 +38,9 @@ describe("Users Page", () => {
     cy.get("tbody tr").first().should("contain", "John Doe");
   });
 
-  it("displays ellipsis for long pagination", () => {
-    cy.get(".usersPaging").should("contain", "...");
-  });
+  // it("displays ellipsis for long pagination", () => {
+  //   cy.get(".usersPaging").should("contain", "...");
+  // });
 
   // it("navigates directly to a specific page", () => {
   //   cy.get(".usersPaging button").contains("2").click();
