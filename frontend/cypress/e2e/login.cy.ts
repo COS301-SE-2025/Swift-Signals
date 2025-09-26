@@ -83,25 +83,25 @@ describe("Login Page", () => {
     cy.contains("Reset failed. Email not found.").should("exist");
   });
 
-  it("updates traffic light based on form input", () => {
-    // cy.get(".traffic-light").within(() => {
-    //   // Initially all off
-    //   cy.get("div").eq(0).should("have.class", "bg-red-900/50");
-    //   cy.get("div").eq(1).should("have.class", "bg-yellow-900/50");
-    //   cy.get("div").eq(2).should("have.class", "bg-green-900/50");
-    // });
+  // it("updates traffic light based on form input", () => {
+  //   // cy.get(".traffic-light").within(() => {
+  //   //   // Initially all off
+  //   //   cy.get("div").eq(0).should("have.class", "bg-red-900/50");
+  //   //   cy.get("div").eq(1).should("have.class", "bg-yellow-900/50");
+  //   //   cy.get("div").eq(2).should("have.class", "bg-green-900/50");
+  //   // });
 
-    // cy.get("input[name='username']").type("user");
-    // cy.get(".traffic-light").within(() => {
-    //   cy.get("div").eq(0).should("have.class", "bg-red-600");
-    //   cy.get("div").eq(1).should("have.class", "bg-yellow-500");
-    // });
+  //   // cy.get("input[name='username']").type("user");
+  //   // cy.get(".traffic-light").within(() => {
+  //   //   cy.get("div").eq(0).should("have.class", "bg-red-600");
+  //   //   cy.get("div").eq(1).should("have.class", "bg-yellow-500");
+  //   // });
 
-    // cy.get("input[name='password']").type("pass");
-    // cy.get(".traffic-light").within(() => {
-    //   cy.get("div").eq(2).should("have.class", "bg-green-500");
-    // });
-  });
+  //   // cy.get("input[name='password']").type("pass");
+  //   // cy.get(".traffic-light").within(() => {
+  //   //   cy.get("div").eq(2).should("have.class", "bg-green-500");
+  //   // });
+  // });
 
   it("navigates to signup on Register Here button click", () => {
     cy.contains("Register Here").click();
