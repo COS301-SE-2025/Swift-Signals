@@ -64,6 +64,10 @@ describe("Intersections Page", () => {
     });
 
     cy.get("input[name='name']").clear().type("Updated Intersection");
+
+    cy.intercept("PATCH", `${API_BASE_URL}/intersections/123`, {
+      
+    }).as("updateIntersection");
     
   });
 });
