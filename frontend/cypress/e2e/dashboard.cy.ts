@@ -32,15 +32,11 @@ describe("Dashboard Page", () => {
     cy.contains("Recent Simulations").should("exist");
 
     cy.get("table").within(() => {
-      cy.contains("#1234").should("exist");
-      cy.contains("Main St & 5th Ave").should("exist");
-      cy.contains("Complete").should("exist");
+      cy.contains("Corner of Albertus Street & Simon Vermooten Road").should("exist");
+      cy.contains("unoptimised").should("exist");
 
-      cy.contains("#1233").should("exist");
-      cy.contains("Running").should("exist");
-
-      cy.contains("#1232").should("exist");
-      cy.contains("Failed").should("exist");
+      cy.contains("Corner of Lynnwood & Jan Shoba").should("exist");
+      cy.contains("unoptimised").should("exist");
 
       cy.get("button").contains("View Details").should("have.length.at.least", 2);
     });
