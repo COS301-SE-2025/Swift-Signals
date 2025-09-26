@@ -79,7 +79,7 @@ describe("Intersections Page", () => {
     cy.contains("Test Intersection").parent().within(() => {
       cy.contains("Delete").click();
     });
-    
+
     cy.contains("Delete Intersection").click();
 
     cy.intercept("DELETE", `${API_BASE_URL}/intersections/123`, {
@@ -87,7 +87,7 @@ describe("Intersections Page", () => {
     }).as("deleteIntersection");
 
     cy.wait("@deleteIntersection");
-    cy.contains("Test Intersection");
+    cy.contains("Test Intersection").should("not.exist");
   });
   
 });
