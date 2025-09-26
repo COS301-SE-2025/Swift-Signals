@@ -246,7 +246,7 @@ const LocationMarker: React.FC<{
 
       if (intersections.length > 0) {
         const closestIntersection = intersections[0];
-        const reverseGeocodeUrl = `${CHATBOT_BASE_URL}/api/reverse-geocode?lat=${closestIntersection.lat}&lon=${closestIntersection.lon}`;
+        const reverseGeocodeUrl = `${CHATBOT_BASE_URL}/reverse-geocode?lat=${closestIntersection.lat}&lon=${closestIntersection.lon}`;
         const reverseGeocodeResponse = await fetch(reverseGeocodeUrl);
         const reverseGeocodeData = await reverseGeocodeResponse.json();
         const address = reverseGeocodeData.address;
