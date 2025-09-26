@@ -25,7 +25,7 @@ describe("Dashboard Page", () => {
     
     cy.contains("View Map").should("exist");
     cy.url().should("include", "/map"); // adjust route if different
-    
+    cy.go("back");
   });
 
   it("displays recent simulations table with correct statuses", () => {
