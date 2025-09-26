@@ -44,7 +44,7 @@ describe("Intersections Page", () => {
 
     cy.get("input[name='name']");
     cy.get("input[name='details.address']");
-    
+    cy.get("input[name='details.city']");
   });
 });
 
