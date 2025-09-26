@@ -85,6 +85,9 @@ describe("Intersections Page", () => {
     cy.intercept("DELETE", `${API_BASE_URL}/intersections/123`, {
       statusCode: 204,
     }).as("deleteIntersection");
+
+    cy.wait("@deleteIntersection");
+    
   });
   
 });
