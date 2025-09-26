@@ -67,6 +67,7 @@ describe("Intersections Page", () => {
 
     cy.intercept("PATCH", `${API_BASE_URL}/intersections/123`, {
       statusCode: 200,
+      body: { id: "123", name: "Updated Intersection" },
     }).as("updateIntersection");
     
   });
