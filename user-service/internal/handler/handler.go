@@ -3,7 +3,7 @@ package handler
 import (
 	"context"
 
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/service"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/util"
