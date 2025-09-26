@@ -1,6 +1,6 @@
 describe("Users Page", () => {
-  beforeEach(() => {
     const API_BASE_URL = "http://localhost:9090";
+  beforeEach(() => {
     cy.visit("/users"); // Adjust path as necessary
   });
 
