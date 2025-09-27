@@ -92,6 +92,8 @@ describe("Users Page", () => {
           .within(() => {
             cy.get("button").contains(/delete/i).click();
         });
+
+        cy.wait("@deleteUser");
         
     });
     
