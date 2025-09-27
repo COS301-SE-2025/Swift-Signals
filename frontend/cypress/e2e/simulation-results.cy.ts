@@ -35,6 +35,11 @@ describe("Simulation Results Page", () => {
     });
   });
 
+  it("shows the chart section", () => {
+    cy.contains("Simulation Results vs Optimized Results").should("be.visible");
+    cy.get("canvas, svg").should("have.length.at.least", 4);
+  });
+
 
 });
 
