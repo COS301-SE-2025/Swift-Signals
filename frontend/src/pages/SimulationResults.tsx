@@ -10,7 +10,6 @@ import { API_BASE_URL } from "../config";
 import "../styles/SimulationResults.css";
 
 Chart.register(...registerables);
-
 const getAuthToken = () => {
   return localStorage.getItem("authToken");
 };
@@ -321,6 +320,24 @@ const SimulationResults: React.FC = () => {
 
   // Get intersectionId from URL params first, then fall back to location.state
   const intersectionId = params.intersectionId || intersectionIds?.[0];
+
+  const [isDarkMode, setIsDarkMode] = useState(
+    document.documentElement.classList.contains("dark"),
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          setIsDarkMode(document.documentElement.classList.contains("dark"));
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => observer.disconnect();
+  }, []);
 
   const chartInstances = useRef<Chart[]>([]);
   const chartRefs = {
@@ -655,7 +672,7 @@ const SimulationResults: React.FC = () => {
         legend: {
           display: showOptimized,
           labels: {
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 12 },
           },
         },
@@ -669,14 +686,25 @@ const SimulationResults: React.FC = () => {
       },
       scales: {
         x: {
-          grid: { color: "rgba(255,255,255,0.1)" },
-          ticks: { color: "#ccc", maxTicksLimit: 10 },
-          title: { display: true, color: "#fff", font: { size: 14 } },
+          grid: {
+            color: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+          },
+          title: {
+            display: true,
+            color: isDarkMode ? "#fff" : "#333",
+            font: { size: 14 },
+          },
         },
         y: {
-          grid: { color: "rgba(255,255,255,0.1)" },
-          ticks: { color: "#ccc" },
-          title: { display: true, color: "#fff", font: { size: 14 } },
+          grid: {
+            color: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+          },
+          ticks: { color: isDarkMode ? "#ccc" : "#666" },
+          title: {
+            display: true,
+            color: isDarkMode ? "#fff" : "#777777ff",
+            font: { size: 14 },
+          },
           beginAtZero: true,
         },
       },
@@ -778,7 +806,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Average Speed Over Time",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
@@ -806,7 +834,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Vehicle Count Over Time",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
@@ -834,7 +862,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Histogram of Final Speeds",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
@@ -865,7 +893,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Histogram of Total Distance",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
