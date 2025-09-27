@@ -19,7 +19,7 @@ channel = grpc.insecure_channel(SIMU_GRPC_ADDR)
 stub = SimulationServiceStub(channel)
 
 
-def run_simulation(individual_params: list) -> dict | None:
+def run_simulation(individual_params: list, traffic_density: int = 2) -> dict | None:
     """
     Runs a simulation using the gRPC service and returns a dictionary of results.
 
