@@ -94,6 +94,8 @@ describe("Users Page", () => {
         });
 
         cy.wait("@deleteUser");
+
+        cy.contains("Bob Johnson").should("not.exist");
         
     });
     
