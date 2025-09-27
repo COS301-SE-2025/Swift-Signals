@@ -1,12 +1,12 @@
-import React from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { X } from "lucide-react";
 import "../styles/MapModal.css";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { X } from "lucide-react";
+import React from "react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 // --- FIX for default icon issue with webpack ---
 // Deletes the default icon's image paths and resets them after the component is loaded.
@@ -26,7 +26,6 @@ interface Intersection {
     address: string;
     city: string;
     province: string;
-    // IMPORTANT: Added placeholder coordinates
     latitude: number;
     longitude: number;
   };
@@ -36,12 +35,14 @@ interface MapModalProps {
   isOpen: boolean;
   onClose: () => void;
   intersections: Intersection[];
+  onSimulate: (id: string, name: string) => void;
 }
 
 const MapModal: React.FC<MapModalProps> = ({
   isOpen,
   onClose,
   intersections,
+  onSimulate,
 }) => {
   if (!isOpen) return null;
 
@@ -78,7 +79,16 @@ const MapModal: React.FC<MapModalProps> = ({
                 <Popup>
                   <b>{intersection.name}</b>
                   <br />
-                  {intersection.details.address}
+                  {intersection.details.address.split(",")[0]}
+                  <br />
+                  <button
+                    className="mt-2 px-3 py-1 bg-[#0F5BA7] text-white text-xs rounded hover:bg-blue-700 transition-colors"
+                    onClick={() =>
+                      onSimulate(intersection.id, intersection.name)
+                    }
+                  >
+                    Simulate
+                  </button>
                 </Popup>
               </Marker>
             ))}

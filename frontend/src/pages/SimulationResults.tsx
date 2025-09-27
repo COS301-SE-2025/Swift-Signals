@@ -1,20 +1,34 @@
-import React, { useEffect, useState, useRef } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import "../styles/SimulationResults.css";
-import HelpMenu from "../components/HelpMenu";
 import { Chart, registerables } from "chart.js";
-import { useLocation } from "react-router-dom";
 import type { ChartConfiguration } from "chart.js";
+import React, { useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+
+import Footer from "../components/Footer";
+import HelpMenu from "../components/HelpMenu";
+import Navbar from "../components/Navbar";
+import { API_BASE_URL } from "../config";
+import "../styles/SimulationResults.css";
 
 Chart.register(...registerables);
 
+const getAuthToken = () => {
+  return localStorage.getItem("authToken");
+};
+
+// Types based on the API Swagger definition
+interface ApiSimulationResults {
+  average_speed: number;
+  average_travel_time: number;
+  average_waiting_time: number;
+  total_vehicles: number;
+  total_travel_time: number;
+}
+
 type Position = { time: number; x: number; y: number; speed: number };
 type Vehicle = { id: string; positions: Position[] };
-type SimulationData = {
-  name?: string;
-  description?: string;
-  intersections?: string[];
+
+// Matches the 'output' part of the API's SimulationResponse
+type SimulationOutput = {
   vehicles: Vehicle[];
   intersection?: {
     trafficLights?: {
@@ -23,6 +37,121 @@ type SimulationData = {
   };
 };
 
+// Full API response for simulation/optimisation endpoints
+interface ApiSimulationResponse {
+  output: SimulationOutput;
+  results: ApiSimulationResults;
+}
+
+// Full API response for a single intersection
+interface ApiIntersection {
+  name: string;
+  traffic_density: string;
+  status?: string; // Added status property
+  // Add other fields from the full intersection object if needed
+}
+// #endregion
+
+// #region Loading Component
+const LoadingAnimation: React.FC = () => (
+  <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6">
+    <div className="relative">
+      {/* Outer spinning ring */}
+      <div className="w-20 h-20 border-4 border-gray-600 border-t-teal-500 rounded-full animate-spin"></div>
+      {/* Inner pulsing dot */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <div className="w-4 h-4 bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full animate-pulse"></div>
+      </div>
+    </div>
+
+    {/* Loading text with animated dots */}
+    <div className="text-center">
+      <div className="text-xl font-semibold text-gray-300 mb-2">
+        Loading Simulation Data
+      </div>
+      <div className="flex items-center justify-center space-x-1">
+        <div
+          className="w-2 h-2 bg-teal-400 rounded-full animate-bounce"
+          style={{ animationDelay: "0ms" }}
+        ></div>
+        <div
+          className="w-2 h-2 bg-teal-400 rounded-full animate-bounce"
+          style={{ animationDelay: "150ms" }}
+        ></div>
+        <div
+          className="w-2 h-2 bg-teal-400 rounded-full animate-bounce"
+          style={{ animationDelay: "300ms" }}
+        ></div>
+      </div>
+    </div>
+
+    {/* Progress bar */}
+    <div className="w-64 h-2 bg-gray-700 rounded-full overflow-hidden">
+      <div className="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full animate-pulse"></div>
+    </div>
+  </div>
+);
+// #endregion
+
+// #region Error Component
+const ErrorDisplay: React.FC<{ error: string; onRetry: () => void }> = ({
+  error,
+  onRetry,
+}) => (
+  <div className="flex flex-col items-center justify-center min-h-[400px] space-y-6 text-center">
+    {/* Error icon */}
+    <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center">
+      <svg
+        className="w-8 h-8 text-red-500"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    </div>
+
+    {/* Error message */}
+    <div className="max-w-md">
+      <h3 className="text-xl font-semibold text-red-400 mb-2">
+        Failed to Load Data
+      </h3>
+      <p className="text-gray-400 mb-6">{error}</p>
+    </div>
+
+    {/* Retry button */}
+    <button
+      onClick={onRetry}
+      className="px-8 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold rounded-xl 
+                 hover:from-red-700 hover:to-red-800 transform transition-all duration-300 ease-in-out 
+                 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-red-500/50 
+                 hover:shadow-xl hover:shadow-red-500/40 flex items-center space-x-2"
+    >
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+        />
+      </svg>
+      <span>Retry</span>
+    </button>
+  </div>
+);
+// #endregion
+
+// #region Helper Functions
 function computeStats(vehicles: Vehicle[]) {
   let totalSpeed = 0,
     maxSpeed = -Infinity,
@@ -140,7 +269,6 @@ function getHistogramData(
       `${(i * binSize).toFixed(0)}-${((i + 1) * binSize).toFixed(0)}`,
     );
   }
-
   return { counts, labels };
 }
 
@@ -152,39 +280,49 @@ function downsampleData<TLabel, TData>(
   if (labels.length <= maxPoints) {
     return { downsampledLabels: labels, downsampledData: data };
   }
-
   const downsampledLabels: TLabel[] = [];
   const downsampledData: TData[] = [];
   const step = Math.ceil(labels.length / maxPoints);
-
   for (let i = 0; i < labels.length; i += step) {
     downsampledLabels.push(labels[i]);
     downsampledData.push(data[i]);
   }
-
   return { downsampledLabels, downsampledData };
 }
+// #endregion
 
 const SimulationResults: React.FC = () => {
-  const [simData, setSimData] = useState<SimulationData | null>(null);
-  const [optimizedData, setOptimizedData] = useState<SimulationData | null>(
+  const [simData, setSimData] = useState<SimulationOutput | null>(null);
+  const [optimizedData, setOptimizedData] = useState<SimulationOutput | null>(
     null,
   );
+  const [apiResults, setApiResults] = useState<ApiSimulationResults | null>(
+    null,
+  );
+  const [optimizedApiResults, setOptimizedApiResults] =
+    useState<ApiSimulationResults | null>(null);
+  const [intersectionData, setIntersectionData] =
+    useState<ApiIntersection | null>(null);
+
   const [showOptimized, setShowOptimized] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [optimizing, setOptimizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [optimizedDataExists, setOptimizedDataExists] = useState(false);
-  const location = useLocation();
-  const simInfo = location.state || {};
+  const [isOptimized, setIsOptimized] = useState(false);
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const [optimizationStatus, setOptimizationStatus] = useState<string>("");
 
-  const simName = simInfo.name || simData?.name || "Simulation";
-  const simDesc = simInfo.description || simData?.description || "";
-  const simIntersections =
-    simInfo.intersections || simData?.intersections || [];
+  const location = useLocation();
+  const navigate = useNavigate();
+  const params = useParams();
+  const { intersectionIds, name, description, type } = location.state || {};
+
+  console.log("name from location.state:", name);
+  console.log("intersectionData?.name:", intersectionData?.name);
+
+  // Get intersectionId from URL params first, then fall back to location.state
+  const intersectionId = params.intersectionId || intersectionIds?.[0];
 
   const chartInstances = useRef<Chart[]>([]);
-
   const chartRefs = {
     avgSpeedRef: useRef<HTMLCanvasElement | null>(null),
     vehCountRef: useRef<HTMLCanvasElement | null>(null),
@@ -192,93 +330,248 @@ const SimulationResults: React.FC = () => {
     totalDistHistRef: useRef<HTMLCanvasElement | null>(null),
   };
 
-  // Load original simulation data
-  useEffect(() => {
-    fetch("/simulation_output (1).json")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setSimData(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(
-          "Failed to load simulation data. Please check the file path and format.",
-        );
-        setLoading(false);
-        console.error(err);
-      });
-  }, []);
+  // Function to run optimization
+  const runOptimization = async () => {
+    if (!intersectionId) {
+      alert("No intersection ID available for optimization.");
+      return;
+    }
 
-  // Check if optimized data exists and load it
-  useEffect(() => {
-    fetch("/optimized_output.json")
-      .then((res) => {
-        if (!res.ok) {
-          // File doesn't exist or can't be accessed
-          setOptimizedDataExists(false);
-          return null;
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data) {
-          setOptimizedData(data);
-          setOptimizedDataExists(true);
-        }
-      })
-      .catch((err) => {
-        console.log("Optimized data file not found or invalid:", err);
-        setOptimizedDataExists(false);
-      });
-  }, []);
+    setIsOptimizing(true);
+    setOptimizationStatus("Running optimization...");
 
-  const handleOptimize = () => {
-    if (!optimizedDataExists) {
-      setError(
-        "No optimized data available. Please run the optimization first.",
+    try {
+      const authToken = getAuthToken();
+      if (!authToken) {
+        throw new Error("Authentication token not found. Please log in again.");
+      }
+
+      // Step 1: Run optimization
+      const optResponse = await fetch(
+        `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        },
       );
-      return;
-    }
 
-    if (showOptimized) {
-      setShowOptimized(false);
-      return;
-    }
-
-    if (optimizedData) {
-      // Data is already loaded, just show it
-      setShowOptimized(true);
-      return;
-    }
-
-    // Load optimized data if not already loaded
-    setOptimizing(true);
-    fetch("/optimized_output.json")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
+      if (!optResponse.ok) {
+        if (optResponse.status === 401) {
+          throw new Error("Authentication failed. Please log in again.");
+        } else if (optResponse.status === 404) {
+          throw new Error("Intersection not found for optimization.");
+        } else {
+          throw new Error(
+            `Failed to run optimization: ${optResponse.statusText}`,
+          );
         }
-        return res.json();
-      })
-      .then((data) => {
-        setOptimizedData(data);
-        setShowOptimized(true);
-        setOptimizing(false);
-      })
-      .catch((err) => {
-        setError(
-          "Failed to load optimized data. Please check if the optimization has been run.",
+      }
+
+      const optResult = await optResponse.json();
+      console.log("Optimization result:", optResult);
+
+      setOptimizationStatus(
+        "Optimization completed successfully! Fetching optimized data...",
+      );
+
+      // Step 2: Fetch optimized simulation data
+      const optDataResponse = await fetch(
+        `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        },
+      );
+
+      if (!optDataResponse.ok) {
+        throw new Error(
+          `Failed to fetch optimized data: ${optDataResponse.statusText}`,
         );
-        setOptimizing(false);
-        console.error(err);
-      });
+      }
+
+      const optData: ApiSimulationResponse = await optDataResponse.json();
+
+      if (!optData.output) {
+        throw new Error(
+          "Invalid optimized simulation data received from server",
+        );
+      }
+
+      // Process traffic lights for optimized data if they exist
+      if (
+        optData.output.intersection &&
+        optData.output.intersection.trafficLights
+      ) {
+        const processedTrafficLights = processTrafficLights(
+          optData.output.intersection.trafficLights,
+        );
+        const newOptData = {
+          ...optData.output,
+          intersection: {
+            ...optData.output.intersection,
+            trafficLights: processedTrafficLights,
+          },
+        };
+        setOptimizedData(newOptData);
+      } else {
+        setOptimizedData(optData.output);
+      }
+
+      setOptimizedApiResults(optData.results);
+      setIsOptimized(true);
+      setShowOptimized(true);
+      setOptimizationStatus("Optimization completed successfully!");
+
+      // Update the intersection status to "optimised" in the backend
+      await updateIntersectionStatus(
+        intersectionId,
+        "INTERSECTION_STATUS_OPTIMISED",
+      );
+
+      setTimeout(() => {
+        setOptimizationStatus("");
+      }, 3000);
+    } catch (error) {
+      console.error("Error running optimization:", error);
+      setOptimizationStatus(
+        `Optimization failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+      );
+      setTimeout(() => {
+        setOptimizationStatus("");
+      }, 5000);
+    } finally {
+      setIsOptimizing(false);
+    }
   };
 
+  // Helper function to process traffic lights (extracted from existing code)
+  const processTrafficLights = (
+    trafficLights: { phases?: { duration?: number }[] }[],
+  ) => {
+    // This would need to be updated based on your actual connection structure
+    // For now, using a simplified approach
+
+    const maxSignalIndex = 11; // Default value, adjust as needed
+    const stateArrayLength = maxSignalIndex >= 0 ? maxSignalIndex + 1 : 12;
+
+    const newPhases = [
+      { duration: 30, state: "G".repeat(stateArrayLength) }, // North-South green
+      { duration: 5, state: "y".repeat(stateArrayLength) }, // North-South yellow
+      { duration: 30, state: "G".repeat(stateArrayLength) }, // East-West green
+      { duration: 5, state: "y".repeat(stateArrayLength) }, // East-West yellow
+    ];
+
+    return trafficLights.map((light) => {
+      let time = 0;
+      const newStates = newPhases.map((phase) => {
+        const state = { time: time, state: phase.state };
+        time += phase.duration;
+        return state;
+      });
+      newStates.push({ time: time, state: newPhases[0].state });
+      return { ...light, phases: newPhases, states: newStates };
+    });
+  };
+
+  // Function to update intersection status
+  const updateIntersectionStatus = async (id: string, status: string) => {
+    try {
+      const authToken = getAuthToken();
+      if (!authToken) return;
+
+      await fetch(`${API_BASE_URL}/intersections/${id}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status }),
+      });
+    } catch (error) {
+      console.error("Failed to update intersection status:", error);
+    }
+  };
+
+  const fetchData = async () => {
+    if (!intersectionId) {
+      setError("No intersection ID provided.");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const authToken = getAuthToken();
+      const headers = { Authorization: `Bearer ${authToken}` };
+
+      // Fetch simulation and intersection data in parallel
+      const [simRes, intersectionRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/intersections/${intersectionId}/simulate`, {
+          headers,
+        }),
+        fetch(`${API_BASE_URL}/intersections/${intersectionId}`, { headers }),
+      ]);
+
+      // Process simulation data
+      if (!simRes.ok)
+        throw new Error(
+          `Failed to fetch simulation data: ${simRes.statusText}`,
+        );
+      const simResponseData: ApiSimulationResponse = await simRes.json();
+      setSimData(simResponseData.output);
+      setApiResults(simResponseData.results);
+
+      // Process intersection details
+      if (!intersectionRes.ok)
+        throw new Error(
+          `Failed to fetch intersection details: ${intersectionRes.statusText}`,
+        );
+      const intersectionResponseData: ApiIntersection =
+        await intersectionRes.json();
+      setIntersectionData(intersectionResponseData);
+
+      // If intersection is optimized, fetch optimization data
+      if (intersectionResponseData.status === "INTERSECTION_STATUS_OPTIMISED") {
+        setIsOptimized(true);
+        const optRes = await fetch(
+          `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
+          {
+            headers,
+          },
+        );
+
+        if (optRes.ok) {
+          const optResponseData: ApiSimulationResponse = await optRes.json();
+          setOptimizedData(optResponseData.output);
+          setOptimizedApiResults(optResponseData.results);
+          // If the user came from the "Optimizations" table, show the comparison by default
+          if (type === "optimizations") {
+            setShowOptimized(true);
+          }
+        }
+      } else {
+        setIsOptimized(false);
+      }
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to load data from the API.",
+      );
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [intersectionId]);
+
+  // Chart creation and updates
   useEffect(() => {
     chartInstances.current.forEach((c) => c?.destroy());
     chartInstances.current = [];
@@ -599,26 +892,61 @@ const SimulationResults: React.FC = () => {
     };
   }, [simData, showOptimized, optimizedData]);
 
-  if (loading)
-    return (
-      <div className="text-center text-gray-700 dark:text-gray-300 py-10">
-        Loading simulation data...
-      </div>
-    );
-  if (error)
-    return <div className="text-center text-red-500 py-10">{error}</div>;
-  if (!simData)
-    return (
-      <div className="text-center text-gray-700 dark:text-gray-300 py-10">
-        No simulation data found.
-      </div>
-    );
+  const handleViewRendering = () => {
+    if (intersectionId) {
+      navigate("/comparison-rendering", {
+        state: {
+          originalIntersectionId: intersectionId,
+          originalIntersectionName: intersectionData?.name || "Simulation",
+          simulationData: simData,
+          optimizedData: optimizedData,
+        },
+      });
+    } else {
+      alert("No intersection ID available for rendering.");
+    }
+  };
 
-  const stats = computeStats(simData.vehicles);
-  const optStats =
-    showOptimized && optimizedData && optimizedData.vehicles
-      ? computeStats(optimizedData.vehicles)
-      : null;
+  if (loading) {
+    return (
+      <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
+        <Navbar />
+        <div className="simRes-main-content py-8 px-6 overflow-y-auto">
+          <LoadingAnimation />
+        </div>
+        <Footer />
+        <HelpMenu />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
+        <Navbar />
+        <div className="simRes-main-content py-8 px-6 overflow-y-auto">
+          <ErrorDisplay error={error} onRetry={fetchData} />
+        </div>
+        <Footer />
+        <HelpMenu />
+      </div>
+    );
+  }
+
+  if (!simData) {
+    return (
+      <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
+        <Navbar />
+        <div className="simRes-main-content py-8 px-6 overflow-y-auto">
+          <div className="text-center text-gray-700 dark:text-gray-300 py-10">
+            No simulation data found.
+          </div>
+        </div>
+        <Footer />
+        <HelpMenu />
+      </div>
+    );
+  }
 
   const { numPhases, totalCycle } = simData.intersection?.trafficLights?.[0]
     ? {
@@ -628,77 +956,109 @@ const SimulationResults: React.FC = () => {
           0,
         ),
       }
-    : { numPhases: 0, totalCycle: 0 };
+    : { numPhases: undefined, totalCycle: undefined };
 
-  const handleViewComparison = () => {
-    window.location.href = "/comparison-rendering";
+  // Define trafficDensityLabel from intersectionData
+  const trafficDensityLabel = intersectionData?.traffic_density
+    ? intersectionData.traffic_density.replace(/_/g, " ").toLowerCase()
+    : "unknown";
+
+  // Helper function to extract street name from a string that might contain coordinates
+  const getStreetName = (fullName: string | undefined | null): string => {
+    if (!fullName) return "Simulation Results";
+    // Remove 'Simulation Results for ' prefix
+    let cleanedName = fullName.replace(/^Simulation Results for\s*/, "");
+    // Remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
+    cleanedName = cleanedName.replace(/\s*\[[^\]]*\]$/, "");
+    return cleanedName.trim();
   };
+
+  const displayedName = getStreetName(name || intersectionData?.name);
+
+  // Helper function to clean the description string
+  const cleanDescription = (
+    desc: string | undefined | null,
+  ): string | undefined => {
+    if (!desc) return undefined;
+    // Only remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
+    const cleanedDesc = desc.replace(/\s*\[[^\]]*\]$/, "");
+    return cleanedDesc.trim();
+  };
+
+  const displayedDescription = cleanDescription(description);
 
   return (
     <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
       <Navbar />
       <div className="simRes-main-content py-8 px-6 overflow-y-auto">
         <div className="results max-w-full mx-auto">
-          {/* Simulation meta info */}
           <div className="mb-10 flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
             <div className="flex-1 text-left">
               <h1 className="simName text-4xl font-extrabold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-2 text-left">
-                {simName}
+                {displayedName}
               </h1>
-              {simDesc && (
+              {displayedDescription && (
                 <p className="simDesc text-lg text-gray-400 mb-4 leading-relaxed text-left">
-                  {simDesc}
+                  {displayedDescription}
                 </p>
               )}
-              {simIntersections && simIntersections.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-2 justify-start">
-                  {simIntersections.map((intersection: string, idx: number) => (
-                    <span
-                      key={idx}
-                      className="px-4 py-2 bg-white/10 dark:bg-[#161B22] backdrop-blur-md rounded-full text-sm font-medium text-[#0F5BA7] border-2 border-[#0F5BA7] hover:bg-white/20 transition-all duration-300"
-                    >
-                      {intersection}
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
-
             <div className="flex flex-col gap-3 lg:min-w-[280px]">
               <button
-                onClick={handleViewComparison}
+                onClick={handleViewRendering}
                 className="px-8 py-3 text-base font-bold text-white bg-[#0F5BA7] border-2 border-[#0F5BA7] rounded-xl transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#0F5BA7]/50 hover:shadow-xl hover:shadow-[#0F5BA7]/40"
               >
                 View Rendering
               </button>
-              <button
-                onClick={handleOptimize}
-                disabled={optimizing || !optimizedDataExists}
-                className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
-                  optimizing
-                    ? "bg-gray-500 cursor-not-allowed"
-                    : !optimizedDataExists
+
+              {/* Optimization Button */}
+              {!isOptimized && (
+                <button
+                  onClick={runOptimization}
+                  disabled={isOptimizing}
+                  className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
+                    isOptimizing
                       ? "bg-gray-600 cursor-not-allowed"
-                      : "bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:scale-105 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
-                }`}
-              >
-                {optimizing ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    Loading...
-                  </div>
-                ) : !optimizedDataExists ? (
-                  "No Optimized Data"
-                ) : showOptimized ? (
-                  "Hide Optimization"
-                ) : (
-                  "Show Optimization"
-                )}
-              </button>
+                      : "bg-gradient-to-r from-orange-600 to-orange-700 shadow-orange-500/50 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/60 focus:ring-orange-300"
+                  }`}
+                >
+                  {isOptimizing ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                      <span>Optimizing...</span>
+                    </div>
+                  ) : (
+                    "Run Optimization"
+                  )}
+                </button>
+              )}
+
+              {/* Show Optimization Results Button */}
+              {isOptimized && (
+                <button
+                  onClick={() => setShowOptimized(!showOptimized)}
+                  className="px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-4 bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
+                >
+                  Show/Hide Optimization
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Simulation Results Section */}
+          {/* Optimization Status Message */}
+          {optimizationStatus && (
+            <div
+              className={`mb-6 p-4 rounded-lg text-center ${
+                optimizationStatus.includes("failed") ||
+                optimizationStatus.includes("No improvement")
+                  ? "bg-red-500/20 border border-red-500/30 text-red-300"
+                  : "bg-green-500/20 border border-green-500/30 text-green-300"
+              }`}
+            >
+              <p className="font-semibold">{optimizationStatus}</p>
+            </div>
+          )}
+
           <section className="visSection simulation-section bg-white/5 backdrop-blur-md p-8 rounded-xl shadow-lg border border-gray-800/50 w-full text-center">
             <h2 className="text-2xl font-semibold mb-8">
               {showOptimized ? (
@@ -718,96 +1078,71 @@ const SimulationResults: React.FC = () => {
               )}
             </h2>
 
-            <div className="statGrid grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-2 mb-8 justify-items-center">
-              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+            <div className="statGrid grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-2 mb-8 justify-items-center">
+              {/* Stat cubes */}
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
-                  Average Speed
+                  Avg Speed
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
-                  {stats ? stats.avgSpeed.toFixed(2) : "..."}{" "}
-                  <span className="text-sm text-[#0F5BA7] font-normal">
-                    m/s
-                  </span>
+                  {apiResults ? apiResults.average_speed.toFixed(2) : "..."}{" "}
+                  <span className="text-sm font-normal">m/s</span>
                 </div>
-                {showOptimized && optStats && (
+                {showOptimized && optimizedApiResults && (
                   <div className="text-lg font-semibold text-[#2B9348] mt-1">
-                    {optStats.avgSpeed.toFixed(2)}{" "}
-                    <span className="text-xs text-[#2B9348] font-normal">
-                      m/s
-                    </span>
+                    {optimizedApiResults.average_speed.toFixed(2)}{" "}
+                    <span className="text-xs font-normal">m/s</span>
                   </div>
                 )}
               </div>
-              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
-                  Max Speed
+                  Avg Travel Time
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
-                  {stats ? stats.maxSpeed.toFixed(2) : "..."}{" "}
-                  <span className="text-sm text-[#0F5BA7] font-normal">
-                    m/s
-                  </span>
+                  {apiResults
+                    ? apiResults.average_travel_time.toFixed(2)
+                    : "..."}{" "}
+                  <span className="text-sm font-normal">s</span>
                 </div>
-                {showOptimized && optStats && (
+                {showOptimized && optimizedApiResults && (
                   <div className="text-lg font-semibold text-[#2B9348] mt-1">
-                    {optStats.maxSpeed.toFixed(2)}{" "}
-                    <span className="text-xs text-[#2B9348] font-normal">
-                      m/s
-                    </span>
+                    {optimizedApiResults.average_travel_time.toFixed(2)}{" "}
+                    <span className="text-xs font-normal">s</span>
                   </div>
                 )}
               </div>
-              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
-                  Min Speed
+                  Avg Wait Time
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
-                  {stats ? stats.minSpeed.toFixed(2) : "..."}{" "}
-                  <span className="text-sm text-[#0F5BA7] font-normal">
-                    m/s
-                  </span>
+                  {apiResults
+                    ? apiResults.average_waiting_time.toFixed(2)
+                    : "..."}{" "}
+                  <span className="text-sm font-normal">s</span>
                 </div>
-                {showOptimized && optStats && (
+                {showOptimized && optimizedApiResults && (
                   <div className="text-lg font-semibold text-[#2B9348] mt-1">
-                    {optStats.minSpeed.toFixed(2)}{" "}
-                    <span className="text-xs text-[#2B9348] font-normal">
-                      m/s
-                    </span>
+                    {optimizedApiResults.average_waiting_time.toFixed(2)}{" "}
+                    <span className="text-xs font-normal">s</span>
                   </div>
                 )}
               </div>
-              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
-                <div className="text-sm font-bold text-gray-600 mb-1">
-                  Total Distance
-                </div>
-                <div className="text-xl font-bold text-[#0F5BA7]">
-                  {stats ? stats.totalDistance.toFixed(2) : "..."}{" "}
-                  <span className="text-sm text-[#0F5BA7] font-normal">m</span>
-                </div>
-                {showOptimized && optStats && (
-                  <div className="text-lg font-semibold text-[#2B9348] mt-1">
-                    {optStats.totalDistance.toFixed(2)}{" "}
-                    <span className="text-xs text-[#2B9348] font-normal">
-                      m
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
                   # Vehicles
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
-                  {stats ? stats.vehicleCount : "..."}
+                  {apiResults ? apiResults.total_vehicles : "..."}
                 </div>
-                {showOptimized && optStats && (
+                {showOptimized && optimizedApiResults && (
                   <div className="text-lg font-semibold text-[#2B9348] mt-1">
-                    {optStats.vehicleCount}
+                    {optimizedApiResults.total_vehicles}
                   </div>
                 )}
               </div>
-              {/* Traffic Light Stat Cards */}
-              <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
                   # TL Phases
                 </div>
@@ -815,18 +1150,24 @@ const SimulationResults: React.FC = () => {
                   {numPhases}
                 </div>
               </div>
-              <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[180px]">
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
-                  TL Cycle Duration
+                  TL Cycle
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
-                  {totalCycle}{" "}
-                  <span className="text-sm text-[#0F5BA7] font-normal">s</span>
+                  {totalCycle} <span className="text-sm font-normal">s</span>
+                </div>
+              </div>
+              <div className="stat-cube bg-white dark:bg-[#161B22] border border-purple-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
+                <div className="text-sm font-bold text-gray-600 mb-1">
+                  Traffic Density
+                </div>
+                <div className="text-xl font-bold text-[#0F5BA7] capitalize">
+                  {trafficDensityLabel}
                 </div>
               </div>
             </div>
 
-            {/* Graphs grid */}
             <div className="graphGrid grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="bg-white dark:bg-[#161B22] outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-2xl p-6 h-80 w-full flex items-center justify-center">
                 <canvas ref={chartRefs.avgSpeedRef} className="w-full h-full" />

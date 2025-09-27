@@ -1,5 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+
+import logo from "../../src/assets/logo.png";
 import "../styles/WelcomePage.css";
 import Carousel from "../components/Carousel";
 
@@ -21,7 +23,7 @@ const WelcomePage: React.FC = () => {
       <div className="glass-block">
         <div className="glass-block-left">
           {/* Replace with your actual logo path */}
-          <img src="../../src/assets/logo.png" alt="Logo" />
+          <img src={logo} alt="Logo" />
           <h1>Welcome to Swift Signals!</h1>
           <div className="auth-buttons">
             <button className="modern-button" onClick={handleLoginClick}>

@@ -70,8 +70,72 @@ body {
 }
 
 .simGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
   justify-self: center;
-  margin-right: 40px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Force grid layout for larger screens */
+@media (min-width: 768px) {
+  .simGrid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 32px !important;
+    padding: 0 32px !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* Ensure the grid layout works with Tailwind classes */
+.simGrid.grid {
+  display: grid !important;
+}
+
+.simGrid.grid-cols-1 {
+  grid-template-columns: 1fr !important;
+}
+
+.simGrid.lg\:grid-cols-2 {
+  grid-template-columns: 1fr 1fr !important;
+}
+
+/* Override any conflicting display properties */
+.simGrid.grid {
+  display: grid !important;
+  flex-direction: unset !important;
+}
+
+/* Ensure grid containers have proper sizing */
+.simGrid .simTableContainer {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Force grid layout on larger screens */
+@media (min-width: 1024px) {
+  .simGrid.grid.lg\:grid-cols-2 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 32px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 32px !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* Mobile styles - ensure single column layout */
+@media (max-width: 1023px) {
+  .simGrid.grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 24px !important;
+    padding: 0 16px !important;
+    margin: 0 auto !important;
+  }
 }
 
 .crossBtn {
@@ -138,6 +202,7 @@ body {
 
   .simGrid {
     margin-top: 20px;
+    display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-right: 0;
@@ -372,8 +437,8 @@ body {
 
   .simGrid {
     margin-top: 20px;
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: column !important;
     gap: 20px;
     width: 100%;
     max-width: 100%;
@@ -789,7 +854,8 @@ body {
 
   .simGrid {
     margin-top: 0;
-    grid-template-columns: 1fr;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 24px;
     margin-right: 0;
     margin-left: 0;
