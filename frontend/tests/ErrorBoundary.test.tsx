@@ -32,16 +32,12 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>
     );
 
-    // Fallback UI is displayed
     expect(screen.getByText("Something went wrong.")).toBeInTheDocument();
 
-    // console.error was called
     expect(console.error).toHaveBeenCalled();
 
-    // Grab all arguments passed to console.error
     const errorArgs = (console.error as jest.Mock).mock.calls[0];
 
-    // Type 'unknown' for safety in TS
     const error = (errorArgs as unknown[]).find((arg: unknown) => arg instanceof Error) as Error | undefined;
 
     expect(error).toBeInstanceOf(Error);

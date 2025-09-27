@@ -1,7 +1,5 @@
-// tests/InteractiveTutorial.test.tsx
 import { render, screen } from "@testing-library/react";
 
-// Mock InteractiveTutorial to bypass NodeJS.Timeout issues
 jest.mock("../src/components/InteractiveTutorial", () => {
   return {
     __esModule: true,
@@ -15,14 +13,12 @@ jest.mock("../src/components/InteractiveTutorial", () => {
 
 import InteractiveTutorial from "../src/components/InteractiveTutorial";
 
-// Mock props
 const steps = [
   { selector: "#step1", title: "Step 1", text: "This is step 1" },
   { selector: "#step2", title: "Step 2", text: "This is step 2" },
 ];
 const onClose = jest.fn();
 
-// Suppress `dragConstraints` warnings like your setup
 beforeAll(() => {
   const originalConsoleError = console.error;
   console.error = (...args: unknown[]) => {

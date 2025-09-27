@@ -5,14 +5,12 @@ import WelcomePage from "../src/pages/WelcomePage";
 
 console.log(React)
 
-// Mock useNavigate from react-router-dom
 const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
   ...(jest.requireActual("react-router-dom") as any),
   useNavigate: () => mockNavigate,
 }));
 
-// Mock Carousel
 jest.mock("../src/components/Carousel", () => (_props: any) => (
   <div data-testid="carousel">Carousel Component</div>
 ));
@@ -29,21 +27,17 @@ describe("WelcomePage", () => {
       </MemoryRouter>
     );
 
-    // Check logo
     const logo = screen.getByAltText("Logo");
     expect(logo).toBeInTheDocument();
 
-    // Check heading
     const heading = screen.getByText(/Welcome to Swift Signals!/i);
     expect(heading).toBeInTheDocument();
 
-    // Check buttons
     const loginButton = screen.getByText("Login");
     const registerButton = screen.getByText("Register");
     expect(loginButton).toBeInTheDocument();
     expect(registerButton).toBeInTheDocument();
 
-    // Check carousel renders
     const carousel = screen.getByTestId("carousel");
     expect(carousel).toBeInTheDocument();
   });

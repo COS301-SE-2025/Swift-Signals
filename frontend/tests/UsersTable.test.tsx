@@ -1,4 +1,3 @@
-// tests/UsersTable.test.tsx
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import UsersTable from "../src/components/UsersTable";
@@ -84,7 +83,6 @@ describe("UsersTable", () => {
 
   it("renders no rows when users list is empty", () => {
     render(<UsersTable users={[]} onEdit={onEdit} onDelete={onDelete} />);
-    // Table still renders headers, but no user data
     expect(screen.getByText("ID")).toBeInTheDocument();
     expect(screen.queryByText("Alice Johnson")).not.toBeInTheDocument();
   });

@@ -1,4 +1,3 @@
-// tests/SimulationResults.test.tsx
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -8,7 +7,6 @@ import SimulationResults, { computeStats } from "../src/pages/SimulationResults"
 
 console.log(React)
 
-// Mock child components so they don't interfere
 jest.mock("../src/components/Navbar", () => () => <div>Mock Navbar</div>);
 jest.mock("../src/components/Footer", () => () => <div>Mock Footer</div>);
 jest.mock("../src/components/HelpMenu", () => () => <div>Mock HelpMenu</div>);
@@ -19,14 +17,14 @@ describe("computeStats", () => {
       id: "v1",
       positions: [
         { time: 0, x: 0, y: 0, speed: 10 },
-        { time: 1, x: 3, y: 4, speed: 20 }, // distance = 5
+        { time: 1, x: 3, y: 4, speed: 20 },
       ],
     },
     {
       id: "v2",
       positions: [
         { time: 0, x: 0, y: 0, speed: 5 },
-        { time: 1, x: 0, y: 3, speed: 15 }, // distance = 3
+        { time: 1, x: 0, y: 3, speed: 15 },
       ],
     },
   ];
@@ -59,9 +57,8 @@ describe("SimulationResults Component", () => {
   }
 
   it("shows loading state initially", () => {
-    // Make fetch never resolve -> component stays in "Loading"
     global.fetch = jest.fn(
-      () => new Promise(() => {}) // pending forever
+      () => new Promise(() => {})
     ) as jest.Mock;
 
     renderWithRoute();

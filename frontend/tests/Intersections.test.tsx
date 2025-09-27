@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import React from "react";
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import '@testing-library/jest-dom';
@@ -9,25 +6,22 @@ import Intersections from "../src/pages/Intersections";
 
 console.log(React)
 
-// Mock dependent components
 jest.mock("../src/components/Navbar", () => () => <div>Navbar</div>);
 jest.mock("../src/components/Footer", () => () => <div>Footer</div>);
 jest.mock("../src/components/HelpMenu", () => () => <div>HelpMenu</div>);
 
-// Mock IntersectionCard to simulate edit/create behavior
 jest.mock("../src/components/IntersectionCard", () => (props: any) => (
   <div data-testid="intersection-card">
     <span>{props.name}</span>
     <button onClick={() => props.onSimulate?.(props.id)}>Simulate</button>
     <button onClick={() => {
       props.onEdit?.(props.id);
-      props.openEditModal?.(); // simulate modal opening
+      props.openEditModal?.();
     }}>Edit</button>
     <button onClick={() => props.onDelete?.(props.id)}>Delete</button>
   </div>
 ));
 
-// Mock fetch and alert
 global.fetch = jest.fn();
 global.alert = jest.fn();
 
@@ -110,19 +104,14 @@ describe("Intersections Page", () => {
 
   const searchInput = screen.getByPlaceholderText(/search by name/i);
   
-  // Simulate typing "2" into search
   await act(async () => {
     fireEvent.change(searchInput, { target: { value: "2" } });
   });
 
-  // Assert the input value updated
   expect((searchInput as HTMLInputElement).value).toBe("2");
 
-  // Optionally assert that the intersection that matches exists in the DOM
   expect(screen.getByText("Test Intersection 2")).toBeInTheDocument();
 });
-
-
 
   it("opens edit modal when clicking edit button", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
@@ -137,7 +126,6 @@ describe("Intersections Page", () => {
       fireEvent.click(screen.getAllByText("Edit")[0]);
     });
 
-    // Simulate that clicking edit opens modal by adding a text element
     const modalText = document.createElement("div");
     modalText.textContent = "Edit Intersection";
     document.body.appendChild(modalText);

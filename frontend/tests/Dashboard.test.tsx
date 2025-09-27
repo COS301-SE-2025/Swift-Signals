@@ -1,4 +1,3 @@
-// tests/Dashboard.test.tsx
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -6,9 +5,6 @@ import { MemoryRouter } from "react-router-dom";
 
 console.log(React)
 
-// =========================
-// Mock window.matchMedia
-// =========================
 beforeAll(() => {
   Object.defineProperty(window, "matchMedia", {
     writable: true,
@@ -25,9 +21,6 @@ beforeAll(() => {
   });
 });
 
-// =========================
-// Mock Chart.js
-// =========================
 jest.mock("chart.js", () => ({
   __esModule: true,
   Chart: jest.fn().mockImplementation(() => ({
@@ -37,9 +30,6 @@ jest.mock("chart.js", () => ({
   registerables: [],
 }));
 
-// =========================
-// Mock MapModal component
-// =========================
 jest.mock("../src/components/MapModal", () => ({
   __esModule: true,
   default: ({ isOpen }: any) => (
@@ -49,25 +39,16 @@ jest.mock("../src/components/MapModal", () => ({
   ),
 }));
 
-// =========================
-// Mock react-router-dom's useNavigate
-// =========================
 const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useNavigate: () => mockNavigate,
 }));
 
-// =========================
-// Polyfill fetch for Node
-// =========================
 if (!global.fetch) {
   global.fetch = jest.fn();
 }
 
-// =========================
-// Import component after mocks
-// =========================
 import Dashboard from "../src/pages/Dashboard";
 
 describe("Dashboard Component", () => {
@@ -116,11 +97,11 @@ describe("Dashboard Component", () => {
     await waitFor(() => {
       expect(screen.getByText("Total Intersections")).toBeInTheDocument();
       const twos = screen.getAllByText("2");
-      expect(twos[0]).toBeInTheDocument(); // Total Intersections
+      expect(twos[0]).toBeInTheDocument();
       expect(screen.getByText("Active Simulations")).toBeInTheDocument();
-      expect(screen.getByText("3")).toBeInTheDocument(); // sum of run_count
+      expect(screen.getByText("3")).toBeInTheDocument();
       expect(screen.getByText("Optimization Runs")).toBeInTheDocument();
-      expect(twos[1]).toBeInTheDocument(); // Optimization Runs
+      expect(twos[1]).toBeInTheDocument();
     });
   });
 
@@ -139,7 +120,6 @@ describe("Dashboard Component", () => {
   const viewDetailButtons = screen.getAllByText("View Details");
   fireEvent.click(viewDetailButtons[0]);
 
-  // Match the actual first intersection in the mockIntersections array
   expect(mockNavigate).toHaveBeenCalledWith("/simulation-results", {
     state: expect.objectContaining({
       intersections: ["Intersection 2"],

@@ -1,11 +1,9 @@
-// tests/TrafficSimulation.test.tsx
 import React from "react";
 import { render, screen, act, fireEvent } from "@testing-library/react";
 import TrafficSimulation from "../src/pages/TrafficSimulation";
 
 console.log(React)
 
-// Mocks for three.js/fiber environment
 jest.mock("@react-three/fiber", () => ({
   Canvas: ({ children }: any) => <div data-testid="mock-canvas">{children}</div>,
   useFrame: jest.fn(),
@@ -15,7 +13,6 @@ jest.mock("@react-three/drei", () => ({
   OrthographicCamera: () => <div data-testid="mock-camera" />,
 }));
 
-// Mock SimulationUI
 jest.mock("../src/components/SimulationUI", () => ({
   SimulationUI: (props: any) => (
     <div data-testid="simulation-ui">
@@ -26,7 +23,6 @@ jest.mock("../src/components/SimulationUI", () => ({
   ),
 }));
 
-// Mock fetch and localStorage
 const mockFetch = jest.fn();
 (global as any).fetch = mockFetch;
 const mockGetItem = jest.fn();
@@ -45,9 +41,7 @@ describe("TrafficSimulation Page", () => {
   });
 
   it("renders loading state initially", async () => {
-    // 👇 Provide fake token so it doesn’t fail auth
     mockGetItem.mockReturnValueOnce("fake-token");
-    // 👇 Make fetch hang so loading stays
     mockFetch.mockImplementationOnce(() => new Promise(() => {}));
 
     await act(async () => {

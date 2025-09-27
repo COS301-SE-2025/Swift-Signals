@@ -1,11 +1,8 @@
-// tests/Footer.test.tsx
 import { render, screen } from "@testing-library/react";
 import Footer from "../src/components/Footer";
 
-// Mock the image so Jest never tries to load the real PNG
 jest.mock("../../src/assets/scs-logo.png", () => "mocked-logo.png", { virtual: true });
 
-// Mock ThemeToggle
 jest.mock("../src/components/ThemeToggle", () => () => (
   <div data-testid="theme-toggle" />
 ));

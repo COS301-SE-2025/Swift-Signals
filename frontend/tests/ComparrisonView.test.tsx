@@ -1,4 +1,3 @@
-// tests/ComparisonView.test.tsx
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -6,7 +5,6 @@ import ComparisonView from "../src/pages/ComparisonView";
 
 console.log(React)
 
-// Mock child components
 jest.mock("../src/pages/TrafficSimulation", () => ({
   __esModule: true,
   default: ({ intersectionId, endpoint }: { intersectionId: string; endpoint: string }) => (
@@ -21,9 +19,7 @@ jest.mock("../src/components/HelpMenu", () => ({
   default: () => <div data-testid="HelpMenu">HelpMenu</div>,
 }));
 
-// Silence window.close in tests
 beforeAll(() => {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   window.close = jest.fn();
   window.history.back = jest.fn();
 });
@@ -74,7 +70,6 @@ describe("ComparisonView", () => {
 
 
   it("exit button triggers history.back when history length > 1", () => {
-    // Mock length via a getter
     jest.spyOn(window.history, "length", "get").mockReturnValue(2);
     renderWithRouter();
     fireEvent.click(screen.getByText("Exit"));

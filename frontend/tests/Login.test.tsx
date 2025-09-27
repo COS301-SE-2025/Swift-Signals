@@ -1,6 +1,3 @@
-/**
- * @jest-environment jsdom
- */
 import React from "react";
 import { render, screen} from "@testing-library/react";
 import '@testing-library/jest-dom';
@@ -9,14 +6,12 @@ import Dashboard from "../src/pages/Dashboard";
 
 console.log(React)
 
-// Mock useNavigate
 const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useNavigate: () => mockNavigate,
 }));
 
-// Mock Footer, Navbar, HelpMenu, MapModal
 jest.mock("../src/components/Footer", () => () => <div>Footer</div>);
 jest.mock("../src/components/Navbar", () => () => <div>Navbar</div>);
 jest.mock("../src/components/HelpMenu", () => () => <div>HelpMenu</div>);
@@ -24,7 +19,6 @@ jest.mock("../src/components/MapModal", () => (props: any) => (
   <div>MapModal {props.isOpen ? "(Open)" : "(Closed)"}</div>
 ));
 
-// --- MOCK CHART.JS ---
 jest.mock("chart.js", () => {
   const actual = jest.requireActual("chart.js");
   return {

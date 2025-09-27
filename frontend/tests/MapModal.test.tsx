@@ -1,9 +1,8 @@
-// tests/MapModal.test.tsx
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import MapModal from "../src/components/MapModal";
+import '@testing-library/jest-dom';
 
-// MOCK react-leaflet components to avoid rendering real maps
 jest.mock("react-leaflet", () => ({
   MapContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   TileLayer: () => <div data-testid="tilelayer" />,
@@ -11,7 +10,6 @@ jest.mock("react-leaflet", () => ({
   Popup: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-// MOCK lucide-react X icon
 jest.mock("lucide-react", () => ({
   X: () => <span>XIcon</span>,
 }));
@@ -78,22 +76,21 @@ describe("MapModal Component", () => {
   });
 
   it("renders all intersections with simulate buttons", () => {
-    render(
-      <MapModal
-        isOpen={true}
-        onClose={mockOnClose}
-        intersections={intersections}
-        onSimulate={mockOnSimulate}
-      />
-    );
+  render(
+    <MapModal
+      isOpen={true}
+      onClose={mockOnClose}
+      intersections={intersections}
+      onSimulate={mockOnSimulate}
+    />
+  );
 
-    // Each intersection name is rendered
-    intersections.forEach((i) => {
-      expect(screen.getByText(i.name)).toBeInTheDocument();
-      // Simulate button for each intersection
-      const button = screen.getByText("Simulate", { selector: "button" });
-      fireEvent.click(button);
-      expect(mockOnSimulate).toHaveBeenCalledWith(i.id, i.name);
-    });
+  intersections.forEach((i, index) => {
+    expect(screen.getByText(i.name)).toBeInTheDocument();
+    const buttons = screen.getAllByText("Simulate", { selector: "button" });
+    fireEvent.click(buttons[index]);
+    expect(mockOnSimulate).toHaveBeenCalledWith(i.id, i.name);
   });
+});
+
 });

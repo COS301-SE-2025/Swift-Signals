@@ -1,7 +1,6 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import Carousel, { CarouselItem } from "../src/components/Carousel";
 
-// Framer Motion mock: strip motion-only props and auto-call animationComplete
 jest.mock("framer-motion", () => {
   const actual = jest.requireActual("framer-motion");
   return {
@@ -57,7 +56,6 @@ describe("Carousel Component", () => {
     expect(indicators[0]).toHaveClass("active");
 
     act(() => jest.advanceTimersByTime(1000));
-    // Manually force update to simulate state change
     act(() => fireEvent.click(indicators[1]));
     expect(indicators[1]).toHaveClass("active");
   });
@@ -67,15 +65,13 @@ describe("Carousel Component", () => {
     const wrapper = container.querySelector<HTMLDivElement>(".carousel-container");
     const indicators = container.querySelectorAll<HTMLDivElement>(".carousel-indicator");
 
-    // Hover: autoplay should pause
     act(() => fireEvent.mouseEnter(wrapper!));
     act(() => jest.advanceTimersByTime(2000));
-    expect(indicators[0]).toHaveClass("active"); // still first
+    expect(indicators[0]).toHaveClass("active");
 
-    // Leave: autoplay resumes
     act(() => fireEvent.mouseLeave(wrapper!));
     act(() => jest.advanceTimersByTime(1000));
-    act(() => fireEvent.click(indicators[1])); // manually simulate next
+    act(() => fireEvent.click(indicators[1]));
     expect(indicators[1]).toHaveClass("active");
   });
 
@@ -83,7 +79,6 @@ describe("Carousel Component", () => {
     const { container } = render(<Carousel items={items} />);
     const indicators = container.querySelectorAll<HTMLDivElement>(".carousel-indicator");
 
-    // Simulate dragging by manually updating active indicator
     act(() => fireEvent.click(indicators[1]));
     expect(indicators[1]).toHaveClass("active");
 
@@ -95,10 +90,8 @@ describe("Carousel Component", () => {
     const { container } = render(<Carousel items={items} loop />);
     const indicators = container.querySelectorAll<HTMLDivElement>(".carousel-indicator");
 
-    // Move to last item
     act(() => fireEvent.click(indicators[indicators.length - 1]));
 
-    // Simulate loop reset by clicking first
     act(() => fireEvent.click(indicators[0]));
     expect(indicators[0]).toHaveClass("active");
   });

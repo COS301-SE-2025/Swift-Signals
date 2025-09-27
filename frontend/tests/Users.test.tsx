@@ -4,13 +4,11 @@ import Users from "../src/pages/Users";
 
 console.log(React)
 
-// Mock Navbar, Footer, HelpMenu
 jest.mock("../src/components/Navbar", () => () => <div>Navbar</div>);
 jest.mock("../src/components/Footer", () => () => <div>Footer</div>);
 jest.mock("../src/components/HelpMenu", () => () => <div>HelpMenu</div>);
 jest.mock("lucide-react", () => ({ X: () => <span>XIcon</span> }));
 
-// ✅ Mock UsersTable to properly pass loading and users
 jest.mock("../src/components/UsersTable", () => {
   return ({ users, onEdit, onDelete, loading }: any) => (
     <div>
@@ -29,7 +27,6 @@ jest.mock("../src/components/UsersTable", () => {
   );
 });
 
-// Mock fetch and localStorage
 const mockFetch = jest.fn();
 (global as any).fetch = mockFetch;
 
@@ -38,7 +35,6 @@ Object.defineProperty(window, "localStorage", {
   value: { getItem: mockGetItem, setItem: jest.fn(), removeItem: jest.fn(), clear: jest.fn() },
 });
 
-// Mock window.confirm
 const originalConfirm = window.confirm;
 beforeAll(() => {
   window.confirm = jest.fn();
@@ -68,11 +64,10 @@ describe("Users Page", () => {
 
   /*it("renders loading spinner initially", async () => {
     mockGetItem.mockReturnValue("token");
-    mockFetch.mockImplementation(() => new Promise(() => {})); // never resolves
+    mockFetch.mockImplementation(() => new Promise(() => {}));
 
     render(<Users />);
 
-    // now we can find the spinner
     expect(await screen.findByTestId("spinner")).toBeInTheDocument();
   });
 
@@ -83,7 +78,6 @@ describe("Users Page", () => {
     render(<Users />);
 
     for (const user of fakeUsers) {
-      // wait for each username to appear in the DOM
       expect(await screen.findByText((content, element) => {
         return element?.tagName === 'SPAN' && content === user.username;
       })).toBeInTheDocument();

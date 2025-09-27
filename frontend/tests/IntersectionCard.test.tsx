@@ -1,11 +1,9 @@
-// tests/IntersectionCard.test.tsx
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import IntersectionCard from "../src/components/IntersectionCard";
 
 console.log(React)
 
-// MOCK ALL IMAGE IMPORTS TO A STRING SO THEY DON'T TRIGGER FILE RESOLUTION
 jest.mock("../src/assets/placeholder.png", () => "", { virtual: true });
 
 describe("IntersectionCard Component", () => {
@@ -18,7 +16,7 @@ describe("IntersectionCard Component", () => {
     name: "Main Street [Downtown]",
     location: "City Center, Block A",
     lanes: "4-way",
-    image: "", // triggers placeholder
+    image: "",
     onSimulate: mockSimulate,
     onEdit: mockEdit,
     onDelete: mockDelete,

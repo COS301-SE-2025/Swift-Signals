@@ -1,4 +1,3 @@
-// tests/ThemeToggle.test.tsx
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import ThemeToggle from "../src/components/ThemeToggle";
@@ -56,16 +55,13 @@ describe("ThemeToggle Component", () => {
     render(<ThemeToggle />);
     const button = screen.getByRole("button");
 
-    // Initially light mode
     expect(document.documentElement.classList.contains("dark")).toBe(false);
     expect(localStorage.getItem("theme")).toBeNull();
 
-    // Click to enable dark mode
     fireEvent.click(button);
     expect(document.documentElement.classList.contains("dark")).toBe(true);
     expect(localStorage.getItem("theme")).toBe("dark");
 
-    // Click to switch back to light mode
     fireEvent.click(button);
     expect(document.documentElement.classList.contains("dark")).toBe(false);
     expect(localStorage.getItem("theme")).toBe("light");
