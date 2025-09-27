@@ -111,7 +111,8 @@ describe("Users Page", () => {
     
         cy.visit("/users");
         cy.wait("@getManyUsers");
-    
+
+        cy.contains("User1").should("exist");
       });
     
   // it("displays correct user information", () => {
