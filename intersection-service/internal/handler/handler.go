@@ -6,7 +6,8 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/service"
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/util"
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -29,7 +30,7 @@ func (h *Handler) CreateIntersection(
 
 	intersectionDetails := h.mapIntersectionDetails(req.GetDetails())
 	trafficDensity := model.TrafficDensity(
-		intersectionpb.TrafficDensity_name[int32(req.GetTrafficDensity())],
+		commonpb.TrafficDensity_name[int32(req.GetTrafficDensity())],
 	)
 	optimisationParams := h.mapOptimisationParameters(req.GetDefaultParameters())
 

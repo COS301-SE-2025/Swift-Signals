@@ -2,7 +2,8 @@ package handler
 
 import (
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/model"
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -25,7 +26,7 @@ func (h *Handler) mapIntersectionDetails(
 }
 
 func (h *Handler) mapSimulationParameters(
-	pbParams *intersectionpb.SimulationParameters,
+	pbParams *commonpb.SimulationParameters,
 ) model.SimulationParameters {
 	if pbParams == nil {
 		return model.SimulationParameters{}
@@ -33,7 +34,7 @@ func (h *Handler) mapSimulationParameters(
 
 	return model.SimulationParameters{
 		IntersectionType: model.IntersectionType(
-			intersectionpb.IntersectionType_name[int32(pbParams.GetIntersectionType())],
+			commonpb.IntersectionType_name[int32(pbParams.GetIntersectionType())],
 		),
 		Green:  int(pbParams.GetGreen()),
 		Yellow: int(pbParams.GetYellow()),
@@ -44,7 +45,7 @@ func (h *Handler) mapSimulationParameters(
 }
 
 func (h *Handler) mapOptimisationParameters(
-	pbOptParams *intersectionpb.OptimisationParameters,
+	pbOptParams *commonpb.OptimisationParameters,
 ) model.OptimisationParameters {
 	if pbOptParams == nil {
 		return model.OptimisationParameters{}
@@ -52,7 +53,7 @@ func (h *Handler) mapOptimisationParameters(
 
 	return model.OptimisationParameters{
 		OptimisationType: model.OptimisationType(
-			intersectionpb.OptimisationType_name[int32(pbOptParams.GetOptimisationType())],
+			commonpb.OptimisationType_name[int32(pbOptParams.GetOptimisationType())],
 		),
 		Parameters: h.mapSimulationParameters(pbOptParams.GetParameters()),
 	}
@@ -74,12 +75,12 @@ func (h *Handler) mapToProtoIntersectionDetails(
 
 func (h *Handler) mapToProtoSimulationParameters(
 	params model.SimulationParameters,
-) *intersectionpb.SimulationParameters {
-	intersectionType := intersectionpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT
-	if enumValue, ok := intersectionpb.IntersectionType_value[string(params.IntersectionType)]; ok {
-		intersectionType = intersectionpb.IntersectionType(enumValue)
+) *commonpb.SimulationParameters {
+	intersectionType := commonpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT
+	if enumValue, ok := commonpb.IntersectionType_value[string(params.IntersectionType)]; ok {
+		intersectionType = commonpb.IntersectionType(enumValue)
 	}
-	return &intersectionpb.SimulationParameters{
+	return &commonpb.SimulationParameters{
 		IntersectionType: intersectionType,
 		Green:            int32(params.Green),
 		Yellow:           int32(params.Yellow),
@@ -91,10 +92,10 @@ func (h *Handler) mapToProtoSimulationParameters(
 
 func (h *Handler) mapToProtoOptimisationParameters(
 	optParams model.OptimisationParameters,
-) *intersectionpb.OptimisationParameters {
-	return &intersectionpb.OptimisationParameters{
-		OptimisationType: intersectionpb.OptimisationType(
-			intersectionpb.OptimisationType_value[string(optParams.OptimisationType)],
+) *commonpb.OptimisationParameters {
+	return &commonpb.OptimisationParameters{
+		OptimisationType: commonpb.OptimisationType(
+			commonpb.OptimisationType_value[string(optParams.OptimisationType)],
 		),
 		Parameters: h.mapToProtoSimulationParameters(optParams.Parameters),
 	}
@@ -113,11 +114,11 @@ func (h *Handler) mapToIntersection(
 		Details:   h.mapToProtoIntersectionDetails(intersection.Details),
 		CreatedAt: timestamppb.New(intersection.CreatedAt),
 		LastRunAt: timestamppb.New(intersection.LastRunAt),
-		Status: intersectionpb.IntersectionStatus(
-			intersectionpb.IntersectionStatus_value[string(intersection.Status)]),
+		Status: commonpb.IntersectionStatus(
+			commonpb.IntersectionStatus_value[string(intersection.Status)]),
 		RunCount: int32(intersection.RunCount),
-		TrafficDensity: intersectionpb.TrafficDensity(
-			intersectionpb.TrafficDensity_value[string(intersection.TrafficDensity)]),
+		TrafficDensity: commonpb.TrafficDensity(
+			commonpb.TrafficDensity_value[string(intersection.TrafficDensity)]),
 		DefaultParameters: h.mapToProtoOptimisationParameters(intersection.DefaultParameters),
 		BestParameters:    h.mapToProtoOptimisationParameters(intersection.BestParameters),
 		CurrentParameters: h.mapToProtoOptimisationParameters(intersection.CurrentParameters),

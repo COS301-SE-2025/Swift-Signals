@@ -7,7 +7,7 @@ import (
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client"
 	mocks "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/mocks/grpc_client"
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc/codes"

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )

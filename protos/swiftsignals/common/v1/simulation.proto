@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package swiftsignals.common.v1;
+
+import "swiftsignals/common/v1/types.proto";
+
+option go_package = "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1";
+
+message SimulationParameters {
+  swiftsignals.common.v1.IntersectionType intersection_type = 1;
+  int32 green = 2;
+  int32 yellow = 3;
+  int32 red = 4;
+  int32 speed = 5;
+  int32 seed = 6;
+  swiftsignals.common.v1.TrafficDensity traffic_density = 7;
+}
+
+message OptimisationParameters {
+  swiftsignals.common.v1.OptimisationType optimisation_type = 1;
+  swiftsignals.common.v1.SimulationParameters parameters = 2;
+}

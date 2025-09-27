@@ -4,13 +4,14 @@ import (
 	"context"
 	"time"
 
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
 )
 
 func (suite *IntegrationTestSuite) TestGetIntersection() {
 	createReq := &intersectionpb.CreateIntersectionRequest{
 		Name:           "Test Intersection",
-		TrafficDensity: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		TrafficDensity: commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	}
 
 	ctx, cancel := context.WithTimeout(suite.ctx, 30*time.Second)
@@ -32,7 +33,7 @@ func (suite *IntegrationTestSuite) TestGetIntersection() {
 func (suite *IntegrationTestSuite) TestGetIntersection_Failure() {
 	createReq := &intersectionpb.CreateIntersectionRequest{
 		Name:           "Test Intersection",
-		TrafficDensity: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		TrafficDensity: commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	}
 
 	ctx, cancel := context.WithTimeout(suite.ctx, 30*time.Second)

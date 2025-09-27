@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc/codes"
@@ -36,8 +37,8 @@ func (suite *TestSuite) TestPutOptimisation_Success() {
 		mock.Anything,
 		mock.MatchedBy(func(req *intersectionpb.PutOptimisationRequest) bool {
 			return req.Id == intersectionID &&
-				req.Parameters.OptimisationType == intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH &&
-				req.Parameters.Parameters.IntersectionType == intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION &&
+				req.Parameters.OptimisationType == commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH &&
+				req.Parameters.Parameters.IntersectionType == commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION &&
 				req.Parameters.Parameters.Green == 12 &&
 				req.Parameters.Parameters.Yellow == 3 &&
 				req.Parameters.Parameters.Red == 5 &&
@@ -192,36 +193,36 @@ func (suite *TestSuite) TestPutOptimisation_StringToEnumConversions() {
 		name                     string
 		optimisationType         string
 		intersectionType         string
-		expectedOptimisationType intersectionpb.OptimisationType
-		expectedIntersectionType intersectionpb.IntersectionType
+		expectedOptimisationType commonpb.OptimisationType
+		expectedIntersectionType commonpb.IntersectionType
 	}{
 		{
 			name:                     "Grid search with traffic light",
 			optimisationType:         "grid_search",
 			intersectionType:         "traffic_light",
-			expectedOptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-			expectedIntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT,
+			expectedOptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+			expectedIntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT,
 		},
 		{
 			name:                     "Genetic with t-junction",
 			optimisationType:         "genetic",
 			intersectionType:         "t-junction",
-			expectedOptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION,
-			expectedIntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+			expectedOptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION,
+			expectedIntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 		},
 		{
 			name:                     "None with roundabout",
 			optimisationType:         "none",
 			intersectionType:         "roundabout",
-			expectedOptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_NONE,
-			expectedIntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_ROUNDABOUT,
+			expectedOptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_NONE,
+			expectedIntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_ROUNDABOUT,
 		},
 		{
 			name:                     "Invalid values default correctly",
 			optimisationType:         "invalid",
 			intersectionType:         "invalid",
-			expectedOptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-			expectedIntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED,
+			expectedOptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+			expectedIntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED,
 		},
 	}
 

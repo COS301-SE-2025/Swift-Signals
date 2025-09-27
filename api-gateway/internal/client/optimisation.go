@@ -6,7 +6,8 @@ import (
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
-	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/optimisation"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation/v1"
 	"google.golang.org/grpc"
 )
 
@@ -27,14 +28,14 @@ func NewOptimisationClientFromConn(conn *grpc.ClientConn) *OptimisationClient {
 func (oc *OptimisationClient) RunOptimisation(
 	ctx context.Context,
 	params model.OptimisationParameters,
-) (*optimisationpb.OptimisationParameters, error) {
-	req := &optimisationpb.OptimisationParameters{
-		OptimisationType: optimisationpb.OptimisationType(
-			optimisationpb.OptimisationType_value[params.OptimisationType],
+) (*commonpb.OptimisationParameters, error) {
+	req := &commonpb.OptimisationParameters{
+		OptimisationType: commonpb.OptimisationType(
+			commonpb.OptimisationType_value[params.OptimisationType],
 		),
-		Parameters: &optimisationpb.SimulationParameters{
-			IntersectionType: optimisationpb.IntersectionType(
-				optimisationpb.IntersectionType_value[params.SimulationParameters.IntersectionType],
+		Parameters: &commonpb.SimulationParameters{
+			IntersectionType: commonpb.IntersectionType(
+				commonpb.IntersectionType_value[params.SimulationParameters.IntersectionType],
 			),
 			Green:  int32(params.SimulationParameters.Green),
 			Yellow: int32(params.SimulationParameters.Yellow),
@@ -61,7 +62,7 @@ type OptimisationClientInterface interface {
 	RunOptimisation(
 		ctx context.Context,
 		params model.OptimisationParameters,
-	) (*optimisationpb.OptimisationParameters, error)
+	) (*commonpb.OptimisationParameters, error)
 }
 
 // NOTE: Asserts Interface Implementation

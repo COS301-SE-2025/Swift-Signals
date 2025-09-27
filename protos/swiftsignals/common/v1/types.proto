@@ -1,24 +1,8 @@
 syntax = "proto3";
 
-option go_package = "protos/gen/optimisation";
+package swiftsignals.common.v1;
 
-service OptimisationService {
-  rpc RunOptimisation(OptimisationParameters) returns (OptimisationParameters);
-}
-
-message OptimisationParameters {
-  OptimisationType optimisation_type = 1;
-  SimulationParameters parameters = 2;
-}
-
-message SimulationParameters {
-  IntersectionType intersection_type = 2;
-  int32 green = 3;
-  int32 yellow = 4;
-  int32 red = 5;
-  int32 speed = 6;
-  int32 seed = 7;
-}
+option go_package = "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1";
 
 enum IntersectionStatus {
   INTERSECTION_STATUS_UNSPECIFIED = 0;

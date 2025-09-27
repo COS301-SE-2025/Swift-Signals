@@ -5,7 +5,7 @@ import (
 
 	mocks "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/mocks/client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	"github.com/stretchr/testify/suite"
 )
 
