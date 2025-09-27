@@ -8,7 +8,6 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
-	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation/v1"
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
@@ -34,7 +33,7 @@ func (suite *TestSuite) TestOptimiseIntersectionByID_Success() {
 	expectedOptimisationParams := &commonpb.OptimisationParameters{
 		OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 		Parameters: &commonpb.SimulationParameters{
-			IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+			IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 			Green:            10,
 			Yellow:           3,
 			Red:              7,
