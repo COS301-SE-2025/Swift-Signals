@@ -1,5 +1,5 @@
 describe('Simulations Page', () => {
-  const API_BASE_URL = 'http://localhost:9090';
+  const API_BASE_URL = 'https://swiftsignals.seebranhome.co.za';
   const mockAuthToken = 'mock-auth-token-123';
 
   beforeEach(() => {

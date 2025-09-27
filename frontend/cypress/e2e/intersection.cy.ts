@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 describe("Intersections Page", () => {
-  const API_BASE_URL = "http://localhost:9090";
+  const API_BASE_URL = "https://swiftsignals.seebranhome.co.za";
 
   beforeEach(() => {
     // Stub auth token in localStorage

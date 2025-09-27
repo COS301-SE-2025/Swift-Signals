@@ -1,5 +1,5 @@
 describe("Users Management Page", () => {
-  const API_BASE_URL = "http://localhost:9090";
+  const API_BASE_URL = "https://swiftsignals.seebranhome.co.za";
 
   beforeEach(() => {
     // Stub token

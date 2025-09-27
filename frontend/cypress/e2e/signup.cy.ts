@@ -19,7 +19,7 @@ describe("SignUp Page", () => {
   });
 
   it("registers successfully with valid input", () => {
-    cy.intercept("POST", "http://localhost:9090/register", {
+    cy.intercept("POST", "https://swiftsignals.seebranhome.co.za/register", {
       statusCode: 200,
       body: {
         message: "Registration successful",
@@ -40,7 +40,7 @@ describe("SignUp Page", () => {
   });
 
   it("shows error on failed registration", () => {
-    cy.intercept("POST", "http://localhost:9090/register", {
+    cy.intercept("POST", "https://swiftsignals.seebranhome.co.za/register", {
       statusCode: 400,
       body: {
         message: "Email already exists",

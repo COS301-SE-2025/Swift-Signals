@@ -19,7 +19,7 @@ describe("Login Page", () => {
 
   it("submits form successfully with valid credentials", () => {
     // Stub backend response
-    cy.intercept("POST", "http://localhost:9090/login", {
+    cy.intercept("POST", "https://swiftsignals.seebranhome.co.za/login", {
       statusCode: 200,
       body: {
         token: "mock-token",
@@ -37,7 +37,7 @@ describe("Login Page", () => {
   });
 
   it("shows login error on failed login", () => {
-    cy.intercept("POST", "http://localhost:9090/login", {
+    cy.intercept("POST", "https://swiftsignals.seebranhome.co.za/login", {
       statusCode: 401,
       body: { message: "Invalid credentials" },
     }).as("loginFail");
@@ -57,7 +57,7 @@ describe("Login Page", () => {
 
     cy.get("input[name='resetEmail']").type("reset@example.com");
 
-    cy.intercept("POST", "http://localhost:9090/reset-password", {
+    cy.intercept("POST", "https://swiftsignals.seebranhome.co.za/reset-password", {
       statusCode: 200,
       body: {
         message: "Password reset instructions sent to your email.",
@@ -73,7 +73,7 @@ describe("Login Page", () => {
     cy.contains("Forgot Password?").click();
 
     cy.get("input[name='resetEmail']").type("fail@example.com");
-    cy.intercept("POST", "http://localhost:9090/reset-password", {
+    cy.intercept("POST", "https://swiftsignals.seebranhome.co.za/reset-password", {
       statusCode: 400,
       body: { message: "Reset failed. Email not found." },
     }).as("resetFail");
