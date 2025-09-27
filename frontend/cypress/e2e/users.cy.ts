@@ -35,10 +35,12 @@ describe("Users Page", () => {
 
     it("should open edit modal, update user, and close", () => {
         cy.contains("Alice Smith")
-      .parent("tr")
-      .within(() => {
-        cy.get("button").contains(/edit/i).click();
-      });
+          .parent("tr")
+          .within(() => {
+            cy.get("button").contains(/edit/i).click();
+        });
+
+        cy.get("input#username").clear().type("Alice Updated");
     
   });
 
