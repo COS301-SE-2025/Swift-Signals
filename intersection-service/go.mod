@@ -1,6 +1,6 @@
 module github.com/COS301-SE-2025/Swift-Signals/intersection-service
 
-go 1.24.7
+go 1.25.1
 
 replace (
 	github.com/COS301-SE-2025/Swift-Signals/protos/gen => ../protos/gen
@@ -8,6 +8,8 @@ replace (
 )
 
 require (
+	github.com/COS301-SE-2025/Swift-Signals/protos/gen v0.0.0-00010101000000-000000000000
+	github.com/COS301-SE-2025/Swift-Signals/shared v0.0.0-00010101000000-000000000000
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/google/uuid v1.6.0
 	github.com/stretchr/testify v1.10.0
@@ -84,6 +86,7 @@ require (
 	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/spf13/viper v1.20.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/testcontainers/testcontainers-go v0.38.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
