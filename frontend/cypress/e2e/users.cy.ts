@@ -60,6 +60,10 @@ describe("Users Page", () => {
         cy.contains("Alice Updated").should("exist");
   });
 
+    it("should show error if update fails", () => {
+        
+    });
+    
   // it("displays correct user information", () => {
   //   cy.get("table.usersTable tbody")
   //     .contains("td", "John Doe")
