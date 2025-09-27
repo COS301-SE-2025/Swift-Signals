@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  run-tests-linting:
+  lint-format-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
