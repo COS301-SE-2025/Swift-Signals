@@ -9,7 +9,7 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/handler"
 	"github.com/COS301-SE-2025/Swift-Signals/intersection-service/internal/service"
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
 	"github.com/stretchr/testify/suite"
 	"github.com/testcontainers/testcontainers-go/modules/mongodb"
 	"go.mongodb.org/mongo-driver/mongo"

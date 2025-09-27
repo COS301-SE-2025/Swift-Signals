@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package swiftsignals.common.v1;
 
-option go_package = "protos/gen/common/v1";
+option go_package = "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1";
 
 enum IntersectionStatus {
   INTERSECTION_STATUS_UNSPECIFIED = 0;

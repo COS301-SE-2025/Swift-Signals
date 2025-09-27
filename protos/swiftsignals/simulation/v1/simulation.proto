@@ -3,9 +3,8 @@ syntax = "proto3";
 package swiftsignals.simulation.v1;
 
 import "swiftsignals/common/v1/simulation.proto";
-import "swiftsignals/common/v1/types.proto";
 
-option go_package = "protos/gen/simulation/v1";
+option go_package = "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/simulation/v1";
 
 service SimulationService {
   rpc GetSimulationResults(SimulationRequest)

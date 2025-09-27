@@ -7,7 +7,7 @@ import "google/protobuf/timestamp.proto";
 import "swiftsignals/common/v1/types.proto";
 import "swiftsignals/common/v1/simulation.proto";
 
-option go_package = "protos/gen/intersection/v1";
+option go_package = "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1";
 
 service IntersectionService {
   rpc CreateIntersection(CreateIntersectionRequest)
@@ -32,16 +32,16 @@ message IntersectionResponse {
   swiftsignals.common.v1.IntersectionStatus status = 6;
   int32 run_count = 7;
   swiftsignals.common.v1.TrafficDensity traffic_density = 8;
-  OptimisationParameters default_parameters = 9;
-  OptimisationParameters best_parameters = 10;
-  OptimisationParameters current_parameters = 11;
+  swiftsignals.common.v1.OptimisationParameters default_parameters = 9;
+  swiftsignals.common.v1.OptimisationParameters best_parameters = 10;
+  swiftsignals.common.v1.OptimisationParameters current_parameters = 11;
 }
 
 message CreateIntersectionRequest {
   string name = 1;
   IntersectionDetails details = 2;
   swiftsignals.common.v1.TrafficDensity traffic_density = 3;
-  OptimisationParameters default_parameters = 4;
+  swiftsignals.common.v1.OptimisationParameters default_parameters = 4;
 }
 
 message GetAllIntersectionsRequest {
@@ -58,7 +58,7 @@ message UpdateIntersectionRequest {
 
 message PutOptimisationRequest {
   string id = 1;
-  OptimisationParameters parameters = 2;
+  swiftsignals.common.v1.OptimisationParameters parameters = 2;
 }
 
 message PutOptimisationResponse { bool improved = 1; }
@@ -67,9 +67,4 @@ message IntersectionDetails {
   string address = 1;
   string city = 2;
   string province = 3;
-}
-
-message OptimisationParameters {
-  swiftsignals.common.v1.OptimisationType optimisation_type = 1;
-  swiftsignals.common.v1.SimulationParameters parameters = 2;
 }
