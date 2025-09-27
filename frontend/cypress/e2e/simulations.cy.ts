@@ -61,5 +61,20 @@ describe('Simulations Page', () => {
     cy.contains('Next').click();
     cy.get('.simulationTable tbody tr').should('have.length.at.least', 1);
   });
+
+  it('creates a new simulation successfully', () => {
+    cy.get('body').type('{ctrl}n'); // open modal
+    cy.get('.simulation-modal-content').should('be.visible');
+
+    cy.get('.simulation-name-input').type('Medium Test Simulation');
+    cy.get('select').last().select('Main Road & Church Street');
+
+    cy.get('.create-simulation-submit-btn').click();
+
+    cy.wait('@createIntersection');
+    cy.wait('@runSimulation');
+    cy.url().should('include', '/simulation-results');
+  });
+  
   
 });
