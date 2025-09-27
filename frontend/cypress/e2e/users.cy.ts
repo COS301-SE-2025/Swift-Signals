@@ -61,6 +61,11 @@ describe("Users Page", () => {
   });
 
     it("should show error if update fails", () => {
+        cy.contains("Bob Johnson")
+          .parent("tr")
+          .within(() => {
+            cy.get("button").contains(/edit/i).click();
+        });
         
     });
     
