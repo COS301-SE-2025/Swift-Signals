@@ -16,33 +16,36 @@ import Users from "./pages/Users";
 import WelcomePage from "./pages/WelcomePage";
 //import reactLogo from './assets/react.svg';
 //import viteLogo from '/vite.svg';
+import { UserProvider } from "./context/UserContext";
 import "./App.css";
 
 function App() {
   return (
-    <Router>
-      {/* <Navbar /> */}
-      <ErrorBoundary>
-        <Routes>
-          <Route path="/" element={<WelcomePage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/logout" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/simulations" element={<Simulations />} />
-          <Route path="/intersections" element={<Intersections />} />
-          <Route path="/Users" element={<Users />} />
-          <Route path="/simulation-results" element={<SimulationResults />} />
-          <Route
-            path="/simulation-results/:intersectionId"
-            element={<SimulationResults />}
-          />
-          <Route path="/comparison-rendering" element={<ComparisonView />} />
-          {/* Add more routes as needed */}
-        </Routes>
-      </ErrorBoundary>
-      {/* <Footer /> */}
-    </Router>
+    <UserProvider>
+      <Router>
+        {/* <Navbar /> */}
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<WelcomePage />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/logout" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/simulations" element={<Simulations />} />
+            <Route path="/intersections" element={<Intersections />} />
+            <Route path="/Users" element={<Users />} />
+            <Route path="/simulation-results" element={<SimulationResults />} />
+            <Route
+              path="/simulation-results/:intersectionId"
+              element={<SimulationResults />}
+            />
+            <Route path="/comparison-rendering" element={<ComparisonView />} />
+            {/* Add more routes as needed */}
+          </Routes>
+        </ErrorBoundary>
+        {/* <Footer /> */}
+      </Router>
+    </UserProvider>
   );
 }
 
