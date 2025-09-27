@@ -83,7 +83,11 @@ const getFriendlyErrorMessage = (backendError: string): string => {
   if (backendError.includes("Username already taken")) {
     return "This username is already taken. Please choose a different one.";
   }
-  if (backendError.includes("An unexpected response was received from the server.")) {
+  if (
+    backendError.includes(
+      "An unexpected response was received from the server.",
+    )
+  ) {
     return "A problem occurred while processing the server's response. Please try again.";
   }
   if (backendError.includes("Failed to fetch")) {
@@ -151,7 +155,8 @@ const SignUp = () => {
       }
 
       if (!response.ok) {
-        const errorMessage = data?.message || "An unexpected error occurred. Please try again.";
+        const errorMessage =
+          data?.message || "An unexpected error occurred. Please try again.";
         throw new Error(getFriendlyErrorMessage(errorMessage));
       }
 
@@ -166,7 +171,9 @@ const SignUp = () => {
       if (err instanceof Error) {
         setError(getFriendlyErrorMessage(err.message));
       } else {
-        setError(getFriendlyErrorMessage("An unexpected sign-up error occurred."));
+        setError(
+          getFriendlyErrorMessage("An unexpected sign-up error occurred."),
+        );
       }
     } finally {
       setIsLoading(false);

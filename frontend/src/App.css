@@ -14,7 +14,7 @@
   margin: 0;
 }
 
-#root:has(.simulation-results-page .simRes-main-content) { 
+#root:has(.simulation-results-page .simRes-main-content) {
   max-width: none;
   padding-top: 2rem;
   padding-left: 0;
