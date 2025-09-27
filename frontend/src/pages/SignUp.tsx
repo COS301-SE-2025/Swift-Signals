@@ -66,6 +66,34 @@ const TrafficLight = ({
   );
 };
 
+const getFriendlyErrorMessage = (backendError: string): string => {
+  if (!backendError) {
+    return "An unexpected error occurred. Please try again.";
+  }
+
+  if (backendError.includes("User with this email already exists")) {
+    return "This email is already registered. Please try logging in or use a different email.";
+  }
+  if (backendError.includes("Invalid password format")) {
+    return "Password does not meet the required criteria. Please ensure it has at least one lowercase, one uppercase, one number, one special character, and is at least 8 characters long.";
+  }
+  if (backendError.includes("Invalid email format")) {
+    return "Please enter a valid email address.";
+  }
+  if (backendError.includes("Username already taken")) {
+    return "This username is already taken. Please choose a different one.";
+  }
+  if (backendError.includes("An unexpected response was received from the server.")) {
+    return "A problem occurred while processing the server's response. Please try again.";
+  }
+  if (backendError.includes("Failed to fetch")) {
+    return "Could not connect to the server. Please check your internet connection or try again later.";
+  }
+
+  // Generic fallback for any other errors
+  return "An unexpected error occurred during registration. Please try again later.";
+};
+
 const SignUp = () => {
   const [username, setUsername] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -123,9 +151,8 @@ const SignUp = () => {
       }
 
       if (!response.ok) {
-        const errorMessage =
-          data?.message || "An unexpected error occurred. Please try again.";
-        throw new Error(errorMessage);
+        const errorMessage = data?.message || "An unexpected error occurred. Please try again.";
+        throw new Error(getFriendlyErrorMessage(errorMessage));
       }
 
       console.log("Registration successful:", data);
@@ -137,9 +164,9 @@ const SignUp = () => {
     } catch (err: unknown) {
       console.error("Sign-up error:", err);
       if (err instanceof Error) {
-        setError(err.message);
+        setError(getFriendlyErrorMessage(err.message));
       } else {
-        setError("An unexpected sign-up error occurred.");
+        setError(getFriendlyErrorMessage("An unexpected sign-up error occurred."));
       }
     } finally {
       setIsLoading(false);
