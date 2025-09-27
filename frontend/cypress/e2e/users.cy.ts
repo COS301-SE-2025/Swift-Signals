@@ -56,6 +56,8 @@ describe("Users Page", () => {
 
         cy.contains("Save Changes").click();
         cy.wait("@updateUser");
+
+        cy.contains("Alice Updated").should("exist");
   });
 
   // it("displays correct user information", () => {
