@@ -5,7 +5,7 @@ import time
 from deap import tools
 
 from ga.ga_core import toolbox, run_ga
-from ga.evaluation import evaluate_waiting_and_travel, evaluate_safety_given_waiting
+from ga.evaluation import evaluate_balanced
 from ga.simulation_client import run_simulation
 
 
@@ -49,7 +49,7 @@ def main(traffic_density: int = 2) -> dict:
 
     # Save and display best parameters
     os.makedirs("out", exist_ok=True)
-    best = hof_safety[0]
+    best = hof[0]
     best_params = {
         "Green": best[0],
         "Yellow": best[1],
@@ -66,7 +66,7 @@ def main(traffic_density: int = 2) -> dict:
     print(json.dumps(best_params, indent=2))
 
     # Run a final simulation with the best parameters and print results
-    final_results = run_simulation(list(best_params.vales())[:5])
+    final_results = run_simulation(list(best_params.values())[:5])
 
     if final_results:
         print("\n--- Final Simulation Results with Optimised Parameters ---")
