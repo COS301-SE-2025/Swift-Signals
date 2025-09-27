@@ -28,14 +28,14 @@ func NewOptimisationClientFromConn(conn *grpc.ClientConn) *OptimisationClient {
 func (oc *OptimisationClient) RunOptimisation(
 	ctx context.Context,
 	params model.OptimisationParameters,
-) (*optimisationpb.OptimisationParameters, error) {
-	req := &optimisationpb.OptimisationParameters{
-		OptimisationType: optimisationpb.OptimisationType(
-			optimisationpb.OptimisationType_value[params.OptimisationType],
+) (*commonpb.OptimisationParameters, error) {
+	req := &commonpb.OptimisationParameters{
+		OptimisationType: commonpb.OptimisationType(
+			commonpb.OptimisationType_value[params.OptimisationType],
 		),
 		Parameters: &commonpb.SimulationParameters{
-			IntersectionType: optimisationpb.IntersectionType(
-				optimisationpb.IntersectionType_value[params.SimulationParameters.IntersectionType],
+			IntersectionType: commonpb.IntersectionType(
+				commonpb.IntersectionType_value[params.SimulationParameters.IntersectionType],
 			),
 			Green:  int32(params.SimulationParameters.Green),
 			Yellow: int32(params.SimulationParameters.Yellow),
@@ -62,7 +62,7 @@ type OptimisationClientInterface interface {
 	RunOptimisation(
 		ctx context.Context,
 		params model.OptimisationParameters,
-	) (*optimisationpb.OptimisationParameters, error)
+	) (*commonpb.OptimisationParameters, error)
 }
 
 // NOTE: Asserts Interface Implementation

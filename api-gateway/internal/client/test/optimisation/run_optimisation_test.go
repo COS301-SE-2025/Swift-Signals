@@ -7,7 +7,6 @@ import (
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
-	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation/v1"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc/codes"
@@ -30,10 +29,10 @@ func (suite *TestSuite) TestRunOptimisation_Success() {
 		},
 	}
 
-	expectedResponse := &optimisationpb.OptimisationParameters{
-		OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+	expectedResponse := &commonpb.OptimisationParameters{
+		OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 		Parameters: &commonpb.SimulationParameters{
-			IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+			IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 			Green:            12,
 			Yellow:           3,
 			Red:              5,
@@ -51,7 +50,7 @@ func (suite *TestSuite) TestRunOptimisation_Success() {
 			timeUntilDeadline := time.Until(deadline)
 			return timeUntilDeadline > 4*time.Second && timeUntilDeadline <= 5*time.Second
 		}),
-		mock.MatchedBy(func(req *optimisationpb.OptimisationParameters) bool {
+		mock.MatchedBy(func(req *commonpb.OptimisationParameters) bool {
 			return req.Parameters.Green == 10 &&
 				req.Parameters.Yellow == 3 &&
 				req.Parameters.Red == 7 &&
@@ -212,10 +211,10 @@ func (suite *TestSuite) TestRunOptimisation_ZeroValues() {
 		},
 	}
 
-	expectedResponse := &optimisationpb.OptimisationParameters{
-		OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+	expectedResponse := &commonpb.OptimisationParameters{
+		OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 		Parameters: &commonpb.SimulationParameters{
-			IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED,
+			IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED,
 			Green:            0,
 			Yellow:           0,
 			Red:              0,
@@ -226,7 +225,7 @@ func (suite *TestSuite) TestRunOptimisation_ZeroValues() {
 
 	suite.grpcClient.On("RunOptimisation",
 		mock.AnythingOfType("*context.timerCtx"),
-		mock.MatchedBy(func(req *optimisationpb.OptimisationParameters) bool {
+		mock.MatchedBy(func(req *commonpb.OptimisationParameters) bool {
 			return req.Parameters.Green == 0 &&
 				req.Parameters.Yellow == 0 &&
 				req.Parameters.Red == 0 &&
@@ -260,10 +259,10 @@ func (suite *TestSuite) TestRunOptimisation_LargeValues() {
 		},
 	}
 
-	expectedResponse := &optimisationpb.OptimisationParameters{
-		OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION,
+	expectedResponse := &commonpb.OptimisationParameters{
+		OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION,
 		Parameters: &commonpb.SimulationParameters{
-			IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT,
+			IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT,
 			Green:            999999,
 			Yellow:           888888,
 			Red:              777777,
@@ -274,7 +273,7 @@ func (suite *TestSuite) TestRunOptimisation_LargeValues() {
 
 	suite.grpcClient.On("RunOptimisation",
 		mock.AnythingOfType("*context.timerCtx"),
-		mock.MatchedBy(func(req *optimisationpb.OptimisationParameters) bool {
+		mock.MatchedBy(func(req *commonpb.OptimisationParameters) bool {
 			return req.Parameters.Green == 999999 &&
 				req.Parameters.Yellow == 888888 &&
 				req.Parameters.Red == 777777 &&
@@ -296,22 +295,22 @@ func (suite *TestSuite) TestRunOptimisation_OptimizationTypeMapping() {
 	testCases := []struct {
 		name                     string
 		inputOptimisationType    string
-		expectedOptimisationType optimisationpb.OptimisationType
+		expectedOptimisationType commonpb.OptimisationType
 	}{
 		{
 			name:                     "OPTIMISATION_TYPE_GRIDSEARCH",
 			inputOptimisationType:    "OPTIMISATION_TYPE_GRIDSEARCH",
-			expectedOptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+			expectedOptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 		},
 		{
 			name:                     "OPTIMISATION_TYPE_GENETIC_EVALUATION",
 			inputOptimisationType:    "OPTIMISATION_TYPE_GENETIC_EVALUATION",
-			expectedOptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION,
+			expectedOptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION,
 		},
 		{
 			name:                     "OPTIMISATION_TYPE_UNSPECIFIED",
 			inputOptimisationType:    "OPTIMISATION_TYPE_UNSPECIFIED",
-			expectedOptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_UNSPECIFIED,
+			expectedOptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_UNSPECIFIED,
 		},
 	}
 
@@ -332,10 +331,10 @@ func (suite *TestSuite) TestRunOptimisation_OptimizationTypeMapping() {
 				},
 			}
 
-			expectedResponse := &optimisationpb.OptimisationParameters{
-				OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+			expectedResponse := &commonpb.OptimisationParameters{
+				OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 				Parameters: &commonpb.SimulationParameters{
-					IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+					IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 					Green:            12,
 					Yellow:           3,
 					Red:              5,
@@ -347,7 +346,7 @@ func (suite *TestSuite) TestRunOptimisation_OptimizationTypeMapping() {
 			// Verify that the client sends the correct optimization type in the request
 			suite.grpcClient.On("RunOptimisation",
 				mock.AnythingOfType("*context.timerCtx"),
-				mock.MatchedBy(func(req *optimisationpb.OptimisationParameters) bool {
+				mock.MatchedBy(func(req *commonpb.OptimisationParameters) bool {
 					return req.OptimisationType == tc.expectedOptimisationType
 				})).Return(expectedResponse, nil)
 
@@ -409,10 +408,10 @@ func (suite *TestSuite) TestRunOptimisation_ValidatesRequestStructure() {
 		},
 	}
 
-	expectedResponse := &optimisationpb.OptimisationParameters{
-		OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+	expectedResponse := &commonpb.OptimisationParameters{
+		OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 		Parameters: &commonpb.SimulationParameters{
-			IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+			IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 			Green:            12,
 			Yellow:           3,
 			Red:              5,
@@ -423,7 +422,7 @@ func (suite *TestSuite) TestRunOptimisation_ValidatesRequestStructure() {
 
 	suite.grpcClient.On("RunOptimisation",
 		mock.AnythingOfType("*context.timerCtx"),
-		mock.MatchedBy(func(req *optimisationpb.OptimisationParameters) bool {
+		mock.MatchedBy(func(req *commonpb.OptimisationParameters) bool {
 			// Validate that the request is properly structured
 			return req != nil &&
 				req.Parameters != nil &&

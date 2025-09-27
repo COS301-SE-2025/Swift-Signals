@@ -180,7 +180,7 @@ func convertParametersToProto(
 ) *commonpb.OptimisationParameters {
 	return &commonpb.OptimisationParameters{
 		OptimisationType: StringToOptimisationType(parameters.OptimisationType),
-		Parameters: &intersectionpb.SimulationParameters{
+		Parameters: &commonpb.SimulationParameters{
 			IntersectionType: StringToIntersectionType(
 				parameters.SimulationParameters.IntersectionType,
 			),

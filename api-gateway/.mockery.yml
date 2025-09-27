@@ -1,5 +1,5 @@
 with-expecter: true
-
+recursive: true
 resolve-type-alias: false
 disable-version-string: true
 issue-845-fix: true

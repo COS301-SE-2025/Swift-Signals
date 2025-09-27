@@ -50,7 +50,7 @@ func (suite *TestSuite) TestCreateIntersection_Success() {
 		TrafficDensity: commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 		DefaultParameters: &commonpb.OptimisationParameters{
 			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-			Parameters: &intersectionpb.SimulationParameters{
+			Parameters: &commonpb.SimulationParameters{
 				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            10,
 				Yellow:           3,

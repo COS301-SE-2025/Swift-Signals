@@ -2,9 +2,9 @@ package util
 
 import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
-	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
-	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/optimisation"
-	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/simulation"
+	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection"
+	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation"
+	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/simulation"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

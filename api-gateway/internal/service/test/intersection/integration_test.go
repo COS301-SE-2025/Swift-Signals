@@ -9,7 +9,6 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
 	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
-	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation/v1"
 	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
@@ -187,10 +186,10 @@ func (suite *TestIntegrationSuite) TestCompleteIntersectionLifecycle() {
 
 	// Mock the optimisation service call
 	suite.optiClient.On("RunOptimisation", ctx, mock.AnythingOfType("model.OptimisationParameters")).
-		Return(&optimisationpb.OptimisationParameters{
-			OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+		Return(&commonpb.OptimisationParameters{
+			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 			Parameters: &commonpb.SimulationParameters{
-				IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            12,
 				Yellow:           3,
 				Red:              5,

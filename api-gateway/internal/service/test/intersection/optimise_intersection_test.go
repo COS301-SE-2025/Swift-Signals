@@ -31,8 +31,8 @@ func (suite *TestSuite) TestOptimiseIntersectionByID_Success() {
 		commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	)
 
-	expectedOptimisationParams := &optimisationpb.OptimisationParameters{
-		OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+	expectedOptimisationParams := &commonpb.OptimisationParameters{
+		OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 		Parameters: &commonpb.SimulationParameters{
 			IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 			Green:            10,

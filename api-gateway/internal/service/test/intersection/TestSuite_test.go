@@ -69,7 +69,7 @@ func createTestIntersection(
 		TrafficDensity: trafficDensity,
 		DefaultParameters: &commonpb.OptimisationParameters{
 			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-			Parameters: &intersectionpb.SimulationParameters{
+			Parameters: &commonpb.SimulationParameters{
 				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            10,
 				Yellow:           3,
@@ -80,7 +80,7 @@ func createTestIntersection(
 		},
 		BestParameters: &commonpb.OptimisationParameters{
 			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-			Parameters: &intersectionpb.SimulationParameters{
+			Parameters: &commonpb.SimulationParameters{
 				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            10,
 				Yellow:           3,
@@ -91,7 +91,7 @@ func createTestIntersection(
 		},
 		CurrentParameters: &commonpb.OptimisationParameters{
 			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-			Parameters: &intersectionpb.SimulationParameters{
+			Parameters: &commonpb.SimulationParameters{
 				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            10,
 				Yellow:           3,
