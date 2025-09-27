@@ -117,11 +117,4 @@ describe("Users Page", () => {
         cy.contains("User9").should("exist");
       });
 
-
-  // it("navigates directly to a specific page", () => {
-  //   cy.get(".usersPaging button").contains("2").click();
-  //   cy.get("tbody tr").first().within(() => {
-  //     cy.get("td").eq(1).should("exist"); // Name cell exists
-  //   });
-  // });
 });
