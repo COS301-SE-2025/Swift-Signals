@@ -45,5 +45,14 @@ describe('Simulations Page', () => {
     cy.wait('@getError');
     cy.contains('Error:').should('be.visible');
   });
+
+  it('filters simulations by intersection', () => {
+    cy.get('.simulation-dropdown').first().click();
+    cy.contains('Main Road & Church Street').click();
+
+    cy.get('.simulationTable tbody tr').each(($row) => {
+      cy.wrap($row).contains('Main Road & Church Street');
+    });
+  });
   
 });
