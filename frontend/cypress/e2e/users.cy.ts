@@ -41,7 +41,8 @@ describe("Users Page", () => {
         });
 
         cy.get("input#username").clear().type("Alice Updated");
-    
+        cy.get("input#email").clear().type("alice.updated@example.com");
+        
   });
 
   // it("displays correct user information", () => {
