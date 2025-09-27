@@ -3,8 +3,9 @@ PROTOC_GEN_GO_VERSION=v1.36.7
 PROTOC_GEN_GO_GRPC_VERSION=v1.5.1
 PYTHON ?= python3
 GEN_DIR=../gen
+VENV_DIR=.venv
 
-.PHONY: install-protoc generate clean-gen generate-go generate-py
+.PHONY: all install-protoc generate clean-gen generate-go generate-py clean
 
 all: install-protoc generate
 
@@ -14,7 +15,10 @@ clean-gen:
 	rm -rf $(GEN_DIR)
 	mkdir -p $(GEN_DIR)
 
-generate-go:
+clean: clean-gen
+	rm -rf $(VENV_DIR)
+
+generate-go: install-protoc
 	protoc -I .. \
 		--go_out=$(GEN_DIR) --go_opt=paths=source_relative \
 		--go-grpc_out=$(GEN_DIR) --go-grpc_opt=paths=source_relative \
@@ -26,8 +30,8 @@ generate-go:
 		swiftsignals/optimisation/v1/optimisation.proto
 	cd $(GEN_DIR) && go mod init github.com/COS301-SE-2025/Swift-Signals/protos/gen && go mod tidy
 
-generate-py:
-	$(PYTHON) -m grpc_tools.protoc -I .. \
+generate-py: install-protoc
+	. $(VENV_DIR)/bin/activate && $(PYTHON) -m grpc_tools.protoc -I .. \
 		--python_out=$(GEN_DIR) \
 		--pyi_out=$(GEN_DIR) \
 		--grpc_python_out=$(GEN_DIR) \
@@ -45,9 +49,8 @@ else
 endif
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
-	export PATH=$$PATH:$(shell go env GOPATH)/bin
-	if [ ! -d ".venv" ]; then \
-		python3 -m venv .venv; \
+	if [ ! -d "$(VENV_DIR)" ]; then \
+		$(PYTHON) -m venv $(VENV_DIR); \
 	fi
-	. .venv/bin/activate && pip install --upgrade pip grpcio grpcio-tools
+	. $(VENV_DIR)/bin/activate && pip install --upgrade pip grpcio grpcio-tools
 	@echo "protoc, Go plugins, and Python gRPC tools installed!"
