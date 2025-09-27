@@ -58,6 +58,19 @@ describe("Simulation Results Page", () => {
     cy.contains("Simulation Results vs Optimized Results").should("not.exist");
   });
 
+  it("handles API errors gracefully", () => {
+    cy.intercept("GET", "/intersections/*/simulate", {
+      statusCode: 500,
+      body: { message: "Internal Server Error" },
+    }).as("getError");
+
+    cy.visit("/simulation-results/1");
+    cy.wait("@getError");
+
+    cy.contains("Failed to fetch").should("be.visible");
+    cy.contains("Retry").click();
+  });
+
 
 });
 
