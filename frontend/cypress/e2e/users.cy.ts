@@ -81,6 +81,7 @@ describe("Users Page", () => {
     });
 
     it("should delete a user after confirmation", () => {
+        cy.on("window:confirm", () => true); // accept confirm dialog
         
     });
     
