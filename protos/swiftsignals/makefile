@@ -47,8 +47,7 @@ endif
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
 	export PATH=$$PATH:$(shell go env GOPATH)/bin
 	if [ ! -d ".venv" ]; then \
-		$(PYTHON) -m venv .venv; \
+		python3 -m venv .venv; \
 	fi
-	source .venv/bin/activate && pip install --upgrade pip grpcio grpcio-tools
+	. .venv/bin/activate && pip install --upgrade pip grpcio grpcio-tools
 	@echo "protoc, Go plugins, and Python gRPC tools installed!"
-
