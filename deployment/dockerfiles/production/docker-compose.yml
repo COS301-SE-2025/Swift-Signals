@@ -2,7 +2,7 @@ services:
   user-service:
     build:
       context: ../../..
-      dockerfile: deployments/development/dockerfiles/Dockerfile.user
+      dockerfile: deployment/dockerfiles/production/Dockerfile.user
     image: swift-signals/user-service:dev
     container_name: user-service
     environment:
@@ -32,7 +32,7 @@ services:
       POSTGRES_DB: user_service_db
     volumes:
       - user_pgdata:/var/lib/postgresql/data
-      - ../../user-service/internal/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+      - ../../../user-service/internal/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
     ports:
       - "5432:5432"
     networks:
@@ -45,8 +45,8 @@ services:
 
   intersection-service:
     build:
-      context: ../..
-      dockerfile: deployments/development/dockerfiles/Dockerfile.intersection
+      context: ../../..
+      dockerfile: deployment/dockerfiles/production/Dockerfile.intersection
     image: swift-signals/intersection-service:dev
     container_name: intersection-service
     environment:
@@ -75,7 +75,7 @@ services:
   simulation-service:
     build:
       context: ../../..
-      dockerfile: deployments/development/dockerfiles/Dockerfile.simulation
+      dockerfile: deployment/dockerfiles/production/Dockerfile.simulation
     image: swift-signals/simulation-service:dev
     container_name: simulation-service
     environment:
@@ -89,7 +89,7 @@ services:
   optimisation-service:
     build:
       context: ../../..
-      dockerfile: deployments/development/dockerfiles/Dockerfile.optimisation
+      dockerfile: deployment/dockerfiles/production/Dockerfile.optimisation
     image: swift-signals/optimisation-service:dev
     container_name: optimisation-service
     environment:
@@ -104,7 +104,7 @@ services:
   api-gateway:
     build:
       context: ../../..
-      dockerfile: deployments/development/dockerfiles/Dockerfile.api-gateway
+      dockerfile: deployment/dockerfiles/production/Dockerfile.api-gateway
     image: swift-signals/api-gateway:dev
     container_name: api-gateway
     depends_on:
@@ -124,8 +124,8 @@ services:
 
   chatbot-server:
     build:
-      context: ../../../frontend/chatbot_server
-      dockerfile: ../../deployments/development/dockerfiles/Dockerfile.chatbot
+      context: ../../..
+      dockerfile: deployment/dockerfiles/production/Dockerfile.chatbot
     image: swift-signals/chatbot-server:dev
     container_name: chatbot-server
     environment:
@@ -133,6 +133,7 @@ services:
       DIALOGFLOW_CLIENT_EMAIL: swift-signals-api-user@swift-signals.iam.gserviceaccount.com
       DIALOGFLOW_PRIVATE_KEY: ${DIALOGFLOW_PRIVATE_KEY}
       PORT: 3001
+      API_BASE_URL: "http://localhost:9090"
     ports:
       - "3001:3001"
     networks:
@@ -140,8 +141,11 @@ services:
 
   frontend:
     build:
-      context: ../../../frontend/
-      dockerfile: ../deployments/development/dockerfiles/Dockerfile.frontend
+      context: ../../..
+      dockerfile: deployment/dockerfiles/production/Dockerfile.frontend
+      args:
+        VITE_API_BASE_URL: "http://localhost:9090"
+        VITE_CHATBOT_BASE_URL: "http://localhost:3001/api/chatbot"
     image: swift-signals/frontend:dev
     container_name: frontend
     depends_on:
