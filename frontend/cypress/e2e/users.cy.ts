@@ -117,12 +117,6 @@ describe("Users Page", () => {
         cy.contains("User9").should("exist");
       });
 
-  // it("paginates to the next page", () => {
-  //   cy.get("tbody tr").first().should("contain", "John Doe"); // Page 1
-  //   cy.get("button[aria-label='Next page']").click();
-  //   cy.get("tbody tr").first().should("not.contain", "John Doe"); // Page 2
-  // });
-
   // it("paginates back to the previous page", () => {
   //   cy.get("button[aria-label='Next page']").click();
   //   cy.get("button[aria-label='Previous page']").click();
