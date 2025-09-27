@@ -68,6 +68,13 @@ describe("Users Page", () => {
         });
 
         cy.get("input#username").clear().type("Broken Bob");
+
+        cy.intercept("PATCH", `${API_BASE_URL}/admin/users/1`, {
+          statusCode: 400,
+          body: { message: "Invalid data" },
+        }).as("updateFail");
+
+        
     });
     
   // it("displays correct user information", () => {
