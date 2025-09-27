@@ -918,7 +918,7 @@ const SimulationResults: React.FC = () => {
       chartInstances.current.forEach((c) => c?.destroy());
       chartInstances.current = [];
     };
-  }, [simData, showOptimized, optimizedData]);
+  }, [simData, showOptimized, optimizedData, isDarkMode]);
 
   const handleViewRendering = () => {
     if (intersectionId) {
