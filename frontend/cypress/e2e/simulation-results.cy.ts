@@ -71,6 +71,21 @@ describe("Simulation Results Page", () => {
     cy.contains("Retry").click();
   });
 
+  it("updates when retrying after error", () => {
+    cy.intercept("GET", "/intersections/*/simulate", {
+      statusCode: 500,
+    }).as("getError");
 
+    cy.visit("/simulation-results/1");
+    cy.wait("@getError");
+
+    cy.contains("Retry").click();
+
+    cy.intercept("GET", "/intersections/*/simulate", {
+      fixture: "simulationResults.json",
+    }).as("getSuccess");
+
+    cy.wait("@getSuccess");
+    cy.contains("Simulation Results").should("be.visible");
+  });
 });
-
