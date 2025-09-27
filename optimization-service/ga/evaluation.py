@@ -1,7 +1,7 @@
 from ga.simulation_client import run_simulation
 
 
-def evaluate_waiting_and_travel(individual: list) -> tuple:
+def evaluate_waiting_and_travel(individual: list, traffic_density: int = 2) -> tuple:
     """Evaluates an individual based on a weighted sum of waiting and travel times."""
     results = run_simulation(individual)
     if results is None:
@@ -13,7 +13,7 @@ def evaluate_waiting_and_travel(individual: list) -> tuple:
     return (fitness,)
 
 
-def evaluate_safety_given_waiting(individual: list) -> tuple:
+def evaluate_safety_given_waiting(individual: list, traffic_density: int = 2) -> tuple:
     """
     Evaluates an individual based on safety metrics and waiting time,
     with a penalty for low speeds.
