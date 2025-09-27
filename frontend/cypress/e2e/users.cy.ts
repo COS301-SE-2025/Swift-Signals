@@ -45,7 +45,13 @@ describe("Users Page", () => {
 
         cy.intercept("PATCH", `${API_BASE_URL}/admin/users/2`, {
           statusCode: 200,
-          
+          body: {
+            id: "2",
+            username: "Alice Updated",
+            email: "alice.updated@example.com",
+            is_admin: false,
+            intersection_ids: [],
+          },
         }).as("updateUser");
         
   });
