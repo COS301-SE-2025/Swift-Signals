@@ -40,6 +40,24 @@ describe("Simulation Results Page", () => {
     cy.get("canvas, svg").should("have.length.at.least", 4);
   });
 
+  it("has working action buttons", () => {
+    // View Monitoring
+    cy.contains("View Monitoring").click();
+    cy.url().should("include", "/monitoring");
+
+    cy.go("back"); // return to results page
+
+    // Manual Optimisation
+    cy.contains("Manual Optimisation").click();
+    cy.url().should("include", "/optimisation");
+
+    cy.go("back");
+
+    // Hide Optimisation
+    cy.contains("Hide Optimisation").click();
+    cy.contains("Simulation Results vs Optimized Results").should("not.exist");
+  });
+
 
 });
 
