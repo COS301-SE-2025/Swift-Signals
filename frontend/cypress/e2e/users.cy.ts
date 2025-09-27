@@ -114,7 +114,7 @@ describe("Users Page", () => {
 
         cy.contains("User1").should("exist");
         cy.contains("Next").click();
-        
+        cy.contains("User9").should("exist");
       });
     
   // it("displays correct user information", () => {
