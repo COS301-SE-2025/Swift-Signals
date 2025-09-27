@@ -84,7 +84,7 @@ describe("Users Page", () => {
         cy.on("window:confirm", () => true); // accept confirm dialog
 
         cy.intercept("DELETE", `${API_BASE_URL}/admin/users/1`, {
-          
+          statusCode: 204,
         }).as("deleteUser");
     });
     
