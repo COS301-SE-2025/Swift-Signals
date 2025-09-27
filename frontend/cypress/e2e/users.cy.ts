@@ -76,6 +76,8 @@ describe("Users Page", () => {
 
         cy.contains("Save Changes").click();
         cy.wait("@updateFail");
+
+        cy.contains("Invalid data").should("exist");
     });
     
   // it("displays correct user information", () => {
