@@ -82,7 +82,10 @@ describe("Users Page", () => {
 
     it("should delete a user after confirmation", () => {
         cy.on("window:confirm", () => true); // accept confirm dialog
-        
+
+        cy.intercept("DELETE", `${API_BASE_URL}/admin/users/1`, {
+          
+        }).as("deleteUser");
     });
     
   // it("displays correct user information", () => {
