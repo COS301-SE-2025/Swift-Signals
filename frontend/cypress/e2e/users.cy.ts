@@ -55,7 +55,7 @@ describe("Users Page", () => {
         }).as("updateUser");
 
         cy.contains("Save Changes").click();
-        
+        cy.wait("@updateUser");
   });
 
   // it("displays correct user information", () => {
