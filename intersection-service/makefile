@@ -3,7 +3,7 @@ GOLANGCI_LINT_VERSION=v1.62.2
 
 .PHONY: all build clean test deps tools mocks lint
 
-all: deps tools proto mocks test lint
+all: tools mocks deps unit-test integration-test lint
 
 deps:
 	@echo "Installing dependencies..."

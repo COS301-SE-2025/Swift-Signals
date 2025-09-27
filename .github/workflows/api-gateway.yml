@@ -1,0 +1,29 @@
+name: Api Gateway
+on:
+  push:
+    branches: [main, dev, api-gateway]
+  pull_request:
+    branches: [main, dev, api-gateway]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  golangci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.6'
+          cache: true
+          
+      - name: Setup and generate proto files
+        working-directory: ./protos/swiftsignals
+        run: make all
+          
+      - name: Run full CI suite
+        working-directory: ./api-gateway
+        run: make all

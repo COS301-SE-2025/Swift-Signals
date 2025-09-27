@@ -6,6 +6,8 @@ GEN_DIR=../gen
 
 .PHONY: install-protoc generate clean-gen generate-go generate-py
 
+all: install-protoc generate
+
 generate: clean-gen generate-go generate-py
 
 clean-gen:
