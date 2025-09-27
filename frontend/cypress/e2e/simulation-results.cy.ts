@@ -14,6 +14,27 @@ describe("Simulation Results Page", () => {
     cy.contains("Viewing detailed results for simulation").should("be.visible");
   });
 
+  it("displays the KPI cards with values", () => {
+    const kpis = [
+      "Avg Speed",
+      "Avg Delay",
+      "Avg Flow Rate",
+      "Emissions",
+      "# Phases",
+      "Cycle Time",
+      "Safety Severity",
+    ];
+
+    kpis.forEach((label) => {
+      cy.contains(label).should("exist");
+    });
+
+    // Verify at least some numeric values exist
+    cy.get(".kpi-card").each(($card) => {
+      cy.wrap($card).invoke("text").should("match", /\d/);
+    });
+  });
+
 
 });
 
