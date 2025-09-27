@@ -98,6 +98,18 @@ describe("Users Page", () => {
         cy.contains("Bob Johnson").should("not.exist");
         
     });
+
+    it("should handle pagination", () => {
+    // Mock 10 users
+    cy.intercept("GET", `${API_BASE_URL}/admin/users*`, Array.from({ length: 10 }).map((_, i) => ({
+      id: String(i + 1),
+      username: `User${i + 1}`,
+      email: `user${i + 1}@example.com`,
+      is_admin: false,
+      intersection_ids: [],
+    }))).as("getManyUsers");
+
+  });
     
   // it("displays correct user information", () => {
   //   cy.get("table.usersTable tbody")
