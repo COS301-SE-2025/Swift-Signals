@@ -113,6 +113,8 @@ describe("Users Page", () => {
         cy.wait("@getManyUsers");
 
         cy.contains("User1").should("exist");
+        cy.contains("Next").click();
+        
       });
     
   // it("displays correct user information", () => {
