@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import {
   FaTimes,
   FaCommentDots,
@@ -12,6 +12,7 @@ import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
 import { v4 as uuidv4 } from "uuid";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../styles/HelpMenu.css";
+import { UserContext } from "../context/UserContext";
 
 type QuickReply = { text: string; payload: string };
 type ChatMessage = {
@@ -487,6 +488,7 @@ const HelpMenu: React.FC = () => {
 
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
+  const userContext = useContext(UserContext);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -876,21 +878,27 @@ const HelpMenu: React.FC = () => {
                       <p>Learn how to run simulations and optimizations.</p>
                     </button>
                   </div>
-                  <div className="accordion-item tutorial-launcher">
-                    <button onClick={() => startTutorial("users")}>
-                      <h4>Users Tutorial</h4>
-                      <p>Learn how to run view, edit, and delete users.</p>
-                    </button>
-                  </div>
-                  <div className="accordion-item tutorial-launcher">
-                    <button onClick={() => startTutorial("simulation-results")}>
-                      <h4>Simulation Results Tutorial</h4>
-                      <p>
-                        Learn how to analyze simulation data, charts, and
-                        statistics.
-                      </p>
-                    </button>
-                  </div>
+                  {userContext?.user?.role === "admin" && (
+                    <div className="accordion-item tutorial-launcher">
+                      <button onClick={() => startTutorial("users")}>
+                        <h4>Users Tutorial</h4>
+                        <p>Learn how to run view, edit, and delete users.</p>
+                      </button>
+                    </div>
+                  )}
+                  {location.pathname === "/simulation-results" && (
+                    <div className="accordion-item tutorial-launcher">
+                      <button
+                        onClick={() => startTutorial("simulation-results")}
+                      >
+                        <h4>Simulation Results Tutorial</h4>
+                        <p>
+                          Learn how to analyze simulation data, charts, and
+                          statistics.
+                        </p>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="accordion-section">
