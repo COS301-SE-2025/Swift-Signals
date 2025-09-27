@@ -53,6 +53,8 @@ describe("Users Page", () => {
             intersection_ids: [],
           },
         }).as("updateUser");
+
+        cy.contains("Save Changes").click();
         
   });
 
