@@ -1,5 +1,3 @@
-/// <reference types="cypress" />
-
 describe("Users Management Page", () => {
   const API_BASE_URL = "http://localhost:9090";
 
