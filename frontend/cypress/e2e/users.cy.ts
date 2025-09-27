@@ -86,6 +86,13 @@ describe("Users Page", () => {
         cy.intercept("DELETE", `${API_BASE_URL}/admin/users/1`, {
           statusCode: 204,
         }).as("deleteUser");
+
+        cy.contains("Bob Johnson")
+          .parent("tr")
+          .within(() => {
+            cy.get("button").contains(/delete/i).click();
+        });
+        
     });
     
   // it("displays correct user information", () => {
