@@ -75,6 +75,12 @@ describe('Simulations Page', () => {
     cy.wait('@runSimulation');
     cy.url().should('include', '/simulation-results');
   });
-  
-  
+
+  it('handles delete button', () => {
+    cy.window().then((win) => {
+      cy.stub(win, 'alert').as('windowAlert');
+    });
+    cy.get('.deleteBtn').first().click();
+    cy.get('@windowAlert').should('have.been.called');
+  });
 });
