@@ -75,6 +75,7 @@ describe("Users Page", () => {
         }).as("updateFail");
 
         cy.contains("Save Changes").click();
+        cy.wait("@updateFail");
     });
     
   // it("displays correct user information", () => {
