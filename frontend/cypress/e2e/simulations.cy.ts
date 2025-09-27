@@ -35,5 +35,15 @@ describe('Simulations Page', () => {
     cy.get('.simulationTable tbody tr').should('have.length.at.least', 1);
   });
 
+  it('handles API error gracefully', () => {
+    cy.intercept('GET', `${API_BASE_URL}/intersections`, {
+      statusCode: 500,
+      body: { error: 'Server error' }
+    }).as('getError');
+
+    cy.visit('/simulations');
+    cy.wait('@getError');
+    cy.contains('Error:').should('be.visible');
+  });
   
 });
