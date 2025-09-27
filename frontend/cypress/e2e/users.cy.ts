@@ -74,7 +74,7 @@ describe("Users Page", () => {
           body: { message: "Invalid data" },
         }).as("updateFail");
 
-        
+        cy.contains("Save Changes").click();
     });
     
   // it("displays correct user information", () => {
