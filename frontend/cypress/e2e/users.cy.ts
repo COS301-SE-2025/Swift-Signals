@@ -33,6 +33,10 @@ describe("Users Page", () => {
     cy.contains("Alice Smith").should("exist");
   });
 
+    it("should open edit modal, update user, and close", () => {
+    
+  });
+
   // it("displays correct user information", () => {
   //   cy.get("table.usersTable tbody")
   //     .contains("td", "John Doe")
