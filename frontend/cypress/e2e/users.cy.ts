@@ -116,16 +116,6 @@ describe("Users Page", () => {
         cy.contains("Next").click();
         cy.contains("User9").should("exist");
       });
-  
-
-  // it("has working edit and delete buttons for each row", () => {
-  //   cy.get("table.usersTable tbody tr").each(($row) => {
-  //     cy.wrap($row).within(() => {
-  //       cy.get("button[aria-label='Edit user']").should("exist").click();
-  //       cy.get("button[aria-label='Delete user']").should("exist").click();
-  //     });
-  //   });
-  // });
 
   // it("paginates to the next page", () => {
   //   cy.get("tbody tr").first().should("contain", "John Doe"); // Page 1
