@@ -66,7 +66,8 @@ describe("Users Page", () => {
           .within(() => {
             cy.get("button").contains(/edit/i).click();
         });
-        
+
+        cy.get("input#username").clear().type("Broken Bob");
     });
     
   // it("displays correct user information", () => {
