@@ -321,13 +321,15 @@ const SimulationResults: React.FC = () => {
   // Get intersectionId from URL params first, then fall back to location.state
   const intersectionId = params.intersectionId || intersectionIds?.[0];
 
-  const [isDarkMode, setIsDarkMode] = useState(document.documentElement.classList.contains('dark'));
+  const [isDarkMode, setIsDarkMode] = useState(
+    document.documentElement.classList.contains("dark"),
+  );
 
   useEffect(() => {
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        if (mutation.attributeName === 'class') {
-          setIsDarkMode(document.documentElement.classList.contains('dark'));
+        if (mutation.attributeName === "class") {
+          setIsDarkMode(document.documentElement.classList.contains("dark"));
         }
       });
     });
@@ -684,13 +686,25 @@ const SimulationResults: React.FC = () => {
       },
       scales: {
         x: {
-          grid: { color: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" },
-          title: { display: true, color: isDarkMode ? "#fff" : "#333", font: { size: 14 } },
+          grid: {
+            color: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+          },
+          title: {
+            display: true,
+            color: isDarkMode ? "#fff" : "#333",
+            font: { size: 14 },
+          },
         },
         y: {
-          grid: { color: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)" },
+          grid: {
+            color: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+          },
           ticks: { color: isDarkMode ? "#ccc" : "#666" },
-          title: { display: true, color: isDarkMode ? "#fff" : "#777777ff", font: { size: 14 } },
+          title: {
+            display: true,
+            color: isDarkMode ? "#fff" : "#777777ff",
+            font: { size: 14 },
+          },
           beginAtZero: true,
         },
       },
@@ -819,8 +833,9 @@ const SimulationResults: React.FC = () => {
           ...baseOptions.plugins,
           title: {
             display: true,
-                          text: "Vehicle Count Over Time",
-                          color: isDarkMode ? "#fff" : "#777777ff",            font: { size: 18 },
+            text: "Vehicle Count Over Time",
+            color: isDarkMode ? "#fff" : "#777777ff",
+            font: { size: 18 },
           },
         },
         scales: {
