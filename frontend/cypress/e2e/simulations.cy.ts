@@ -54,5 +54,12 @@ describe('Simulations Page', () => {
       cy.wrap($row).contains('Main Road & Church Street');
     });
   });
+
+  it('paginates simulations correctly', () => {
+    // Assume backend returns >5 rows
+    cy.get('.simulationTable tbody tr').should('have.length.at.most', 5);
+    cy.contains('Next').click();
+    cy.get('.simulationTable tbody tr').should('have.length.at.least', 1);
+  });
   
 });
