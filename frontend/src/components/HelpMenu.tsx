@@ -556,8 +556,8 @@ const HelpMenu: React.FC = () => {
             );
             setTimeout(() => {
               navigate(path);
-              setIsOpen(false); // Close the help menu on navigation
-            }, 1000); // Wait 1 second for the user to read the message
+              setIsOpen(false);
+            }, 1000);
           }
         }
       }
