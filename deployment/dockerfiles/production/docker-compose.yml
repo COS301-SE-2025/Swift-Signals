@@ -133,7 +133,7 @@ services:
       DIALOGFLOW_CLIENT_EMAIL: swift-signals-api-user@swift-signals.iam.gserviceaccount.com
       DIALOGFLOW_PRIVATE_KEY: ${DIALOGFLOW_PRIVATE_KEY}
       PORT: 3001
-      API_BASE_URL: "http:localhost:9090"
+      API_BASE_URL: "http://localhost:9090"
     ports:
       - "3001:3001"
     networks:
