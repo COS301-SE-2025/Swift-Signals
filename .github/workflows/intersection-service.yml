@@ -1,9 +1,9 @@
 name: Intersection Service 
 on:
   push:
-    branches: [main]
+    branches: [main, dev, intersection-service]
   pull_request:
-    branches: [main]
+    branches: [main, dev, intersection-service]
   workflow_dispatch:
 
 permissions:

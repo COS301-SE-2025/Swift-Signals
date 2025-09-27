@@ -1,9 +1,9 @@
 name: Api Gateway
 on:
   push:
-    branches: [main]
+    branches: [main, dev, api-gateway]
   pull_request:
-    branches: [main]
+    branches: [main, dev, api-gateway]
   workflow_dispatch:
 
 permissions:

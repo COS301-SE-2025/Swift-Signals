@@ -3,11 +3,14 @@ GOLANGCI_LINT_VERSION=v1.62.2
 
 .PHONY: all build clean test deps tools mocks lint
 
-all: tools mocks deps 
+all: tools deps-pre mocks deps-post
 
-deps:
-	@echo "Installing dependencies..."
+deps-pre:
+	@echo "Installing base dependencies..."
 	go mod download
+
+deps-post: mocks
+	@echo "Tidying dependencies after code generation..."
 	go mod tidy
 
 tools:
