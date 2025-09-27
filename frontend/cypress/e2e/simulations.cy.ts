@@ -25,5 +25,15 @@ describe('Simulations Page', () => {
     cy.wait('@getIntersections');
   });
 
+  it('renders the page with simulations table', () => {
+    cy.contains('Recent Simulations').should('be.visible');
+    cy.get('.simulationTable thead').within(() => {
+      cy.contains('Name');
+      cy.contains('Status');
+      cy.contains('Actions');
+    });
+    cy.get('.simulationTable tbody tr').should('have.length.at.least', 1);
+  });
+
   
 });
