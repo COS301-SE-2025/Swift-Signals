@@ -2,15 +2,15 @@ package util
 
 import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
-	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection"
-	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation"
-	"github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/simulation"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
+	simulationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/simulation/v1"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func RPCIntersectionToIntersection(rpc *intersection.IntersectionResponse) model.Intersection {
+func RPCIntersectionToIntersection(rpc *intersectionpb.IntersectionResponse) model.Intersection {
 	return model.Intersection{
 		ID:                rpc.Id,
 		Name:              rpc.Name,
@@ -26,7 +26,7 @@ func RPCIntersectionToIntersection(rpc *intersection.IntersectionResponse) model
 	}
 }
 
-func RPCDetailsToDetails(rpc *intersection.IntersectionDetails) model.Details {
+func RPCDetailsToDetails(rpc *intersectionpb.IntersectionDetails) model.Details {
 	return model.Details{
 		Address:  rpc.Address,
 		City:     rpc.City,
@@ -35,7 +35,7 @@ func RPCDetailsToDetails(rpc *intersection.IntersectionDetails) model.Details {
 }
 
 func RPCOptiParamToOptiParam(
-	rpc *intersection.OptimisationParameters,
+	rpc *commonpb.OptimisationParameters,
 ) model.OptimisationParameters {
 	return model.OptimisationParameters{
 		OptimisationType:     rpc.OptimisationType.String(),
@@ -44,7 +44,7 @@ func RPCOptiParamToOptiParam(
 }
 
 func RPCOptiParamToOptiParamOp(
-	rpc *optimisation.OptimisationParameters,
+	rpc *commonpb.OptimisationParameters,
 ) model.OptimisationParameters {
 	return model.OptimisationParameters{
 		OptimisationType:     rpc.OptimisationType.String(),
@@ -52,7 +52,7 @@ func RPCOptiParamToOptiParamOp(
 	}
 }
 
-func RPCSimParamToSimParam(rpc *intersection.SimulationParameters) model.SimulationParameters {
+func RPCSimParamToSimParam(rpc *commonpb.SimulationParameters) model.SimulationParameters {
 	return model.SimulationParameters{
 		IntersectionType: rpc.IntersectionType.String(),
 		Red:              int(rpc.Red),
@@ -63,7 +63,7 @@ func RPCSimParamToSimParam(rpc *intersection.SimulationParameters) model.Simulat
 	}
 }
 
-func RPCSimParamToSimParamOp(rpc *optimisation.SimulationParameters) model.SimulationParameters {
+func RPCSimParamToSimParamOp(rpc *commonpb.SimulationParameters) model.SimulationParameters {
 	return model.SimulationParameters{
 		IntersectionType: rpc.IntersectionType.String(),
 		Red:              int(rpc.Red),
@@ -75,7 +75,7 @@ func RPCSimParamToSimParamOp(rpc *optimisation.SimulationParameters) model.Simul
 }
 
 func RPCSimResultsToSimResults(
-	rpc *simulation.SimulationResultsResponse,
+	rpc *simulationpb.SimulationResultsResponse,
 ) model.SimulationResults {
 	return model.SimulationResults{
 		TotalVehicles:      int(rpc.TotalVehicles),
@@ -91,7 +91,7 @@ func RPCSimResultsToSimResults(
 	}
 }
 
-func RPCSimOutputToSimOutput(rpc *simulation.SimulationOutputResponse) model.SimulationOutput {
+func RPCSimOutputToSimOutput(rpc *simulationpb.SimulationOutputResponse) model.SimulationOutput {
 	return model.SimulationOutput{
 		Intersection: RPCSimIntersectionToSimIntersection(rpc.Intersection),
 		Vehicles:     RPCSimVehiclesToSimVehicles(rpc.Vehicles),
@@ -99,7 +99,7 @@ func RPCSimOutputToSimOutput(rpc *simulation.SimulationOutputResponse) model.Sim
 }
 
 func RPCSimIntersectionToSimIntersection(
-	rpc *simulation.Intersection,
+	rpc *simulationpb.Intersection,
 ) model.SimulationIntersection {
 	return model.SimulationIntersection{
 		Nodes:         RPCSimNodesToSimNodes(rpc.Nodes),
@@ -109,7 +109,7 @@ func RPCSimIntersectionToSimIntersection(
 	}
 }
 
-func RPCSimNodesToSimNodes(rpc []*simulation.Node) []model.SimulationNode {
+func RPCSimNodesToSimNodes(rpc []*simulationpb.Node) []model.SimulationNode {
 	nodes := make([]model.SimulationNode, len(rpc))
 	for i, n := range rpc {
 		nodes[i] = model.SimulationNode{
@@ -122,7 +122,7 @@ func RPCSimNodesToSimNodes(rpc []*simulation.Node) []model.SimulationNode {
 	return nodes
 }
 
-func RPCSimEdgesToSimEdges(rpc []*simulation.Edge) []model.SimulationEdge {
+func RPCSimEdgesToSimEdges(rpc []*simulationpb.Edge) []model.SimulationEdge {
 	edges := make([]model.SimulationEdge, len(rpc))
 	for i, e := range rpc {
 		edges[i] = model.SimulationEdge{
@@ -136,7 +136,7 @@ func RPCSimEdgesToSimEdges(rpc []*simulation.Edge) []model.SimulationEdge {
 	return edges
 }
 
-func RPCSimConnsToSimConns(rpc []*simulation.Connection) []model.SimulationConn {
+func RPCSimConnsToSimConns(rpc []*simulationpb.Connection) []model.SimulationConn {
 	conns := make([]model.SimulationConn, len(rpc))
 	for i, c := range rpc {
 		conns[i] = model.SimulationConn{
@@ -151,7 +151,7 @@ func RPCSimConnsToSimConns(rpc []*simulation.Connection) []model.SimulationConn 
 }
 
 func RPCSimTrafficLightsToSimTrafficLights(
-	rpc []*simulation.TrafficLight,
+	rpc []*simulationpb.TrafficLight,
 ) []model.SimulationTrafficLight {
 	tls := make([]model.SimulationTrafficLight, len(rpc))
 	for i, tl := range rpc {
@@ -171,7 +171,7 @@ func RPCSimTrafficLightsToSimTrafficLights(
 	return tls
 }
 
-func RPCSimVehiclesToSimVehicles(rpc []*simulation.Vehicle) []model.SimulationVehicle {
+func RPCSimVehiclesToSimVehicles(rpc []*simulationpb.Vehicle) []model.SimulationVehicle {
 	vehicles := make([]model.SimulationVehicle, len(rpc))
 	for i, v := range rpc {
 		positions := make([]model.Position, len(v.Positions))
