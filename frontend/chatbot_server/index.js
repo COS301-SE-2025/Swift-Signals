@@ -57,20 +57,16 @@ app.post("/api/chatbot", async (req, res) => {
     };
   }
 
-  // --- THIS IS THE CRUCIAL DIAGNOSTIC STEP ---
   console.log("--- FINAL REQUEST BEING SENT TO DIALOGFLOW ---");
   console.log(JSON.stringify(request, null, 2));
-  // -------------------------------------------------
 
   try {
     const responses = await sessionClient.detectIntent(request);
     const result = responses[0].queryResult;
 
-    // --- ENHANCED DIAGNOSTIC LOG ---
     console.log("--- FULL DIALOGFLOW RESPONSE ---");
     console.log(JSON.stringify(result, null, 2));
 
-    // Specifically check for the presence of knowledge answers
     if (
       result.knowledgeAnswers &&
       result.knowledgeAnswers.answers &&
@@ -87,9 +83,7 @@ app.post("/api/chatbot", async (req, res) => {
         );
       }
     }
-    // ------------------------------------
 
-    // Extract the token from the request body
     const { token } = req.body;
     console.log("--- SERVER RECEIVED ---", {
       token: token
@@ -97,7 +91,6 @@ app.post("/api/chatbot", async (req, res) => {
         : "No token provided",
     });
 
-    // Check for the Get_Intersections intent
     if (result.intent && result.intent.displayName === "Get_Intersections") {
       console.log("✅ Matched intent: Get_Intersections");
       if (!token) {
@@ -135,7 +128,6 @@ app.post("/api/chatbot", async (req, res) => {
       }
     }
 
-    // NEW LOGIC FOR Get_Intersection_Details
     if (
       result.intent &&
       result.intent.displayName === "Get_Intersection_Details"
@@ -163,11 +155,10 @@ app.post("/api/chatbot", async (req, res) => {
           );
           const allIntersections = allIntersectionsResponse.data.intersections;
 
-          // Fuzzy search with Fuse.js
           const fuse = new Fuse(allIntersections, {
             keys: ["name", "id"],
             includeScore: true,
-            threshold: 0.4, // Adjust this for more or less strict matching
+            threshold: 0.4,
           });
 
           const searchResult = fuse.search(intersectionIdentifier);
@@ -226,7 +217,6 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
       }
     }
 
-    // --- NEW LOGIC FOR Run_Simulation ---
     if (result.intent && result.intent.displayName === "Run_Simulation") {
       console.log("✅ Matched intent: Run_Simulation");
       const intersectionIdentifier =
@@ -252,11 +242,10 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
           );
           const allIntersections = allIntersectionsResponse.data.intersections;
 
-          // Fuzzy search with Fuse.js
           const fuse = new Fuse(allIntersections, {
             keys: ["name", "id"],
             includeScore: true,
-            threshold: 0.4, // Adjust this for more or less strict matching
+            threshold: 0.4,
           });
 
           const searchResult = fuse.search(intersectionIdentifier);
@@ -268,11 +257,8 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
               `Found intersection with ID: ${targetIntersection.id}. Triggering simulation.`,
             );
 
-            // The server's job is just to tell the frontend where to go.
-            // The frontend will be responsible for fetching the simulation data.
             result.fulfillmentText = `Okay, navigating to the simulation results for ${targetIntersection.name}.`;
 
-            // --- ADD CUSTOM PAYLOAD FOR NAVIGATION ---
             result.fulfillmentMessages = [
               {
                 platform: "PLATFORM_UNSPECIFIED",
@@ -305,7 +291,6 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
       }
     }
 
-    // Check for the Default Welcome Intent to add the user's name
     if (
       result.intent &&
       result.intent.displayName === "Default Welcome Intent"
@@ -326,12 +311,10 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
           result.fulfillmentText = `Hello, ${userName}! I'm here to help. What can I assist you with today?`;
         } catch (apiError) {
           console.error("❌ API Gateway Error on /me:", apiError.message);
-          // If the API call fails, we just fall back to the default non-personalized greeting.
         }
       }
     }
 
-    // --- NEW LOGIC FOR Create.Intersection ---
     if (result.intent && result.intent.displayName === "Create.Intersection") {
       console.log("✅ Matched intent: Create.Intersection");
       console.log("Parameters collected so far:", result.parameters.fields);
@@ -344,14 +327,10 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
         result.fulfillmentText =
           "I can't create an intersection without knowing who you are. Please make sure you are logged in.";
       } else if (!result.allRequiredParamsPresent) {
-        // If not all parameters are present, let Dialogflow handle the prompts
-        // The fulfillmentText will contain Dialogflow's prompt for the next parameter
         console.log(
           "Not all parameters present. Returning Dialogflow's prompt.",
         );
-        // No need to modify result.fulfillmentText here, Dialogflow already set it.
       } else {
-        // All parameters are present, proceed with API call
         try {
           const params = result.parameters.fields;
           const requestBody = {
@@ -370,8 +349,8 @@ Created: ${new Date(targetIntersection.created_at).toLocaleString()}`;
               speed: params["vehicle-speed"]
                 ? params["vehicle-speed"].numberValue
                 : 0,
-              intersection_type: "traffic_light", // Defaulting to a standard traffic light intersection
-              seed: Math.floor(Math.random() * 1000000000), // Add a random seed, as it's required
+              intersection_type: "traffic_light",
+              seed: Math.floor(Math.random() * 1000000000),
             },
           };
 

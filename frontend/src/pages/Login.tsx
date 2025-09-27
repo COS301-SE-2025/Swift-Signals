@@ -191,7 +191,7 @@ const Login = () => {
   return (
     <div className="loginScreen min-h-screen min-w-screen w-full h-full flex flex-col sm:flex-row items-center justify-center font-sans from-slate-100 to-sky-100 p-4">
       <div
-        className="welcomeMessage absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-2 z-10 animate-fade-in-down"
+        className="welcomeMessage absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-row items-center justify-center space-x-4 z-10 animate-fade-in-down"
         style={{ minWidth: 350 }}
       >
         <img
