@@ -42,6 +42,11 @@ describe("Users Page", () => {
 
         cy.get("input#username").clear().type("Alice Updated");
         cy.get("input#email").clear().type("alice.updated@example.com");
+
+        cy.intercept("PATCH", `${API_BASE_URL}/admin/users/2`, {
+          statusCode: 200,
+          
+        }).as("updateUser");
         
   });
 
