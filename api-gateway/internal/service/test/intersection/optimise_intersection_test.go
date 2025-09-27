@@ -6,9 +6,10 @@ import (
 	"log/slog"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
-	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/optimisation"
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
+	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation/v1"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
 )
@@ -25,14 +26,14 @@ func (suite *TestSuite) TestOptimiseIntersectionByID_Success() {
 		"123 Test St",
 		"Test City",
 		"Test Province",
-		intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
+		commonpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
 		0,
-		intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	)
 
 	expectedOptimisationParams := &optimisationpb.OptimisationParameters{
 		OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-		Parameters: &optimisationpb.SimulationParameters{
+		Parameters: &commonpb.SimulationParameters{
 			IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 			Green:            10,
 			Yellow:           3,
@@ -222,9 +223,9 @@ func (suite *TestSuite) TestOptimiseIntersectionByID_AlreadyOptimising() {
 		"123 Test St",
 		"Test City",
 		"Test Province",
-		intersectionpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISING,
+		commonpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISING,
 		0,
-		intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	)
 
 	suite.userClient.On("GetUserIntersectionIDs", ctx, userID).Return(mockUserStream, nil)
@@ -271,9 +272,9 @@ func (suite *TestSuite) TestOptimiseIntersectionByID_InvalidParameters() {
 		"123 Test St",
 		"Test City",
 		"Test Province",
-		intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
+		commonpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
 		0,
-		intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	)
 
 	suite.userClient.On("GetUserIntersectionIDs", ctx, userID).Return(mockUserStream, nil)
@@ -402,9 +403,9 @@ func (suite *TestSuite) TestOptimiseIntersectionByID_UnauthorizedAccess() {
 		"123 Test St",
 		"Test City",
 		"Test Province",
-		intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
+		commonpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
 		0,
-		intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	)
 
 	suite.userClient.On("GetUserIntersectionIDs", ctx, userID).Return(mockUserStream, nil)
@@ -451,9 +452,9 @@ func (suite *TestSuite) TestOptimiseIntersectionByID_ServiceUnavailable() {
 		"123 Test St",
 		"Test City",
 		"Test Province",
-		intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
+		commonpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
 		0,
-		intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	)
 
 	suite.userClient.On("GetUserIntersectionIDs", ctx, userID).Return(mockUserStream, nil)

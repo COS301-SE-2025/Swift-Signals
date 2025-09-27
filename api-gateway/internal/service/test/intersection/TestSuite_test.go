@@ -7,8 +7,9 @@ import (
 	mocks "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/mocks/client"
 	grpcmocks "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/mocks/grpc_client"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/service"
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -48,9 +49,9 @@ func (suite *TestSuite) NewMockUserIntersectionIDsStream() *grpcmocks.MockUserSe
 // createTestIntersection creates a test intersection protobuf object
 func createTestIntersection(
 	id, name, address, city, province string,
-	status intersectionpb.IntersectionStatus,
+	status commonpb.IntersectionStatus,
 	runCount int32,
-	trafficDensity intersectionpb.TrafficDensity,
+	trafficDensity commonpb.TrafficDensity,
 ) *intersectionpb.IntersectionResponse {
 	now := time.Now()
 	return &intersectionpb.IntersectionResponse{
@@ -66,10 +67,10 @@ func createTestIntersection(
 		Status:         status,
 		RunCount:       runCount,
 		TrafficDensity: trafficDensity,
-		DefaultParameters: &intersectionpb.OptimisationParameters{
-			OptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+		DefaultParameters: &commonpb.OptimisationParameters{
+			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 			Parameters: &intersectionpb.SimulationParameters{
-				IntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            10,
 				Yellow:           3,
 				Red:              7,
@@ -77,10 +78,10 @@ func createTestIntersection(
 				Seed:             12345,
 			},
 		},
-		BestParameters: &intersectionpb.OptimisationParameters{
-			OptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+		BestParameters: &commonpb.OptimisationParameters{
+			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 			Parameters: &intersectionpb.SimulationParameters{
-				IntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            10,
 				Yellow:           3,
 				Red:              7,
@@ -88,10 +89,10 @@ func createTestIntersection(
 				Seed:             12345,
 			},
 		},
-		CurrentParameters: &intersectionpb.OptimisationParameters{
-			OptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+		CurrentParameters: &commonpb.OptimisationParameters{
+			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 			Parameters: &intersectionpb.SimulationParameters{
-				IntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            10,
 				Yellow:           3,
 				Red:              7,

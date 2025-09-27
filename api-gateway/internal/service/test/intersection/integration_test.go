@@ -7,9 +7,10 @@ import (
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
-	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/optimisation"
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
+	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation/v1"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"github.com/stretchr/testify/mock"
 )
@@ -90,9 +91,9 @@ func (suite *TestIntegrationSuite) TestCompleteIntersectionLifecycle() {
 		"123 Integration Street",
 		"Cape Town",
 		"Western Cape",
-		intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
+		commonpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
 		0,
-		intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	)
 
 	// Mock user intersection IDs stream for GetIntersectionByID
@@ -133,9 +134,9 @@ func (suite *TestIntegrationSuite) TestCompleteIntersectionLifecycle() {
 		"456 Updated Street",
 		"Johannesburg",
 		"Gauteng",
-		intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
+		commonpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
 		0,
-		intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	)
 
 	// Mock user intersection IDs stream for UpdateIntersectionByID
@@ -188,7 +189,7 @@ func (suite *TestIntegrationSuite) TestCompleteIntersectionLifecycle() {
 	suite.optiClient.On("RunOptimisation", ctx, mock.AnythingOfType("model.OptimisationParameters")).
 		Return(&optimisationpb.OptimisationParameters{
 			OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-			Parameters: &optimisationpb.SimulationParameters{
+			Parameters: &commonpb.SimulationParameters{
 				IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            12,
 				Yellow:           3,
@@ -243,9 +244,9 @@ func (suite *TestIntegrationSuite) TestGetAllIntersectionsWithMultipleIntersecti
 			"123 First St",
 			"Pretoria",
 			"Gauteng",
-			intersectionpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED,
+			commonpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED,
 			5,
-			intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+			commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 		),
 		createTestIntersection(
 			"intersection-2",
@@ -253,9 +254,9 @@ func (suite *TestIntegrationSuite) TestGetAllIntersectionsWithMultipleIntersecti
 			"456 Second Ave",
 			"Cape Town",
 			"Western Cape",
-			intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
+			commonpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
 			0,
-			intersectionpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM,
+			commonpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM,
 		),
 		createTestIntersection(
 			"intersection-3",
@@ -263,9 +264,9 @@ func (suite *TestIntegrationSuite) TestGetAllIntersectionsWithMultipleIntersecti
 			"789 Third Rd",
 			"Johannesburg",
 			"Gauteng",
-			intersectionpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISING,
+			commonpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISING,
 			2,
-			intersectionpb.TrafficDensity_TRAFFIC_DENSITY_LOW,
+			commonpb.TrafficDensity_TRAFFIC_DENSITY_LOW,
 		),
 	}
 
@@ -434,22 +435,22 @@ func (suite *TestIntegrationSuite) TestCreateIntersectionWithDifferentTrafficDen
 	testCases := []struct {
 		name            string
 		trafficDensity  string
-		expectedPbValue intersectionpb.TrafficDensity
+		expectedPbValue commonpb.TrafficDensity
 	}{
 		{
 			name:            "Low Traffic",
 			trafficDensity:  "low",
-			expectedPbValue: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_LOW,
+			expectedPbValue: commonpb.TrafficDensity_TRAFFIC_DENSITY_LOW,
 		},
 		{
 			name:            "Medium Traffic",
 			trafficDensity:  "medium",
-			expectedPbValue: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM,
+			expectedPbValue: commonpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM,
 		},
 		{
 			name:            "High Traffic",
 			trafficDensity:  "high",
-			expectedPbValue: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+			expectedPbValue: commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 		},
 	}
 

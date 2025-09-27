@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
-	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/optimisation"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation/v1"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc/codes"
@@ -31,7 +32,7 @@ func (suite *TestSuite) TestRunOptimisation_Success() {
 
 	expectedResponse := &optimisationpb.OptimisationParameters{
 		OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-		Parameters: &optimisationpb.SimulationParameters{
+		Parameters: &commonpb.SimulationParameters{
 			IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 			Green:            12,
 			Yellow:           3,
@@ -213,7 +214,7 @@ func (suite *TestSuite) TestRunOptimisation_ZeroValues() {
 
 	expectedResponse := &optimisationpb.OptimisationParameters{
 		OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-		Parameters: &optimisationpb.SimulationParameters{
+		Parameters: &commonpb.SimulationParameters{
 			IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED,
 			Green:            0,
 			Yellow:           0,
@@ -261,7 +262,7 @@ func (suite *TestSuite) TestRunOptimisation_LargeValues() {
 
 	expectedResponse := &optimisationpb.OptimisationParameters{
 		OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION,
-		Parameters: &optimisationpb.SimulationParameters{
+		Parameters: &commonpb.SimulationParameters{
 			IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT,
 			Green:            999999,
 			Yellow:           888888,
@@ -333,7 +334,7 @@ func (suite *TestSuite) TestRunOptimisation_OptimizationTypeMapping() {
 
 			expectedResponse := &optimisationpb.OptimisationParameters{
 				OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-				Parameters: &optimisationpb.SimulationParameters{
+				Parameters: &commonpb.SimulationParameters{
 					IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 					Green:            12,
 					Yellow:           3,
@@ -410,7 +411,7 @@ func (suite *TestSuite) TestRunOptimisation_ValidatesRequestStructure() {
 
 	expectedResponse := &optimisationpb.OptimisationParameters{
 		OptimisationType: optimisationpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-		Parameters: &optimisationpb.SimulationParameters{
+		Parameters: &commonpb.SimulationParameters{
 			IntersectionType: optimisationpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 			Green:            12,
 			Yellow:           3,

@@ -6,7 +6,8 @@ import (
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
-	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/optimisation"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation/v1"
 	"google.golang.org/grpc"
 )
 
@@ -32,7 +33,7 @@ func (oc *OptimisationClient) RunOptimisation(
 		OptimisationType: optimisationpb.OptimisationType(
 			optimisationpb.OptimisationType_value[params.OptimisationType],
 		),
-		Parameters: &optimisationpb.SimulationParameters{
+		Parameters: &commonpb.SimulationParameters{
 			IntersectionType: optimisationpb.IntersectionType(
 				optimisationpb.IntersectionType_value[params.SimulationParameters.IntersectionType],
 			),

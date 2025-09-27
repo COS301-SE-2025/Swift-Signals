@@ -5,7 +5,8 @@ import (
 	"testing"
 	"time"
 
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc/codes"
@@ -28,13 +29,13 @@ func (suite *TestSuite) TestGetIntersection_Success() {
 		},
 		CreatedAt:      timestamppb.Now(),
 		LastRunAt:      timestamppb.Now(),
-		Status:         intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
+		Status:         commonpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
 		RunCount:       5,
-		TrafficDensity: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
-		DefaultParameters: &intersectionpb.OptimisationParameters{
-			OptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+		TrafficDensity: commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		DefaultParameters: &commonpb.OptimisationParameters{
+			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 			Parameters: &intersectionpb.SimulationParameters{
-				IntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            10,
 				Yellow:           3,
 				Red:              7,
@@ -42,10 +43,10 @@ func (suite *TestSuite) TestGetIntersection_Success() {
 				Seed:             12345,
 			},
 		},
-		BestParameters: &intersectionpb.OptimisationParameters{
-			OptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+		BestParameters: &commonpb.OptimisationParameters{
+			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 			Parameters: &intersectionpb.SimulationParameters{
-				IntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            12,
 				Yellow:           3,
 				Red:              5,
@@ -53,10 +54,10 @@ func (suite *TestSuite) TestGetIntersection_Success() {
 				Seed:             12345,
 			},
 		},
-		CurrentParameters: &intersectionpb.OptimisationParameters{
-			OptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+		CurrentParameters: &commonpb.OptimisationParameters{
+			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
 			Parameters: &intersectionpb.SimulationParameters{
-				IntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            11,
 				Yellow:           3,
 				Red:              6,
@@ -183,9 +184,9 @@ func (suite *TestSuite) TestGetIntersection_ValidatesRequestStructure() {
 	expectedResponse := &intersectionpb.IntersectionResponse{
 		Id:             intersectionID,
 		Name:           "Complex Test Intersection",
-		Status:         intersectionpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED,
+		Status:         commonpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED,
 		RunCount:       10,
-		TrafficDensity: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM,
+		TrafficDensity: commonpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM,
 	}
 
 	suite.grpcClient.On("GetIntersection",
@@ -203,9 +204,9 @@ func (suite *TestSuite) TestGetIntersection_ValidatesRequestStructure() {
 	suite.Equal(expectedResponse, result)
 	suite.Equal(intersectionID, result.Id)
 	suite.Equal("Complex Test Intersection", result.Name)
-	suite.Equal(intersectionpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED, result.Status)
+	suite.Equal(commonpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED, result.Status)
 	suite.Equal(int32(10), result.RunCount)
-	suite.Equal(intersectionpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM, result.TrafficDensity)
+	suite.Equal(commonpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM, result.TrafficDensity)
 	suite.grpcClient.AssertExpectations(suite.T())
 }
 
