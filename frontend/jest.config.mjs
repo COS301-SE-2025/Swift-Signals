@@ -5,9 +5,12 @@ export default {
     '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.jest.json', useESM: true }],
     '^.+\\.(js|jsx)$': 'babel-jest',
   },
+  transformIgnorePatterns: [
+    '/node_modules/(?!react-leaflet|@react-leaflet/.*)/',
+  ],
   moduleNameMapper: {
     '\\.css$': 'identity-obj-proxy',
-    '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/jest.fileMock.js', // <- point to CJS mock
+    '\\.(jpg|jpeg|png|gif|svg)$': '<rootDir>/tests/jest.fileMock.js', // <- point to CJS mock
     '^src/(.*)$': '<rootDir>/src/$1',
   },
   extensionsToTreatAsEsm: ['.ts', '.tsx'],

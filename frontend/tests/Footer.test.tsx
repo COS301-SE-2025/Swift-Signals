@@ -1,4 +1,3 @@
-/*
 // tests/Footer.test.tsx
 import { render, screen } from "@testing-library/react";
 import Footer from "../src/components/Footer";
@@ -37,4 +36,3 @@ describe("Footer", () => {
     expect(screen.getByTestId("theme-toggle")).toBeInTheDocument();
   });
 });
-*/

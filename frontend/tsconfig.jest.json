@@ -6,6 +6,7 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx",
     "types": ["jest", "@testing-library/jest-dom"],
+    "types": ["node"]
   },
   "include": ["tests", "src"]
 }

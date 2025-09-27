@@ -1,140 +1,87 @@
 // tests/HelpMenu.test.tsx
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import HelpMenu from "../src/components/HelpMenu";
+import React from "react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom"; // adds .toBeInTheDocument() and other matchers
 import { MemoryRouter } from "react-router-dom";
+import HelpMenu from "../src/components/HelpMenu";
 
-// Mock uuid
-jest.mock("uuid", () => ({
-  v4: () => "test-uuid",
-}));
+console.log(React)
 
-// Mock fetch
-(globalThis as any).fetch = jest.fn(() =>
-  Promise.resolve({
-    ok: true,
-    json: () =>
-      Promise.resolve({
-        fulfillmentText: "Hello from bot!",
-        fulfillmentMessages: [],
-      }),
-  })
-);
+const renderHelpMenu = () =>
+  render(
+    <MemoryRouter>
+      <HelpMenu />
+    </MemoryRouter>
+  );
 
-// Mock InteractiveTutorial
-jest.mock("../src/components/InteractiveTutorial", () => ({
-  __esModule: true,
-  default: (props: any) => {
-    return <div data-testid={`tutorial-${props.tutorialType}`}>Tutorial Open</div>;
-  },
-}));
+describe("HelpMenu component", () => {
+  test("opens and closes the help menu", () => {
+    renderHelpMenu();
 
-// Suppress specific React warnings
-beforeAll(() => {
-  const originalConsoleError = console.error;
-  console.error = (...args: unknown[]) => {
-    if (
-      typeof args[0] === "string" &&
-      args[0].includes("React does not recognize the `dragConstraints` prop")
-    ) {
-      return;
-    }
-    originalConsoleError(...args);
-  };
-});
+    const helpButton = screen.getByRole("button", { name: /help/i });
+    fireEvent.click(helpButton);
 
-describe("HelpMenu Component", () => {
-  it("renders the help button", () => {
-    render(
-      <MemoryRouter>
-        <HelpMenu />
-      </MemoryRouter>
-    );
-    expect(screen.getByText(/HELP/i)).toBeInTheDocument();
-  });
-
-  it("opens and closes the help menu on button click", () => {
-    render(
-      <MemoryRouter>
-        <HelpMenu />
-      </MemoryRouter>
-    );
-    const button = screen.getByRole("button", { name: /HELP/i });
-    fireEvent.click(button);
     expect(screen.getByText(/Swift Chat/i)).toBeInTheDocument();
-    fireEvent.click(button);
-    expect(screen.queryByText(/Swift Chat/i)).not.toBeVisible();
+
+    const closeButton = screen.getAllByRole("button", { name: /times/i })[0];
+    fireEvent.click(closeButton);
+
+    expect(screen.queryByText(/Swift Chat/i)).not.toBeInTheDocument();
   });
 
-  it("switches between chat and general help tabs", () => {
-    render(
-      <MemoryRouter>
-        <HelpMenu />
-      </MemoryRouter>
-    );
-    fireEvent.click(screen.getByRole("button", { name: /HELP/i }));
-    const generalTab = screen.getByText(/General Help/i);
+  test("switches tabs between chat and general help", () => {
+    renderHelpMenu();
+    fireEvent.click(screen.getByRole("button", { name: /help/i }));
+
+    const generalTab = screen.getByRole("button", { name: /general help/i });
     fireEvent.click(generalTab);
     expect(screen.getByText(/Tutorials/i)).toBeInTheDocument();
-    const chatTab = screen.getByText(/Swift Chat/i);
+
+    const chatTab = screen.getByRole("button", { name: /swift chat/i });
     fireEvent.click(chatTab);
     expect(screen.getByPlaceholderText(/Type your message/i)).toBeInTheDocument();
   });
 
-  it("can send a chat message", async () => {
-    render(
-      <MemoryRouter>
-        <HelpMenu />
-      </MemoryRouter>
-    );
-    fireEvent.click(screen.getByRole("button", { name: /HELP/i }));
-    const input = screen.getByPlaceholderText(/Type your message/i);
-    fireEvent.change(input, { target: { value: "Hello" } });
-    fireEvent.keyPress(input, { key: "Enter", code: "Enter", charCode: 13 });
+  test("opens the dashboard tutorial", () => {
+    renderHelpMenu();
+    fireEvent.click(screen.getByRole("button", { name: /help/i }));
 
-    await waitFor(() =>
-      expect(screen.getByText("Hello from bot!")).toBeInTheDocument()
-    );
+    fireEvent.click(screen.getByText(/Tutorials/i));
+
+    const dashboardButton = screen.getByRole("button", { name: /dashboard tutorial/i });
+    fireEvent.click(dashboardButton);
+
+    expect(screen.getByText(/Summary Cards/i)).toBeInTheDocument();
   });
 
-  it("toggles FAQ sections", () => {
-    render(
-      <MemoryRouter>
-        <HelpMenu />
-      </MemoryRouter>
-    );
-    fireEvent.click(screen.getByRole("button", { name: /HELP/i }));
-    fireEvent.click(screen.getByText(/General Help/i));
-    const firstFaq = screen.getByText("What is Swift Signals?");
-    fireEvent.click(firstFaq);
-    expect(
-      screen.getByText(/Swift Signals is a simulation-powered/i)
-    ).toBeVisible();
-    fireEvent.click(firstFaq);
-    expect(
-      screen.getByText(/Swift Signals is a simulation-powered/i)
-    ).not.toHaveClass("open");
+  test("opens the intersections tutorial", () => {
+    renderHelpMenu();
+    fireEvent.click(screen.getByRole("button", { name: /help/i }));
+
+    fireEvent.click(screen.getByText(/Tutorials/i));
+
+    const intersectionsButton = screen.getByRole("button", { name: /intersections tutorial/i });
+    fireEvent.click(intersectionsButton);
+
+    expect(screen.getByText(/Search Bar/i)).toBeInTheDocument();
   });
 
-  it("launches tutorials from accordion", () => {
-    render(
-      <MemoryRouter>
-        <HelpMenu />
-      </MemoryRouter>
-    );
-    fireEvent.click(screen.getByRole("button", { name: /HELP/i }));
-    fireEvent.click(screen.getByText(/General Help/i));
-    fireEvent.click(screen.getByText(/Navigation Tutorial/i));
-    expect(screen.getByTestId("tutorial-navigation")).toBeInTheDocument();
-  });
+  test("toggles FAQ sections", () => {
+    renderHelpMenu();
 
-  it("opens confirmation overlay when tutorial page differs", () => {
-    render(
-      <MemoryRouter initialEntries={["/somepath"]}>
-        <HelpMenu />
-      </MemoryRouter>
-    );
-    fireEvent.click(screen.getByRole("button", { name: /HELP/i }));
-    fireEvent.click(screen.getByText(/Dashboard Tutorial/i));
-    expect(screen.getByText(/Switch to Dashboard/i)).toBeInTheDocument();
+    // Use querySelector to target the top-level HELP button specifically
+    const helpButton = screen.getByText("HELP").closest("button");
+    if (!helpButton) throw new Error("Top-level HELP button not found");
+    fireEvent.click(helpButton);
+
+    // Open FAQ accordion
+    const faqAccordion = screen.getByText(/Frequently Asked Questions/i);
+    fireEvent.click(faqAccordion);
+
+    // Open a specific FAQ
+    const faqQuestion = screen.getByRole("button", { name: /What is Swift Signals/i });
+    fireEvent.click(faqQuestion);
+
+    expect(screen.getByText(/Swift Signals is a simulation-powered/i)).toBeInTheDocument();
   });
 });

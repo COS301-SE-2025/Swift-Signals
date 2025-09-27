@@ -10,7 +10,9 @@ import { useState } from "react";
 
 import { FaRoad, FaPlay, FaChartLine, FaPlus, FaMap } from "react-icons/fa";
 
-Chart.register(...registerables);
+if (Chart.register) {
+  Chart.register(...registerables);
+}
 
 interface Intersection {
   id: string;
@@ -286,7 +288,7 @@ const Dashboard: React.FC = () => {
           }
           return null;
         })
-        .filter((intr): intr is Intersection => intr !== null);
+        .filter((intr: Intersection): intr is Intersection => intr !== null);
 
       setMapIntersections(intersectionsWithCoords);
     } catch (err: unknown) {
