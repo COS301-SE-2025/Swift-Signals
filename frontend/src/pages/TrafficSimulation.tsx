@@ -5,6 +5,8 @@ import { MapControls, OrthographicCamera } from "@react-three/drei";
 import * as THREE from "three";
 import { SimulationUI } from "../components/SimulationUI";
 
+console.log(React)
+
 // Data Interfaces & Helpers
 interface Node {
   id: string;
