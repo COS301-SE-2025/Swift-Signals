@@ -79,6 +79,10 @@ describe("Users Page", () => {
 
         cy.contains("Invalid data").should("exist");
     });
+
+    it("should delete a user after confirmation", () => {
+        
+    });
     
   // it("displays correct user information", () => {
   //   cy.get("table.usersTable tbody")
