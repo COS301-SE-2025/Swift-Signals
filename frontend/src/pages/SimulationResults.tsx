@@ -918,7 +918,7 @@ const SimulationResults: React.FC = () => {
       chartInstances.current.forEach((c) => c?.destroy());
       chartInstances.current = [];
     };
-  }, [simData, showOptimized, optimizedData]);
+  }, [simData, showOptimized, optimizedData, isDarkMode]);
 
   const handleViewRendering = () => {
     if (intersectionId) {
@@ -1080,7 +1080,7 @@ const SimulationResults: React.FC = () => {
                 optimizationStatus.includes("failed") ||
                 optimizationStatus.includes("No improvement")
                   ? "bg-red-500/20 border border-red-500/30 text-red-300"
-                  : "bg-green-500/20 border border-green-500/30 text-green-300"
+                  : "bg-green-600 border border-green-700 text-white dark:bg-green-700/20 dark:border-green-700/30 dark:text-green-300"
               }`}
             >
               <p className="font-semibold">{optimizationStatus}</p>
