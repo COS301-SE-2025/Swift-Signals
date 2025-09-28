@@ -22,6 +22,7 @@ type IntersectionRepository interface {
 		id string,
 		name string,
 		details model.IntersectionDetails,
+		status model.IntersectionStatus,
 	) (*model.Intersection, error)
 	DeleteIntersection(ctx context.Context, id string) error
 	UpdateCurrentParams(

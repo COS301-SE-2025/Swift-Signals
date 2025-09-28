@@ -9,6 +9,7 @@ import (
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 )
 
@@ -182,14 +183,25 @@ func (s *SimulationService) OptimiseIntersection(
 		)
 	}
 
-	logger.Debug("intersection service to get intersection details")
+	logger.Debug("calling intersection service to get intersection details")
 	intersection, err := s.intrClient.GetIntersection(ctx, intersectionID)
 	if err != nil {
 		return model.OptimisationResponse{}, err
 	}
 
-	// TODO: Change optimisation status to "IN_PROGRESS" or similar
-	// ...
+	logger.Debug(
+		"calling intersection service to change status to 'INTERSECTION_STATUS_OPTIMISING'",
+	)
+	_, err = s.intrClient.UpdateIntersectionStatus(
+		ctx,
+		intersection.Id,
+		intersection.Name,
+		util.RPCDetailsToDetails(intersection.Details),
+		commonpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISING,
+	)
+	if err != nil {
+		logger.Warn("Could not update intersection status to 'INTERSECTION_STATUS_OPTIMISING'")
+	}
 
 	logger.Debug("calling optimisation service to optimise intersection")
 	response, err := s.optiClient.RunOptimisation(

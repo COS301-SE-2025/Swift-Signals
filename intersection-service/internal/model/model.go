@@ -27,6 +27,7 @@ type IntersectionDetails struct {
 type IntersectionStatus string
 
 const (
+	Unspecified IntersectionStatus = "INTERSECTION_STATUS_UNSPECIFIED"
 	Unoptimised IntersectionStatus = "INTERSECTION_STATUS_UNOPTIMISED"
 	Optimising  IntersectionStatus = "INTERSECTION_STATUS_OPTIMISING"
 	Optimised   IntersectionStatus = "INTERSECTION_STATUS_OPTIMISED"
