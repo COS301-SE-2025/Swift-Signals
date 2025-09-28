@@ -6,8 +6,8 @@ from pprint import pformat
 from google.protobuf.json_format import MessageToDict, ParseDict
 import grpc
 from grpc_reflection.v1alpha import reflection
-import simulation_pb2 as pb
-import simulation_pb2_grpc as pb_grpc
+from swiftsignals.simulation.v1 import simulation_pb2 as pb
+from swiftsignals.simulation.v1 import simulation_pb2_grpc as pb_grpc
 
 import SimLoad
 
@@ -49,7 +49,7 @@ def pretty_log(name, obj, max_len=1000):
 
 
 class SimulationServicer(pb_grpc.SimulationServiceServicer):
-    def GetSimulationResults(self, request, context):
+    def GetSimulationResults(self, request: pb.SimulationRequest, context):
         logger.info(
             "Received GetSimulationResults request",
             extra={"intersection_id": request.intersection_id},

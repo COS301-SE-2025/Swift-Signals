@@ -5,8 +5,10 @@ from pprint import pformat
 
 import grpc
 from grpc_reflection.v1alpha import reflection
-import optimisation_pb2 as pb
-import optimisation_pb2_grpc as pb_grpc
+from swiftsignals.common.v1 import simulation_pb2 as sim_pb
+from swiftsignals.common.v1 import types_pb2 as types_pb
+from swiftsignals.optimisation.v1 import optimisation_pb2 as pb
+from swiftsignals.optimisation.v1 import optimisation_pb2_grpc as pb_grpc
 
 from ga.main import main as run_optimisation
 
@@ -33,21 +35,22 @@ def pretty_log(name, obj, max_len=1000):
 
 
 class OptimisationServicer(pb_grpc.OptimisationServiceServicer):
-    def RunOptimisation(self, request, context):
+    def RunOptimisation(self, request: sim_pb.OptimisationParameters, context):
         logger.info(
             f"Received RunOptimisation request with intersection_type: {request.parameters.intersection_type}",
         )
         pretty_log("Request Parameters", request.parameters)
 
         # Call the main optimisation function
-        result = run_optimisation(traffic_density=2)
+        traffic_density = request.parameters.traffic_density
+        result = run_optimisation(traffic_density)
         logger.info("Optimisation completed successfully.")
 
         # Convert the result to a dictionary
-        response = pb.OptimisationParameters(
-            optimisation_type=pb.OptimisationType.OPTIMISATION_TYPE_GENETIC_EVALUATION,
-            parameters=pb.SimulationParameters(
-                intersection_type=pb.IntersectionType.INTERSECTION_TYPE_TRAFFICLIGHT,
+        response = sim_pb.OptimisationParameters(
+            optimisation_type=types_pb.OptimisationType.OPTIMISATION_TYPE_GENETIC_EVALUATION,
+            parameters=sim_pb.SimulationParameters(
+                intersection_type=types_pb.IntersectionType.INTERSECTION_TYPE_TRAFFICLIGHT,
                 green=result["Green"],
                 yellow=result["Yellow"],
                 red=result["Red"],
