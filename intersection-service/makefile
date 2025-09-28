@@ -3,11 +3,14 @@ GOLANGCI_LINT_VERSION=v1.62.2
 
 .PHONY: all build clean test deps tools mocks lint
 
-all: deps tools proto mocks test lint
+all: tools deps-pre mocks deps-post unit-test integration-test lint
 
-deps:
-	@echo "Installing dependencies..."
+deps-pre:
+	@echo "Installing base dependencies..."
 	go mod download
+
+deps-post: mocks
+	@echo "Tidying dependencies after code generation..."
 	go mod tidy
 
 tools:
@@ -15,7 +18,7 @@ tools:
 	go install github.com/vektra/mockery/v2@$(MOCKERY_VERSION)
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
 
-mocks: tools
+mocks: tools deps-pre
 	@echo "Generating mocks with mockery $(MOCKERY_VERSION)..."
 	@echo "Cleaning existing mocks..."
 	rm -rf internal/mocks
@@ -24,15 +27,15 @@ mocks: tools
 	mockery --version
 	mockery --config .mockery.yml
 
-lint: tools
+lint: tools deps-post
 	@echo "Running golangci-lint $(GOLANGCI_LINT_VERSION)..."
 	golangci-lint run
 
-unit-test: mocks
+unit-test: mocks deps-post
 	@echo "Running unit tests..."
 	go test -v ./internal/db/test ./internal/service/test ./internal/handler/test
 
-unit-test-coverage: mocks
+unit-test-coverage: mocks deps-post
 	@echo "Running unit tests with coverage..."
 	go test -v -coverprofile=coverage.out -coverpkg=./internal/db/,./internal/service/,./internal/handler/ ./internal/db/test ./internal/service/test ./internal/handler/test
 	go tool cover -html=coverage.out 

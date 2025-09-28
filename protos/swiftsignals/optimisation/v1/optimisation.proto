@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package swiftsignals.optimisation.v1;
+
+import "swiftsignals/common/v1/simulation.proto";
+
+option go_package = "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation/v1";
+
+service OptimisationService {
+  rpc RunOptimisation(swiftsignals.common.v1.OptimisationParameters)
+      returns (swiftsignals.common.v1.OptimisationParameters);
+}

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	grpcmocks "github.com/COS301-SE-2025/Swift-Signals/user-service/internal/mocks/grpc"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"

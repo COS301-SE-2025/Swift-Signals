@@ -1,8 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
-import "../styles/HelpMenu.css";
-import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import {
   FaTimes,
   FaCommentDots,
@@ -11,6 +7,12 @@ import {
   FaChevronDown,
 } from "react-icons/fa";
 import { IoSend } from "react-icons/io5";
+import { CHATBOT_BASE_URL } from "../config";
+import InteractiveTutorial, { type TutorialStep } from "./InteractiveTutorial";
+import { v4 as uuidv4 } from "uuid";
+import { useLocation, useNavigate } from "react-router-dom";
+import "../styles/HelpMenu.css";
+import { UserContext } from "../context/UserContext";
 
 type QuickReply = { text: string; payload: string };
 type ChatMessage = {
@@ -29,9 +31,7 @@ type TutorialType =
 type DialogflowMessage = {
   payload?: {
     fields?: {
-      action?: { stringValue: string };
-      path?: { stringValue: string };
-      richContent?: {
+      richContent: {
         listValue: {
           values: {
             listValue: {
@@ -488,6 +488,7 @@ const HelpMenu: React.FC = () => {
 
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
+  const userContext = useContext(UserContext);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -521,7 +522,7 @@ const HelpMenu: React.FC = () => {
     setIsBotTyping(true);
 
     try {
-      const response = await fetch("http://localhost:3001/api/chatbot", {
+      const response = await fetch(`${CHATBOT_BASE_URL}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -539,13 +540,14 @@ const HelpMenu: React.FC = () => {
       // --- HANDLE NAVIGATION PAYLOAD ---
       if (data.fulfillmentMessages) {
         const navigationPayload = data.fulfillmentMessages.find(
-          (msg: DialogflowMessage) =>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          (msg: any) =>
             msg.payload && msg.payload.fields && msg.payload.fields.action,
         );
 
         if (navigationPayload) {
-          const action = navigationPayload.payload?.fields?.action?.stringValue;
-          const path = navigationPayload.payload?.fields?.path?.stringValue;
+          const action = navigationPayload.payload.fields.action.stringValue;
+          const path = navigationPayload.payload.fields.path.stringValue;
 
           if (action === "NAVIGATE" && path) {
             console.log(
@@ -554,8 +556,8 @@ const HelpMenu: React.FC = () => {
             );
             setTimeout(() => {
               navigate(path);
-              setIsOpen(false); // Close the help menu on navigation
-            }, 1000); // Wait 1 second for the user to read the message
+              setIsOpen(false);
+            }, 1000);
           }
         }
       }
@@ -855,7 +857,7 @@ const HelpMenu: React.FC = () => {
                   <div className="accordion-item tutorial-launcher">
                     <button onClick={() => startTutorial("navigation")}>
                       <h4>Navigation Tutorial</h4>
-                      <p>Learn how to use the site's navbar and footer.</p>
+                      <p>Learn how to use the site&apos;s navbar and footer.</p>
                     </button>
                   </div>
                   <div className="accordion-item tutorial-launcher">
@@ -876,21 +878,27 @@ const HelpMenu: React.FC = () => {
                       <p>Learn how to run simulations and optimizations.</p>
                     </button>
                   </div>
-                  <div className="accordion-item tutorial-launcher">
-                    <button onClick={() => startTutorial("users")}>
-                      <h4>Users Tutorial</h4>
-                      <p>Learn how to run view, edit, and delete users.</p>
-                    </button>
-                  </div>
-                  <div className="accordion-item tutorial-launcher">
-                    <button onClick={() => startTutorial("simulation-results")}>
-                      <h4>Simulation Results Tutorial</h4>
-                      <p>
-                        Learn how to analyze simulation data, charts, and
-                        statistics.
-                      </p>
-                    </button>
-                  </div>
+                  {userContext?.user?.role === "admin" && (
+                    <div className="accordion-item tutorial-launcher">
+                      <button onClick={() => startTutorial("users")}>
+                        <h4>Users Tutorial</h4>
+                        <p>Learn how to run view, edit, and delete users.</p>
+                      </button>
+                    </div>
+                  )}
+                  {location.pathname === "/simulation-results" && (
+                    <div className="accordion-item tutorial-launcher">
+                      <button
+                        onClick={() => startTutorial("simulation-results")}
+                      >
+                        <h4>Simulation Results Tutorial</h4>
+                        <p>
+                          Learn how to analyze simulation data, charts, and
+                          statistics.
+                        </p>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="accordion-section">

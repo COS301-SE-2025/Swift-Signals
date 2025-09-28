@@ -3,6 +3,7 @@ import random
 import subprocess
 import json
 from datetime import datetime
+import time
 from deap import base, creator, tools
 from tqdm import tqdm
 
@@ -11,9 +12,9 @@ SIM_SCRIPT = "../simulation-service/SimLoad.py"
 PARAMS_FOLDER = "../simulation-service/parameters"
 RESULTS_FOLDER = "../simulation-service/out/results"
 RESULT_FILE_TEMPLATE = os.path.join(RESULTS_FOLDER, "simulation_results_{}.json")
-REFERENCE_RESULT = "../simulation-service/out/results/simulation_results.json"
+REFERENCE_RESULT = "../simulation-service/out/results/simulation_result.json"
 BEST_PARAM_OUTPUT = "out/best_parameters.json"
-ALL_RESULTS_CSV = "ga_results/all_individuas_log.csv"
+ALL_RESULTS_CSV = "ga_results/all_individuals_log.csv"
 
 # Track files for cleanup
 generated_param_files = []
@@ -26,10 +27,10 @@ creator.create("Individual", list, fitness=creator.FitnessMin)
 # Toolbox setup
 toolbox = base.Toolbox()
 toolbox.register("green", random.randint, 10, 60)
-toolbox.register("yellow", random.randint, 3, 8)
+toolbox.register("yellow", random.randint, 3, 20)
 toolbox.register("red", random.randint, 10, 60)
-toolbox.register("speed", lambda: random.choice([40, 60, 80, 100]))
-toolbox.register("seed", lambda: 1408)
+toolbox.register("speed", lambda: random.choice([60, 80, 100]))
+toolbox.register("seed", lambda: random.randint(0, 2 ** 32 - 1))
 toolbox.register(
     "individual",
     tools.initCycle,
@@ -55,7 +56,7 @@ def custom_mutate(individual, indpb=0.2, min_speed=40):
     if random.random() < indpb:
         individual[2] = random.randint(10, 60)  # Red
     if random.random() < indpb:
-        allowed_speeds = [s for s in [40, 60, 80, 100] if s >= min_speed]
+        allowed_speeds = [s for s in [60, 80, 100] if s >= min_speed]
         individual[3] = random.choice(allowed_speeds)
     return (individual,)
 
@@ -63,7 +64,7 @@ def custom_mutate(individual, indpb=0.2, min_speed=40):
 toolbox.register("mutate", custom_mutate)
 
 
-def run_simulation(individual):
+def run_simulation(individual, traffic_density=2):
     green, yellow, red, speed, seed = individual
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     param_file = os.path.join(PARAMS_FOLDER, f"params_Trafficlight_{timestamp}.json")
@@ -75,13 +76,13 @@ def run_simulation(individual):
     params = {
         "intersection": {
             "name": "Trafficlight",
-            "Traffic Density": 2,
+            "traffic density": traffic_density,
             "simulation_parameters": {
-                "Intersection Type": 1,
-                "Green": green,
-                "Yellow": yellow,
-                "Red": red,
-                "Speed": speed,
+                "intersection_type": 1,
+                "green": green,
+                "yellow": yellow,
+                "red": red,
+                "speed": speed,
                 "seed": seed,
             },
             "output_path": result_file,
@@ -101,35 +102,34 @@ def run_simulation(individual):
         with open(result_file, "r") as f:
             result_data = json.load(f)
         return result_data["intersection"]["results"]
-    except:
+    except (FileNotFoundError, json.JSONDecodeError, KeyError):
         return None
 
 
-def evaluate_waiting_and_travel(individual):
-    result = run_simulation(individual)
+# --- Balanced evaluation function ---
+def evaluate_balanced(individual, traffic_density=2):
+    # Penalize very unsafe speeds
+    if individual[3] < 60:
+        return (1e6,)
+
+    result = run_simulation(individual, traffic_density)
     if result is None:
         return (1e6,)
 
+    # Efficiency metrics
     waiting = result.get("Total Waiting Time", 1e6)
     travel = result.get("Total Travel Time", 1e6)
-    return (0.9 * waiting + 0.3 * travel,)  # Weighted objective
 
-
-def evaluate_safety_given_waiting(individual):
-    if individual[3] < 60:
-        return (1e6,)  # Penalize unsafe speeds below 60
-
-    result = run_simulation(individual)
-    if result is None:
-        return (1e6,)
-
+    # Safety metrics
     brakes = result.get("Emergency Brakes", 0)
     stops = result.get("Emergency Stops", 0)
     collisions = result.get("Near collisions", 0)
-    waiting = result.get("Total Waiting Time", 0)
 
-    fitness = 1000 * brakes + 1000 * stops + 20000 * collisions + 0.9 * waiting
-    return (fitness,)
+    # Weighted combination
+    efficiency_score = 0.7 * (0.9 * waiting + 0.3 * travel)
+    safety_score = 0.3 * (1000 * brakes + 1000 * stops + 20000 * collisions)
+
+    return (efficiency_score + safety_score,)
 
 
 def log_individual_to_file(individual, generation, ind_id):
@@ -181,7 +181,7 @@ def run_ga(pop, hof, ngen, cxpb, mutpb, label="GA"):
         logbook.record(gen=gen, nevals=len(invalid_ind), **record)
 
 
-def run_final_simulation_and_compare(best_params):
+def run_final_simulation_and_compare(best_params, traffic_density=2):
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     final_param_file = os.path.join(PARAMS_FOLDER, f"final_params_{timestamp}.json")
     final_result_file = os.path.join(
@@ -192,13 +192,13 @@ def run_final_simulation_and_compare(best_params):
     params = {
         "intersection": {
             "name": "Trafficlight",
-            "Traffic Density": 2,
+            "traffic density": traffic_density,
             "simulation_parameters": {
-                "Intersection Type": 1,
-                "Green": best_params["Green"],
-                "Yellow": best_params["Yellow"],
-                "Red": best_params["Red"],
-                "Speed": best_params["Speed"],
+                "intersection_type": 1,
+                "green": best_params["Green"],
+                "yellow": best_params["Yellow"],
+                "red": best_params["Red"],
+                "speed": best_params["Speed"],
                 "seed": best_params["Seed"],
             },
             "output_path": final_result_file,
@@ -225,18 +225,22 @@ def run_final_simulation_and_compare(best_params):
         print(f"Failed to read final or reference results: {e}")
         return
 
+    metrics_map = {
+        "Total Waiting Time": "total_waiting_time",
+        "Total Travel Time": "total_travel_time",
+        "Emergency Brakes": "emergency_brakes",
+        "Emergency Stops": "emergency_stops",
+        "Near collisions": "near_collisions",
+    }
+
     print("\n--- Final Comparison ---")
     print(f"{'Metric':<25}{'Optimized':>15}{'Reference':>15}")
-    for metric in [
-        "Total Waiting Time",
-        "Total Travel Time",
-        "Emergency Brakes",
-        "Emergency Stops",
-        "Near collisions",
-    ]:
-        opt = final_results.get(metric, "N/A")
-        ref = reference_results.get(metric, "N/A")
+    for metric, key in metrics_map.items():
+        opt = final_results.get(key, "N/A")
+        ref = reference_results.get(key, "N/A")
         print(f"{metric:<25}{str(opt):>15}{str(ref):>15}")
+
+    return final_results
 
 
 def cleanup_files():
@@ -249,34 +253,39 @@ def cleanup_files():
 
 def main():
     random.seed(1408)
-    ngen_waiting = 30
-    ngen_safety = 10
     pop_size = 30
-    cxpb = 0.5
+    ngen = 50
+    cxpb = 0.6
     mutpb = 0.3
+    traffic_density = 2
 
-    # Phase 1: Minimize waiting time
-    print("\n--- Phase 1: Minimizing Waiting Time ---")
-    toolbox.register("evaluate", evaluate_waiting_and_travel)
+    # Register balanced evaluation
+    toolbox.register(
+        "evaluate", lambda ind: evaluate_balanced(ind, traffic_density=traffic_density)
+    )
     toolbox.register("mutate", lambda ind: custom_mutate(ind, indpb=0.2, min_speed=60))
+
     pop = toolbox.population(n=pop_size)
-    hof_wait = tools.HallOfFame(3)
+    hof = tools.HallOfFame(1)
+
+    # Initialize CSV
     with open(ALL_RESULTS_CSV, "w") as f:
         f.write("generation,individual_id,green,yellow,red,speed,seed,fitness\n")
-    run_ga(pop, hof_wait, ngen_waiting, cxpb, mutpb, label="WaitingTime")
 
-    # Phase 2: Minimize safety issues
-    print("\n--- Phase 2: Minimizing Safety Hazards ---")
-    toolbox.register("evaluate", evaluate_safety_given_waiting)
-    toolbox.register("mutate", lambda ind: custom_mutate(ind, indpb=0.2, min_speed=60))
-    pop2 = [toolbox.clone(ind) for ind in hof_wait]
-    pop2 += toolbox.population(n=pop_size - len(pop2))
-    hof_safety = tools.HallOfFame(1)
-    run_ga(pop2, hof_safety, ngen_safety, cxpb, mutpb, label="Safety")
+    start_ga = time.time()
+    # Run GA
+    run_ga(pop, hof, ngen, cxpb, mutpb, label="BalancedGA")
 
-    # Save and compare best
+    end_ga = time.time()
+    total_time_run = end_ga - start_ga
+    mins = int(total_time_run // 60)
+    secs = int(total_time_run % 60)
+
+    print(f"GA ran for {mins} minutes and {secs} seconds")
+
+    # Save best individual
     os.makedirs("out", exist_ok=True)
-    best = hof_safety[0]
+    best = hof[0]
     best_params = {
         "Green": best[0],
         "Yellow": best[1],
@@ -291,8 +300,13 @@ def main():
     print("\nBest Parameters Found:")
     print(json.dumps(best_params, indent=2))
 
-    run_final_simulation_and_compare(best_params)
+    # Final simulation and comparison
+    final_results = run_final_simulation_and_compare(
+        best_params, traffic_density=traffic_density
+    )
     cleanup_files()
+
+    return final_results
 
 
 if __name__ == "__main__":

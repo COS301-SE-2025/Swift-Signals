@@ -1,0 +1,29 @@
+name: User Service 
+on:
+  push:
+    branches: [main, dev, user-service]
+  pull_request:
+    branches: [main, dev, user-service]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-format-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.1'
+          cache: true
+          
+      - name: Setup protoc and generate proto files
+        working-directory: ./protos/swiftsignals
+        run: make all
+        
+      - name: Run full CI suite
+        working-directory: ./user-service
+        run: make all

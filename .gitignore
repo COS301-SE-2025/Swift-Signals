@@ -1,6 +1,13 @@
 # Created by https://www.toptal.com/developers/gitignore/api/macos,windows,linux,visualstudiocode,react,go,python,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,windows,linux,visualstudiocode,react,go,python,node
 
+### Kubernetes ###
+# Ignore all secrets.yaml files anywhere
+**/secrets.yaml
+
+# But do NOT ignore secrets.example.yaml
+!**/secrets.example.yaml
+
 ### Protos ### 
 **/gen/
 

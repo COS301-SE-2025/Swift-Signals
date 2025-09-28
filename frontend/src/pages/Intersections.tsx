@@ -1,11 +1,7 @@
-import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import type { LatLng } from "leaflet";
+import L from "leaflet";
 import { Search, X, FileText, MapPin, TrafficCone } from "lucide-react";
-import IntersectionCard from "../components/IntersectionCard";
-import "../styles/Intersections.css";
-import Footer from "../components/Footer";
-import HelpMenu from "../components/HelpMenu";
+import { useState, useEffect, useRef } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -13,9 +9,43 @@ import {
   useMapEvents,
   Popup,
 } from "react-leaflet";
+import { useNavigate } from "react-router-dom";
+
+import Footer from "../components/Footer";
+import HelpMenu from "../components/HelpMenu";
+import IntersectionCard from "../components/IntersectionCard";
+import Navbar from "../components/Navbar";
+import "../styles/Intersections.css";
+
 import "leaflet/dist/leaflet.css";
-import type { LatLng } from "leaflet";
-import L from "leaflet";
+import { API_BASE_URL } from "../config";
+import { CHATBOT_BASE_URL } from "../config";
+
+// =================================================================
+// TOOLTIP COMPONENT
+// =================================================================
+
+const Tooltip: React.FC<{
+  text: string;
+  children: React.ReactElement;
+}> = ({ text, children }) => {
+  const [show, setShow] = useState(false);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+    >
+      {children}
+      {show && (
+        <div className="absolute bottom-full mb-2 w-max bg-gray-800 text-white text-xs rounded py-1 px-2 z-10">
+          {text}
+        </div>
+      )}
+    </div>
+  );
+};
 
 // =================================================================
 // DATA STRUCTURES & INTERFACES
@@ -94,19 +124,13 @@ interface OverpassElement {
   };
 }
 
-interface FoundIntersection {
+// Type for intersection with calculated distance
+type IntersectionWithDistance = Intersection & {
+  distance: number;
+  intersection: string;
   lat: number;
   lon: number;
-  roads: string[];
-  intersection: string;
-  distance: number;
-}
-
-interface NearestIntersection extends FoundIntersection {
-  address: string;
-  city: string;
-  province: string;
-}
+};
 // #endregion
 
 // =================================================================
@@ -143,7 +167,8 @@ const LocationMarker: React.FC<{
   const findNearestIntersection = async (
     lat: number,
     lon: number,
-  ): Promise<NearestIntersection | null> => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ): Promise<any | null> => {
     try {
       setIsSnapping?.(true);
       setIsLoading(true);
@@ -210,7 +235,7 @@ const LocationMarker: React.FC<{
         }
       });
 
-      const intersections: FoundIntersection[] = [];
+      const intersections: IntersectionWithDistance[] = [];
 
       for (const [nodeId, nodeWays] of nodeWaysMap.entries()) {
         if (nodeWays.length >= 2) {
@@ -236,7 +261,8 @@ const LocationMarker: React.FC<{
                 roads: uniqueRoads.slice(0, 2),
                 intersection: `${uniqueRoads[0]} & ${uniqueRoads[1]}`,
                 distance,
-              });
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              } as any);
             }
           }
         }
@@ -246,7 +272,7 @@ const LocationMarker: React.FC<{
 
       if (intersections.length > 0) {
         const closestIntersection = intersections[0];
-        const reverseGeocodeUrl = `http://localhost:3001/api/reverse-geocode?lat=${closestIntersection.lat}&lon=${closestIntersection.lon}`;
+        const reverseGeocodeUrl = `${CHATBOT_BASE_URL}/reverse-geocode?lat=${closestIntersection.lat}&lon=${closestIntersection.lon}`;
         const reverseGeocodeResponse = await fetch(reverseGeocodeUrl);
         const reverseGeocodeData = await reverseGeocodeResponse.json();
         const address = reverseGeocodeData.address;
@@ -421,10 +447,10 @@ const DeleteConfirmationModal: React.FC<DeleteConfirmationModalProps> = ({
 
           <div className="space-y-2">
             <p className="text-gray-700 dark:text-[#C9D1D9]">
-              You're about to permanently delete
+              You&apos;re about to permanently delete
             </p>
             <p className="text-lg font-semibold text-gray-900 dark:text-[#E6EDF3] bg-gray-50 dark:bg-[#21262D] px-3 py-2 rounded-lg border border-gray-200 dark:border-[#30363D]">
-              "{intersectionName}"
+              &quot;{intersectionName}&quot;
             </p>
             <p className="text-sm text-red-600 dark:text-red-400 font-medium mt-3">
               This action cannot be undone
@@ -647,21 +673,25 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                   >
                     Intersection Name
                   </label>
-                  <input
-                    type="text"
-                    name="name"
-                    id="name"
-                    required
-                    className={inputClasses}
-                    value={formData.name}
-                    onChange={handleChange}
-                    placeholder="e.g., Lynnwood & Atterbury"
-                  />
+                  <Tooltip text="Enter a unique name for the intersection.">
+                    <input
+                      type="text"
+                      name="name"
+                      id="name"
+                      required
+                      className={inputClasses}
+                      value={formData.name}
+                      onChange={handleChange}
+                      placeholder="e.g., Lynnwood & Atterbury"
+                    />
+                  </Tooltip>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-2">
-                    Traffic Density
-                  </label>
+                  <Tooltip text="Select the estimated traffic density for this intersection.">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-[#C9D1D9] mb-2">
+                      Traffic Density
+                    </label>
+                  </Tooltip>
                   <div className="flex space-x-2 bg-gray-100 dark:bg-[#0D1117] p-1 rounded-lg">
                     <TrafficDensityButton value="low" label="Low" />
                     <TrafficDensityButton value="medium" label="Medium" />
@@ -675,28 +705,32 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                   Location Details
                 </h3>
                 <div className="flex space-x-2 mb-3">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("Manual")}
-                    className={`px-3 py-1 rounded-md text-sm font-medium ${
-                      activeTab === "Manual"
-                        ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]"
-                        : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
-                    } transition-all duration-300`}
-                  >
-                    Manual
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("Map")}
-                    className={`px-3 py-1 rounded-md text-sm font-medium ${
-                      activeTab === "Map"
-                        ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]"
-                        : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
-                    } transition-all duration-300`}
-                  >
-                    Map
-                  </button>
+                  <Tooltip text="Manually enter the intersection details.">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("Manual")}
+                      className={`px-3 py-1 rounded-md text-sm font-medium ${
+                        activeTab === "Manual"
+                          ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]"
+                          : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+                      } transition-all duration-300`}
+                    >
+                      Manual
+                    </button>
+                  </Tooltip>
+                  <Tooltip text="Select the intersection location from a map.">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab("Map")}
+                      className={`px-3 py-1 rounded-md text-sm font-medium ${
+                        activeTab === "Map"
+                          ? "bg-[#2B9348] text-white dark:bg-[#2DA44E]"
+                          : "bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-500"
+                      } transition-all duration-300`}
+                    >
+                      Map
+                    </button>
+                  </Tooltip>
                 </div>
                 {activeTab === "Manual" && (
                   <>
@@ -707,16 +741,18 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                       >
                         Address / Cross Streets
                       </label>
-                      <input
-                        type="text"
-                        name="details.address"
-                        id="details.address"
-                        required
-                        className={inputClasses}
-                        value={formData.details.address}
-                        onChange={handleChange}
-                        placeholder="Corner of Lynnwood Rd and Atterbury Rd"
-                      />
+                      <Tooltip text="Enter the address or cross streets of the intersection.">
+                        <input
+                          type="text"
+                          name="details.address"
+                          id="details.address"
+                          required
+                          className={inputClasses}
+                          value={formData.details.address}
+                          onChange={handleChange}
+                          placeholder="Corner of Lynnwood Rd and Atterbury Rd"
+                        />
+                      </Tooltip>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
@@ -726,15 +762,17 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                         >
                           City
                         </label>
-                        <input
-                          type="text"
-                          name="details.city"
-                          id="details.city"
-                          required
-                          className={inputClasses}
-                          value={formData.details.city}
-                          onChange={handleChange}
-                        />
+                        <Tooltip text="Enter the city where the intersection is located.">
+                          <input
+                            type="text"
+                            name="details.city"
+                            id="details.city"
+                            required
+                            className={inputClasses}
+                            value={formData.details.city}
+                            onChange={handleChange}
+                          />
+                        </Tooltip>
                       </div>
                       <div>
                         <label
@@ -743,15 +781,17 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                         >
                           Province
                         </label>
-                        <input
-                          type="text"
-                          name="details.province"
-                          id="details.province"
-                          required
-                          className={inputClasses}
-                          value={formData.details.province}
-                          onChange={handleChange}
-                        />
+                        <Tooltip text="Enter the province where the intersection is located.">
+                          <input
+                            type="text"
+                            name="details.province"
+                            id="details.province"
+                            required
+                            className={inputClasses}
+                            value={formData.details.province}
+                            onChange={handleChange}
+                          />
+                        </Tooltip>
                       </div>
                     </div>
                   </>
@@ -808,18 +848,21 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                   >
                     Intersection Type
                   </label>
-                  <select
-                    name="default_parameters.intersection_type"
-                    id="default_parameters.intersection_type"
-                    required
-                    className={inputClasses}
-                    value={formData.default_parameters.intersection_type}
-                    onChange={handleChange}
-                  >
-                    <option value="INTERSECTION_TYPE_TRAFFICLIGHT">
-                      Traffic Light
-                    </option>
-                  </select>
+                  <Tooltip text="Choose the type of intersection.">
+                    <select
+                      name="default_parameters.intersection_type"
+                      id="default_parameters.intersection_type"
+                      required
+                      disabled
+                      className={`${inputClasses} bg-gray-200 dark:bg-gray-700`}
+                      value={formData.default_parameters.intersection_type}
+                      onChange={handleChange}
+                    >
+                      <option value="INTERSECTION_TYPE_TRAFFICLIGHT">
+                        Traffic Light
+                      </option>
+                    </select>
+                  </Tooltip>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   <div>
@@ -829,16 +872,18 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                     >
                       Green (s)
                     </label>
-                    <input
-                      type="number"
-                      name="default_parameters.green"
-                      id="default_parameters.green"
-                      required
-                      min="1"
-                      className={inputClasses}
-                      value={formData.default_parameters.green}
-                      onChange={handleChange}
-                    />
+                    <Tooltip text="Duration of the green light in seconds.">
+                      <input
+                        type="number"
+                        name="default_parameters.green"
+                        id="default_parameters.green"
+                        required
+                        min="1"
+                        className={inputClasses}
+                        value={formData.default_parameters.green}
+                        onChange={handleChange}
+                      />
+                    </Tooltip>
                   </div>
                   <div>
                     <label
@@ -847,16 +892,18 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                     >
                       Yellow (s)
                     </label>
-                    <input
-                      type="number"
-                      name="default_parameters.yellow"
-                      id="default_parameters.yellow"
-                      required
-                      min="1"
-                      className={inputClasses}
-                      value={formData.default_parameters.yellow}
-                      onChange={handleChange}
-                    />
+                    <Tooltip text="Duration of the yellow light in seconds.">
+                      <input
+                        type="number"
+                        name="default_parameters.yellow"
+                        id="default_parameters.yellow"
+                        required
+                        min="1"
+                        className={inputClasses}
+                        value={formData.default_parameters.yellow}
+                        onChange={handleChange}
+                      />
+                    </Tooltip>
                   </div>
                   <div>
                     <label
@@ -865,16 +912,18 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                     >
                       Red (s)
                     </label>
-                    <input
-                      type="number"
-                      name="default_parameters.red"
-                      id="default_parameters.red"
-                      required
-                      min="1"
-                      className={inputClasses}
-                      value={formData.default_parameters.red}
-                      onChange={handleChange}
-                    />
+                    <Tooltip text="Duration of the red light in seconds.">
+                      <input
+                        type="number"
+                        name="default_parameters.red"
+                        id="default_parameters.red"
+                        required
+                        min="1"
+                        className={inputClasses}
+                        value={formData.default_parameters.red}
+                        onChange={handleChange}
+                      />
+                    </Tooltip>
                   </div>
                 </div>
                 <div>
@@ -884,67 +933,72 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
                   >
                     Vehicle Speed (km/h)
                   </label>
-                  <input
-                    type="number"
-                    name="default_parameters.speed"
-                    id="default_parameters.speed"
-                    required
-                    min="1"
-                    className={inputClasses}
-                    value={formData.default_parameters.speed}
-                    onChange={handleChange}
-                  />
+                  <Tooltip text="The average speed of vehicles passing through the intersection.">
+                    <input
+                      type="number"
+                      name="default_parameters.speed"
+                      id="default_parameters.speed"
+                      required
+                      min="1"
+                      className={inputClasses}
+                      value={formData.default_parameters.speed}
+                      onChange={handleChange}
+                    />
+                  </Tooltip>
                 </div>
               </div>
             </div>
           </div>
-
           {error && (
             <p className="text-red-500 text-sm text-center mt-6">{error}</p>
           )}
           <div className="flex justify-end space-x-4 pt-0 border-t border-gray-200 dark:border-[#30363D] mt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-6 py-2.5 bg-gray-100 dark:bg-[#21262D] border-2 border-gray-300 dark:border-[#30363D] text-gray-700 dark:text-[#C9D1D9] rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-[#30363D] transition-colors duration-150"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-6 py-2.5 bg-[#2da44e] text-white rounded-lg font-medium hover:bg-[#288c42] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center transition-colors duration-150 shadow-sm"
-            >
-              {isLoading ? (
-                <>
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-5 w-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  {isEditing ? "Updating..." : "Creating..."}
-                </>
-              ) : isEditing ? (
-                "Update Intersection"
-              ) : (
-                "Create Intersection"
-              )}
-            </button>
-          </div>
+            <Tooltip text="Discard changes and close the modal.">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-6 py-2.5 bg-gray-100 dark:bg-[#21262D] border-2 border-gray-300 dark:border-[#30363D] text-gray-700 dark:text-[#C9D1D9] rounded-lg font-medium hover:bg-gray-200 dark:hover:bg-[#30363D] transition-colors duration-150"
+              >
+                Cancel
+              </button>
+            </Tooltip>
+            <Tooltip text="Save the intersection details.">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="px-6 py-2.5 bg-[#2da44e] text-white rounded-lg font-medium hover:bg-[#288c42] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center transition-colors duration-150 shadow-sm"
+              >
+                {isLoading ? (
+                  <>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-5 w-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    {isEditing ? "Updating..." : "Creating..."}
+                  </>
+                ) : isEditing ? (
+                  "Update Intersection"
+                ) : (
+                  "Create Intersection"
+                )}
+              </button>
+            </Tooltip>
+          </div>{" "}
         </form>
       </div>
     </div>
@@ -954,8 +1008,6 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
 // =================================================================
 // MAIN PAGE COMPONENT
 // =================================================================
-
-const API_BASE_URL = "http://localhost:9090";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");

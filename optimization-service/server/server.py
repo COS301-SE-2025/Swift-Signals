@@ -40,7 +40,7 @@ class OptimisationServicer(pb_grpc.OptimisationServiceServicer):
         pretty_log("Request Parameters", request.parameters)
 
         # Call the main optimisation function
-        result = run_optimisation()
+        result = run_optimisation(traffic_density=2)
         logger.info("Optimisation completed successfully.")
 
         # Convert the result to a dictionary

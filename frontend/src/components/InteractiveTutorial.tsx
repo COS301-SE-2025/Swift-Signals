@@ -1,10 +1,11 @@
+import { X } from "lucide-react";
 import React, {
   useEffect,
   useLayoutEffect,
   useState,
   useCallback,
 } from "react";
-import { X } from "lucide-react";
+import "../styles/InteractiveTutorial.css";
 
 export type TutorialStep = {
   selector: string;
@@ -13,7 +14,7 @@ export type TutorialStep = {
   position?: "top" | "bottom" | "left" | "right" | "center";
   action?: () => void;
   autoAdvance?: boolean;
-  waitFor?: string; // CSS selector to wait for before auto-advancing
+  waitFor?: string;
 };
 
 type Position = {
@@ -62,7 +63,6 @@ const InteractiveTutorial: React.FC<Props> = ({
     }
   }, [currentStep]);
 
-  // Auto-advance logic
   useEffect(() => {
     if (!currentStep?.autoAdvance) return;
 
@@ -78,13 +78,11 @@ const InteractiveTutorial: React.FC<Props> = ({
             } else {
               onClose();
             }
-          }, 500); // Small delay to ensure smooth transition
+          }, 500);
         } else {
-          // Keep checking every 100ms
           timeoutId = setTimeout(checkForAdvance, 100);
         }
       } else {
-        // Auto-advance after action without waiting for element
         timeoutId = setTimeout(() => {
           if (stepIndex < steps.length - 1) {
             setStepIndex(stepIndex + 1);

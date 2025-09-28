@@ -1,6 +1,6 @@
 module github.com/COS301-SE-2025/Swift-Signals/intersection-service
 
-go 1.24.6
+go 1.25.1
 
 replace (
 	github.com/COS301-SE-2025/Swift-Signals/protos/gen => ../protos/gen
@@ -8,7 +8,7 @@ replace (
 )
 
 require (
-	github.com/COS301-SE-2025/Swift-Signals/protos/gen v0.1.0
+	github.com/COS301-SE-2025/Swift-Signals/protos/gen v0.0.0-00010101000000-000000000000
 	github.com/COS301-SE-2025/Swift-Signals/shared v0.0.0-00010101000000-000000000000
 	github.com/go-playground/validator/v10 v10.27.0
 	github.com/google/uuid v1.6.0
@@ -16,8 +16,8 @@ require (
 	github.com/testcontainers/testcontainers-go/modules/mongodb v0.38.0
 	github.com/vektra/mockery/v2 v2.53.4
 	go.mongodb.org/mongo-driver v1.17.4
-	google.golang.org/grpc v1.74.2
-	google.golang.org/protobuf v1.36.7
+	google.golang.org/grpc v1.75.1
+	google.golang.org/protobuf v1.36.9
 )
 
 require (
@@ -98,18 +98,18 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.54.0 // indirect
-	go.opentelemetry.io/otel v1.36.0 // indirect
-	go.opentelemetry.io/otel/metric v1.36.0 // indirect
-	go.opentelemetry.io/otel/trace v1.36.0 // indirect
+	go.opentelemetry.io/otel v1.37.0 // indirect
+	go.opentelemetry.io/otel/metric v1.37.0 // indirect
+	go.opentelemetry.io/otel/trace v1.37.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.38.0 // indirect
+	golang.org/x/crypto v0.39.0 // indirect
 	golang.org/x/mod v0.25.0 // indirect
-	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/net v0.41.0 // indirect
 	golang.org/x/sync v0.15.0 // indirect
 	golang.org/x/sys v0.33.0 // indirect
 	golang.org/x/term v0.32.0 // indirect
 	golang.org/x/text v0.26.0 // indirect
 	golang.org/x/tools v0.33.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250707201910-8d1bb00bc6a7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -1,14 +1,15 @@
+import { Chart, registerables } from "chart.js";
+import { useState } from "react";
 import React, { useEffect, useRef } from "react";
+import { FaRoad, FaPlay, FaChartLine, FaPlus, FaMap } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
-import "../styles/Dashboard.css";
-import { Chart, registerables } from "chart.js";
 import MapModal from "../components/MapModal";
-import { useState } from "react";
-
-import { FaRoad, FaPlay, FaChartLine, FaPlus, FaMap } from "react-icons/fa";
+import Navbar from "../components/Navbar";
+import "../styles/Dashboard.css";
+import { API_BASE_URL } from "../config";
 
 if (Chart.register) {
   Chart.register(...registerables);
@@ -61,7 +62,8 @@ const Dashboard: React.FC = () => {
 
   const [totalIntersections, setTotalIntersections] = useState<number>(0);
   const [loadingTotal, setLoadingTotal] = useState(false);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [activeSimulations, setActiveSimulations] = useState<number>(0);
   const [loadingActiveSimulations, setLoadingActiveSimulations] =
     useState(false);
   const [totalSimulationsRun, setTotalSimulationsRun] = useState<number>(0);
@@ -72,7 +74,7 @@ const Dashboard: React.FC = () => {
     // setLoadingActiveSimulations(true); // This line will be removed as activeSimulations is no longer used in the same way
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:9090/intersections", {
+      const response = await fetch(`${API_BASE_URL}/intersections`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");
@@ -261,7 +263,7 @@ const Dashboard: React.FC = () => {
     setMapError(null);
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:9090/intersections", {
+      const response = await fetch(`${API_BASE_URL}/intersections`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");
@@ -305,7 +307,7 @@ const Dashboard: React.FC = () => {
     setRecentError(null);
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:9090/intersections", {
+      const response = await fetch(`${API_BASE_URL}/intersections`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");

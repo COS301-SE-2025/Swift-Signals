@@ -12,7 +12,6 @@ if "trafficLight" not in sys.modules:
 
 
 class TestTLIntersection(unittest.TestCase):
-
     @patch("builtins.open", new_callable=mock_open)
     def test_writeNodeFile_creates_expected_content(self, m):
         trafficLight.writeNodeFile("nodes.xml")

@@ -13,7 +13,6 @@ if "stopStreet" not in sys.modules:
 
 
 class TestStopIntersection(unittest.TestCase):
-
     @patch("stopStreet.os.remove")
     @patch("stopStreet.extractTrajectories", return_value=[])
     @patch("stopStreet.parseNodes", return_value=[])

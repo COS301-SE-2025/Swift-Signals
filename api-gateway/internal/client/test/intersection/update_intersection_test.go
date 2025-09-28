@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc/codes"
@@ -35,9 +36,9 @@ func (suite *TestSuite) TestUpdateIntersection_Success() {
 		},
 		CreatedAt:      timestamppb.Now(),
 		LastRunAt:      timestamppb.Now(),
-		Status:         intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
+		Status:         commonpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED,
 		RunCount:       5,
-		TrafficDensity: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		TrafficDensity: commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	}
 
 	suite.grpcClient.On("UpdateIntersection",

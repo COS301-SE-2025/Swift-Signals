@@ -1,14 +1,13 @@
 package main
 
 import (
-	// Un/comment for Postgresql
 	"database/sql"
 	"fmt"
 	"log"
 	"net"
 	"os"
 
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	"github.com/COS301-SE-2025/Swift-Signals/shared/jwt"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/db"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/handler"

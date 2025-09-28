@@ -4,13 +4,14 @@ import (
 	"context"
 	"time"
 
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
 )
 
 func (suite *IntegrationTestSuite) TestUpdateIntersection() {
 	createReq := &intersectionpb.CreateIntersectionRequest{
 		Name:           "Test Intersection",
-		TrafficDensity: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		TrafficDensity: commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	}
 
 	ctx, cancel := context.WithTimeout(suite.ctx, 30*time.Second)
@@ -33,7 +34,7 @@ func (suite *IntegrationTestSuite) TestUpdateIntersection() {
 func (suite *IntegrationTestSuite) TestUpdateIntersection_Failure_Min() {
 	createReq := &intersectionpb.CreateIntersectionRequest{
 		Name:           "Test Intersection",
-		TrafficDensity: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		TrafficDensity: commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	}
 
 	ctx, cancel := context.WithTimeout(suite.ctx, 30*time.Second)
@@ -56,7 +57,7 @@ func (suite *IntegrationTestSuite) TestUpdateIntersection_Failure_Min() {
 func (suite *IntegrationTestSuite) TestUpdateIntersection_Failure_Max() {
 	createReq := &intersectionpb.CreateIntersectionRequest{
 		Name:           "Test Intersection",
-		TrafficDensity: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		TrafficDensity: commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	}
 
 	ctx, cancel := context.WithTimeout(suite.ctx, 30*time.Second)
@@ -79,7 +80,7 @@ func (suite *IntegrationTestSuite) TestUpdateIntersection_Failure_Max() {
 func (suite *IntegrationTestSuite) TestUpdateIntersection_Failure_UUID() {
 	createReq := &intersectionpb.CreateIntersectionRequest{
 		Name:           "Test Intersection",
-		TrafficDensity: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		TrafficDensity: commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	}
 
 	ctx, cancel := context.WithTimeout(suite.ctx, 30*time.Second)

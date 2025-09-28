@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	grpcmocks "github.com/COS301-SE-2025/Swift-Signals/user-service/internal/mocks/grpc"
 	"github.com/COS301-SE-2025/Swift-Signals/user-service/internal/model"
 	"github.com/stretchr/testify/mock"

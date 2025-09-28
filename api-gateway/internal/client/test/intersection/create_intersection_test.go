@@ -6,7 +6,8 @@ import (
 	"time"
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc/codes"
@@ -46,11 +47,11 @@ func (suite *TestSuite) TestCreateIntersection_Success() {
 			City:     "Test City",
 			Province: "Test Province",
 		},
-		TrafficDensity: intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
-		DefaultParameters: &intersectionpb.OptimisationParameters{
-			OptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-			Parameters: &intersectionpb.SimulationParameters{
-				IntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+		TrafficDensity: commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		DefaultParameters: &commonpb.OptimisationParameters{
+			OptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+			Parameters: &commonpb.SimulationParameters{
+				IntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 				Green:            10,
 				Yellow:           3,
 				Red:              7,
@@ -74,9 +75,9 @@ func (suite *TestSuite) TestCreateIntersection_Success() {
 				req.Details.Address == "123 Test St" &&
 				req.Details.City == "Test City" &&
 				req.Details.Province == "Test Province" &&
-				req.TrafficDensity == intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH &&
-				req.DefaultParameters.OptimisationType == intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH &&
-				req.DefaultParameters.Parameters.IntersectionType == intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION &&
+				req.TrafficDensity == commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH &&
+				req.DefaultParameters.OptimisationType == commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH &&
+				req.DefaultParameters.Parameters.IntersectionType == commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION &&
 				req.DefaultParameters.Parameters.Green == 10 &&
 				req.DefaultParameters.Parameters.Yellow == 3 &&
 				req.DefaultParameters.Parameters.Red == 7 &&
@@ -181,45 +182,45 @@ func (suite *TestSuite) TestCreateIntersection_StringToEnumConversions() {
 		trafficDensity           string
 		optimisationType         string
 		intersectionType         string
-		expectedTrafficDensity   intersectionpb.TrafficDensity
-		expectedOptimisationType intersectionpb.OptimisationType
-		expectedIntersectionType intersectionpb.IntersectionType
+		expectedTrafficDensity   commonpb.TrafficDensity
+		expectedOptimisationType commonpb.OptimisationType
+		expectedIntersectionType commonpb.IntersectionType
 	}{
 		{
 			name:                     "High traffic density, grid search, traffic light",
 			trafficDensity:           "high",
 			optimisationType:         "grid_search",
 			intersectionType:         "traffic_light",
-			expectedTrafficDensity:   intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
-			expectedOptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-			expectedIntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT,
+			expectedTrafficDensity:   commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+			expectedOptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+			expectedIntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT,
 		},
 		{
 			name:                     "Medium traffic density, genetic, t-junction",
 			trafficDensity:           "medium",
 			optimisationType:         "genetic",
 			intersectionType:         "t-junction",
-			expectedTrafficDensity:   intersectionpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM,
-			expectedOptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION,
-			expectedIntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
+			expectedTrafficDensity:   commonpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM,
+			expectedOptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION,
+			expectedIntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION,
 		},
 		{
 			name:                     "Low traffic density, none, roundabout",
 			trafficDensity:           "low",
 			optimisationType:         "none",
 			intersectionType:         "roundabout",
-			expectedTrafficDensity:   intersectionpb.TrafficDensity_TRAFFIC_DENSITY_LOW,
-			expectedOptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_NONE,
-			expectedIntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_ROUNDABOUT,
+			expectedTrafficDensity:   commonpb.TrafficDensity_TRAFFIC_DENSITY_LOW,
+			expectedOptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_NONE,
+			expectedIntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_ROUNDABOUT,
 		},
 		{
 			name:                     "Invalid values default correctly",
 			trafficDensity:           "invalid",
 			optimisationType:         "invalid",
 			intersectionType:         "invalid",
-			expectedTrafficDensity:   intersectionpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM,
-			expectedOptimisationType: intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
-			expectedIntersectionType: intersectionpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED,
+			expectedTrafficDensity:   commonpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM,
+			expectedOptimisationType: commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH,
+			expectedIntersectionType: commonpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED,
 		},
 	}
 

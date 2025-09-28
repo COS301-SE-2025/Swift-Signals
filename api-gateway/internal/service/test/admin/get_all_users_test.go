@@ -6,7 +6,7 @@ import (
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	grpcmocks "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/mocks/grpc_client"
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 )
 

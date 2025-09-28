@@ -1,12 +1,12 @@
+import { X } from "lucide-react";
 import { useState, useEffect } from "react";
+
+import Footer from "../components/Footer";
+import HelpMenu from "../components/HelpMenu";
 import Navbar from "../components/Navbar";
 import UsersTable from "../components/UsersTable";
 import "../styles/Users.css";
-import Footer from "../components/Footer";
-import HelpMenu from "../components/HelpMenu";
-import { X } from "lucide-react";
-
-const API_BASE_URL = "http://localhost:9090";
+import { API_BASE_URL } from "../config";
 
 interface ApiUser {
   id: string;

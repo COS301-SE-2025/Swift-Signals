@@ -1,9 +1,11 @@
-import React, { useRef, useState, useEffect, useMemo } from "react";
-import type { FC } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
 import { MapControls, OrthographicCamera } from "@react-three/drei";
+import { Canvas, useFrame } from "@react-three/fiber";
+import type { FC } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
+
 import { SimulationUI } from "../components/SimulationUI";
+import { API_BASE_URL } from "../config";
 
 console.log(React)
 
@@ -77,8 +79,6 @@ interface SimulationResponse {
     total_waiting_time: number;
   };
 }
-
-const API_BASE_URL = "http://localhost:9090";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");

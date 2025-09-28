@@ -1,11 +1,13 @@
-import React, { useEffect, useState, useRef } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import "../styles/SimulationResults.css";
-import HelpMenu from "../components/HelpMenu";
 import { Chart, registerables } from "chart.js";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import type { ChartConfiguration } from "chart.js";
+import React, { useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+
+import Footer from "../components/Footer";
+import HelpMenu from "../components/HelpMenu";
+import Navbar from "../components/Navbar";
+import { API_BASE_URL } from "../config";
+import "../styles/SimulationResults.css";
 
 if (Chart.register) {
   Chart.register(...registerables);
@@ -346,6 +348,24 @@ const SimulationResults: React.FC = () => {
   // Get intersectionId from URL params first, then fall back to location.state
   const intersectionId = params.intersectionId || intersectionIds?.[0];
 
+  const [isDarkMode, setIsDarkMode] = useState(
+    document.documentElement.classList.contains("dark"),
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          setIsDarkMode(document.documentElement.classList.contains("dark"));
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => observer.disconnect();
+  }, []);
+
   const chartInstances = useRef<Chart[]>([]);
   const chartRefs = {
     avgSpeedRef: useRef<HTMLCanvasElement | null>(null),
@@ -679,7 +699,7 @@ const SimulationResults: React.FC = () => {
         legend: {
           display: showOptimized,
           labels: {
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 12 },
           },
         },
@@ -693,14 +713,25 @@ const SimulationResults: React.FC = () => {
       },
       scales: {
         x: {
-          grid: { color: "rgba(255,255,255,0.1)" },
-          ticks: { color: "#ccc", maxTicksLimit: 10 },
-          title: { display: true, color: "#fff", font: { size: 14 } },
+          grid: {
+            color: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+          },
+          title: {
+            display: true,
+            color: isDarkMode ? "#fff" : "#333",
+            font: { size: 14 },
+          },
         },
         y: {
-          grid: { color: "rgba(255,255,255,0.1)" },
-          ticks: { color: "#ccc" },
-          title: { display: true, color: "#fff", font: { size: 14 } },
+          grid: {
+            color: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+          },
+          ticks: { color: isDarkMode ? "#ccc" : "#666" },
+          title: {
+            display: true,
+            color: isDarkMode ? "#fff" : "#777777ff",
+            font: { size: 14 },
+          },
           beginAtZero: true,
         },
       },
@@ -802,7 +833,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Average Speed Over Time",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
@@ -830,7 +861,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Vehicle Count Over Time",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
@@ -858,7 +889,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Histogram of Final Speeds",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
@@ -889,7 +920,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Histogram of Total Distance",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
@@ -914,7 +945,7 @@ const SimulationResults: React.FC = () => {
       chartInstances.current.forEach((c) => c?.destroy());
       chartInstances.current = [];
     };
-  }, [simData, showOptimized, optimizedData]);
+  }, [simData, showOptimized, optimizedData, isDarkMode]);
 
   const handleViewRendering = () => {
     if (intersectionId) {
@@ -1055,7 +1086,7 @@ const SimulationResults: React.FC = () => {
                 optimizationStatus.includes("failed") ||
                 optimizationStatus.includes("No improvement")
                   ? "bg-red-500/20 border border-red-500/30 text-red-300"
-                  : "bg-green-500/20 border border-green-500/30 text-green-300"
+                  : "bg-green-600 border border-green-700 text-white dark:bg-green-700/20 dark:border-green-700/30 dark:text-green-300"
               }`}
             >
               <p className="font-semibold">{optimizationStatus}</p>

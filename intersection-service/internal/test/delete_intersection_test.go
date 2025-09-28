@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
 )
 
 func (suite *IntegrationTestSuite) TestDeleteIntersection() {
