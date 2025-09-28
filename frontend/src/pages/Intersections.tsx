@@ -595,7 +595,7 @@ const CreateIntersectionModal: React.FC<CreateIntersectionModalProps> = ({
   }) => {
     setFormData((prev) => ({
       ...prev,
-      name: location.address,
+      name: prev.name === "" ? location.address : prev.name,
       details: {
         ...prev.details,
         address: `${location.address}, ${location.city}, ${location.province}`,
