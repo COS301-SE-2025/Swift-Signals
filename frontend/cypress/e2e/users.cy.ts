@@ -90,7 +90,9 @@ describe("Users Management Page", () => {
     cy.contains("Bob Johnson")
       .parent("tr")
       .within(() => {
-        cy.get("button").contains(/delete/i).click();
+        cy.get("button")
+          .contains(/delete/i)
+          .click();
       });
 
     cy.wait("@deleteUser");
@@ -100,13 +102,17 @@ describe("Users Management Page", () => {
 
   it("should handle pagination", () => {
     // Mock 10 users
-    cy.intercept("GET", `${API_BASE_URL}/admin/users*`, Array.from({ length: 10 }).map((_, i) => ({
-      id: String(i + 1),
-      username: `User${i + 1}`,
-      email: `user${i + 1}@example.com`,
-      is_admin: false,
-      intersection_ids: [],
-    }))).as("getManyUsers");
+    cy.intercept(
+      "GET",
+      `${API_BASE_URL}/admin/users*`,
+      Array.from({ length: 10 }).map((_, i) => ({
+        id: String(i + 1),
+        username: `User${i + 1}`,
+        email: `user${i + 1}@example.com`,
+        is_admin: false,
+        intersection_ids: [],
+      })),
+    ).as("getManyUsers");
 
     cy.visit("/users");
     cy.wait("@getManyUsers");

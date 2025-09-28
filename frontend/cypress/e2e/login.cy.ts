@@ -47,7 +47,9 @@ describe("Login Page", () => {
     cy.contains("Log Me In").click();
 
     cy.wait("@loginFail");
-    cy.contains('Login failed. Server says: "Invalid credentials"').should("exist");
+    cy.contains('Login failed. Server says: "Invalid credentials"').should(
+      "exist",
+    );
   });
 
   it("opens forgot password modal and submits reset request", () => {
@@ -57,26 +59,36 @@ describe("Login Page", () => {
 
     cy.get("input[name='resetEmail']").type("reset@example.com");
 
-    cy.intercept("POST", "https://swiftsignals.seebranhome.co.za/reset-password", {
-      statusCode: 200,
-      body: {
-        message: "Password reset instructions sent to your email.",
+    cy.intercept(
+      "POST",
+      "https://swiftsignals.seebranhome.co.za/reset-password",
+      {
+        statusCode: 200,
+        body: {
+          message: "Password reset instructions sent to your email.",
+        },
       },
-    }).as("resetRequest");
+    ).as("resetRequest");
 
     cy.contains("Send Reset Link").click();
     cy.wait("@resetRequest");
-    cy.contains("Password reset instructions sent to your email.").should("exist");
+    cy.contains("Password reset instructions sent to your email.").should(
+      "exist",
+    );
   });
 
   it("shows error for invalid reset email", () => {
     cy.contains("Forgot Password?").click();
 
     cy.get("input[name='resetEmail']").type("fail@example.com");
-    cy.intercept("POST", "https://swiftsignals.seebranhome.co.za/reset-password", {
-      statusCode: 400,
-      body: { message: "Reset failed. Email not found." },
-    }).as("resetFail");
+    cy.intercept(
+      "POST",
+      "https://swiftsignals.seebranhome.co.za/reset-password",
+      {
+        statusCode: 400,
+        body: { message: "Reset failed. Email not found." },
+      },
+    ).as("resetFail");
 
     cy.contains("Send Reset Link").click();
     cy.wait("@resetFail");

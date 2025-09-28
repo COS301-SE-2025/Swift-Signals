@@ -23,9 +23,11 @@ describe("Welcome Page", () => {
       cy.get(".carousel-container").should("be.visible");
 
       // First slide (title: "Overview") should be visible
-      cy.get(".carousel-item").first().within(() => {
-        cy.get(".carousel-item-title").should("contain.text", "Overview");
-      });
+      cy.get(".carousel-item")
+        .first()
+        .within(() => {
+          cy.get(".carousel-item-title").should("contain.text", "Overview");
+        });
 
       // First indicator should be active
       cy.get(".carousel-indicator").eq(0).should("have.class", "active");
@@ -39,9 +41,14 @@ describe("Welcome Page", () => {
       cy.get(".carousel-indicator").eq(1).should("have.class", "active");
 
       // Optional: confirm second slide content
-      cy.get(".carousel-item").eq(1).within(() => {
-        cy.get(".carousel-item-title").should("contain.text", "Purpose & Impact");
-      });
+      cy.get(".carousel-item")
+        .eq(1)
+        .within(() => {
+          cy.get(".carousel-item-title").should(
+            "contain.text",
+            "Purpose & Impact",
+          );
+        });
     });
 
     it("should change slides when clicking indicators", () => {
@@ -52,12 +59,14 @@ describe("Welcome Page", () => {
       cy.get(".carousel-indicator").eq(2).should("have.class", "active");
 
       // Verify title of slide 3
-      cy.get(".carousel-item").eq(2).within(() => {
-        cy.get(".carousel-item-title").should("contain.text", "Intelligent Optimization");
-      });
+      cy.get(".carousel-item")
+        .eq(2)
+        .within(() => {
+          cy.get(".carousel-item-title").should(
+            "contain.text",
+            "Intelligent Optimization",
+          );
+        });
     });
-
   });
-  
 });
-

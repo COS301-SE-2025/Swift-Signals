@@ -3,20 +3,24 @@ describe("TrafficSimulation E2E Tests", () => {
 
   beforeEach(() => {
     // Set up auth token and intercepts before visiting
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`, 
-      { fixture: "simulation.json" }
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`,
+      { fixture: "simulation.json" },
     ).as("getSim");
 
     cy.visit("/simulation-results", {
       onBeforeLoad: (win) => {
         win.localStorage.setItem("authToken", "fake-token");
-      }
+      },
     });
   });
 
   it("shows loading state", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`, 
-      { delay: 1000, fixture: "simulation.json" }
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`,
+      { delay: 1000, fixture: "simulation.json" },
     ).as("getSimDelayed");
 
     // Navigate to the simulation (replace with your actual trigger)
@@ -26,8 +30,10 @@ describe("TrafficSimulation E2E Tests", () => {
   });
 
   it("shows error state if API fails", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`, 
-      { statusCode: 500 }
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`,
+      { statusCode: 500 },
     ).as("getSimError");
 
     // Navigate to the simulation
@@ -38,8 +44,10 @@ describe("TrafficSimulation E2E Tests", () => {
   });
 
   it("shows no data state", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`, 
-      { body: { output: null } }
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`,
+      { body: { output: null } },
     ).as("getSimEmpty");
 
     // Navigate to the simulation
@@ -49,8 +57,10 @@ describe("TrafficSimulation E2E Tests", () => {
   });
 
   it("renders simulation and UI controls", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`, 
-      { fixture: "simulation.json" }
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`,
+      { fixture: "simulation.json" },
     ).as("getSim");
 
     // Navigate to the simulation
@@ -80,30 +90,40 @@ describe("TrafficSimulation E2E Tests", () => {
   });
 
   it("handles 401 authentication error", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`, 
-      { statusCode: 401 }
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`,
+      { statusCode: 401 },
     ).as("getSimUnauth");
 
     // Navigate to the simulation
     cy.get(`[data-intersection-id="${INTERSECTION_ID}"] .viewBtn`).click();
 
-    cy.contains("Error: Authentication failed. Please log in again.").should("be.visible");
+    cy.contains("Error: Authentication failed. Please log in again.").should(
+      "be.visible",
+    );
   });
 
   it("handles 404 not found error", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`, 
-      { statusCode: 404 }
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/simulate`,
+      { statusCode: 404 },
     ).as("getSimNotFound");
 
     // Navigate to the simulation
     cy.get(`[data-intersection-id="${INTERSECTION_ID}"] .viewBtn`).click();
 
-    cy.contains("Error: Simulation data not found for this intersection.").should("be.visible");
+    cy.contains(
+      "Error: Simulation data not found for this intersection.",
+    ).should("be.visible");
   });
 
   it("works with optimize endpoint", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/optimise`, 
-      { fixture: "simulation.json" }
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${INTERSECTION_ID}/optimise`,
+      { fixture: "simulation.json" },
     ).as("getOptimize");
 
     // Navigate to optimization (adjust selector as needed)
