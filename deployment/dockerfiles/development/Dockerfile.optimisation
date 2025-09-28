@@ -2,22 +2,17 @@ FROM python:3
 
 WORKDIR /app
 
-COPY optimization-service/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y make && rm -rf /var/lib/apt/lists/* 
 
-COPY protos/ /app/protos/
-RUN mkdir -p /app/gen/python && \
-    touch /app/gen/python/__init__.py && \
-    python -m grpc_tools.protoc \
-        --proto_path=protos/ \
-        --python_out=gen/python/ \
-        --grpc_python_out=gen/python/ \
-        protos/optimisation.proto && \
-    python -m grpc_tools.protoc \
-        --proto_path=protos/ \
-        --python_out=gen/python/ \
-        --grpc_python_out=gen/python/ \
-        protos/simulation.proto
+COPY optimization-service/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt 
+
+COPY protos/ protos/
+
+WORKDIR /app/protos/swiftsignals/
+RUN make clean-gen
+RUN make generate-py 
+
 ENV PYTHONPATH="/app/gen/python:$PYTHONPATH"
 
 COPY optimization-service/ .

@@ -49,7 +49,7 @@ func (sc *SimulationClient) GetSimulationResults(
 		},
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
 	resp, err := sc.client.GetSimulationResults(ctx, req)
@@ -82,7 +82,7 @@ func (sc *SimulationClient) GetSimulationOutput(
 		},
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
 	resp, err := sc.client.GetSimulationOutput(ctx, req)

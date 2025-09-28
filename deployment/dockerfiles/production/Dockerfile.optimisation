@@ -1,42 +1,35 @@
 FROM python:3.11 AS builder
 WORKDIR /app
 
+RUN apt-get update && apt-get install -y make && rm -rf /var/lib/apt/lists/* 
+
 COPY optimization-service/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt 
 
-COPY protos/ protos/
-RUN mkdir -p gen/python && \
-    touch gen/python/__init__.py && \
-    python -m grpc_tools.protoc \
-        --proto_path=protos/ \
-        --python_out=gen/python/ \
-        --grpc_python_out=gen/python/ \
-        protos/optimisation.proto
-        RUN mkdir -p gen/python && \
-    touch gen/python/__init__.py && \
-    python -m grpc_tools.protoc \
-        --proto_path=protos/ \
-        --python_out=gen/python/ \
-        --grpc_python_out=gen/python/ \
-        protos/optimisation.proto \
-        protos/simulation.proto
+COPY protos/ protos/ 
 
-COPY optimization-service/ .
+WORKDIR /app/protos/swiftsignals/
+RUN make clean-gen
+RUN make generate-py 
+
+WORKDIR /app
+RUN find protos/gen -type d -exec touch {}/__init__.py \; 
+
+COPY optimization-service/ . 
 
 RUN python -m venv /app/venv
 ENV PATH="/app/venv/bin:$PATH"
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt 
 
 FROM python:3.11-slim AS production
 WORKDIR /app
-
 COPY --from=builder /app/venv/lib/python3.*/site-packages /app/site-packages
 
-COPY --from=builder /app/gen /app/gen
+COPY --from=builder /app/protos/gen /app/protos/gen
 
 COPY --from=builder /app/ /app/
 
-ENV PYTHONPATH="/app:/app/site-packages:/app/gen/python"
+ENV PYTHONPATH="/app:/app/site-packages:/app/protos/gen"
 
 RUN useradd --create-home --shell /bin/bash --uid 1001 app \
     && chown -R app:app /app

@@ -7,7 +7,13 @@ VENV_DIR=.venv
 
 .PHONY: all install-protoc generate clean-gen generate-go generate-py clean
 
-all: install-protoc generate
+workflow: install-protoc generate
+
+user-service: install-protoc-go clean-gen generate-user-service
+
+intersection-service: install-protoc-go clean-gen generate-intersection-service
+
+api-gateway: install-protoc-go install-protoc-py clean-gen generate
 
 generate: clean-gen generate-go generate-py
 
@@ -18,7 +24,7 @@ clean-gen:
 clean: clean-gen
 	rm -rf $(VENV_DIR)
 
-generate-go: install-protoc
+generate-go: 
 	protoc -I .. \
 		--go_out=$(GEN_DIR) --go_opt=paths=source_relative \
 		--go-grpc_out=$(GEN_DIR) --go-grpc_opt=paths=source_relative \
@@ -30,14 +36,31 @@ generate-go: install-protoc
 		swiftsignals/optimisation/v1/optimisation.proto
 	cd $(GEN_DIR) && go mod init github.com/COS301-SE-2025/Swift-Signals/protos/gen && go mod tidy
 
-generate-py: install-protoc
+generate-py: 
 	. $(VENV_DIR)/bin/activate && $(PYTHON) -m grpc_tools.protoc -I .. \
 		--python_out=$(GEN_DIR) \
 		--pyi_out=$(GEN_DIR) \
 		--grpc_python_out=$(GEN_DIR) \
 		swiftsignals/common/v1/types.proto \
+		swiftsignals/common/v1/simulation.proto \
 		swiftsignals/simulation/v1/simulation.proto \
 		swiftsignals/optimisation/v1/optimisation.proto
+
+generate-user-service:  
+	protoc -I .. \
+		--go_out=$(GEN_DIR) --go_opt=paths=source_relative \
+		--go-grpc_out=$(GEN_DIR) --go-grpc_opt=paths=source_relative \
+		swiftsignals/user/v1/user.proto ; \
+	cd $(GEN_DIR) && go mod init github.com/COS301-SE-2025/Swift-Signals/protos/gen && go mod tidy
+
+generate-intersection-service:  
+	protoc -I .. \
+		--go_out=$(GEN_DIR) --go_opt=paths=source_relative \
+		--go-grpc_out=$(GEN_DIR) --go-grpc_opt=paths=source_relative \
+		swiftsignals/common/v1/types.proto \
+		swiftsignals/common/v1/simulation.proto \
+		swiftsignals/intersection/v1/intersection.proto ; \
+	cd $(GEN_DIR) && go mod init github.com/COS301-SE-2025/Swift-Signals/protos/gen && go mod tidy
 
 install-protoc:
 	@echo "Installing protoc and gRPC tools..."
@@ -54,3 +77,17 @@ endif
 	fi
 	. $(VENV_DIR)/bin/activate && pip install --upgrade pip grpcio grpcio-tools
 	@echo "protoc, Go plugins, and Python gRPC tools installed!"
+
+install-protoc-go:
+	@echo "Installing protoc and gRPC tools..."
+	apk add --no-cache protobuf protobuf-dev && \
+    rm -rf /var/cache/apk/* && \
+    go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION) && \
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION) 
+
+install-protoc-py:
+	@echo "Installing protoc and Python gRPC tools..."
+	apk add --no-cache python3 py3-pip protobuf protobuf-dev && \
+	rm -rf /var/cache/apk/* && \
+	pip install --break-system-packages --upgrade pip grpcio grpcio-tools
+	@echo "protoc and Python gRPC tools installed!"

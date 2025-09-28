@@ -1,29 +1,22 @@
-FROM golang:1.24.6-alpine
+FROM golang:1.25.1-alpine
+
+RUN apk add --no-cache \
+    protobuf \
+    protobuf-dev \
+    make \
+    git \
+    curl \
+    unzip
 
 WORKDIR /app
-COPY protos/ protos/
+COPY protos/swiftsignals/user protos/swiftsignals/user
+COPY protos/swiftsignals/makefile protos/swiftsignals/makefile
 COPY shared/ shared/
 COPY user-service/ user-service/
 
-WORKDIR /app/protos/
-RUN apk add --no-cache protobuf protobuf-dev && \
-    rm -rf /var/cache/apk/* && \
-    go install google.golang.org/protobuf/cmd/protoc-gen-go@latest && \
-    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest && \
-    mkdir -p /app/protos/gen/user/
-RUN protoc --go_out=./gen/user/ --go_opt=paths=source_relative \
-           --go-grpc_out=./gen/user/ --go-grpc_opt=paths=source_relative \
-           user.proto
-
-WORKDIR gen/
-RUN go mod init "github.com/COS301-SE-2025/Swift-Signals/protos/gen"
+WORKDIR /app/protos/swiftsignals/
+RUN make user-service
 
 WORKDIR /app/user-service/
-RUN go install github.com/vektra/mockery/v2@latest && \
-    mockery
-RUN go mod tidy && \
-    go mod download
-
-WORKDIR cmd/
-RUN go build -o main 
-CMD ["./main"]
+RUN make dockerfile
+CMD ["./bin/user-service"]

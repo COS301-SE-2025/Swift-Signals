@@ -22,8 +22,8 @@ jobs:
           
       - name: Setup and generate proto files
         working-directory: ./protos/swiftsignals
-        run: make all
+        run: make workflow
         
       - name: Run full CI suite
         working-directory: ./intersection-service
-        run: make all
+        run: make workflow

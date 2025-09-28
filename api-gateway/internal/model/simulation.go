@@ -1,5 +1,7 @@
 package model
 
+import "log/slog"
+
 type NodeType string
 
 type OptimisationResponse struct {
@@ -85,4 +87,28 @@ type Position struct {
 	X     float64 `json:"x"     example:"100.0"`
 	Y     float64 `json:"y"     example:"200.0"`
 	Speed float64 `json:"speed" example:"50.0"`
+}
+
+/* Logging */
+const maxVehiclesToLog = 5
+
+func (r SimulationResponse) LogValue() slog.Value {
+	displayVehicles := r.Output.Vehicles
+	truncated := false
+
+	if len(displayVehicles) > maxVehiclesToLog {
+		displayVehicles = displayVehicles[:maxVehiclesToLog]
+		truncated = true
+	}
+
+	// Return a structured slog group
+	return slog.GroupValue(
+		slog.Any("results", r.Results),
+		slog.Group("output",
+			slog.Any("intersection", r.Output.Intersection),
+			slog.Any("vehicles", displayVehicles),
+			slog.Bool("vehicles_truncated", truncated),
+			slog.Int("total_vehicles", len(r.Output.Vehicles)),
+		),
+	)
 }
