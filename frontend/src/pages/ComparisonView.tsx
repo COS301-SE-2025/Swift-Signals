@@ -57,12 +57,12 @@ const ComparisonView: React.FC<ComparisonViewProps> = ({
   const [hasOptimizedData, setHasOptimizedData] =
     useState<boolean>(!!optimizedData);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isLoadingOptimized, setIsLoadingOptimized] = useState<boolean>(false);
+  const [isLoadingOptimized, _setIsLoadingOptimized] = useState<boolean>(false);
   const [optimizedDataError, setOptimizedDataError] = useState<string | null>(
     null,
   );
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [optimizedDataSuccess, setOptimizedDataSuccess] = useState<
+  const [optimizedDataSuccess, _setOptimizedDataSuccess] = useState<
     string | null
   >(null);
   const [isDarkMode, setIsDarkMode] = useState(false);

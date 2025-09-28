@@ -11,7 +11,9 @@ import Navbar from "../components/Navbar";
 import "../styles/Dashboard.css";
 import { API_BASE_URL } from "../config";
 
-Chart.register(...registerables);
+if (Chart.register) {
+  Chart.register(...registerables);
+}
 
 interface Intersection {
   id: string;
@@ -61,7 +63,7 @@ const Dashboard: React.FC = () => {
   const [totalIntersections, setTotalIntersections] = useState<number>(0);
   const [loadingTotal, setLoadingTotal] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [activeSimulations, setActiveSimulations] = useState<number>(0);
+  const [_activeSimulations, _setActiveSimulations] = useState<number>(0);
   const [loadingActiveSimulations, setLoadingActiveSimulations] =
     useState(false);
   const [totalSimulationsRun, setTotalSimulationsRun] = useState<number>(0);
@@ -288,7 +290,7 @@ const Dashboard: React.FC = () => {
           }
           return null;
         })
-        .filter((intr): intr is Intersection => intr !== null);
+        .filter((intr: Intersection): intr is Intersection => intr !== null);
 
       setMapIntersections(intersectionsWithCoords);
     } catch (err: unknown) {

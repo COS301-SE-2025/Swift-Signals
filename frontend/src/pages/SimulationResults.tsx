@@ -6,10 +6,16 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
 import Navbar from "../components/Navbar";
-import { API_BASE_URL } from "../config";
+//import { API_BASE_URL } from "../config";
 import "../styles/SimulationResults.css";
 
-Chart.register(...registerables);
+if (Chart.register) {
+  Chart.register(...registerables);
+}
+
+// #region API Integration
+const API_BASE_URL = "http://localhost:9090";
+
 const getAuthToken = () => {
   return localStorage.getItem("authToken");
 };
@@ -289,6 +295,26 @@ function downsampleData<TLabel, TData>(
   return { downsampledLabels, downsampledData };
 }
 // #endregion
+
+// Helper function to extract street name from a string that might contain coordinates
+const getStreetName = (fullName: string | undefined | null): string => {
+  if (!fullName) return "Simulation Results";
+  // Remove 'Simulation Results for ' prefix
+  let cleanedName = fullName.replace(/^Simulation Results for\s*/, "");
+  // Remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
+  cleanedName = cleanedName.replace(/\s*\[[^\]]*\]$/, "");
+  return cleanedName.trim();
+};
+
+// Helper function to clean the description string
+const cleanDescription = (
+  desc: string | undefined | null,
+): string | undefined => {
+  if (!desc) return undefined;
+  // Only remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
+  const cleanedDesc = desc.replace(/\s*\[[^\]]*\]$/, "");
+  return cleanedDesc.trim();
+};
 
 const SimulationResults: React.FC = () => {
   const [simData, setSimData] = useState<SimulationOutput | null>(null);
@@ -991,28 +1017,7 @@ const SimulationResults: React.FC = () => {
     ? intersectionData.traffic_density.replace(/_/g, " ").toLowerCase()
     : "unknown";
 
-  // Helper function to extract street name from a string that might contain coordinates
-  const getStreetName = (fullName: string | undefined | null): string => {
-    if (!fullName) return "Simulation Results";
-    // Remove 'Simulation Results for ' prefix
-    let cleanedName = fullName.replace(/^Simulation Results for\s*/, "");
-    // Remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
-    cleanedName = cleanedName.replace(/\s*\[[^\]]*\]$/, "");
-    return cleanedName.trim();
-  };
-
   const displayedName = getStreetName(name || intersectionData?.name);
-
-  // Helper function to clean the description string
-  const cleanDescription = (
-    desc: string | undefined | null,
-  ): string | undefined => {
-    if (!desc) return undefined;
-    // Only remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
-    const cleanedDesc = desc.replace(/\s*\[[^\]]*\]$/, "");
-    return cleanedDesc.trim();
-  };
-
   const displayedDescription = cleanDescription(description);
 
   return (
@@ -1226,3 +1231,12 @@ const SimulationResults: React.FC = () => {
 };
 
 export default SimulationResults;
+export {
+  computeStats,
+  getAllTimes,
+  getAverageSpeedOverTime,
+  getVehicleCountOverTime,
+  getTotalDistancePerVehicle,
+  getStreetName,
+  cleanDescription,
+};
