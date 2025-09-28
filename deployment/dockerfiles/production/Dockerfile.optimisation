@@ -29,7 +29,7 @@ COPY --from=builder /app/protos/gen /app/protos/gen
 
 COPY --from=builder /app/ /app/
 
-ENV PYTHONPATH="/app:/app/site-packages:/app/gen"
+ENV PYTHONPATH="/app:/app/site-packages:/app/protos/gen"
 
 RUN useradd --create-home --shell /bin/bash --uid 1001 app \
     && chown -R app:app /app
