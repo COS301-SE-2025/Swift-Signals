@@ -2,13 +2,13 @@ import os
 import logging
 
 import grpc
-from simulation_pb2 import (
+from swiftsignals.common.v1.simulation_pb2 import SimulationParameters
+from swiftsignals.common.v1.types_pb2 import IntersectionType
+from swiftsignals.simulation.v1.simulation_pb2 import (
     SimulationRequest,
-    SimulationParameters,
-    IntersectionType,
     SimulationResultsResponse,
 )
-from simulation_pb2_grpc import SimulationServiceStub
+from swiftsignals.simulation.v1.simulation_pb2_grpc import SimulationServiceStub
 
 # Configuration
 SIMU_GRPC_ADDR = os.environ.get("SIMU_GRPC_ADDR", "localhost:50053")
