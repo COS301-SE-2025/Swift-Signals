@@ -81,6 +81,22 @@ Swift Signals is a data-driven, simulation-powered traffic light optimization pl
 
 ## Key Links
 
+### Demo 4
+
+| Document                                      | Link                                                                                                                                        |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Functional Requirements (SRS)**             | [View Document](docs/Demo4/SRSV4.pdf)                                     |
+| **Technical Installation Manual**             | [View Document](docs/Demo4/Technical-installation-manual-V4.pdf)                                         |
+| **User Manual**                               | [View Document](docs/Demo4/User-Manual.pdf)                                           |
+| **Architectural Requirements Document**       | [View Document](docs/Demo4/Architectural-Requirements.pdf)                                       |
+| **Coding Standards and Practices**            | [View Document](docs/Demo4/CodingStandardsPractices-v2.pdf)                                     |
+| **Technology Requirements**            | [View Document](docs/Demo4/Technology-Requirements.pdf)                                     |
+| **Non Functional Testing**            | [View Document](docs/Demo4/Non-functional-testing.pdf)                                     |
+| **Testing Policy**            | [View Document](docs/Demo4/Testing-Policy.pdf)                                     |
+| **User Testing**            | [View Document](docs/Demo4/User-Testing.pdf)                                     |
+| **Team Wiki**                                 | [View Wiki](https://github.com/COS301-SE-2025/Swift-Signals/wiki)                                                                           |
+| **Demo 4 Video**                              | [Watch Video](https://drive.google.com/file/d/1jwd5ZOZnacllvD1cR0Qc2rUw_mRHZ2dk/view?usp=drive_link)                                        |
+
 ### Demo 3
 
 | Document                                      | Link                                                                                                                                        |
