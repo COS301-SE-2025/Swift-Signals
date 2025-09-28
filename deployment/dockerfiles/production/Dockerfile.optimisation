@@ -13,7 +13,7 @@ RUN make clean-gen
 RUN make generate-py 
 
 WORKDIR /app
-RUN find gen -type d exec touch {}/__init__.py \; 
+RUN find protos/gen -type d -exec touch {}/__init__.py \; 
 
 COPY optimization-service/ . 
 

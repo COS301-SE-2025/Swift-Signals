@@ -19,7 +19,7 @@ RUN make clean-gen
 RUN make generate-py
 
 WORKDIR /app
-RUN find gen -type d exec touch {}/__init__.py \; 
+RUN find protos/gen -type d -exec touch {}/__init__.py \; 
 
 COPY simulation-service/ /app/
 
@@ -41,11 +41,11 @@ WORKDIR /app
 
 COPY --from=builder /app/venv/lib/python3.*/site-packages /app/site-packages
 
-COPY --from=builder /app/gen /app/gen
+COPY --from=builder /app/protos/gen /app/protos/gen
 
 COPY --from=builder /app/ /app/
 
-ENV PYTHONPATH="/app:/app/site-packages:/app/gen:$SUMO_HOME/tools"
+ENV PYTHONPATH="/app:/app/site-packages:/app/protos/gen:$SUMO_HOME/tools"
 
 RUN useradd --create-home --shell /bin/bash --uid 1001 app \
     && chown -R app:app /app
