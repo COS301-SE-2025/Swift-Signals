@@ -85,15 +85,15 @@ Swift Signals is a data-driven, simulation-powered traffic light optimization pl
 
 | Document                                      | Link                                                                                                                                        |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Functional Requirements (SRS)**             | [View Document](docs/Demo4/Swift-Signals_SRS_version_4.pdf)                                     |
-| **Technical Installation Manual**             | [View Document](docs/Demo4/Technical-installation-manual-V4.pdf)                                         |
-| **User Manual**                               | [View Document](docs/Demo4/User-Manual.pdf)                                           |
-| **Architectural Requirements Document**       | [View Document](docs/Demo4/Architectural-Requirements.pdf)                                       |
+| **Functional Requirements (SRS)**             | [View Document](docs/Demo4/Swift%20Signals_SRS_version_4.pdf)                                |
+| **Technical Installation Manual**             | [View Document](docs/Demo4/Technical%20installation%20manual%20V4.pdf)                                         |
+| **User Manual**                               | [View Document](docs/Demo4/User%20Manual.pdf)                                           |
+| **Architectural Requirements Document**       | [View Document](docs/Demo4/Architectural%20Requirements.pdf)                                       |
 | **Coding Standards and Practices**            | [View Document](docs/Demo4/CodingStandardsPractices-v2.pdf)                                     |
-| **Technology Requirements**            | [View Document](docs/Demo4/Technology-Requirements.pdf)                                     |
-| **Non Functional Testing**            | [View Document](docs/Demo4/Non-functional-testing.pdf)                                     |
-| **Testing Policy**            | [View Document](docs/Demo4/Testing-Policy.pdf)                                     |
-| **User Testing**            | [View Document](docs/Demo4/User-Testing.pdf)                                     |
+| **Technology Requirements**            | [View Document](docs/Demo4/Technology%20Requirements.pdf)                                     |
+| **Non Functional Testing**            | [View Document](docs/Demo4/Non%20functional%20testing.pdf)                                     |
+| **Testing Policy**            | [View Document](docs/Demo4/Testing%20Policy.pdf)                                     |
+| **User Testing**            | [View Document](docs/Demo4/User%20Testing.pdf)                                     |
 | **Team Wiki**                                 | [View Wiki](https://github.com/COS301-SE-2025/Swift-Signals/wiki)                                                                           |
 | **Demo 4 Video**                              | [Watch Video](https://drive.google.com/file/d/1jwd5ZOZnacllvD1cR0Qc2rUw_mRHZ2dk/view?usp=drive_link)                                        |
 
