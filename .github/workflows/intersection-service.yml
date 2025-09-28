@@ -1,0 +1,29 @@
+name: Intersection Service 
+on:
+  push:
+    branches: [main, dev, intersection-service]
+  pull_request:
+    branches: [main, dev, intersection-service]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-format-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.1'
+          cache: true
+          
+      - name: Setup and generate proto files
+        working-directory: ./protos/swiftsignals
+        run: make all
+        
+      - name: Run full CI suite
+        working-directory: ./intersection-service
+        run: make all

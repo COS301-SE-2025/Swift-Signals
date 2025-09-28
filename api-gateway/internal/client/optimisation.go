@@ -1,0 +1,69 @@
+package client
+
+import (
+	"context"
+	"time"
+
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation/v1"
+	"google.golang.org/grpc"
+)
+
+type OptimisationClient struct {
+	client optimisationpb.OptimisationServiceClient
+}
+
+func NewOptimisationClient(client optimisationpb.OptimisationServiceClient) *OptimisationClient {
+	return &OptimisationClient{
+		client: client,
+	}
+}
+
+func NewOptimisationClientFromConn(conn *grpc.ClientConn) *OptimisationClient {
+	return NewOptimisationClient(optimisationpb.NewOptimisationServiceClient(conn))
+}
+
+func (oc *OptimisationClient) RunOptimisation(
+	ctx context.Context,
+	params model.OptimisationParameters,
+) (*commonpb.OptimisationParameters, error) {
+	req := &commonpb.OptimisationParameters{
+		OptimisationType: commonpb.OptimisationType(
+			commonpb.OptimisationType_value[params.OptimisationType],
+		),
+		Parameters: &commonpb.SimulationParameters{
+			IntersectionType: commonpb.IntersectionType(
+				commonpb.IntersectionType_value[params.SimulationParameters.IntersectionType],
+			),
+			Green:  int32(params.SimulationParameters.Green),
+			Yellow: int32(params.SimulationParameters.Yellow),
+			Red:    int32(params.SimulationParameters.Red),
+			Speed:  int32(params.SimulationParameters.Speed),
+			Seed:   int32(params.SimulationParameters.Seed),
+		},
+	}
+	ctx, cancel := context.WithTimeout(
+		ctx,
+		5*time.Hour,
+	) // NOTE: This time depends on the hardware and should be adjusted accordingly
+	defer cancel()
+
+	resp, err := oc.client.RunOptimisation(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
+}
+
+// NOTE: Creates stub for testing
+type OptimisationClientInterface interface {
+	RunOptimisation(
+		ctx context.Context,
+		params model.OptimisationParameters,
+	) (*commonpb.OptimisationParameters, error)
+}
+
+// NOTE: Asserts Interface Implementation
+var _ OptimisationClientInterface = (*OptimisationClient)(nil)

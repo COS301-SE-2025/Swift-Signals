@@ -1,0 +1,189 @@
+.welcome-page {
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: url("../assets/welcomeBG.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.glass-block {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  width: 80%;
+  max-width: 900px;
+  height: 60%;
+  max-height: 500px;
+  display: flex;
+  overflow: hidden;
+}
+
+.glass-block-left,
+.glass-block-right {
+  flex: 1;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.glass-block-left {
+  color: #fff;
+}
+
+.glass-block-left img {
+  max-width: 150px;
+  margin-bottom: 20px;
+}
+
+.glass-block-left h1 {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+}
+
+.glass-block-left p {
+  font-size: 1.1em;
+  line-height: 1.5;
+}
+
+.glass-block-right {
+  background: rgba(0, 0, 0, 0.1);
+  color: #fff;
+  font-size: 1.1em;
+  line-height: 1.6;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.modern-button {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 25px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.modern-button:hover {
+  background: linear-gradient(135deg, #0056b3, #003d80);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+}
+
+.modern-button.register {
+  background: linear-gradient(135deg, #28a745, #1e7e34);
+}
+
+.modern-button.register:hover {
+  background: linear-gradient(135deg, #1e7e34, #155d2b);
+}
+
+@media (max-width: 768px) {
+  .glass-block {
+    flex-direction: column;
+    width: 90%;
+    height: auto;
+  }
+
+  .glass-block-left,
+  .glass-block-right {
+    padding: 20px;
+  }
+
+  .auth-buttons {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+@media (max-width: 1024px) {
+  /* Tablet: stack vertically but keep a balanced look */
+  .glass-block {
+    flex-direction: column;
+    height: auto;
+    max-height: none;
+    width: 90%;
+  }
+
+  .glass-block-left,
+  .glass-block-right {
+    padding: 20px;
+  }
+
+  .glass-block-left img {
+    max-width: 120px;
+  }
+
+  .glass-block-left h1 {
+    font-size: 2em;
+  }
+
+  .glass-block-right {
+    height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome-page {
+    align-items: flex-start;
+    padding-top: 50px;
+    height: 100%;
+  }
+
+  .glass-block {
+    flex-direction: column;
+    width: 95%;
+    margin-bottom: 40px;
+  }
+
+  .glass-block-left,
+  .glass-block-right {
+    padding: 15px;
+  }
+
+  .glass-block-left img {
+    max-width: 100px;
+  }
+
+  .glass-block-left h1 {
+    font-size: 1.8em;
+  }
+
+  .auth-buttons {
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .modern-button {
+    width: 100%;
+    padding: 12px 0;
+  }
+
+  .glass-block-right {
+    height: 250px;
+  }
+}

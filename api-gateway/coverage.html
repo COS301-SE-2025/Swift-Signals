@@ -1,0 +1,837 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>client: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client/intersection.go (0.0%)</option>
+				
+				<option value="file1">github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client/optimisation.go (0.0%)</option>
+				
+				<option value="file2">github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client/simulation.go (0.0%)</option>
+				
+				<option value="file3">github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/client/user.go (88.8%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package client
+
+import (
+        "context"
+        "fmt"
+        "strings"
+        "time"
+
+        "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+        "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
+        intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+        "google.golang.org/grpc"
+        "google.golang.org/protobuf/types/known/emptypb"
+)
+
+type IntersectionClient struct {
+        client intersectionpb.IntersectionServiceClient
+}
+
+func NewIntersectionClient(conn *grpc.ClientConn) *IntersectionClient <span class="cov0" title="0">{
+        return &amp;IntersectionClient{
+                client: intersectionpb.NewIntersectionServiceClient(conn),
+        }
+}</span>
+
+func NewIntersectionClientWithGrpcClient(client intersectionpb.IntersectionServiceClient) *IntersectionClient <span class="cov0" title="0">{
+        return &amp;IntersectionClient{
+                client: client,
+        }
+}</span>
+
+func (ic *IntersectionClient) CreateIntersection(
+        ctx context.Context,
+        intersection model.Intersection,
+) (*intersectionpb.IntersectionResponse, error) <span class="cov0" title="0">{
+        req := &amp;intersectionpb.CreateIntersectionRequest{
+                Name:              intersection.Name,
+                Details:           convertDetailsToProto(intersection.Details),
+                TrafficDensity:    StringToTrafficDensity(intersection.TrafficDensity),
+                DefaultParameters: convertParametersToProto(intersection.DefaultParameters),
+        }
+
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+        resp, err := ic.client.CreateIntersection(ctx, req)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov0" title="0">return resp, nil</span>
+}
+
+func (ic *IntersectionClient) GetIntersection(
+        ctx context.Context,
+        id string,
+) (*intersectionpb.IntersectionResponse, error) <span class="cov0" title="0">{
+        req := &amp;intersectionpb.IntersectionIDRequest{
+                Id: id,
+        }
+
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+        resp, err := ic.client.GetIntersection(ctx, req)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov0" title="0">return resp, nil</span>
+}
+
+func (ic *IntersectionClient) GetAllIntersections(
+        ctx context.Context,
+) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error) <span class="cov0" title="0">{
+        req := &amp;intersectionpb.GetAllIntersectionsRequest{}
+
+        return ic.client.GetAllIntersections(ctx, req)
+}</span>
+
+func (ic *IntersectionClient) UpdateIntersection(
+        ctx context.Context,
+        id, name string,
+        details model.Details,
+) (*intersectionpb.IntersectionResponse, error) <span class="cov0" title="0">{
+        req := &amp;intersectionpb.UpdateIntersectionRequest{
+                Id:      id,
+                Name:    name,
+                Details: convertDetailsToProto(details),
+        }
+
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+        resp, err := ic.client.UpdateIntersection(ctx, req)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov0" title="0">return resp, nil</span>
+}
+
+func (ic *IntersectionClient) DeleteIntersection(
+        ctx context.Context,
+        id string,
+) (*emptypb.Empty, error) <span class="cov0" title="0">{
+        req := &amp;intersectionpb.IntersectionIDRequest{
+                Id: id,
+        }
+
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+        resp, err := ic.client.DeleteIntersection(ctx, req)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov0" title="0">return resp, nil</span>
+}
+
+func (ic *IntersectionClient) PutOptimisation(
+        ctx context.Context,
+        id string,
+        parameters model.OptimisationParameters,
+) (*intersectionpb.PutOptimisationResponse, error) <span class="cov0" title="0">{
+        req := &amp;intersectionpb.PutOptimisationRequest{
+                Id:         id,
+                Parameters: convertParametersToProto(parameters),
+        }
+
+        resp, err := ic.client.PutOptimisation(ctx, req)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov0" title="0">return resp, nil</span>
+}
+
+// NOTE: Creates stub for testing
+type IntersectionClientInterface interface {
+        CreateIntersection(
+                ctx context.Context,
+                intersection model.Intersection,
+        ) (*intersectionpb.IntersectionResponse, error)
+        GetIntersection(ctx context.Context, id string) (*intersectionpb.IntersectionResponse, error)
+        GetAllIntersections(
+                ctx context.Context,
+        ) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error)
+        UpdateIntersection(
+                ctx context.Context,
+                id, name string,
+                details model.Details,
+        ) (*intersectionpb.IntersectionResponse, error)
+        DeleteIntersection(ctx context.Context, id string) (*emptypb.Empty, error)
+        PutOptimisation(
+                ctx context.Context,
+                id string,
+                parameters model.OptimisationParameters,
+        ) (*intersectionpb.PutOptimisationResponse, error)
+}
+
+// NOTE: Asserts Interface Implementation
+var _ IntersectionClientInterface = (*IntersectionClient)(nil)
+
+//////////////////////
+// Helper functions //
+//////////////////////
+
+func convertDetailsToProto(details model.Details) *intersectionpb.IntersectionDetails <span class="cov0" title="0">{
+        return &amp;intersectionpb.IntersectionDetails{
+                Address:  details.Address,
+                City:     details.City,
+                Province: details.Province,
+        }
+}</span>
+
+func convertParametersToProto(
+        parameters model.OptimisationParameters,
+) *intersectionpb.OptimisationParameters <span class="cov0" title="0">{
+        return &amp;intersectionpb.OptimisationParameters{
+                OptimisationType: StringToOptimisationType(parameters.OptimisationType),
+                Parameters: &amp;intersectionpb.SimulationParameters{
+                        IntersectionType: StringToIntersectionType(
+                                parameters.SimulationParameters.IntersectionType,
+                        ),
+                        Green:  int32(parameters.SimulationParameters.Green),
+                        Yellow: int32(parameters.SimulationParameters.Yellow),
+                        Red:    int32(parameters.SimulationParameters.Red),
+                        Speed:  int32(parameters.SimulationParameters.Speed),
+                        Seed:   int32(parameters.SimulationParameters.Seed),
+                },
+        }
+}</span>
+
+func StringToOptimisationType(s string) intersectionpb.OptimisationType <span class="cov0" title="0">{
+        switch strings.ToLower(s) </span>{
+        case "grid_search", "gridsearch":<span class="cov0" title="0">
+                return intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH</span>
+        case "genetic_evaluation", "genetic":<span class="cov0" title="0">
+                return intersectionpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION</span>
+        case "none", "":<span class="cov0" title="0">
+                return intersectionpb.OptimisationType_OPTIMISATION_TYPE_NONE</span>
+        default:<span class="cov0" title="0">
+                fmt.Printf("Warning: unknown optimisation type '%s', defaulting to GRIDSEARCH\n", s)
+                return intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH</span>
+        }
+}
+
+func StringToIntersectionType(s string) intersectionpb.IntersectionType <span class="cov0" title="0">{
+        switch strings.ToLower(strings.ReplaceAll(s, "-", "")) </span>{
+        case "trafficlight", "traffic_light":<span class="cov0" title="0">
+                return intersectionpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT</span>
+        case "tjunction", "t_junction":<span class="cov0" title="0">
+                return intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION</span>
+        case "roundabout":<span class="cov0" title="0">
+                return intersectionpb.IntersectionType_INTERSECTION_TYPE_ROUNDABOUT</span>
+        case "stopsign", "stop_sign":<span class="cov0" title="0">
+                return intersectionpb.IntersectionType_INTERSECTION_TYPE_STOP_SIGN</span>
+        case "unspecified", "":<span class="cov0" title="0">
+                return intersectionpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED</span>
+        default:<span class="cov0" title="0">
+                fmt.Printf("Warning: unknown intersection type '%s', defaulting to UNSPECIFIED\n", s)
+                return intersectionpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED</span>
+        }
+}
+
+func StringToTrafficDensity(s string) intersectionpb.TrafficDensity <span class="cov0" title="0">{
+        switch strings.ToLower(s) </span>{
+        case "high":<span class="cov0" title="0">
+                return intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH</span>
+        case "medium":<span class="cov0" title="0">
+                return intersectionpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM</span>
+        case "low":<span class="cov0" title="0">
+                return intersectionpb.TrafficDensity_TRAFFIC_DENSITY_LOW</span>
+        default:<span class="cov0" title="0">
+                fmt.Printf("Warning: unknown traffic density '%s', defaulting to MEDIUM\n", s)
+                return intersectionpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM</span>
+        }
+}
+
+func StringToIntersectionStatus(s string) intersectionpb.IntersectionStatus <span class="cov0" title="0">{
+        switch strings.ToLower(s) </span>{
+        case "unoptimised", "unoptimized":<span class="cov0" title="0">
+                return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED</span>
+        case "optimising", "optimizing":<span class="cov0" title="0">
+                return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISING</span>
+        case "optimised", "optimized":<span class="cov0" title="0">
+                return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED</span>
+        case "failed":<span class="cov0" title="0">
+                return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_FAILED</span>
+        default:<span class="cov0" title="0">
+                fmt.Printf("Warning: unknown intersection status '%s', defaulting to UNOPTIMISED\n", s)
+                return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package client
+
+import (
+        "context"
+        "time"
+
+        "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+        "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
+        optimisationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/optimisation"
+        "google.golang.org/grpc"
+)
+
+type OptimisationClient struct {
+        client optimisationpb.OptimisationServiceClient
+}
+
+func NewOptimisationClient(client optimisationpb.OptimisationServiceClient) *OptimisationClient <span class="cov0" title="0">{
+        return &amp;OptimisationClient{
+                client: client,
+        }
+}</span>
+
+func NewOptimisationClientFromConn(conn *grpc.ClientConn) *OptimisationClient <span class="cov0" title="0">{
+        return NewOptimisationClient(optimisationpb.NewOptimisationServiceClient(conn))
+}</span>
+
+func (oc *OptimisationClient) RunOptimisation(
+        ctx context.Context,
+        params model.OptimisationParameters,
+) (*optimisationpb.OptimisationParameters, error) <span class="cov0" title="0">{
+        req := &amp;optimisationpb.OptimisationParameters{
+                OptimisationType: optimisationpb.OptimisationType(
+                        optimisationpb.OptimisationType_value[params.OptimisationType],
+                ),
+                Parameters: &amp;optimisationpb.SimulationParameters{
+                        IntersectionType: optimisationpb.IntersectionType(
+                                optimisationpb.IntersectionType_value[params.SimulationParameters.IntersectionType],
+                        ),
+                        Green:  int32(params.SimulationParameters.Green),
+                        Yellow: int32(params.SimulationParameters.Yellow),
+                        Red:    int32(params.SimulationParameters.Red),
+                        Speed:  int32(params.SimulationParameters.Speed),
+                        Seed:   int32(params.SimulationParameters.Seed),
+                },
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := oc.client.RunOptimisation(ctx, req)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov0" title="0">return resp, nil</span>
+}
+
+// NOTE: Creates stub for testing
+type OptimisationClientInterface interface {
+        RunOptimisation(
+                ctx context.Context,
+                params model.OptimisationParameters,
+        ) (*optimisationpb.OptimisationParameters, error)
+}
+
+// NOTE: Asserts Interface Implementation
+var _ OptimisationClientInterface = (*OptimisationClient)(nil)
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package client
+
+import (
+        "context"
+        "errors"
+        "time"
+
+        "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
+        simulationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/simulation"
+        "google.golang.org/grpc"
+)
+
+type SimulationClient struct {
+        client simulationpb.SimulationServiceClient
+}
+
+func NewSimulationClient(conn *grpc.ClientConn) *SimulationClient <span class="cov0" title="0">{
+        return &amp;SimulationClient{
+                client: simulationpb.NewSimulationServiceClient(conn),
+        }
+}</span>
+
+func (sc *SimulationClient) GetSimulationResults(
+        ctx context.Context,
+        id string,
+        simulation_parameters model.SimulationParameters,
+) (*simulationpb.SimulationResultsResponse, error) <span class="cov0" title="0">{
+        intersection, ok := simulationpb.IntersectionType_value[simulation_parameters.IntersectionType]
+
+        if !ok </span><span class="cov0" title="0">{
+                return nil, errors.New("invalid intersection type")
+        }</span>
+
+        <span class="cov0" title="0">req := &amp;simulationpb.SimulationRequest{
+                IntersectionId: id,
+                SimulationParameters: &amp;simulationpb.SimulationParameters{
+                        IntersectionType: simulationpb.IntersectionType(intersection),
+                        Green:            int32(simulation_parameters.Green),
+                },
+        }
+
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+        return sc.client.GetSimulationResults(ctx, req)</span>
+}
+
+func (sc *SimulationClient) GetSimulationOutput(
+        ctx context.Context,
+        id string,
+        simulation_parameters model.SimulationParameters,
+) (*simulationpb.SimulationOutputResponse, error) <span class="cov0" title="0">{
+        intersection, ok := simulationpb.IntersectionType_value[simulation_parameters.IntersectionType]
+
+        if !ok </span><span class="cov0" title="0">{
+                return nil, errors.New("invalid intersection type")
+        }</span>
+
+        <span class="cov0" title="0">req := &amp;simulationpb.SimulationRequest{
+                IntersectionId: id,
+                SimulationParameters: &amp;simulationpb.SimulationParameters{
+                        IntersectionType: simulationpb.IntersectionType(intersection),
+                        Green:            int32(simulation_parameters.Green),
+                },
+        }
+
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+        return sc.client.GetSimulationOutput(ctx, req)</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package client
+
+import (
+        "context"
+        "time"
+
+        "github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
+        userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+        "google.golang.org/grpc"
+        "google.golang.org/protobuf/types/known/emptypb"
+)
+
+type UserClient struct {
+        client userpb.UserServiceClient
+}
+
+func NewUserClient(client userpb.UserServiceClient) *UserClient <span class="cov8" title="1">{
+        return &amp;UserClient{
+                client: client,
+        }
+}</span>
+
+func NewUserClientFromConn(conn *grpc.ClientConn) *UserClient <span class="cov0" title="0">{
+        return NewUserClient(userpb.NewUserServiceClient(conn))
+}</span>
+
+func (uc *UserClient) RegisterUser(
+        ctx context.Context,
+        name, email, password string,
+) (*userpb.UserResponse, error) <span class="cov8" title="1">{
+        req := &amp;userpb.RegisterUserRequest{
+                Name:     name,
+                Email:    email,
+                Password: password,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        user, err := uc.client.RegisterUser(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return user, nil</span>
+}
+
+func (uc *UserClient) LoginUser(
+        ctx context.Context,
+        email, password string,
+) (*userpb.LoginUserResponse, error) <span class="cov8" title="1">{
+        req := &amp;userpb.LoginUserRequest{
+                Email:    email,
+                Password: password,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := uc.client.LoginUser(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+func (uc *UserClient) LogoutUser(ctx context.Context, userID string) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        req := &amp;userpb.UserIDRequest{
+                UserId: userID,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := uc.client.LogoutUser(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+func (uc *UserClient) GetUserByID(
+        ctx context.Context,
+        userID string,
+) (*userpb.UserResponse, error) <span class="cov8" title="1">{
+        req := &amp;userpb.UserIDRequest{
+                UserId: userID,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := uc.client.GetUserByID(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+func (uc *UserClient) GetUserByEmail(
+        ctx context.Context,
+        email string,
+) (*userpb.UserResponse, error) <span class="cov8" title="1">{
+        req := &amp;userpb.GetUserByEmailRequest{
+                Email: email,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := uc.client.GetUserByEmail(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+func (uc *UserClient) GetAllUsers(
+        ctx context.Context,
+        page, page_size int32,
+        filter string,
+) (userpb.UserService_GetAllUsersClient, error) <span class="cov0" title="0">{
+        req := &amp;userpb.GetAllUsersRequest{
+                Page:     page,
+                PageSize: page_size,
+                Filter:   filter,
+        }
+
+        resp, err := uc.client.GetAllUsers(ctx, req)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov0" title="0">return resp, nil</span>
+}
+
+func (uc *UserClient) UpdateUser(
+        ctx context.Context,
+        user_id, name, email string,
+) (*userpb.UserResponse, error) <span class="cov8" title="1">{
+        req := &amp;userpb.UpdateUserRequest{
+                UserId: user_id,
+                Name:   name,
+                Email:  email,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := uc.client.UpdateUser(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+func (uc *UserClient) DeleteUser(ctx context.Context, userID string) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        req := &amp;userpb.UserIDRequest{
+                UserId: userID,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := uc.client.DeleteUser(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+func (uc *UserClient) GetUserIntersectionIDs(
+        ctx context.Context,
+        userID string,
+) (userpb.UserService_GetUserIntersectionIDsClient, error) <span class="cov0" title="0">{
+        req := &amp;userpb.UserIDRequest{
+                UserId: userID,
+        }
+
+        resp, err := uc.client.GetUserIntersectionIDs(ctx, req)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov0" title="0">return resp, nil</span>
+}
+
+func (uc *UserClient) AddIntersectionID(
+        ctx context.Context,
+        userID string,
+        intersection_id string,
+) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        req := &amp;userpb.AddIntersectionIDRequest{
+                UserId:         userID,
+                IntersectionId: intersection_id,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := uc.client.AddIntersectionID(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+// Remove a single intersection ID
+func (uc *UserClient) RemoveIntersectionID(
+        ctx context.Context,
+        userID string,
+        intersectionID string,
+) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        resp, err := uc.RemoveIntersectionIDs(ctx, userID, []string{intersectionID})
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+// Remove multiple intersection IDs
+func (uc *UserClient) RemoveIntersectionIDs(
+        ctx context.Context,
+        userID string,
+        intersectionIDs []string,
+) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        req := &amp;userpb.RemoveIntersectionIDRequest{
+                UserId:         userID,
+                IntersectionId: intersectionIDs,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+        resp, err := uc.client.RemoveIntersectionIDs(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+func (uc *UserClient) ChangePassword(
+        ctx context.Context,
+        user_id, current_password, new_password string,
+) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        req := &amp;userpb.ChangePasswordRequest{
+                UserId:          user_id,
+                CurrentPassword: current_password,
+                NewPassword:     new_password,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := uc.client.ChangePassword(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+func (uc *UserClient) ResetPassword(ctx context.Context, email string) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        req := &amp;userpb.ResetPasswordRequest{
+                Email: email,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := uc.client.ResetPassword(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+func (uc *UserClient) MakeAdmin(
+        ctx context.Context,
+        user_id, admin_user_id string,
+) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        req := &amp;userpb.AdminRequest{
+                UserId:      user_id,
+                AdminUserId: admin_user_id,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := uc.client.MakeAdmin(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+func (uc *UserClient) RemoveAdmin(
+        ctx context.Context,
+        user_id, admin_user_id string,
+) (*emptypb.Empty, error) <span class="cov8" title="1">{
+        req := &amp;userpb.AdminRequest{
+                UserId:      user_id,
+                AdminUserId: admin_user_id,
+        }
+        ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+        defer cancel()
+
+        resp, err := uc.client.RemoveAdmin(ctx, req)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, util.GrpcErrorToErr(err)
+        }</span>
+        <span class="cov8" title="1">return resp, nil</span>
+}
+
+// NOTE: Creates stub for testing
+type UserClientInterface interface {
+        RegisterUser(ctx context.Context, name, email, password string) (*userpb.UserResponse, error)
+        LoginUser(ctx context.Context, email, password string) (*userpb.LoginUserResponse, error)
+        LogoutUser(ctx context.Context, userID string) (*emptypb.Empty, error)
+        GetUserByID(ctx context.Context, userID string) (*userpb.UserResponse, error)
+        GetUserByEmail(ctx context.Context, email string) (*userpb.UserResponse, error)
+        GetAllUsers(
+                ctx context.Context,
+                page, page_size int32,
+                filter string,
+        ) (userpb.UserService_GetAllUsersClient, error)
+        UpdateUser(ctx context.Context, user_id, name, email string) (*userpb.UserResponse, error)
+        DeleteUser(ctx context.Context, userID string) (*emptypb.Empty, error)
+        GetUserIntersectionIDs(
+                ctx context.Context,
+                userID string,
+        ) (userpb.UserService_GetUserIntersectionIDsClient, error)
+        AddIntersectionID(
+                ctx context.Context,
+                userID string,
+                intersection_id string,
+        ) (*emptypb.Empty, error)
+        RemoveIntersectionID(
+                ctx context.Context,
+                userID string,
+                intersectionID string,
+        ) (*emptypb.Empty, error)
+        RemoveIntersectionIDs(
+                ctx context.Context,
+                userID string,
+                intersectionIDs []string,
+        ) (*emptypb.Empty, error)
+        ChangePassword(
+                ctx context.Context,
+                userID, current_password, new_password string,
+        ) (*emptypb.Empty, error)
+        ResetPassword(ctx context.Context, email string) (*emptypb.Empty, error)
+        MakeAdmin(ctx context.Context, user_id, admin_user_id string) (*emptypb.Empty, error)
+        RemoveAdmin(ctx context.Context, user_id, admin_user_id string) (*emptypb.Empty, error)
+}
+
+// NOTE: Asserts Interface Implementation
+var _ UserClientInterface = (*UserClient)(nil)
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

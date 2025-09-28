@@ -1,0 +1,36 @@
+name: React Frontend
+
+on:
+  push:
+    branches: [main, dev, frontend, feature/ChatBot, feature/frontend-api-integration]
+  pull_request:
+    branches: [main, dev, frontend, feature/ChatBot, feature/frontend-api-integration]
+
+jobs:
+  lint-format-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install dependencies
+      working-directory: frontend
+      run: npm ci
+      
+    - name: Run ESLint
+      working-directory: frontend
+      run: npx eslint "src/**/*.{js,jsx,ts,tsx}"
+    
+    - name: Check Prettier formatting
+      run: npx prettier --check "frontend/**/*.{js,jsx,ts,tsx,css,md}"
+
+
+    - name: Run Jest tests
+      working-directory: frontend
+      run: npx jest --passWithNoTests

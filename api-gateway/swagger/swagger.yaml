@@ -1,0 +1,22 @@
+basePath: /
+host: localhost:9090
+info:
+  contact:
+    email: insideinsights2025@gmail.com
+    name: Inside Insights Team
+    url: https://swagger.io/
+  description: This is the API Gateway for the Swift-Signals project, forwarding requests
+    to backend gRPC microservices.
+  termsOfService: http://example.com/terms/
+  title: Authentication API Gateway
+  version: "1.0"
+paths: {}
+schemes:
+- http
+securityDefinitions:
+  BearerAuth:
+    description: Type "Bearer" followed by a space and JWT token.
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

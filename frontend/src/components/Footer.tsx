@@ -1,20 +1,26 @@
-import './Footer.css';
-import ThemeToggle from './ThemeToggle';
+import "./Footer.css";
+import ThemeToggle from "./ThemeToggle";
+import southernCrossLogo from "../../src/assets/scs-logo.png";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="footer bg-gray-800 text-white py-6">
-      <div className="container mx-auto flex items-center">
+    <footer className="footer bg-gray-800 text-white py-3">
+      <div className="container mx-auto flex items-center justify-between px-4">
         {/* Logo Section */}
         <div className="footer-logo flex items-center">
-          <img src="/src/assets/scs-logo.png" alt="Logo" className="h-10 mr-3" />
-          <span className="text-lg font-semibold">A Southern Cross Solutions Product</span>
+          <img src={southernCrossLogo} alt="Logo" className="h-6 mr-2" />
+          <span className="footerText text-sm font-medium">
+            A Southern Cross Solutions Product
+          </span>
         </div>
-        <ThemeToggle />
-        {/* Copyright Section
-        <div className="footer-copyright text-sm">
+
+        <div className="footer-copyright text-xs opacity-75">
           © {new Date().getFullYear()} Swift Signals. All rights reserved.
-        </div> */}
+        </div>
+
+        <div className="footer-toggle">
+          <ThemeToggle />
+        </div>
       </div>
     </footer>
   );

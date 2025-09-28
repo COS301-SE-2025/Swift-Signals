@@ -1,0 +1,148 @@
+.intersectionBody .main-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background-color: #f0f0f0;
+  top: 80px;
+  left: 0;
+  position: absolute;
+  padding: 20px;
+  position: fixed;
+  overflow-y: auto;
+}
+
+.intersections {
+  overflow-y: hidden;
+  margin-bottom: 120px;
+}
+
+.intersectionBody .searchBar {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-color: #0f5ba7;
+  color: black;
+}
+
+.dark .intersectionBody .searchBar {
+  background-color: #161b22;
+  border-color: #30363d;
+  color: #fff;
+}
+
+.dark .intersectionBody .main-content {
+  background-color: #0d1117;
+}
+
+.dark .intersectionName {
+  color: #e6edf3;
+}
+
+.dark .intersectionID {
+  color: #8b949e;
+}
+
+.dark .intersectionLocation {
+  color: #8b949e;
+}
+
+.dark .intersectionLanes {
+  color: #8b949e;
+}
+
+@media screen and (max-width: 1400px) and (max-height: 800px) {
+  .intersectionBody .main-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+    top: 80px;
+    left: 0;
+    position: absolute;
+    padding: 20px;
+    position: fixed;
+    overflow-y: auto;
+  }
+
+  .intersections {
+    overflow-y: hidden;
+    margin-bottom: 120px;
+  }
+}
+
+@media screen and (min-width: 481px) and (max-width: 768px) {
+  .intersectionBody .main-content {
+    overflow-y: auto;
+    align-items: center;
+  }
+
+  .topBar {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .intersectionBody .searchContainer {
+    width: 100%;
+    max-width: none;
+  }
+
+  .addIntersectionBtn {
+    width: 100%;
+    margin-left: 0;
+    height: 44px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .intersectionBody .main-content {
+    overflow-y: auto;
+    align-items: center;
+  }
+
+  .intersectionBody .searchContainer {
+    width: 100%;
+  }
+
+  .intersectionBody .searchBar {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: red;
+    color: black;
+    width: 100%;
+    height: 44px;
+  }
+
+  .topBar {
+    display: flex;
+    flex-direction: column;
+    justify-content: unset;
+    align-items: stretch;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .addIntersectionBtn {
+    margin-left: 0;
+    width: 100%;
+    height: 44px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+}
+
+@media screen and (max-width: 1400px) and (min-width: 1025px) {
+  .create-intersection-modal {
+    max-width: 850px !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .create-intersection-modal {
+    max-height: 100vh !important;
+    margin-top: 70% !important;
+    margin-bottom: 20% !important;
+    overflow-y: hidden;
+  }
+}

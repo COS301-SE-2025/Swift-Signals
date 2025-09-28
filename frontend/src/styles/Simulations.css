@@ -2,62 +2,1076 @@ body {
   overflow: hidden;
 }
 
-.main-content {
+/* Override for mobile to enable scrolling */
+@media screen and (max-width: 480px) {
+  body {
+    overflow: visible !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    position: relative !important;
+  }
+
+  html {
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+}
+
+.sim-main-content {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
   background-color: #f0f0f0;
-  top: 80px;
+  top: 0px;
   left: 0;
   position: absolute;
-  padding: 20px;
+  padding: 0px;
   position: fixed;
+  justify-content: center;
+  align-items: center;
 }
 
-.dark .main-content {
-  background-color: #000000;
+.dark .sim-main-content {
+  background-color: #0d1117;
 }
 
-.carContainer {
-  margin-top: 0px;
-  top: 0px;
+.table-fixed-height {
+  min-height: 550px;
 }
 
-.c-card {
-  background-color: #fff;
+.simTable {
   border-radius: 25px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.viewBtn {
+  border-radius: 50px;
+  background-color: #0f5ba7;
+  color: #ffffff;
+  width: 50px;
+}
+
+.dark .viewBtn {
+  background-color: #388bfd;
+  color: #ffffff;
+}
+
+.deleteBtn {
+  border-radius: 50px;
+  background-color: #ca5252;
+  color: #ffffff;
+  width: 50px;
+}
+
+.dark .deleteBtn {
+  background-color: #da3633;
+  color: #ffffff;
+}
+
+.simGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  justify-self: center;
+  margin: 0 auto;
   width: 100%;
 }
 
-.view-results-btn {
-  border-radius: 50px;
-  background-color: #92a4fb;
-  color: black;
+/* Force grid layout for larger screens */
+@media (min-width: 768px) {
+  .simGrid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 32px !important;
+    padding: 0 32px !important;
+    margin: 0 auto !important;
+  }
 }
 
-.delete-btn {
-  border-radius: 50px;
-  background-color: #ef3e3e;
-  color: black;
+/* Ensure the grid layout works with Tailwind classes */
+.simGrid.grid {
+  display: grid !important;
+}
+
+.simGrid.grid-cols-1 {
+  grid-template-columns: 1fr !important;
+}
+
+.simGrid.lg\:grid-cols-2 {
+  grid-template-columns: 1fr 1fr !important;
+}
+
+/* Override any conflicting display properties */
+.simGrid.grid {
+  display: grid !important;
+  flex-direction: unset !important;
+}
+
+/* Ensure grid containers have proper sizing */
+.simGrid .simTableContainer {
+  width: 100%;
+  min-width: 0;
+}
+
+/* Force grid layout on larger screens */
+@media (min-width: 1024px) {
+  .simGrid.grid.lg\:grid-cols-2 {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 32px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 32px !important;
+    margin: 0 auto !important;
+  }
+}
+
+/* Mobile styles - ensure single column layout */
+@media (max-width: 1023px) {
+  .simGrid.grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 24px !important;
+    padding: 0 16px !important;
+    margin: 0 auto !important;
+  }
+}
+
+.crossBtn {
+  background-color: transparent;
+  color: #000000;
   font-weight: bold;
-}
-
-.title {
   font-size: 30px;
+  padding: 0px;
+  padding-right: 10px;
+  outline: none;
 }
 
-.bg-maroon {
-  background-color: #800000;
+.crossBtn:hover {
+  outline: none;
 }
 
-.dropdown {
-  border-radius: 50px;
-  border-color: #800000;
+.intersection-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  margin: 0.125rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  line-height: 1.25;
+  background-color: #e0e7ff;
+  color: #3730a3;
 }
 
-.run-btn {
-  border-radius: 50px;
-  background-color: #86cd8e;
+.dark .intersection-pill {
+  background-color: #388bfd;
+  color: #ffffff;
+}
+
+.intersection-pill .remove-cross {
+  margin-left: 0.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  line-height: 1;
+  color: #0f5ba7;
+  padding: 0;
+}
+
+.dark .intersection-pill .remove-cross {
+  color: #c7d2fe;
+}
+
+.intersection-pill .remove-cross:hover {
+  color: #1e40af;
+}
+
+.dark .intersection-pill .remove-cross:hover {
+  color: #e0e7ff;
+}
+
+/* Tablet and smaller laptop screens */
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+  .sim-main-content {
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 90px;
+  }
+
+  .simGrid {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-right: 0;
+    margin-left: 0;
+    max-width: 95%;
+    width: 95%;
+    justify-self: center;
+  }
+
+  .table-fixed-height {
+    min-height: 450px;
+    max-height: 550px;
+    height: auto;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .simulationTable {
+    font-size: 14px;
+  }
+
+  .simTableHead th {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .simTable tbody td {
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+
+  .simTable .h-16 {
+    height: 40px;
+    width: 60px;
+  }
+
+  .simGrid h1 {
+    font-size: 24px;
+  }
+
+  .simGrid button,
+  .simGrid select {
+    padding: 6px 12px;
+    font-size: 12px;
+    max-width: 180px;
+  }
+
+  .viewBtn,
+  .deleteBtn {
+    width: 40px;
+    font-size: 12px;
+    padding: 4px;
+  }
+
+  /* Modal adjustments */
+  .fixed.inset-0 > div {
+    max-width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  .fixed.inset-0 h2 {
+    font-size: 18px;
+  }
+
+  .fixed.inset-0 .leaflet-container {
+    height: 160px;
+  }
+}
+
+@media screen and (max-width: 1400px) and (min-width: 1025px) {
+  .sim-main-content {
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 100px;
+  }
+
+  .simGrid {
+    margin-top: 30px;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-right: 0;
+    margin-left: 0;
+    max-width: 1400px;
+    width: 90%;
+    justify-self: center;
+  }
+
+  .table-fixed-height {
+    min-height: 200px;
+    max-height: 280px;
+    height: auto;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .simulationTable {
+    font-size: 11px;
+  }
+
+  .simTableHead th {
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+
+  .simTable tbody td {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .simTable .h-16 {
+    height: 32px;
+    width: 48px;
+  }
+
+  .simTable .absolute {
+    padding: 6px;
+  }
+
+  .simTable .absolute button {
+    padding: 1px 10px;
+    font-size: 9px;
+  }
+
+  .fixed.inset-0 {
+    padding: 12px;
+  }
+
+  .fixed.inset-0 > div {
+    max-width: 360px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 12px;
+  }
+
+  .fixed.inset-0 h2 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .fixed.inset-0 label {
+    font-size: 11px;
+  }
+
+  .fixed.inset-0 input,
+  .fixed.inset-0 textarea,
+  .fixed.inset-0 select {
+    padding: 5px;
+    font-size: 11px;
+  }
+
+  .intersection-pill {
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+
+  .intersection-pill .remove-cross {
+    font-size: 9px;
+  }
+
+  .fixed.inset-0 .flex.space-x-2 button {
+    padding: 4px 6px;
+    font-size: 9px;
+  }
+
+  .fixed.inset-0 .leaflet-container {
+    height: 120px;
+  }
+
+  .fixed.inset-0 .mt-6 button {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .crossBtn {
+    font-size: 18px;
+    padding-right: 6px;
+  }
+
+  .simGrid > div > div.flex {
+    flex-direction: row;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .simGrid h1 {
+    font-size: 20px;
+  }
+
+  .simGrid button,
+  .simGrid select {
+    padding: 5px 10px;
+    font-size: 11px;
+    max-width: 160px;
+  }
+
+  .viewBtn,
+  .deleteBtn {
+    width: 36px;
+    font-size: 11px;
+    padding: 3px;
+  }
+}
+
+/* Fixed mobile styles for screens 480px and below */
+@media screen and (max-width: 480px) {
+  body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    position: relative !important;
+  }
+
+  .simulationBody {
+    overflow-y: auto !important;
+    min-height: 100vh;
+    height: auto !important;
+    position: relative !important;
+  }
+
+  .sim-main-content {
+    position: relative !important;
+    height: auto !important;
+    min-height: 100vh;
+    justify-content: flex-start;
+    align-items: center;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+    padding: 80px 10px 20px;
+  }
+
+  .simGrid {
+    margin-top: 20px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px;
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+    margin-bottom: 20px;
+    padding: 0 10px;
+  }
+
+  .simTableContainer {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  .simTableContainer.sims,
+  .simTableContainer.opts {
+    width: 100%;
+  }
+
+  .table-fixed-height {
+    height: auto;
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+    position: relative;
+    margin-bottom: 0;
+    width: 100%;
+  }
+
+  .simTable {
+    border-radius: 12px;
+    width: 100%;
+    overflow: hidden;
+    margin-bottom: 0;
+  }
+
+  .simulationTable {
+    font-size: 11px;
+    width: 100%;
+    table-layout: auto;
+  }
+
+  .simTableHead th {
+    padding: 8px 4px;
+    font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .simTable tbody td {
+    padding: 8px 4px;
+    font-size: 11px;
+    vertical-align: middle;
+  }
+
+  /* Adjust column widths for mobile */
+  .simTableHead th:nth-child(1),
+  .simTable tbody td:nth-child(1) {
+    width: 60px;
+    padding-left: 8px;
+  }
+
+  .simTableHead th:nth-child(2),
+  .simTable tbody td:nth-child(2) {
+    width: auto;
+    min-width: 100px;
+  }
+
+  .intersectionCell {
+    word-break: break-word;
+    word-wrap: break-word;
+    white-space: normal !important;
+    overflow-wrap: break-word;
+    line-height: 1.3;
+    font-size: 10px;
+  }
+
+  /* Hide chart column on mobile */
+  .chartCell,
+  .graphTHead {
+    display: none;
+  }
+
+  /* Hide Throughput and A.W.T columns on mobile */
+  .simTableHead th:nth-child(3),
+  .simTable tbody td:nth-child(3),
+  .simTableHead th:nth-child(4),
+  .simTable tbody td:nth-child(4) {
+    display: none;
+  }
+
+  /* Status column */
+  .simTableHead th:nth-child(6),
+  .simTable tbody td:nth-child(6) {
+    width: 80px;
+  }
+
+  /* Actions column */
+  .simTableHead th:nth-child(7),
+  .simTable tbody td:nth-child(7) {
+    width: 60px;
+    padding-right: 8px;
+  }
+
+  /* Shorten "Simulation ID" to "SIM ID" on mobile */
+  .simTableHead th:nth-child(1) {
+    font-size: 0;
+  }
+
+  .simTableHead th:nth-child(1):after {
+    content: "SIM ID";
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+  }
+
+  .dark .simTableHead th:nth-child(1):after {
+    color: #9ca3af;
+  }
+
+  .sim-status {
+    font-size: 10px !important;
+    padding: 3px 8px !important;
+  }
+
+  /* Fix pagination positioning */
+  .pagination {
+    position: relative !important;
+    margin-top: 10px;
+    padding: 10px !important;
+    background-color: transparent !important;
+    border-top: none !important;
+  }
+
+  .simTable .absolute button {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  /* Modal styles */
+  .fixed.inset-0 {
+    padding: 10px;
+    overflow-y: auto;
+  }
+
+  .simulation-modal-content {
+    max-width: 95vw !important;
+    max-height: 90vh;
+    padding: 16px !important;
+    overflow-y: auto;
+    border-radius: 8px;
+  }
+
+  .fixed.inset-0 h2 {
+    font-size: 18px;
+    margin-bottom: 12px;
+  }
+
+  .fixed.inset-0 label {
+    font-size: 12px;
+  }
+
+  .fixed.inset-0 input,
+  .fixed.inset-0 textarea,
+  .fixed.inset-0 select {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .intersection-pill {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+
+  .intersection-tabs button {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .fixed.inset-0 .leaflet-container {
+    height: 150px;
+    width: 100%;
+  }
+
+  .fixed.inset-0 .mt-6 button {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .crossBtn {
+    font-size: 20px;
+    padding-right: 8px;
+  }
+
+  .simGrid > div > div.flex {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    margin-bottom: 10px;
+  }
+
+  .simGrid h1 {
+    font-size: 22px;
+    text-align: left;
+    margin-bottom: 8px;
+  }
+
+  .simGrid button,
+  .simGrid select {
+    padding: 8px 12px;
+    font-size: 12px;
+    width: 100%;
+    max-width: none;
+  }
+
+  .new-simulation-button {
+    order: -1;
+  }
+
+  .viewBtn,
+  .deleteBtn {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
+    padding: 2px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 2px auto;
+  }
+}
+
+@media screen and (max-width: 430px) and (min-width: 415px) {
+  .simGrid {
+    padding: 0 8px;
+  }
+
+  .simGrid h1 {
+    font-size: 20px;
+  }
+
+  .table-fixed-height {
+    max-height: none;
+  }
+
+  .simTableHead th {
+    padding: 7px 3px;
+    font-size: 9px;
+  }
+
+  .simTable tbody td {
+    padding: 7px 3px;
+    font-size: 10px;
+  }
+
+  .intersectionCell {
+    font-size: 9px;
+  }
+}
+
+/* Specific adjustments for iPhone 14 Pro (390-414px) */
+@media screen and (max-width: 414px) and (min-width: 390px) {
+  .sim-main-content {
+    padding: 75px 8px 20px;
+  }
+
+  .simGrid {
+    padding: 0 5px;
+  }
+
+  .simGrid h1 {
+    font-size: 18px;
+  }
+
+  .simTableHead th {
+    padding: 6px 2px;
+    font-size: 9px;
+  }
+
+  .simTable tbody td {
+    padding: 6px 2px;
+    font-size: 9px;
+  }
+
+  .intersectionCell {
+    font-size: 8px;
+  }
+
+  .sim-status {
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+  }
+
+  .viewBtn,
+  .deleteBtn {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* Pixel 7 and similar Android devices (412px) */
+@media screen and (max-width: 412px) and (min-width: 390px) {
+  .simTableHead th:nth-child(1),
+  .simTable tbody td:nth-child(1) {
+    width: 55px;
+  }
+
+  .simTableHead th:nth-child(2),
+  .simTable tbody td:nth-child(2) {
+    min-width: 90px;
+  }
+}
+
+/* Ultra small screens (< 390px) */
+@media screen and (max-width: 389px) {
+  .sim-main-content {
+    padding: 70px 5px 20px;
+  }
+
+  .simGrid {
+    padding: 0 3px;
+    gap: 15px;
+  }
+
+  .simGrid h1 {
+    font-size: 16px;
+  }
+
+  .simGrid button,
+  .simGrid select {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .simTableHead th {
+    padding: 5px 2px;
+    font-size: 8px;
+  }
+
+  .simTable tbody td {
+    padding: 5px 2px;
+    font-size: 8px;
+  }
+
+  .simTableHead th:nth-child(1),
+  .simTable tbody td:nth-child(1) {
+    width: 50px;
+  }
+
+  .intersectionCell {
+    font-size: 7px;
+    min-width: 80px;
+  }
+
+  .sim-status {
+    font-size: 8px !important;
+    padding: 2px 4px !important;
+  }
+
+  .viewBtn,
+  .deleteBtn {
+    width: 20px;
+    height: 20px;
+    font-size: 8px;
+  }
+
+  .pagination button {
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+
+  /* Modal adjustments for very small screens */
+  .simulation-modal-content {
+    padding: 12px !important;
+  }
+
+  .fixed.inset-0 h2 {
+    font-size: 16px;
+  }
+
+  .intersection-tabs button {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+}
+
+@media screen and (max-width: 1024px) and (min-width: 769px) {
+  body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    position: relative !important;
+  }
+
+  html {
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+
+  .sim-main-content {
+    position: relative !important;
+    height: auto !important;
+    min-height: 100vh;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 90px 20px 40px;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+  }
+
+  .simGrid {
+    margin-top: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-right: 0;
+    margin-left: 0;
+    max-width: 95%;
+    width: 95%;
+    justify-self: center;
+  }
+
+  .table-fixed-height {
+    min-height: 600px;
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .simulationTable {
+    font-size: 14px;
+  }
+
+  .simTableHead th {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .simTable tbody td {
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+
+  .simTable .h-16 {
+    height: 40px;
+    width: 60px;
+  }
+
+  .simGrid h1 {
+    font-size: 24px;
+  }
+
+  .simGrid button,
+  .simGrid select {
+    padding: 6px 12px;
+    font-size: 12px;
+    max-width: 180px;
+  }
+
+  .viewBtn,
+  .deleteBtn {
+    width: 40px;
+    font-size: 12px;
+    padding: 4px;
+  }
+
+  .fixed.inset-0 > div {
+    max-width: 400px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 16px;
+  }
+
+  .fixed.inset-0 h2 {
+    font-size: 18px;
+  }
+
+  .fixed.inset-0 .leaflet-container {
+    height: 160px;
+  }
+}
+
+@media screen and (max-width: 1400px) and (min-width: 1025px) {
+  body {
+    overflow-y: hidden !important;
+    overflow-x: hidden !important;
+    height: auto !important;
+    position: relative !important;
+  }
+
+  html {
+    overflow-y: hidden !important;
+    height: auto !important;
+  }
+
+  .sim-main-content {
+    position: relative !important;
+    height: auto !important;
+    min-height: 100vh;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 100px 40px 40px;
+    overflow-y: visible !important;
+    overflow-x: hidden !important;
+  }
+
+  .simGrid {
+    margin-top: 0;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-right: 0;
+    margin-left: 0;
+    max-width: 90%;
+    width: 90%;
+    justify-self: center;
+  }
+
+  .table-fixed-height {
+    min-height: 450px;
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .simulationTable {
+    font-size: 11px;
+  }
+
+  .simTableHead th {
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+
+  .simTable tbody td {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .simTable .h-16 {
+    height: 32px;
+    width: 48px;
+  }
+
+  .simTable .absolute {
+    padding: 6px;
+  }
+
+  .simTable .absolute button {
+    padding: 1px 10px;
+    font-size: 9px;
+  }
+
+  .fixed.inset-0 {
+    padding: 12px;
+  }
+
+  .fixed.inset-0 > div {
+    max-width: 360px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 12px;
+  }
+
+  .fixed.inset-0 h2 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .fixed.inset-0 label {
+    font-size: 11px;
+  }
+
+  .fixed.inset-0 input,
+  .fixed.inset-0 textarea,
+  .fixed.inset-0 select {
+    padding: 5px;
+    font-size: 11px;
+  }
+
+  .intersection-pill {
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+
+  .intersection-pill .remove-cross {
+    font-size: 9px;
+  }
+
+  .fixed.inset-0 .flex.space-x-2 button {
+    padding: 4px 6px;
+    font-size: 9px;
+  }
+
+  .fixed.inset-0 .leaflet-container {
+    height: 120px;
+  }
+
+  .fixed.inset-0 .mt-6 button {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+
+  .crossBtn {
+    font-size: 18px;
+    padding-right: 6px;
+  }
+
+  .simGrid > div > div.flex {
+    flex-direction: row;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .simGrid h1 {
+    font-size: 20px;
+  }
+
+  .simGrid button,
+  .simGrid select {
+    padding: 5px 10px;
+    font-size: 11px;
+    max-width: 160px;
+  }
+
+  .viewBtn,
+  .deleteBtn {
+    width: 36px;
+    font-size: 11px;
+    padding: 3px;
+  }
 }

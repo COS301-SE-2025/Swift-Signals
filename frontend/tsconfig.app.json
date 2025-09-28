@@ -21,7 +21,8 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "types": ["node", "jest"]
   },
-  "include": ["src"]
+  "include": ["src", "tests/**/*.ts", "tests/**/*.tsx", "tests/jest.fileMock.js"]
 }

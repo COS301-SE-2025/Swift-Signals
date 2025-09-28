@@ -1,0 +1,29 @@
+# Dependency directories
+node_modules/
+# dist/
+
+# Logs and system files
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+pnpm-debug.log
+.DS_Store
+Thumbs.db
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.swp
+
+# Test and local config files (optional, if present)
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+.env
+.env.*
+
+# Cache
+.cache/
+.tmp/
+
