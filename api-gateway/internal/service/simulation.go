@@ -63,7 +63,7 @@ func (s *SimulationService) GetSimulationData(
 		)
 	}
 
-	logger.Debug("intersection service to get simulation parameters")
+	logger.Debug("calling intersection service to get simulation parameters")
 	intersection, err := s.intrClient.GetIntersection(ctx, intersectionID)
 	if err != nil {
 		return model.SimulationResponse{}, err
@@ -119,7 +119,7 @@ func (s *SimulationService) GetOptimisedData(
 		)
 	}
 
-	logger.Debug("intersection service to get simulation parameters")
+	logger.Debug("calling intersection service to get simulation parameters")
 	intersection, err := s.intrClient.GetIntersection(ctx, intersectionID)
 	if err != nil {
 		return model.SimulationResponse{}, err
@@ -132,16 +132,16 @@ func (s *SimulationService) GetOptimisedData(
 		)
 	}
 
-	defaultParams := util.RPCSimParamToSimParam(intersection.BestParameters.Parameters)
+	bestParams := util.RPCSimParamToSimParam(intersection.BestParameters.Parameters)
 
 	logger.Debug("calling simulation service to get simulation results")
-	simulationResults, err := s.simClient.GetSimulationResults(ctx, intersection.Id, defaultParams)
+	simulationResults, err := s.simClient.GetSimulationResults(ctx, intersection.Id, bestParams)
 	if err != nil {
 		return model.SimulationResponse{}, err
 	}
 
 	logger.Debug("calling simulation service to get simulation output")
-	simulationOutput, err := s.simClient.GetSimulationOutput(ctx, intersection.Id, defaultParams)
+	simulationOutput, err := s.simClient.GetSimulationOutput(ctx, intersection.Id, bestParams)
 	if err != nil {
 		return model.SimulationResponse{}, err
 	}

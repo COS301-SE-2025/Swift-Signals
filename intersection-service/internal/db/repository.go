@@ -243,12 +243,12 @@ func (r *MongoIntersectionRepo) UpdateBestParams(
 	filter := bson.M{"id": id}
 	update := bson.M{
 		"$set": bson.M{
-			"best_parameters": params,
-			"last_run_at":     time.Now(),
-			"status":          model.Optimised,
+			"bestparameters": params,
+			"lastrunat":      time.Now(),
+			"status":         model.Optimised,
 		},
 		"$inc": bson.M{
-			"run_count": 1,
+			"runcount": 1,
 		},
 	}
 

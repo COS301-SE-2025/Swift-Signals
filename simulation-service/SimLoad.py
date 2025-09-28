@@ -62,18 +62,18 @@ def loadParams(param_dict=None):
     sim_params = data["intersection"]["simulation_parameters"]
     raw_density = data["intersection"].get("traffic density", 1)
     traffic_density = TRAFFIC_DENSITY.get(raw_density, "medium")
-    raw_type = sim_params.get("intersection_type", 0)
+    raw_type = sim_params.get("intersection_type", 1)
 
     try:
         raw_type = int(raw_type)
     except (ValueError, TypeError):
         raw_type = 0
 
-    intersection_type_str = INTERSECTION_TYPES.get(raw_type, "unspecified")
+    intersection_type_str = INTERSECTION_TYPES.get(raw_type, "trafficlight")
 
     mapped = {
         "traffic_density": traffic_density,
-        "intersection_type": intersection_type_str,
+        "intersection_type": "trafficlight",  # intersection_type_str,
         "speed": sim_params.get("Speed", 40),
         "seed": sim_params.get("Seed", 42),
     }
