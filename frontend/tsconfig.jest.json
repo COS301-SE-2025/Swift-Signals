@@ -2,11 +2,12 @@
   "extends": "./tsconfig.app.json",
   "compilerOptions": {
     "verbatimModuleSyntax": false,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx",
-    "types": ["jest", "@testing-library/jest-dom"],
-    "types": ["node"]
+    "types": ["jest", "@testing-library/jest-dom", "node"]
   },
   "include": ["tests", "src"]
 }

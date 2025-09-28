@@ -2,8 +2,11 @@ export default {
   preset: 'ts-jest/presets/js-with-ts',
   testEnvironment: 'jsdom',
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.jest.json', useESM: true }],
-    '^.+\\.(js|jsx)$': 'babel-jest',
+    '^.+\\.(ts|tsx)$': [
+      'ts-jest',
+      { tsconfig: '<rootDir>/tsconfig.jest.json', useESM: true }
+    ],
+    '^.+\\.(js|jsx)$': 'babel-jest'
   },
   transformIgnorePatterns: [
     '/node_modules/(?!react-leaflet|@react-leaflet/.*)/',

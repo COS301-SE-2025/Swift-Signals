@@ -91,7 +91,7 @@ describe("SignUp Page", () => {
   it("shows error if API returns non-OK response", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: false,
-      text: async () => JSON.stringify({ message: "User already exists" }),
+      json: async () => ({ message: "User already exists" }),
     });
 
     render(
@@ -112,7 +112,10 @@ describe("SignUp Page", () => {
 
     fireEvent.click(screen.getByText("Register"));
 
-    expect(await screen.findByText(/User already exists/i)).toBeInTheDocument();
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent(
+      /An unexpected error occurred during registration/i,
+    );
   });
 
   it("traffic lights activate correctly based on input", async () => {

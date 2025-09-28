@@ -1,7 +1,12 @@
 // jest.setup.ts
 import "@testing-library/jest-dom";
 
-// jest.setup.ts
+jest.mock("/src/config", () => ({
+  API_BASE_URL: "http://localhost:3000",
+  CHATBOT_BASE_URL: "http://localhost:3000/chatbot",
+}));
+
+// Polyfills for TextEncoder/TextDecoder
 class PolyTextEncoder {
   encode(input: string) {
     const result = new Uint8Array(input.length);
@@ -27,10 +32,20 @@ global.TextEncoder = PolyTextEncoder;
 // @ts-ignore
 global.TextDecoder = PolyTextDecoder;
 
-// Save original console.error
-const originalConsoleError = console.error;
+// Mock import.meta.env for Jest
+Object.defineProperty(globalThis, "import", {
+  value: {
+    meta: {
+      env: {
+        VITE_API_BASE_URL: "http://localhost:3000",
+        VITE_CHATBOT_BASE_URL: "http://localhost:3000/chatbot",
+      },
+    },
+  },
+});
 
-// Suppress specific React warning
+// Suppress specific React warnings
+const originalConsoleError = console.error;
 beforeAll(() => {
   console.error = (...args: unknown[]) => {
     if (
