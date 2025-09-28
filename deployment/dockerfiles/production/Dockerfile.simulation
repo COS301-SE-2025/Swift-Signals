@@ -15,6 +15,7 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 COPY protos/ protos/
 
 WORKDIR /app/protos/swiftsignals
+RUN make clean-gen 
 RUN make generate-py
 
 WORKDIR /app

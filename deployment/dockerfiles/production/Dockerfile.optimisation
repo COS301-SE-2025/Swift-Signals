@@ -1,7 +1,7 @@
 FROM python:3.11 AS builder
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y make && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y make && rm -rf /var/lib/apt/lists/* 
 
 COPY optimization-service/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt 
@@ -9,6 +9,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY protos/ protos/ 
 
 WORKDIR /app/protos/swiftsignals/
+RUN make clean-gen
 RUN make generate-py 
 
 WORKDIR /app
