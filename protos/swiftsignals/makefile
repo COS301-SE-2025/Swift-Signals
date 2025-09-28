@@ -36,6 +36,7 @@ generate-py: install-protoc
 		--pyi_out=$(GEN_DIR) \
 		--grpc_python_out=$(GEN_DIR) \
 		swiftsignals/common/v1/types.proto \
+		swiftsignals/common/v1/simulation.proto \
 		swiftsignals/simulation/v1/simulation.proto \
 		swiftsignals/optimisation/v1/optimisation.proto
 
