@@ -15,7 +15,7 @@
 [![API Gateway](https://img.shields.io/github/actions/workflow/status/COS301-SE-2025/Swift-Signals/api-gateway.yml?branch=dev&style=for-the-badge&label=API%20Gateway&logo=github&logoColor=white)](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/apiGateway.yml)
 [![React Frontend](https://img.shields.io/github/actions/workflow/status/COS301-SE-2025/Swift-Signals/react.yml?branch=dev&style=for-the-badge&label=React%20Frontend&logo=react&logoColor=white)](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/react.yml)
 [![Simulation Service](https://img.shields.io/github/actions/workflow/status/COS301-SE-2025/Swift-Signals/simulation-service-test.yml?branch=dev&style=for-the-badge&label=Simulation%20Service&logo=aws&logoColor=white)](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/intersection-service.yml)
-[![Unified Testing](https://img.shields.io/github/actions/workflow/status/COS301-SE-2025/Swift-Signals/test.yml?branch=dev&style=for-the-badge&label=Unified%20Testing&logo=jest&logoColor=white)](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/main.yml)
+[![Unified Testing](https://img.shields.io/github/actions/workflow/status/COS301-SE-2025/Swift-Signals/main.yml?branch=dev&style=for-the-badge&label=Unified%20Testing&logo=jest&logoColor=white)](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/main.yml)
 [![Live Website](https://img.shields.io/badge/🚀_Live_Site-swiftsignals.seebranhome.co.za-28A745?style=for-the-badge&logo=vercel&logoColor=white)](https://swiftsignals.seebranhome.co.za/)
 
 </div>
