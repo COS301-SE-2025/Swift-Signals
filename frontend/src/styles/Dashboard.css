@@ -18,7 +18,7 @@ canvas {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background-color: #F0F0F0;
+  background-color: #f0f0f0;
   top: 80px;
   left: 0;
   position: absolute;
@@ -77,44 +77,44 @@ canvas {
 }
 
 .dark .card {
-  background-color: #2A2A2A;
-  color: #F9FAFB;
+  background-color: #2a2a2a;
+  color: #f9fafb;
 }
 
 .card-icon-1 {
   font-size: 2.5em;
-  color: #3700FF;
+  color: #3700ff;
   position: absolute;
   top: 20px;
   right: 50px;
   text-align: right;
   padding: 10px;
   border-radius: 10px;
-  background-color: #D0D3FF;
+  background-color: #d0d3ff;
 }
 
 .card-icon-2 {
   font-size: 2.5em;
-  color: #008B25;
+  color: #008b25;
   position: absolute;
   top: 20px;
   right: 50px;
   text-align: right;
   padding: 10px;
   border-radius: 10px;
-  background-color: #87FF95;
+  background-color: #87ff95;
 }
 
 .card-icon-3 {
   font-size: 2.5em;
-  color: #8600B3;
+  color: #8600b3;
   position: absolute;
   top: 20px;
   right: 50px;
   text-align: right;
   padding: 10px;
   border-radius: 10px;
-  background-color: #ED96FF;
+  background-color: #ed96ff;
 }
 
 .card-h3 {
@@ -129,7 +129,7 @@ canvas {
 }
 
 .dark .card-h3 {
-  color: #DADADA;
+  color: #dadada;
 }
 
 .card-p {
@@ -144,7 +144,7 @@ canvas {
 }
 
 .dark .card-p {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .quick-actions {
@@ -185,8 +185,8 @@ canvas {
 }
 
 .dark .recent-simulations-tab {
-  background-color: #2A2A2A;
-  color: #F9FAFB;
+  background-color: #2a2a2a;
+  color: #f9fafb;
 }
 
 .recent-simulations-tab h2 {
@@ -199,7 +199,7 @@ canvas {
 }
 
 .dark .recent-simulations-tab h2 {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .recent-simulations-tab table {
@@ -217,8 +217,8 @@ canvas {
 }
 
 .dark .recent-simulations-tab thead tr th {
-  background-color: #2A2A2A;
-  color: #DADADA;
+  background-color: #2a2a2a;
+  color: #dadada;
 }
 
 .recent-simulations-tab tbody tr td {
@@ -229,7 +229,7 @@ canvas {
 }
 
 .dark .recent-simulations-tab tbody tr td {
-  background-color: #2A2A2A;
+  background-color: #2a2a2a;
   color: #fff;
 }
 
@@ -246,8 +246,8 @@ canvas {
 }
 
 .dark .view-details-button {
-  background-color: #2A2A2A;
-  color: #5287FA;
+  background-color: #2a2a2a;
+  color: #5287fa;
 }
 
 .view-details-button:hover {
@@ -255,7 +255,7 @@ canvas {
 }
 
 .dark .view-details-button:hover {
-  border-color: #2A2A2A;
+  border-color: #2a2a2a;
 }
 
 .stats {
@@ -275,7 +275,7 @@ canvas {
 }
 
 .dark .stats {
-  background-color: #2A2A2A;
+  background-color: #2a2a2a;
 }
 
 .stats h2 {
@@ -288,7 +288,7 @@ canvas {
 }
 
 .dark .stats h2 {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .stats .traffic-graph {
@@ -301,7 +301,7 @@ canvas {
 }
 
 .dark .stats .traffic-graph {
-  background-color: #2A2A2A;
+  background-color: #2a2a2a;
 }
 
 .top-intersections {
@@ -319,7 +319,7 @@ canvas {
 }
 
 .dark .top-intersections h3 {
-  color: #FFFFFF;
+  color: #ffffff;
 }
 
 .top-intersections span {
@@ -327,7 +327,7 @@ canvas {
 }
 
 .top-intersections .total span {
-  font-size: 1.0em;
+  font-size: 1em;
 }
 
 @media screen and (max-width: 1700px) {
@@ -339,7 +339,7 @@ canvas {
     right: 0;
     margin-right: 60px;
   }
-  
+
   .recent-simulations-tab {
     width: 110%;
     max-width: 1000px;
@@ -374,4 +374,3 @@ canvas {
     margin-bottom: 110px;
   }
 }
-

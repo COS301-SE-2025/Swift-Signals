@@ -36,7 +36,7 @@
 }
 
 .dark .logo {
-  color: #DADADA;
+  color: #dadada;
 }
 
 .navbar-center .nav-links {
@@ -54,7 +54,7 @@
 }
 
 .dark .navbar-center .nav-links li a {
-  color: #DADADA;
+  color: #dadada;
 }
 
 .navbar-center .nav-links li a:hover {
@@ -62,7 +62,7 @@
 }
 
 .dark .navbar-center .nav-links li a:hover {
-  color: #4B6FFF;
+  color: #4b6fff;
 }
 
 .navbar-right {
@@ -80,7 +80,7 @@
 }
 
 .dark .user-profile {
-  color: #DADADA;
+  color: #dadada;
 }
 
 .user-image {
@@ -99,5 +99,5 @@
 }
 
 .dark .logout-icon {
-  color: #DADADA;
+  color: #dadada;
 }

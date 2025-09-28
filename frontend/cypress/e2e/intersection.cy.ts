@@ -14,7 +14,11 @@ describe("Intersections Page", () => {
             id: "123",
             name: "Test Intersection",
             traffic_density: "medium",
-            details: { address: "Main Rd", city: "Pretoria", province: "Gauteng" },
+            details: {
+              address: "Main Rd",
+              city: "Pretoria",
+              province: "Gauteng",
+            },
             default_parameters: {
               optimisation_type: "default",
               simulation_parameters: {
@@ -43,7 +47,9 @@ describe("Intersections Page", () => {
     cy.contains("Create New Intersection").click();
 
     cy.get("input[name='name']").type("New Intersection");
-    cy.get("input[name='details.address']").type("Corner of Lynnwood & Atterbury");
+    cy.get("input[name='details.address']").type(
+      "Corner of Lynnwood & Atterbury",
+    );
     cy.get("input[name='details.city']").clear().type("Pretoria");
     cy.get("input[name='details.province']").clear().type("Gauteng");
 
@@ -59,9 +65,11 @@ describe("Intersections Page", () => {
   });
 
   it("should edit an intersection", () => {
-    cy.contains("Test Intersection").parent().within(() => {
-      cy.contains("Edit").click();
-    });
+    cy.contains("Test Intersection")
+      .parent()
+      .within(() => {
+        cy.contains("Edit").click();
+      });
 
     cy.get("input[name='name']").clear().type("Updated Intersection");
 
@@ -77,9 +85,11 @@ describe("Intersections Page", () => {
   });
 
   it("should delete an intersection", () => {
-    cy.contains("Test Intersection").parent().within(() => {
-      cy.contains("Delete").click();
-    });
+    cy.contains("Test Intersection")
+      .parent()
+      .within(() => {
+        cy.contains("Delete").click();
+      });
 
     cy.contains("Delete Intersection").click();
 
@@ -98,7 +108,11 @@ describe("Intersections Page", () => {
         id: "123",
         name: "Search Result",
         traffic_density: "low",
-        details: { address: "Search Rd", city: "Pretoria", province: "Gauteng" },
+        details: {
+          address: "Search Rd",
+          city: "Pretoria",
+          province: "Gauteng",
+        },
         default_parameters: {
           optimisation_type: "default",
           simulation_parameters: {

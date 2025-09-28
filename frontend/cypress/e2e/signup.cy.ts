@@ -33,7 +33,9 @@ describe("SignUp Page", () => {
     cy.contains("Register").click();
 
     cy.wait("@register");
-    cy.contains("Registration successful! Redirecting to login...").should("exist");
+    cy.contains("Registration successful! Redirecting to login...").should(
+      "exist",
+    );
 
     // Wait for redirect
     cy.url({ timeout: 5000 }).should("include", "/login");

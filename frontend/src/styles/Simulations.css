@@ -7,7 +7,7 @@ body {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  background-color: #F0F0F0;
+  background-color: #f0f0f0;
   top: 80px;
   left: 0;
   position: absolute;
@@ -20,26 +20,26 @@ body {
 }
 
 .carContainer {
-    margin-top: 0px;
-    top: 0px;
+  margin-top: 0px;
+  top: 0px;
 }
 
 .c-card {
-    background-color: #fff;
-    border-radius: 25px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    width: 100%;
+  background-color: #fff;
+  border-radius: 25px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 .view-results-btn {
   border-radius: 50px;
-  background-color: #92A4FB;
+  background-color: #92a4fb;
   color: black;
 }
 
 .delete-btn {
   border-radius: 50px;
-  background-color: #EF3E3E;
+  background-color: #ef3e3e;
   color: black;
   font-weight: bold;
 }
@@ -59,5 +59,5 @@ body {
 
 .run-btn {
   border-radius: 50px;
-  background-color: #86CD8E;
+  background-color: #86cd8e;
 }

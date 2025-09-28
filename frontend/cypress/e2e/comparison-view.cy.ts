@@ -8,13 +8,21 @@ describe("ComparisonView Page", () => {
   });
 
   it("renders both panels with labels", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/simulate`, {
-      fixture: "simulation.json",
-    }).as("getSim");
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/simulate`,
+      {
+        fixture: "simulation.json",
+      },
+    ).as("getSim");
 
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/optimise`, {
-      fixture: "optimized.json",
-    }).as("getOpt");
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/optimise`,
+      {
+        fixture: "optimized.json",
+      },
+    ).as("getOpt");
 
     cy.visit(`/comparison/${ORIGINAL_ID}`);
 
@@ -49,10 +57,14 @@ describe("ComparisonView Page", () => {
   });
 
   it("shows loading state while checking optimized data", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/optimise`, {
-      delay: 1000,
-      fixture: "optimized.json",
-    }).as("getOpt");
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/optimise`,
+      {
+        delay: 1000,
+        fixture: "optimized.json",
+      },
+    ).as("getOpt");
 
     cy.visit(`/comparison/${ORIGINAL_ID}`);
 
@@ -61,9 +73,13 @@ describe("ComparisonView Page", () => {
   });
 
   it("shows 'No Optimization Available' when no optimized data", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/optimise`, {
-      body: { output: { vehicles: [] } },
-    }).as("getOpt");
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/optimise`,
+      {
+        body: { output: { vehicles: [] } },
+      },
+    ).as("getOpt");
 
     cy.visit(`/comparison/${ORIGINAL_ID}`);
 
@@ -74,9 +90,13 @@ describe("ComparisonView Page", () => {
   });
 
   it("renders optimized simulation when data exists", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/optimise`, {
-      fixture: "optimized.json",
-    }).as("getOpt");
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/optimise`,
+      {
+        fixture: "optimized.json",
+      },
+    ).as("getOpt");
 
     cy.visit(`/comparison/${ORIGINAL_ID}`);
     cy.wait("@getOpt");
@@ -87,9 +107,13 @@ describe("ComparisonView Page", () => {
   });
 
   it("displays error if optimization check fails", () => {
-    cy.intercept("GET", `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/optimise`, {
-      statusCode: 500,
-    }).as("getOpt");
+    cy.intercept(
+      "GET",
+      `https://swiftsignals.seebranhome.co.za/intersections/${ORIGINAL_ID}/optimise`,
+      {
+        statusCode: 500,
+      },
+    ).as("getOpt");
 
     cy.visit(`/comparison/${ORIGINAL_ID}`);
     cy.wait("@getOpt");
@@ -98,4 +122,3 @@ describe("ComparisonView Page", () => {
     cy.contains("Error").should("be.visible");
   });
 });
-
