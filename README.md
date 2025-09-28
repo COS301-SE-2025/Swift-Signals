@@ -129,7 +129,7 @@ Swift Signals is a data-driven, simulation-powered traffic light optimization pl
 ## Team Member Biographies
 
 ### Joshua Garner
-**Frontend Lead Developer | UI/UX Specialist**
+**Frontend Lead Developer | UI/UX Specialist | Frontend Integration**
 
 Joshua Garner is a final-year Information and Knowledge Systems student at the University of Pretoria, specializing in the Data Science stream. He is a hands-on developer who combines a love for clean code and smart design with a passion for turning ideas into functional, well-crafted software.
 
