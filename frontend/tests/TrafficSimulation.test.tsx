@@ -2,11 +2,13 @@ import React from "react";
 import { render, screen, act, fireEvent } from "@testing-library/react";
 import TrafficSimulation from "../src/pages/TrafficSimulation";
 
-console.log(React)
+console.log(React);
 
 jest.mock("@react-three/fiber", () => ({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Canvas: ({ children }: any) => <div data-testid="mock-canvas">{children}</div>,
+  Canvas: ({ children }: any) => (
+    <div data-testid="mock-canvas">{children}</div>
+  ),
   useFrame: jest.fn(),
 }));
 jest.mock("@react-three/drei", () => ({
@@ -51,9 +53,7 @@ describe("TrafficSimulation Page", () => {
       render(<TrafficSimulation intersectionId="1" isExpanded={true} />);
     });
 
-    expect(
-      screen.getByText(/Loading simulation data/i)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Loading simulation data/i)).toBeInTheDocument();
   });
 
   it("shows error if no intersectionId is provided", async () => {
@@ -144,9 +144,7 @@ describe("TrafficSimulation Page", () => {
       render(<TrafficSimulation intersectionId="123" isExpanded={true} />);
     });
 
-    expect(
-      screen.getByText(/Simulation data not found/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Simulation data not found/i)).toBeInTheDocument();
 
     const retryBtn = screen.getByText(/Retry/i);
     expect(retryBtn).toBeInTheDocument();

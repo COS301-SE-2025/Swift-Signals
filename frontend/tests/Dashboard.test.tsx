@@ -3,12 +3,12 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { MemoryRouter } from "react-router-dom";
 
-console.log(React)
+console.log(React);
 
 beforeAll(() => {
   Object.defineProperty(window, "matchMedia", {
     writable: true,
-    value: jest.fn().mockImplementation(query => ({
+    value: jest.fn().mockImplementation((query) => ({
       matches: false,
       media: query,
       onchange: null,
@@ -34,9 +34,7 @@ jest.mock("../src/components/MapModal", () => ({
   __esModule: true,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default: ({ isOpen }: any) => (
-    <div data-testid="map-modal">
-      {isOpen && <span>Map Modal Open</span>}
-    </div>
+    <div data-testid="map-modal">{isOpen && <span>Map Modal Open</span>}</div>
   ),
 }));
 
@@ -79,7 +77,7 @@ describe("Dashboard Component", () => {
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ intersections: mockIntersections }),
-      })
+      }),
     );
     localStorage.setItem("authToken", "fake-token");
   });
@@ -92,7 +90,7 @@ describe("Dashboard Component", () => {
     render(
       <MemoryRouter>
         <Dashboard />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -107,36 +105,36 @@ describe("Dashboard Component", () => {
   });
 
   test("renders recent intersections list and allows viewing details", async () => {
-  render(
-    <MemoryRouter>
-      <Dashboard />
-    </MemoryRouter>
-  );
+    render(
+      <MemoryRouter>
+        <Dashboard />
+      </MemoryRouter>,
+    );
 
-  await waitFor(() => {
-    expect(screen.getByText("Intersection 2")).toBeInTheDocument();
-    expect(screen.getByText("Intersection 1")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Intersection 2")).toBeInTheDocument();
+      expect(screen.getByText("Intersection 1")).toBeInTheDocument();
+    });
+
+    const viewDetailButtons = screen.getAllByText("View Details");
+    fireEvent.click(viewDetailButtons[0]);
+
+    expect(mockNavigate).toHaveBeenCalledWith("/simulation-results", {
+      state: expect.objectContaining({
+        intersections: ["Intersection 2"],
+        intersectionIds: ["2"],
+        description: expect.any(String),
+        name: expect.any(String),
+        type: "simulations",
+      }),
+    });
   });
-
-  const viewDetailButtons = screen.getAllByText("View Details");
-  fireEvent.click(viewDetailButtons[0]);
-
-  expect(mockNavigate).toHaveBeenCalledWith("/simulation-results", {
-    state: expect.objectContaining({
-      intersections: ["Intersection 2"],
-      intersectionIds: ["2"],
-      description: expect.any(String),
-      name: expect.any(String),
-      type: "simulations",
-    }),
-  });
-});
 
   test("opens new intersection, run simulation, and map modals", async () => {
     render(
       <MemoryRouter>
         <Dashboard />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const newIntersectionBtn = screen.getByTitle(/Go to Intersections page/i);
@@ -157,13 +155,13 @@ describe("Dashboard Component", () => {
 
   test("handles fetch failure gracefully", async () => {
     (global.fetch as jest.Mock).mockImplementationOnce(() =>
-      Promise.resolve({ ok: false })
+      Promise.resolve({ ok: false }),
     );
 
     render(
       <MemoryRouter>
         <Dashboard />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await waitFor(() => {

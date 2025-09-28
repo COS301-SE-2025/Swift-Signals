@@ -1,10 +1,10 @@
 import React from "react";
-import { render, screen} from "@testing-library/react";
-import '@testing-library/jest-dom';
+import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { BrowserRouter } from "react-router-dom";
 import Dashboard from "../src/pages/Dashboard";
 
-console.log(React)
+console.log(React);
 
 const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
@@ -52,7 +52,7 @@ describe("Dashboard", () => {
     render(
       <BrowserRouter>
         <Dashboard />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
     expect(screen.getByText("Navbar")).toBeInTheDocument();

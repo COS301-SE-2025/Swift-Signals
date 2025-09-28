@@ -1,12 +1,16 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import MapModal from "../src/components/MapModal";
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 
 jest.mock("react-leaflet", () => ({
-  MapContainer: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  MapContainer: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   TileLayer: () => <div data-testid="tilelayer" />,
-  Marker: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  Marker: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
   Popup: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
@@ -54,7 +58,7 @@ describe("MapModal Component", () => {
         onClose={mockOnClose}
         intersections={intersections}
         onSimulate={mockOnSimulate}
-      />
+      />,
     );
     expect(container.firstChild).toBeNull();
   });
@@ -66,7 +70,7 @@ describe("MapModal Component", () => {
         onClose={mockOnClose}
         intersections={intersections}
         onSimulate={mockOnSimulate}
-      />
+      />,
     );
 
     expect(screen.getByText("Intersections Map")).toBeInTheDocument();
@@ -76,21 +80,20 @@ describe("MapModal Component", () => {
   });
 
   it("renders all intersections with simulate buttons", () => {
-  render(
-    <MapModal
-      isOpen={true}
-      onClose={mockOnClose}
-      intersections={intersections}
-      onSimulate={mockOnSimulate}
-    />
-  );
+    render(
+      <MapModal
+        isOpen={true}
+        onClose={mockOnClose}
+        intersections={intersections}
+        onSimulate={mockOnSimulate}
+      />,
+    );
 
-  intersections.forEach((i, index) => {
-    expect(screen.getByText(i.name)).toBeInTheDocument();
-    const buttons = screen.getAllByText("Simulate", { selector: "button" });
-    fireEvent.click(buttons[index]);
-    expect(mockOnSimulate).toHaveBeenCalledWith(i.id, i.name);
+    intersections.forEach((i, index) => {
+      expect(screen.getByText(i.name)).toBeInTheDocument();
+      const buttons = screen.getAllByText("Simulate", { selector: "button" });
+      fireEvent.click(buttons[index]);
+      expect(mockOnSimulate).toHaveBeenCalledWith(i.id, i.name);
+    });
   });
-});
-
 });

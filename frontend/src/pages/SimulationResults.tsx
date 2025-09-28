@@ -297,25 +297,24 @@ function downsampleData<TLabel, TData>(
 // #endregion
 
 // Helper function to extract street name from a string that might contain coordinates
-  const getStreetName = (fullName: string | undefined | null): string => {
-    if (!fullName) return "Simulation Results";
-    // Remove 'Simulation Results for ' prefix
-    let cleanedName = fullName.replace(/^Simulation Results for\s*/, "");
-    // Remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
-    cleanedName = cleanedName.replace(/\s*\[[^\]]*\]$/, "");
-    return cleanedName.trim();
-  };
-  
-  // Helper function to clean the description string
-  const cleanDescription = (
-    desc: string | undefined | null,
-  ): string | undefined => {
-    if (!desc) return undefined;
-    // Only remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
-    const cleanedDesc = desc.replace(/\s*\[[^\]]*\]$/, "");
-    return cleanedDesc.trim();
-  };
+const getStreetName = (fullName: string | undefined | null): string => {
+  if (!fullName) return "Simulation Results";
+  // Remove 'Simulation Results for ' prefix
+  let cleanedName = fullName.replace(/^Simulation Results for\s*/, "");
+  // Remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
+  cleanedName = cleanedName.replace(/\s*\[[^\]]*\]$/, "");
+  return cleanedName.trim();
+};
 
+// Helper function to clean the description string
+const cleanDescription = (
+  desc: string | undefined | null,
+): string | undefined => {
+  if (!desc) return undefined;
+  // Only remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
+  const cleanedDesc = desc.replace(/\s*\[[^\]]*\]$/, "");
+  return cleanedDesc.trim();
+};
 
 const SimulationResults: React.FC = () => {
   const [simData, setSimData] = useState<SimulationOutput | null>(null);
@@ -1232,4 +1231,12 @@ const SimulationResults: React.FC = () => {
 };
 
 export default SimulationResults;
-export { computeStats, getAllTimes, getAverageSpeedOverTime, getVehicleCountOverTime, getTotalDistancePerVehicle, getStreetName, cleanDescription };
+export {
+  computeStats,
+  getAllTimes,
+  getAverageSpeedOverTime,
+  getVehicleCountOverTime,
+  getTotalDistancePerVehicle,
+  getStreetName,
+  cleanDescription,
+};

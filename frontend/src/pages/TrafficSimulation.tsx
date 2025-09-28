@@ -7,7 +7,7 @@ import * as THREE from "three";
 import { SimulationUI } from "../components/SimulationUI";
 import { API_BASE_URL } from "../config";
 
-console.log(React)
+console.log(React);
 
 // Data Interfaces & Helpers
 interface Node {

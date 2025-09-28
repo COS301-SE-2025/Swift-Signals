@@ -1,10 +1,16 @@
 import React from "react";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
-import '@testing-library/jest-dom';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
+import "@testing-library/jest-dom";
 import { BrowserRouter } from "react-router-dom";
 import Intersections from "../src/pages/Intersections";
 
-console.log(React)
+console.log(React);
 
 jest.mock("../src/components/Navbar", () => () => <div>Navbar</div>);
 jest.mock("../src/components/Footer", () => () => <div>Footer</div>);
@@ -15,10 +21,14 @@ jest.mock("../src/components/IntersectionCard", () => (props: any) => (
   <div data-testid="intersection-card">
     <span>{props.name}</span>
     <button onClick={() => props.onSimulate?.(props.id)}>Simulate</button>
-    <button onClick={() => {
-      props.onEdit?.(props.id);
-      props.openEditModal?.();
-    }}>Edit</button>
+    <button
+      onClick={() => {
+        props.onEdit?.(props.id);
+        props.openEditModal?.();
+      }}
+    >
+      Edit
+    </button>
     <button onClick={() => props.onDelete?.(props.id)}>Delete</button>
   </div>
 ));
@@ -73,7 +83,7 @@ describe("Intersections Page", () => {
       render(
         <BrowserRouter>
           <Intersections />
-        </BrowserRouter>
+        </BrowserRouter>,
       );
     });
   };
@@ -95,24 +105,24 @@ describe("Intersections Page", () => {
   });
 
   it("filters intersections by search query", async () => {
-  (fetch as jest.Mock).mockResolvedValueOnce({
-    ok: true,
-    json: async () => ({ intersections: mockIntersections }),
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ intersections: mockIntersections }),
+    });
+
+    await renderPage();
+    await waitFor(() => screen.getByText("Test Intersection 1"));
+
+    const searchInput = screen.getByPlaceholderText(/search by name/i);
+
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: "2" } });
+    });
+
+    expect((searchInput as HTMLInputElement).value).toBe("2");
+
+    expect(screen.getByText("Test Intersection 2")).toBeInTheDocument();
   });
-
-  await renderPage();
-  await waitFor(() => screen.getByText("Test Intersection 1"));
-
-  const searchInput = screen.getByPlaceholderText(/search by name/i);
-  
-  await act(async () => {
-    fireEvent.change(searchInput, { target: { value: "2" } });
-  });
-
-  expect((searchInput as HTMLInputElement).value).toBe("2");
-
-  expect(screen.getByText("Test Intersection 2")).toBeInTheDocument();
-});
 
   it("opens edit modal when clicking edit button", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
@@ -132,11 +142,11 @@ describe("Intersections Page", () => {
     document.body.appendChild(modalText);
 
     await waitFor(() =>
-      expect(screen.getByText(/edit intersection/i)).toBeInTheDocument()
+      expect(screen.getByText(/edit intersection/i)).toBeInTheDocument(),
     );
   });
 
-   it("opens create modal when clicking Add Intersection", async () => {
+  it("opens create modal when clicking Add Intersection", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ intersections: [] }),

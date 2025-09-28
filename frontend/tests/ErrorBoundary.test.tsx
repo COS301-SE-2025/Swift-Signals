@@ -16,7 +16,7 @@ describe("ErrorBoundary", () => {
     render(
       <ErrorBoundary>
         <div>Child content</div>
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
     expect(screen.getByText("Child content")).toBeInTheDocument();
   });
@@ -29,7 +29,7 @@ describe("ErrorBoundary", () => {
     render(
       <ErrorBoundary>
         <ProblemChild />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
 
     expect(screen.getByText("Something went wrong.")).toBeInTheDocument();
@@ -38,7 +38,9 @@ describe("ErrorBoundary", () => {
 
     const errorArgs = (console.error as jest.Mock).mock.calls[0];
 
-    const error = (errorArgs as unknown[]).find((arg: unknown) => arg instanceof Error) as Error | undefined;
+    const error = (errorArgs as unknown[]).find(
+      (arg: unknown) => arg instanceof Error,
+    ) as Error | undefined;
 
     expect(error).toBeInstanceOf(Error);
     expect(error?.message).toBe("Test error");

@@ -3,7 +3,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import HelpMenu from "../src/components/HelpMenu";
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 
 // Mock fetch for chatbot API
 global.fetch = jest.fn(() =>
@@ -14,7 +14,7 @@ global.fetch = jest.fn(() =>
         fulfillmentText: "Hello from bot",
         fulfillmentMessages: [],
       }),
-  })
+  }),
 ) as jest.Mock;
 
 const renderWithRouter = (ui: React.ReactElement) => {
@@ -53,7 +53,9 @@ describe("HelpMenu Component", () => {
     // Click Chat tab
     const chatTab = screen.getByText(/Swift Chat/i);
     fireEvent.click(chatTab);
-    expect(screen.getByPlaceholderText(/Type your message/i)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Type your message/i),
+    ).toBeInTheDocument();
   });
 
   test("expands and collapses FAQ items", () => {
@@ -66,11 +68,15 @@ describe("HelpMenu Component", () => {
     const firstQuestion = screen.getByText(/What is Swift Signals/i);
     fireEvent.click(firstQuestion);
 
-    expect(screen.getByText(/Swift Signals is a simulation-powered/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Swift Signals is a simulation-powered/i),
+    ).toBeInTheDocument();
 
     // Collapse FAQ
     fireEvent.click(firstQuestion);
-    expect(screen.queryByText(/Swift Signals is a simulation-powered/i)).not.toBeVisible();
+    expect(
+      screen.queryByText(/Swift Signals is a simulation-powered/i),
+    ).not.toBeVisible();
   });
 
   test("starts a tutorial from General Help", () => {
@@ -124,7 +130,9 @@ describe("HelpMenu Component", () => {
                                             {
                                               structValue: {
                                                 fields: {
-                                                  text: { stringValue: "Option 1" },
+                                                  text: {
+                                                    stringValue: "Option 1",
+                                                  },
                                                 },
                                               },
                                             },
@@ -145,7 +153,7 @@ describe("HelpMenu Component", () => {
               },
             ],
           }),
-      })
+      }),
     );
 
     renderWithRouter(<HelpMenu />);

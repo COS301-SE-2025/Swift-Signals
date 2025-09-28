@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Navbar from "../src/components/Navbar";
 
-console.log(React)
+console.log(React);
 
 jest.mock("../src/assets/logo.png", () => "logo.png");
 
@@ -16,7 +16,7 @@ describe("Navbar Component", () => {
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ username: "TestUser" }),
-      })
+      }),
     ) as jest.Mock;
   });
 
@@ -24,7 +24,7 @@ describe("Navbar Component", () => {
     render(
       <MemoryRouter initialEntries={["/dashboard"]}>
         <Navbar />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByAltText("Logo")).toBeInTheDocument();
     expect(screen.getByText("Swift Signals")).toBeInTheDocument();
@@ -34,7 +34,7 @@ describe("Navbar Component", () => {
     render(
       <MemoryRouter initialEntries={["/dashboard"]}>
         <Navbar />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     const dashboardLink = screen.getByText("Dashboard");
     expect(dashboardLink).toHaveClass("active");
@@ -47,7 +47,7 @@ describe("Navbar Component", () => {
     render(
       <MemoryRouter>
         <Navbar />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     const toggleButton = screen.getByRole("button");
     const navCenter = document.querySelector(".navbar-center")!;
@@ -65,7 +65,7 @@ describe("Navbar Component", () => {
     render(
       <MemoryRouter>
         <Navbar />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -77,7 +77,7 @@ describe("Navbar Component", () => {
     render(
       <MemoryRouter>
         <Navbar />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getAllByText("Loading...")[0]).toBeInTheDocument();
   });
@@ -86,7 +86,7 @@ describe("Navbar Component", () => {
     render(
       <MemoryRouter>
         <Navbar />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const toggleButton = screen.getByRole("button");
@@ -103,7 +103,7 @@ describe("Navbar Component", () => {
     render(
       <MemoryRouter>
         <Navbar />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const logoutIcons = screen.getAllByRole("link", { name: "" });

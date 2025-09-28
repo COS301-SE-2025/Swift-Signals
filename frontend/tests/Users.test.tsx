@@ -3,7 +3,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Users from "../src/pages/Users";
 
-console.log(React)
+console.log(React);
 
 jest.mock("../src/components/Navbar", () => () => <div>Navbar</div>);
 jest.mock("../src/components/Footer", () => () => <div>Footer</div>);
@@ -18,8 +18,15 @@ jest.mock("../src/components/UsersTable", () => {
       {users?.map((u: any) => (
         <div key={u.id} data-testid="user-row">
           <span>{u.username}</span>
-          <button data-testid={`edit-btn-${u.id}`} onClick={() => onEdit(u.id)}>Edit</button>
-          <button data-testid={`delete-btn-${u.id}`} onClick={() => onDelete(u.id)}>Delete</button>
+          <button data-testid={`edit-btn-${u.id}`} onClick={() => onEdit(u.id)}>
+            Edit
+          </button>
+          <button
+            data-testid={`delete-btn-${u.id}`}
+            onClick={() => onDelete(u.id)}
+          >
+            Delete
+          </button>
         </div>
       ))}
       <button data-testid="prev-page">Prev</button>
@@ -33,7 +40,12 @@ const mockFetch = jest.fn();
 
 const mockGetItem = jest.fn();
 Object.defineProperty(window, "localStorage", {
-  value: { getItem: mockGetItem, setItem: jest.fn(), removeItem: jest.fn(), clear: jest.fn() },
+  value: {
+    getItem: mockGetItem,
+    setItem: jest.fn(),
+    removeItem: jest.fn(),
+    clear: jest.fn(),
+  },
 });
 
 const originalConfirm = window.confirm;
@@ -53,14 +65,30 @@ beforeAll(() => {
     })),
   });
 });
-afterAll(() => { window.confirm = originalConfirm; });
+afterAll(() => {
+  window.confirm = originalConfirm;
+});
 
 describe("Users Page", () => {
-  beforeEach(() => { jest.clearAllMocks(); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   const fakeUsers = [
-    { id: "1", username: "Alice", email: "alice@test.com", is_admin: true, intersection_ids: [] },
-    { id: "2", username: "Bob", email: "bob@test.com", is_admin: false, intersection_ids: [] },
+    {
+      id: "1",
+      username: "Alice",
+      email: "alice@test.com",
+      is_admin: true,
+      intersection_ids: [],
+    },
+    {
+      id: "2",
+      username: "Bob",
+      email: "bob@test.com",
+      is_admin: false,
+      intersection_ids: [],
+    },
   ];
 
   /*it("renders loading spinner initially", async () => {
@@ -88,7 +116,9 @@ describe("Users Page", () => {
   it("shows error if no auth token", async () => {
     mockGetItem.mockReturnValue(null);
     render(<Users />);
-    expect(await screen.findByText(/No authentication token found/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/No authentication token found/i),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Retry/i)).toBeInTheDocument();
   });
 
@@ -104,8 +134,9 @@ describe("Users Page", () => {
   it("deletes a user after confirmation", async () => {
     mockGetItem.mockReturnValue("token");
     (window.confirm as jest.Mock).mockReturnValue(true);
-    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => fakeUsers })
-             .mockResolvedValueOnce({ status: 204 });
+    mockFetch
+      .mockResolvedValueOnce({ ok: true, json: async () => fakeUsers })
+      .mockResolvedValueOnce({ status: 204 });
 
     render(<Users />);
     fireEvent.click(await screen.findByTestId("delete-btn-1"));
@@ -113,18 +144,18 @@ describe("Users Page", () => {
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("/admin/users/1"),
-        expect.objectContaining({ method: "DELETE" })
+        expect.objectContaining({ method: "DELETE" }),
       );
     });
   });
 
   it("handles pagination buttons", async () => {
     const manyUsers = Array.from({ length: 20 }, (_, i) => ({
-      id: `${i+1}`,
-      username: `User${i+1}`,
-      email: `u${i+1}@test.com`,
+      id: `${i + 1}`,
+      username: `User${i + 1}`,
+      email: `u${i + 1}@test.com`,
       is_admin: false,
-      intersection_ids: []
+      intersection_ids: [],
     }));
 
     mockGetItem.mockReturnValue("token");

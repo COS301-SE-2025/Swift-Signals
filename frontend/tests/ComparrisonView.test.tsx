@@ -3,11 +3,17 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import ComparisonView from "../src/pages/ComparisonView";
 
-console.log(React)
+console.log(React);
 
 jest.mock("../src/pages/TrafficSimulation", () => ({
   __esModule: true,
-  default: ({ intersectionId, endpoint }: { intersectionId: string; endpoint: string }) => (
+  default: ({
+    intersectionId,
+    endpoint,
+  }: {
+    intersectionId: string;
+    endpoint: string;
+  }) => (
     <div data-testid={`TrafficSimulation-${endpoint}-${intersectionId}`}>
       Simulation {endpoint} {intersectionId}
     </div>
@@ -29,7 +35,7 @@ const renderWithRouter = (state?: any) => {
   return render(
     <MemoryRouter initialEntries={[{ pathname: "/", state }]}>
       <ComparisonView />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 };
 
@@ -43,7 +49,9 @@ describe("ComparisonView", () => {
   it("renders original simulation by default", () => {
     renderWithRouter();
     expect(screen.getByText("Original Simulation")).toBeInTheDocument();
-    expect(screen.getByTestId("TrafficSimulation-simulate-1")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("TrafficSimulation-simulate-1"),
+    ).toBeInTheDocument();
   });
 
   it("renders optimized simulation if optimizedData is provided", () => {
@@ -53,7 +61,9 @@ describe("ComparisonView", () => {
       optimizedIntersectionId: "99",
     });
     expect(screen.getByText("Optimized Simulation")).toBeInTheDocument();
-    expect(screen.getByTestId("TrafficSimulation-optimise-1")).toBeInTheDocument();
+    expect(
+      screen.getByTestId("TrafficSimulation-optimise-1"),
+    ).toBeInTheDocument();
   });
 
   it("shows 'No Optimization Available' if optimizedData is missing", () => {
@@ -69,21 +79,19 @@ describe("ComparisonView", () => {
     expect(bodyStyle.backgroundColor).toBe("rgb(30, 30, 30)");
   });
 
-
   it("exit button triggers history.back when history length > 1", () => {
     jest.spyOn(window.history, "length", "get").mockReturnValue(2);
     renderWithRouter();
     fireEvent.click(screen.getByText("Exit"));
     expect(window.history.back).toHaveBeenCalled();
-    });
+  });
 
-    it("exit button triggers window.close when history length <= 1", () => {
+  it("exit button triggers window.close when history length <= 1", () => {
     jest.spyOn(window.history, "length", "get").mockReturnValue(1);
     renderWithRouter();
     fireEvent.click(screen.getByText("Exit"));
     expect(window.close).toHaveBeenCalled();
-    });
-
+  });
 
   it("Escape key triggers exit handler", () => {
     Object.defineProperty(window.history, "length", { value: 2 });
@@ -102,7 +110,9 @@ describe("ComparisonView", () => {
   it("clicking refresh optimization shows error", () => {
     renderWithRouter({ simulationData: {} });
     fireEvent.click(screen.getByText("Check for Optimization"));
-    expect(screen.getByText(/Error: Refresh not available/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Error: Refresh not available/),
+    ).toBeInTheDocument();
   });
 
   it("renders HelpMenu component", () => {

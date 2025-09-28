@@ -5,7 +5,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import WelcomePage from "../src/pages/WelcomePage";
 
-console.log(React)
+console.log(React);
 
 const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
@@ -28,7 +28,7 @@ describe("WelcomePage", () => {
     render(
       <MemoryRouter>
         <WelcomePage />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const logo = screen.getByAltText("Logo");
@@ -50,7 +50,7 @@ describe("WelcomePage", () => {
     render(
       <MemoryRouter>
         <WelcomePage />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const loginButton = screen.getByText("Login");
@@ -63,7 +63,7 @@ describe("WelcomePage", () => {
     render(
       <MemoryRouter>
         <WelcomePage />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const registerButton = screen.getByText("Register");

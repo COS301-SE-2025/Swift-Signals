@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import UsersTable from "../src/components/UsersTable";
 
-console.log(React)
+console.log(React);
 
 describe("UsersTable", () => {
   const mockUsers = [
@@ -32,7 +32,9 @@ describe("UsersTable", () => {
   });
 
   it("renders table headers correctly", () => {
-    render(<UsersTable users={mockUsers} onEdit={onEdit} onDelete={onDelete} />);
+    render(
+      <UsersTable users={mockUsers} onEdit={onEdit} onDelete={onDelete} />,
+    );
     expect(screen.getByText("ID")).toBeInTheDocument();
     expect(screen.getByText("Name")).toBeInTheDocument();
     expect(screen.getByText("Email")).toBeInTheDocument();
@@ -42,7 +44,9 @@ describe("UsersTable", () => {
   });
 
   it("renders user rows with correct data", () => {
-    render(<UsersTable users={mockUsers} onEdit={onEdit} onDelete={onDelete} />);
+    render(
+      <UsersTable users={mockUsers} onEdit={onEdit} onDelete={onDelete} />,
+    );
 
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText("Alice Johnson")).toBeInTheDocument();
@@ -58,7 +62,9 @@ describe("UsersTable", () => {
   });
 
   it("calls onEdit when edit button is clicked", () => {
-    render(<UsersTable users={mockUsers} onEdit={onEdit} onDelete={onDelete} />);
+    render(
+      <UsersTable users={mockUsers} onEdit={onEdit} onDelete={onDelete} />,
+    );
     const editButtons = screen.getAllByRole("button", { name: /edit user/i });
 
     fireEvent.click(editButtons[0]);
@@ -70,8 +76,12 @@ describe("UsersTable", () => {
   });
 
   it("calls onDelete when delete button is clicked", () => {
-    render(<UsersTable users={mockUsers} onEdit={onEdit} onDelete={onDelete} />);
-    const deleteButtons = screen.getAllByRole("button", { name: /delete user/i });
+    render(
+      <UsersTable users={mockUsers} onEdit={onEdit} onDelete={onDelete} />,
+    );
+    const deleteButtons = screen.getAllByRole("button", {
+      name: /delete user/i,
+    });
 
     fireEvent.click(deleteButtons[0]);
     expect(onDelete).toHaveBeenCalledTimes(1);

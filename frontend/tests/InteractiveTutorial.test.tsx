@@ -5,9 +5,7 @@ jest.mock("../src/components/InteractiveTutorial", () => {
     __esModule: true,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     default: (props: any) => (
-      <div data-testid={`tutorial-${props.tutorialType}`}>
-        Tutorial Open
-      </div>
+      <div data-testid={`tutorial-${props.tutorialType}`}>Tutorial Open</div>
     ),
   };
 });
@@ -36,14 +34,22 @@ beforeAll(() => {
 describe("InteractiveTutorial Component (mocked)", () => {
   it("renders the mocked tutorial", () => {
     render(
-      <InteractiveTutorial steps={steps} onClose={onClose} tutorialType="navigation" />
+      <InteractiveTutorial
+        steps={steps}
+        onClose={onClose}
+        tutorialType="navigation"
+      />,
     );
     expect(screen.getByTestId("tutorial-navigation")).toBeInTheDocument();
   });
 
   it("renders with a different tutorialType", () => {
     render(
-      <InteractiveTutorial steps={steps} onClose={onClose} tutorialType="comparison-view" />
+      <InteractiveTutorial
+        steps={steps}
+        onClose={onClose}
+        tutorialType="comparison-view"
+      />,
     );
     expect(screen.getByTestId("tutorial-comparison-view")).toBeInTheDocument();
   });

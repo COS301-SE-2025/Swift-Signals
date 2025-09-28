@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import ThemeToggle from "../src/components/ThemeToggle";
 
-console.log(React)
+console.log(React);
 
 describe("ThemeToggle Component", () => {
   const localStorageMock = (() => {

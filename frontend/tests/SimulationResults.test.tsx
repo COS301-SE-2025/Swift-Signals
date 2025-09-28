@@ -3,9 +3,11 @@ import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 
-import SimulationResults, { computeStats } from "../src/pages/SimulationResults";
+import SimulationResults, {
+  computeStats,
+} from "../src/pages/SimulationResults";
 
-console.log(React)
+console.log(React);
 
 jest.mock("../src/components/Navbar", () => () => <div>Mock Navbar</div>);
 jest.mock("../src/components/Footer", () => () => <div>Mock Footer</div>);
@@ -50,16 +52,17 @@ describe("SimulationResults Component", () => {
     return render(
       <MemoryRouter initialEntries={[path]}>
         <Routes>
-          <Route path="/results/:intersectionId" element={<SimulationResults />} />
+          <Route
+            path="/results/:intersectionId"
+            element={<SimulationResults />}
+          />
         </Routes>
-      </MemoryRouter>
+      </MemoryRouter>,
     );
   }
 
   it("shows loading state initially", () => {
-    global.fetch = jest.fn(
-      () => new Promise(() => {})
-    ) as jest.Mock;
+    global.fetch = jest.fn(() => new Promise(() => {})) as jest.Mock;
 
     renderWithRoute();
 
@@ -71,13 +74,13 @@ describe("SimulationResults Component", () => {
       Promise.resolve({
         ok: false,
         statusText: "Not Found",
-      } as Response)
+      } as Response),
     ) as jest.Mock;
 
     renderWithRoute();
 
     await waitFor(() =>
-      expect(screen.getByText(/Failed to Load Data/i)).toBeInTheDocument()
+      expect(screen.getByText(/Failed to Load Data/i)).toBeInTheDocument(),
     );
   });
 
@@ -110,7 +113,7 @@ describe("SimulationResults Component", () => {
     renderWithRoute();
 
     await waitFor(() =>
-      expect(screen.getByText(/Test Intersection/i)).toBeInTheDocument()
+      expect(screen.getByText(/Test Intersection/i)).toBeInTheDocument(),
     );
     expect(screen.getByText(/Avg Speed/i)).toBeInTheDocument();
   });

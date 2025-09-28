@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import IntersectionCard from "../src/components/IntersectionCard";
 
-console.log(React)
+console.log(React);
 
 jest.mock("../src/assets/placeholder.png", () => "", { virtual: true });
 

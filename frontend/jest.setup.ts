@@ -1,5 +1,5 @@
 // jest.setup.ts
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 
 // jest.setup.ts
 class PolyTextEncoder {

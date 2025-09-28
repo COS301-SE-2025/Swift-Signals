@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { SimulationUI } from "../src/components/SimulationUI";
 
-console.log(React)
+console.log(React);
 
 describe("SimulationUI Component", () => {
   const mockPlayPause = jest.fn();
@@ -39,15 +39,23 @@ describe("SimulationUI Component", () => {
     expect(screen.getByText("Progress")).toBeInTheDocument();
 
     expect(
-      screen.getByText(`${defaultProps.time.toFixed(1)} / ${defaultProps.totalSimTime.toFixed(1)} s`)
+      screen.getByText(
+        `${defaultProps.time.toFixed(1)} / ${defaultProps.totalSimTime.toFixed(1)} s`,
+      ),
     ).toBeInTheDocument();
 
     expect(screen.getByText("Total")).toBeInTheDocument();
-    expect(screen.getByText(defaultProps.vehicleCount.toString())).toBeInTheDocument();
+    expect(
+      screen.getByText(defaultProps.vehicleCount.toString()),
+    ).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
-    expect(screen.getByText(defaultProps.activeVehicles.toString())).toBeInTheDocument();
+    expect(
+      screen.getByText(defaultProps.activeVehicles.toString()),
+    ).toBeInTheDocument();
     expect(screen.getByText("Completed")).toBeInTheDocument();
-    expect(screen.getByText(defaultProps.completedVehicles.toString())).toBeInTheDocument();
+    expect(
+      screen.getByText(defaultProps.completedVehicles.toString()),
+    ).toBeInTheDocument();
 
     const avgSpeedKmh = (defaultProps.avgSpeed * 3.6).toFixed(1);
     expect(screen.getByText(`${avgSpeedKmh} km/h`)).toBeInTheDocument();
@@ -59,7 +67,9 @@ describe("SimulationUI Component", () => {
     expect(screen.getByText("Play")).toBeInTheDocument();
     expect(screen.getByText("Restart")).toBeInTheDocument();
 
-    expect(screen.getByDisplayValue(defaultProps.speed.toString())).toBeInTheDocument();
+    expect(
+      screen.getByDisplayValue(defaultProps.speed.toString()),
+    ).toBeInTheDocument();
   });
 
   it("calls onPlayPause and onRestart on button click", () => {
@@ -79,7 +89,9 @@ describe("SimulationUI Component", () => {
   });
 
   it("updates Play/Pause button text when isPlaying prop changes", () => {
-    const { rerender } = render(<SimulationUI {...defaultProps} isPlaying={false} />);
+    const { rerender } = render(
+      <SimulationUI {...defaultProps} isPlaying={false} />,
+    );
     expect(screen.getByText("Play")).toBeInTheDocument();
 
     rerender(<SimulationUI {...defaultProps} isPlaying={true} />);
