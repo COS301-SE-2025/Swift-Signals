@@ -15,6 +15,7 @@ jest.mock("react-router-dom", () => ({
 jest.mock("../src/components/Footer", () => () => <div>Footer</div>);
 jest.mock("../src/components/Navbar", () => () => <div>Navbar</div>);
 jest.mock("../src/components/HelpMenu", () => () => <div>HelpMenu</div>);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock("../src/components/MapModal", () => (props: any) => (
   <div>MapModal {props.isOpen ? "(Open)" : "(Closed)"}</div>
 ));

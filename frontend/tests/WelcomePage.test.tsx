@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -7,10 +9,12 @@ console.log(React)
 
 const mockNavigate = jest.fn();
 jest.mock("react-router-dom", () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ...(jest.requireActual("react-router-dom") as any),
   useNavigate: () => mockNavigate,
 }));
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock("../src/components/Carousel", () => (_props: any) => (
   <div data-testid="carousel">Carousel Component</div>
 ));

@@ -7,6 +7,7 @@ jest.mock("framer-motion", () => {
     ...actual,
     motion: {
       ...actual.motion,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       div: ({ children, onAnimationComplete, ...rest }: any) => {
         if (onAnimationComplete) setTimeout(() => onAnimationComplete(), 0);
         return <div {...rest}>{children}</div>;

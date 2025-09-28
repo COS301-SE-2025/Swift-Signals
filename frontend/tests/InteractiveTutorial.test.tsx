@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 jest.mock("../src/components/InteractiveTutorial", () => {
   return {
     __esModule: true,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     default: (props: any) => (
       <div data-testid={`tutorial-${props.tutorialType}`}>
         Tutorial Open

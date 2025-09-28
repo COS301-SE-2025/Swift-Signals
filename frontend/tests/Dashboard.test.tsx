@@ -32,6 +32,7 @@ jest.mock("chart.js", () => ({
 
 jest.mock("../src/components/MapModal", () => ({
   __esModule: true,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default: ({ isOpen }: any) => (
     <div data-testid="map-modal">
       {isOpen && <span>Map Modal Open</span>}

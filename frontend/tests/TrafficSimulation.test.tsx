@@ -5,6 +5,7 @@ import TrafficSimulation from "../src/pages/TrafficSimulation";
 console.log(React)
 
 jest.mock("@react-three/fiber", () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Canvas: ({ children }: any) => <div data-testid="mock-canvas">{children}</div>,
   useFrame: jest.fn(),
 }));
@@ -14,6 +15,7 @@ jest.mock("@react-three/drei", () => ({
 }));
 
 jest.mock("../src/components/SimulationUI", () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   SimulationUI: (props: any) => (
     <div data-testid="simulation-ui">
       <button onClick={props.onPlayPause}>Toggle Play</button>
@@ -24,6 +26,7 @@ jest.mock("../src/components/SimulationUI", () => ({
 }));
 
 const mockFetch = jest.fn();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 (global as any).fetch = mockFetch;
 const mockGetItem = jest.fn();
 Object.defineProperty(window, "localStorage", {

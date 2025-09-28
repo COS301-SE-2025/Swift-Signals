@@ -10,6 +10,7 @@ jest.mock("../src/components/Navbar", () => () => <div>Navbar</div>);
 jest.mock("../src/components/Footer", () => () => <div>Footer</div>);
 jest.mock("../src/components/HelpMenu", () => () => <div>HelpMenu</div>);
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 jest.mock("../src/components/IntersectionCard", () => (props: any) => (
   <div data-testid="intersection-card">
     <span>{props.name}</span>

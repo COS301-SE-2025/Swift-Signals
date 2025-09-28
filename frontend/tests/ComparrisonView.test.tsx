@@ -24,6 +24,7 @@ beforeAll(() => {
   window.history.back = jest.fn();
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderWithRouter = (state?: any) => {
   return render(
     <MemoryRouter initialEntries={[{ pathname: "/", state }]}>
