@@ -6,8 +6,8 @@ RUN apt-get update && apt-get install -y \
     sumo sumo-tools sumo-doc \
     && apt-get clean && rm -rf /var/lib/apt/lists/* 
 
-ENV SUMO_HOME=/usr/share/sumo
-WORKDIR /app
+ENV SUMO_HOME=/usr/share/sumo 
+WORKDIR /app 
 
 COPY simulation-service/requirements.txt .
 RUN pip3 install --no-cache-dir -r requirements.txt 

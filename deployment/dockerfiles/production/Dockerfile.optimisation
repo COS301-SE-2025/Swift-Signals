@@ -23,7 +23,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 FROM python:3.11-slim AS production
 WORKDIR /app
-
 COPY --from=builder /app/venv/lib/python3.*/site-packages /app/site-packages
 
 COPY --from=builder /app/protos/gen /app/protos/gen
