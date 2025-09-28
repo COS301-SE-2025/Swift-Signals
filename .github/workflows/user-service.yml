@@ -22,8 +22,8 @@ jobs:
           
       - name: Setup protoc and generate proto files
         working-directory: ./protos/swiftsignals
-        run: make all
+        run: make workflow
         
       - name: Run full CI suite
         working-directory: ./user-service
-        run: make all
+        run: make workflow
