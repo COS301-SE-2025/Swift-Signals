@@ -128,11 +128,14 @@ func (h *Handler) UpdateIntersection(
 
 	intersectionDetails := h.mapIntersectionDetails(req.GetDetails())
 
+	intersectionStatus := model.IntersectionStatus(req.Status.String())
+
 	intersection, err := h.service.UpdateIntersection(
 		ctx,
 		req.GetId(),
 		req.GetName(),
 		intersectionDetails,
+		intersectionStatus,
 	)
 	if err != nil {
 		logger.Error("failed to update intersection",

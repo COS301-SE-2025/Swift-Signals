@@ -120,6 +120,22 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
             )
         }
         pretty_log("Request dict", req_dict)
+        req_dict["intersection"]["traffic density"] = 1
+        req_dict["intersection"]["simulation_parameters"]["Green"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["green"]
+        req_dict["intersection"]["simulation_parameters"]["Yellow"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["yellow"]
+        req_dict["intersection"]["simulation_parameters"]["Red"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["red"]
+        req_dict["intersection"]["simulation_parameters"]["Speed"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["speed"]
+        req_dict["intersection"]["simulation_parameters"]["Seed"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["seed"]
 
         try:
             sim_output = SimLoad.main(req_dict)

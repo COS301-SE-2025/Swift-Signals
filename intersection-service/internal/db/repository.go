@@ -136,6 +136,7 @@ func (r *MongoIntersectionRepo) UpdateIntersection(
 	id string,
 	name string,
 	details model.IntersectionDetails,
+	status model.IntersectionStatus,
 ) (*model.Intersection, error) {
 	logger := util.LoggerFromContext(ctx)
 	logger.Debug("updating intersection")
@@ -145,7 +146,17 @@ func (r *MongoIntersectionRepo) UpdateIntersection(
 		"$set": bson.M{
 			"name":    name,
 			"details": details,
+			"status":  status,
 		},
+	}
+
+	if status == model.IntersectionStatus("INTERSECTION_STATUS_UNSPECIFIED") {
+		update = bson.M{
+			"$set": bson.M{
+				"name":    name,
+				"details": details,
+			},
+		}
 	}
 
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
