@@ -235,11 +235,11 @@ To get a local copy up and running, follow these simple steps.
 
 1. Navigate to the development deployment directory:
     ```sh
-    cd deployments/development
+    cd deployment/dockerfiles/production
     ```
 2. Start the application using Docker Compose:
     ```sh
-    docker-compose up -d
+    docker-compose up -d --build
     ```
 3. The frontend will be available at `http://localhost:80`.
 
@@ -270,10 +270,4 @@ To run the tests for the Python services, navigate to the service directory and 
   pytest
   ```
 
-### Frontend
-
-There is currently no test script configured for the frontend.
-
-## License
-
-This project is unlicensed. We recommend adding a `LICENSE` file and choosing a license such as the [MIT License](https://opensource.org/licenses/MIT).
+### Contact Us: insideinsights2025@gmail.com
