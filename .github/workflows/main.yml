@@ -7,9 +7,8 @@ on:
     branches: [main, dev, quality-assurance]
 
 jobs:
-           
+
   python-standard-check:
-    # needs: go-standard-check
     runs-on: ubuntu-latest
 
     steps:

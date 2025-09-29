@@ -1,16 +1,20 @@
-import "./Navbar.css";
+import { useState, useEffect, useContext } from "react";
 import { FaCircleUser } from "react-icons/fa6";
-import { IoIosLogOut } from "react-icons/io";
-import { useState, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { IoIosLogOut } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
+
 import logo from "../../src/assets/logo.png";
+// import { API_BASE_URL } from "../config";
+import "../components/Navbar.css";
+import { UserContext } from "../context/UserContext";
 
 function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [username, setUsername] = useState("");
   const location = useLocation();
+  const userContext = useContext(UserContext);
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -22,28 +26,10 @@ function Navbar() {
   const isActive: IsActiveFn = (path) => location.pathname === path;
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) return;
-
-        const res = await fetch("http://localhost:9090/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!res.ok) throw new Error("Failed to fetch user profile");
-
-        const data = await res.json();
-        setUsername(data.username || "User");
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
+    if (userContext?.user) {
+      setUsername(userContext.user.username);
+    }
+  }, [userContext]);
 
   return (
     <nav className="navbar">
@@ -89,15 +75,17 @@ function Navbar() {
               Simulations
             </a>
           </li>
-          <li>
-            <a
-              href="/users"
-              className={isActive("/users") ? "active" : ""}
-              onClick={toggleMobileMenu}
-            >
-              Users
-            </a>
-          </li>
+          {userContext?.user?.role === "admin" && (
+            <li>
+              <a
+                href="/users"
+                className={isActive("/users") ? "active" : ""}
+                onClick={toggleMobileMenu}
+              >
+                Users
+              </a>
+            </li>
+          )}
         </ul>
         <div className="mobile-user-profile">
           <FaCircleUser size={45} />

@@ -1,0 +1,29 @@
+FROM golang:1.25.1-alpine AS build
+
+RUN apk add --no-cache \
+    protobuf \
+    protobuf-dev \
+    make \
+    git \
+    curl \
+    unzip
+
+WORKDIR /app
+COPY protos/swiftsignals/intersection protos/swiftsignals/intersection
+COPY protos/swiftsignals/common protos/swiftsignals/common
+COPY protos/swiftsignals/makefile protos/swiftsignals/makefile
+COPY shared/ shared/
+COPY intersection-service/ intersection-service/
+RUN find . -name "test" -type d -exec rm -rf {} + || true
+
+WORKDIR /app/protos/swiftsignals/
+RUN make intersection-service
+
+WORKDIR /app/intersection-service/
+RUN make dockerfile-production
+
+FROM alpine:edge
+
+WORKDIR /app
+COPY --from=build /app/intersection-service/bin/intersection-service .
+ENTRYPOINT ["/app/intersection-service"]

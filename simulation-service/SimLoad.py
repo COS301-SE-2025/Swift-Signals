@@ -60,38 +60,37 @@ def loadParams(param_dict=None):
             data = json.load(f)
 
     sim_params = data["intersection"]["simulation_parameters"]
-    raw_density = data["intersection"].get("traffic_density", 1)
+    raw_density = data["intersection"].get("traffic density", 1)
     traffic_density = TRAFFIC_DENSITY.get(raw_density, "medium")
-    raw_type = sim_params.get("intersection_type", 0)
+    raw_type = sim_params.get("intersection_type", 1)
 
     try:
         raw_type = int(raw_type)
     except (ValueError, TypeError):
         raw_type = 0
 
-    intersection_type_str = INTERSECTION_TYPES.get(raw_type, "unspecified")
+    intersection_type_str = INTERSECTION_TYPES.get(raw_type, "trafficlight")
 
     mapped = {
         "traffic_density": traffic_density,
-        "intersection_type": intersection_type_str,
-        "speed": sim_params.get("speed", 40),
-        "seed": sim_params.get("seed", 42),
+        "intersection_type": "trafficlight",  # intersection_type_str,
+        "speed": sim_params.get("Speed", 40),
+        "seed": sim_params.get("Seed", 42),
     }
 
     if intersection_type_str == "trafficlight":
-        mapped["green"] = sim_params.get("green", 25)
-        mapped["yellow"] = sim_params.get("yellow", 3)
-        mapped["red"] = sim_params.get("red", 30)
+        mapped["green"] = sim_params.get("Green", 25)
+        mapped["yellow"] = sim_params.get("Yellow", 3)
+        mapped["red"] = sim_params.get("Red", 30)
 
     output_path = data["intersection"].get("output_path", None)
-
     return {
         "mapped": mapped,
         "raw": {
             "traffic_density": raw_density,
             "intersection_type": raw_type,
-            "speed": sim_params.get("speed", 40),
-            "seed": sim_params.get("seed", 42),
+            "speed": sim_params.get("Speed", 40),
+            "seed": sim_params.get("Seed", 42),
         },
         "output_path": output_path,
     }
@@ -237,9 +236,9 @@ def main(param_dict=None) -> dict:
     parameters = {"intersection_type": raw.get("intersection_type")}
 
     if intersection_type == "trafficlight":
-        parameters["green"] = mapped.get("green")
-        parameters["yellow"] = mapped.get("yellow")
-        parameters["red"] = mapped.get("red")
+        parameters["green"] = mapped.get("Green")
+        parameters["yellow"] = mapped.get("Yellow")
+        parameters["red"] = mapped.get("Red")
 
     parameters["seed"] = raw.get("seed")
 
@@ -260,7 +259,7 @@ def main(param_dict=None) -> dict:
     }
 
     timestamp = time.strftime("%Y%m%d-%H%M%S")
-    intersection_type = mapped.get("Intersection Type", "unknown")
+    intersection_type = mapped.get("intersection_type", "unknown")
 
     custom_result_path = params.get("output_path", None)
 
@@ -297,6 +296,7 @@ def main(param_dict=None) -> dict:
     except Exception as e:
         print(f"Warning: Could not delete run_count.txt - {e}")
 
+    # print(output)
     return output, fullOut
 
 

@@ -8,7 +8,8 @@ import (
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -70,10 +71,12 @@ func (ic *IntersectionClient) GetIntersection(
 
 func (ic *IntersectionClient) GetAllIntersections(
 	ctx context.Context,
+	ids string,
 ) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error) {
 	req := &intersectionpb.GetAllIntersectionsRequest{
 		Page:     1,
 		PageSize: 100,
+		Filter:   ids,
 	}
 
 	return ic.client.GetAllIntersections(ctx, req)
@@ -88,6 +91,28 @@ func (ic *IntersectionClient) UpdateIntersection(
 		Id:      id,
 		Name:    name,
 		Details: convertDetailsToProto(details),
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	resp, err := ic.client.UpdateIntersection(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
+}
+
+func (ic *IntersectionClient) UpdateIntersectionStatus(
+	ctx context.Context,
+	id, name string,
+	details model.Details,
+	status commonpb.IntersectionStatus,
+) (*intersectionpb.IntersectionResponse, error) {
+	req := &intersectionpb.UpdateIntersectionRequest{
+		Id:      id,
+		Name:    name,
+		Details: convertDetailsToProto(details),
+		Status:  status,
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
@@ -142,11 +167,18 @@ type IntersectionClientInterface interface {
 	GetIntersection(ctx context.Context, id string) (*intersectionpb.IntersectionResponse, error)
 	GetAllIntersections(
 		ctx context.Context,
+		ids string,
 	) (intersectionpb.IntersectionService_GetAllIntersectionsClient, error)
 	UpdateIntersection(
 		ctx context.Context,
 		id, name string,
 		details model.Details,
+	) (*intersectionpb.IntersectionResponse, error)
+	UpdateIntersectionStatus(
+		ctx context.Context,
+		id, name string,
+		details model.Details,
+		status commonpb.IntersectionStatus,
 	) (*intersectionpb.IntersectionResponse, error)
 	DeleteIntersection(ctx context.Context, id string) (*emptypb.Empty, error)
 	PutOptimisation(
@@ -173,10 +205,10 @@ func convertDetailsToProto(details model.Details) *intersectionpb.IntersectionDe
 
 func convertParametersToProto(
 	parameters model.OptimisationParameters,
-) *intersectionpb.OptimisationParameters {
-	return &intersectionpb.OptimisationParameters{
+) *commonpb.OptimisationParameters {
+	return &commonpb.OptimisationParameters{
 		OptimisationType: StringToOptimisationType(parameters.OptimisationType),
-		Parameters: &intersectionpb.SimulationParameters{
+		Parameters: &commonpb.SimulationParameters{
 			IntersectionType: StringToIntersectionType(
 				parameters.SimulationParameters.IntersectionType,
 			),
@@ -189,64 +221,64 @@ func convertParametersToProto(
 	}
 }
 
-func StringToOptimisationType(s string) intersectionpb.OptimisationType {
+func StringToOptimisationType(s string) commonpb.OptimisationType {
 	switch strings.ToLower(s) {
 	case "grid_search", "gridsearch":
-		return intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH
+		return commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH
 	case "genetic_evaluation", "genetic":
-		return intersectionpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION
+		return commonpb.OptimisationType_OPTIMISATION_TYPE_GENETIC_EVALUATION
 	case "none", "":
-		return intersectionpb.OptimisationType_OPTIMISATION_TYPE_NONE
+		return commonpb.OptimisationType_OPTIMISATION_TYPE_NONE
 	default:
 		fmt.Printf("Warning: unknown optimisation type '%s', defaulting to GRIDSEARCH\n", s)
-		return intersectionpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH
+		return commonpb.OptimisationType_OPTIMISATION_TYPE_GRIDSEARCH
 	}
 }
 
-func StringToIntersectionType(s string) intersectionpb.IntersectionType {
+func StringToIntersectionType(s string) commonpb.IntersectionType {
 	switch strings.ToLower(strings.ReplaceAll(s, "-", "")) {
 	case "trafficlight", "traffic_light":
-		return intersectionpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT
+		return commonpb.IntersectionType_INTERSECTION_TYPE_TRAFFICLIGHT
 	case "tjunction", "t_junction":
-		return intersectionpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION
+		return commonpb.IntersectionType_INTERSECTION_TYPE_TJUNCTION
 	case "roundabout":
-		return intersectionpb.IntersectionType_INTERSECTION_TYPE_ROUNDABOUT
+		return commonpb.IntersectionType_INTERSECTION_TYPE_ROUNDABOUT
 	case "stopsign", "stop_sign":
-		return intersectionpb.IntersectionType_INTERSECTION_TYPE_STOP_SIGN
+		return commonpb.IntersectionType_INTERSECTION_TYPE_STOP_SIGN
 	case "unspecified", "":
-		return intersectionpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED
+		return commonpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED
 	default:
 		fmt.Printf("Warning: unknown intersection type '%s', defaulting to UNSPECIFIED\n", s)
-		return intersectionpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED
+		return commonpb.IntersectionType_INTERSECTION_TYPE_UNSPECIFIED
 	}
 }
 
-func StringToTrafficDensity(s string) intersectionpb.TrafficDensity {
+func StringToTrafficDensity(s string) commonpb.TrafficDensity {
 	switch strings.ToLower(s) {
 	case "high":
-		return intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH
+		return commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH
 	case "medium":
-		return intersectionpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM
+		return commonpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM
 	case "low":
-		return intersectionpb.TrafficDensity_TRAFFIC_DENSITY_LOW
+		return commonpb.TrafficDensity_TRAFFIC_DENSITY_LOW
 	default:
 		fmt.Printf("Warning: unknown traffic density '%s', defaulting to MEDIUM\n", s)
-		return intersectionpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM
+		return commonpb.TrafficDensity_TRAFFIC_DENSITY_MEDIUM
 	}
 }
 
-func StringToIntersectionStatus(s string) intersectionpb.IntersectionStatus {
+func StringToIntersectionStatus(s string) commonpb.IntersectionStatus {
 	switch strings.ToLower(s) {
 	case "unoptimised", "unoptimized":
-		return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED
+		return commonpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED
 	case "optimising", "optimizing":
-		return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISING
+		return commonpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISING
 	case "optimised", "optimized":
-		return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED
+		return commonpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED
 	case "failed":
-		return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_FAILED
+		return commonpb.IntersectionStatus_INTERSECTION_STATUS_FAILED
 	default:
 		fmt.Printf("Warning: unknown intersection status '%s', defaulting to UNOPTIMISED\n", s)
-		return intersectionpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED
+		return commonpb.IntersectionStatus_INTERSECTION_STATUS_UNOPTIMISED
 	}
 }

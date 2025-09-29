@@ -6,8 +6,8 @@ from pprint import pformat
 from google.protobuf.json_format import MessageToDict, ParseDict
 import grpc
 from grpc_reflection.v1alpha import reflection
-import simulation_pb2 as pb
-import simulation_pb2_grpc as pb_grpc
+from swiftsignals.simulation.v1 import simulation_pb2 as pb
+from swiftsignals.simulation.v1 import simulation_pb2_grpc as pb_grpc
 
 import SimLoad
 
@@ -49,7 +49,7 @@ def pretty_log(name, obj, max_len=1000):
 
 
 class SimulationServicer(pb_grpc.SimulationServiceServicer):
-    def GetSimulationResults(self, request, context):
+    def GetSimulationResults(self, request: pb.SimulationRequest, context):
         logger.info(
             "Received GetSimulationResults request",
             extra={"intersection_id": request.intersection_id},
@@ -60,6 +60,24 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
                 request, preserving_proto_field_name=True, use_integers_for_enums=True
             )
         }
+        req_dict["intersection"]["traffic density"] = 1
+        req_dict["intersection"]["Traffic Density"] = 1
+        req_dict["intersection"]["simulation_parameters"]["Green"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["green"]
+        req_dict["intersection"]["simulation_parameters"]["Yellow"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["yellow"]
+        req_dict["intersection"]["simulation_parameters"]["Red"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["red"]
+        req_dict["intersection"]["simulation_parameters"]["Speed"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["speed"]
+        req_dict["intersection"]["simulation_parameters"]["Seed"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["seed"]
+
         pretty_log("Request dict", req_dict)
 
         try:
@@ -103,6 +121,22 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
             )
         }
         pretty_log("Request dict", req_dict)
+        req_dict["intersection"]["traffic density"] = 1
+        req_dict["intersection"]["simulation_parameters"]["Green"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["green"]
+        req_dict["intersection"]["simulation_parameters"]["Yellow"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["yellow"]
+        req_dict["intersection"]["simulation_parameters"]["Red"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["red"]
+        req_dict["intersection"]["simulation_parameters"]["Speed"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["speed"]
+        req_dict["intersection"]["simulation_parameters"]["Seed"] = req_dict[
+            "intersection"
+        ]["simulation_parameters"]["seed"]
 
         try:
             sim_output = SimLoad.main(req_dict)
@@ -135,7 +169,7 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
 
 
 def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=1))
     pb_grpc.add_SimulationServiceServicer_to_server(SimulationServicer(), server)
 
     SERVICE_NAMES = (

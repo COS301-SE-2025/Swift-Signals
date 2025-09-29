@@ -7,8 +7,8 @@ import (
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/middleware"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
-	intersectionpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection"
-	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/user"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	userpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 )
 
@@ -37,9 +37,9 @@ func (suite *TestSuite) TestUpdateIntersectionByID_Success() {
 		"456 Updated Street",
 		"Johannesburg",
 		"Gauteng",
-		intersectionpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED,
+		commonpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED,
 		5,
-		intersectionpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
+		commonpb.TrafficDensity_TRAFFIC_DENSITY_HIGH,
 	)
 
 	logger := slog.Default()

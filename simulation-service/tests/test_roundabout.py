@@ -14,7 +14,6 @@ if "circle" not in sys.modules:
 
 
 class TestRoundabout(unittest.TestCase):
-
     @patch("circle.os.remove")
     @patch("circle.extractTrajectories", return_value=[])
     @patch("circle.parseNodes", return_value=[])

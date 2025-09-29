@@ -12,7 +12,6 @@ if "tJunction" not in sys.modules:
 
 
 class TestTJunction(unittest.TestCase):
-
     @patch("tJunction.writeNodeFile")
     @patch("tJunction.writeEdgeFile")
     @patch("tJunction.writeConnectionFile")

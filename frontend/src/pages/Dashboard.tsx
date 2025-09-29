@@ -1,16 +1,19 @@
+import { Chart, registerables } from "chart.js";
+import { useState } from "react";
 import React, { useEffect, useRef } from "react";
+import { FaRoad, FaPlay, FaChartLine, FaPlus, FaMap } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+
 import Footer from "../components/Footer";
 import HelpMenu from "../components/HelpMenu";
-import "../styles/Dashboard.css";
-import { Chart, registerables } from "chart.js";
 import MapModal from "../components/MapModal";
-import { useState } from "react";
+import Navbar from "../components/Navbar";
+import "../styles/Dashboard.css";
+import { API_BASE_URL } from "../config";
 
-import { FaRoad, FaPlay, FaChartLine, FaPlus, FaMap } from "react-icons/fa";
-
-Chart.register(...registerables);
+if (Chart.register) {
+  Chart.register(...registerables);
+}
 
 interface Intersection {
   id: string;
@@ -59,16 +62,19 @@ const Dashboard: React.FC = () => {
 
   const [totalIntersections, setTotalIntersections] = useState<number>(0);
   const [loadingTotal, setLoadingTotal] = useState(false);
-  const [activeSimulations, setActiveSimulations] = useState<number>(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_activeSimulations, _setActiveSimulations] = useState<number>(0);
   const [loadingActiveSimulations, setLoadingActiveSimulations] =
     useState(false);
+  const [totalSimulationsRun, setTotalSimulationsRun] = useState<number>(0);
+  const [totalOptimizationsRun, setTotalOptimizationsRun] = useState<number>(0);
 
   const fetchAllIntersections = async () => {
     setLoadingTotal(true);
-    setLoadingActiveSimulations(true);
+    // setLoadingActiveSimulations(true); // This line will be removed as activeSimulations is no longer used in the same way
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:9090/intersections", {
+      const response = await fetch(`${API_BASE_URL}/intersections`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");
@@ -77,25 +83,35 @@ const Dashboard: React.FC = () => {
 
       setTotalIntersections(items.length);
 
-      // Calculate active simulations (intersections with run_count > 0)
-      const activeCount = items.reduce((sum, item) => {
+      let totalSims = 0;
+      let totalOptimizations = 0;
+
+      items.forEach((item) => {
         const runCount =
           typeof item.run_count === "number" ? item.run_count : 0;
-        return sum + (runCount > 0 ? 1 : 0);
-      }, 0);
-      setActiveSimulations(activeCount);
+        totalSims += runCount;
+
+        if (item.status === "INTERSECTION_STATUS_OPTIMISED") {
+          totalOptimizations += runCount;
+        }
+      });
+
+      setTotalSimulationsRun(totalSims);
+      setTotalOptimizationsRun(totalOptimizations);
 
       updateChart(items);
     } catch (err: unknown) {
       console.error("Failed to fetch intersections:", err);
       setTotalIntersections(0);
+      setTotalSimulationsRun(0); // Reset on error
+      setTotalOptimizationsRun(0); // Reset on error
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
         chartInstanceRef.current = null;
       }
     } finally {
       setLoadingTotal(false);
-      setLoadingActiveSimulations(false);
+      setLoadingActiveSimulations(false); // Keep this to ensure loading state is cleared
     }
   };
 
@@ -247,24 +263,35 @@ const Dashboard: React.FC = () => {
     setMapError(null);
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:9090/intersections", {
+      const response = await fetch(`${API_BASE_URL}/intersections`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");
       const data = await response.json();
-      const intersectionsWithCoords: Intersection[] = (
-        data.intersections || []
-      ).map((intr: ApiIntersection, idx: number) => ({
-        id: String(intr.id),
-        name: intr.name ?? "Unnamed",
-        details: {
-          address: intr.details?.address ?? "",
-          city: intr.details?.city ?? "",
-          province: intr.details?.province ?? "",
-          latitude: intr.details?.latitude ?? -25.7479 + 0.01 * idx,
-          longitude: intr.details?.longitude ?? 28.2293 + 0.01 * idx,
-        },
-      }));
+
+      const intersectionsWithCoords = (data.intersections || [])
+        .map((intr: ApiIntersection) => {
+          const name = intr.name ?? "";
+          const match = name.match(/\[(-?\d+\.?\d*),(-?\d+\.?\d*)\]/);
+          if (match) {
+            const lat = parseFloat(match[1]);
+            const lng = parseFloat(match[2]);
+            return {
+              id: String(intr.id),
+              name: name.split(" [")[0],
+              details: {
+                address: intr.details?.address ?? "",
+                city: intr.details?.city ?? "",
+                province: intr.details?.province ?? "",
+                latitude: lat,
+                longitude: lng,
+              },
+            };
+          }
+          return null;
+        })
+        .filter((intr: Intersection): intr is Intersection => intr !== null);
+
       setMapIntersections(intersectionsWithCoords);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Unknown error";
@@ -280,7 +307,7 @@ const Dashboard: React.FC = () => {
     setRecentError(null);
     try {
       const token = localStorage.getItem("authToken");
-      const response = await fetch("http://localhost:9090/intersections", {
+      const response = await fetch(`${API_BASE_URL}/intersections`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!response.ok) throw new Error("Failed to fetch intersections");
@@ -316,6 +343,18 @@ const Dashboard: React.FC = () => {
   };
   const handleCloseMapModal = () => setIsMapModalOpen(false);
 
+  const handleSimulateFromMap = (id: string, name: string) => {
+    navigate("/simulation-results", {
+      state: {
+        name: `Simulation Results for ${name}`,
+        description: `Viewing simulation results for ${name}`,
+        intersections: [name],
+        intersectionIds: [id],
+        type: "simulations",
+      },
+    });
+  };
+
   const handleViewDetails = (intersection: ApiIntersection) => {
     navigate("/simulation-results", {
       state: {
@@ -330,12 +369,17 @@ const Dashboard: React.FC = () => {
 
   const getStatusStyles = (status?: string) => {
     switch (status) {
-      case "optimised":
+      case "Optimised":
         return {
           statusColor: "bg-statusGreen",
           textColor: "text-statusTextGreen",
         };
-      case "unoptimised":
+      case "Optimising":
+        return {
+          statusColor: "bg-statusOrange",
+          textColor: "text-statusTextOrange",
+        };
+      case "Unoptimised":
         return {
           statusColor: "bg-statusYellow",
           textColor: "text-statusTextYellow",
@@ -355,14 +399,16 @@ const Dashboard: React.FC = () => {
 
   const mapApiStatus = (status?: string): string => {
     switch (status) {
-      case "optimised":
-        return "optimised";
+      case "INTERSECTION_STATUS_OPTIMISED":
+        return "Optimised";
+      case "INTERSECTION_STATUS_OPTIMISING":
+        return "Optimising";
       case "unoptimised":
-        return "unoptimised";
+        return "Unoptimised";
       case "Failed":
         return "Failed";
       default:
-        return "unoptimised";
+        return "Unoptimised";
     }
   };
 
@@ -393,7 +439,7 @@ const Dashboard: React.FC = () => {
             <div>
               <h3 className="card-h3">Active Simulations</h3>
               <p className="card-p">
-                {loadingActiveSimulations ? "..." : activeSimulations}
+                {loadingActiveSimulations ? "..." : totalSimulationsRun}
               </p>
             </div>
           </div>
@@ -405,7 +451,9 @@ const Dashboard: React.FC = () => {
             </div>
             <div>
               <h3 className="card-h3">Optimization Runs</h3>
-              <p className="card-p">156</p>
+              <p className="card-p">
+                {loadingActiveSimulations ? "..." : totalOptimizationsRun}
+              </p>
             </div>
           </div>
         </div>
@@ -442,7 +490,7 @@ const Dashboard: React.FC = () => {
                   <thead>
                     <tr className="text-gray-600 dark:text-[#C9D1D9]">
                       <th className="p-2">#</th>
-                      <th className="p-2">Intersection</th>
+                      <th className="p-2">Location</th>
                       <th className="p-2">Status</th>
                       <th className="p-2">Actions</th>
                     </tr>
@@ -488,9 +536,13 @@ const Dashboard: React.FC = () => {
                               {index + 1}
                             </td>
                             <td className="p-2 text-gray-700 dark:text-[#F0F6FC]">
-                              {intr.details?.address ||
-                                intr.name ||
-                                "Unnamed Intersection"}
+                              {
+                                (
+                                  intr.details?.address ||
+                                  intr.name ||
+                                  "Unnamed Intersection"
+                                ).split(",")[0]
+                              }
                             </td>
                             <td className="p-2">
                               <span
@@ -571,12 +623,16 @@ const Dashboard: React.FC = () => {
                 {!loadingRecent && !recentError && (
                   <ul className="divide-y divide-gray-200 dark:divide-gray-700">
                     {recentIntersections.map((intr) => {
-                      const address =
+                      const displayName = (
+                        intr.name || "Unnamed Intersection"
+                      ).split(" [")[0];
+                      const address = (
                         intr.details?.address ||
                         [intr.details?.city, intr.details?.province]
                           .filter(Boolean)
                           .join(", ") ||
-                        "No address provided";
+                        "No address provided"
+                      ).split(",")[0];
 
                       const displayStatus = mapApiStatus(intr.status);
                       const styles = getStatusStyles(displayStatus);
@@ -603,7 +659,7 @@ const Dashboard: React.FC = () => {
                               </div>
                               <div className="min-w-0">
                                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
-                                  {intr.name || "Unnamed Intersection"}
+                                  {displayName}
                                 </p>
                                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                                   {address}
@@ -654,6 +710,7 @@ const Dashboard: React.FC = () => {
         isOpen={isMapModalOpen}
         onClose={handleCloseMapModal}
         intersections={mapIntersections}
+        onSimulate={handleSimulateFromMap}
       />
       {isLoadingMap && isMapModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-30">

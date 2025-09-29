@@ -1,0 +1,22 @@
+FROM golang:1.25.1-alpine
+
+RUN apk add --no-cache \
+    protobuf \
+    protobuf-dev \
+    make \
+    git \
+    curl \
+    unzip
+
+WORKDIR /app
+COPY protos/swiftsignals/user protos/swiftsignals/user
+COPY protos/swiftsignals/makefile protos/swiftsignals/makefile
+COPY shared/ shared/
+COPY user-service/ user-service/
+
+WORKDIR /app/protos/swiftsignals/
+RUN make user-service
+
+WORKDIR /app/user-service/
+RUN make dockerfile
+CMD ["./bin/user-service"]

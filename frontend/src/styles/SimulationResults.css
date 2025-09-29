@@ -185,6 +185,11 @@
   .simulation-results-page .simRes-main-content {
     padding: 20px 0;
   }
+
+  .simulation-results-page .stat-cube {
+    min-height: 80px;
+    padding: 3px !important;
+  }
 }
 
 @media screen and (max-width: 1200px) {
@@ -241,15 +246,6 @@
     font-size: 1rem;
     margin-bottom: 10px;
   }
-}
-
-.simulation-section {
-  box-shadow: 0 0 30px 8px rgba(59, 130, 246, 0.35);
-  transition: box-shadow 0.3s ease-in-out;
-}
-
-.simulation-section:hover {
-  box-shadow: 0 0 40px 12px rgba(59, 130, 246, 0.45);
 }
 
 /* Extra large screens (≥ 1600px) */
@@ -421,4 +417,27 @@
 /* Very small devices (≤ 400px) */
 @media screen and (max-width: 400px) {
   /* Add your styles for very small devices here */
+}
+
+.simulation-section {
+  box-shadow: 0 0 30px 8px rgba(59, 130, 246, 0.35);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.simulation-section:hover {
+  box-shadow: 0 0 40px 12px rgba(59, 130, 246, 0.45);
+}
+
+@keyframes pulse-width {
+  0%,
+  100% {
+    width: 0%;
+  }
+  50% {
+    width: 100%;
+  }
+}
+
+.animate-pulse-width {
+  animation: pulse-width 2s infinite ease-in-out;
 }

@@ -1,6 +1,5 @@
 import subprocess
 import json
-import random
 from unittest import mock
 import GP
 

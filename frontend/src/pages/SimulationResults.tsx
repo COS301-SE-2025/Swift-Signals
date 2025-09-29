@@ -1,16 +1,20 @@
-import React, { useEffect, useState, useRef } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import "../styles/SimulationResults.css";
-import HelpMenu from "../components/HelpMenu";
 import { Chart, registerables } from "chart.js";
-import { useLocation, useNavigate } from "react-router-dom";
 import type { ChartConfiguration } from "chart.js";
+import React, { useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
-Chart.register(...registerables);
+import Footer from "../components/Footer";
+import HelpMenu from "../components/HelpMenu";
+import Navbar from "../components/Navbar";
+import { API_BASE_URL } from "../config";
+import "../styles/SimulationResults.css";
+
+if (Chart.register) {
+  Chart.register(...registerables);
+}
 
 // #region API Integration
-const API_BASE_URL = "http://localhost:9090";
+// const API_BASE_URL = "http://localhost:9090";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");
@@ -292,6 +296,26 @@ function downsampleData<TLabel, TData>(
 }
 // #endregion
 
+// Helper function to extract street name from a string that might contain coordinates
+const getStreetName = (fullName: string | undefined | null): string => {
+  if (!fullName) return "Simulation Results";
+  // Remove 'Simulation Results for ' prefix
+  let cleanedName = fullName.replace(/^Simulation Results for\s*/, "");
+  // Remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
+  cleanedName = cleanedName.replace(/\s*\[[^\]]*\]$/, "");
+  return cleanedName.trim();
+};
+
+// Helper function to clean the description string
+const cleanDescription = (
+  desc: string | undefined | null,
+): string | undefined => {
+  if (!desc) return undefined;
+  // Only remove coordinates in square brackets, e.g., ' [-25.757139,28.1936006]'
+  const cleanedDesc = desc.replace(/\s*\[[^\]]*\]$/, "");
+  return cleanedDesc.trim();
+};
+
 const SimulationResults: React.FC = () => {
   const [simData, setSimData] = useState<SimulationOutput | null>(null);
   const [optimizedData, setOptimizedData] = useState<SimulationOutput | null>(
@@ -308,14 +332,38 @@ const SimulationResults: React.FC = () => {
   const [showOptimized, setShowOptimized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [canBeOptimized, setCanBeOptimized] = useState(false);
+  const [isOptimized, setIsOptimized] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizationStatus, setOptimizationStatus] = useState<string>("");
 
   const location = useLocation();
   const navigate = useNavigate();
+  const params = useParams();
   const { intersectionIds, name, description, type } = location.state || {};
-  const intersectionId = intersectionIds?.[0];
+
+  console.log("name from location.state:", name);
+  console.log("intersectionData?.name:", intersectionData?.name);
+
+  // Get intersectionId from URL params first, then fall back to location.state
+  const intersectionId = params.intersectionId || intersectionIds?.[0];
+
+  const [isDarkMode, setIsDarkMode] = useState(
+    document.documentElement.classList.contains("dark"),
+  );
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === "class") {
+          setIsDarkMode(document.documentElement.classList.contains("dark"));
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, { attributes: true });
+
+    return () => observer.disconnect();
+  }, []);
 
   const chartInstances = useRef<Chart[]>([]);
   const chartRefs = {
@@ -334,6 +382,12 @@ const SimulationResults: React.FC = () => {
 
     setIsOptimizing(true);
     setOptimizationStatus("Running optimization...");
+
+    // Save optimization status to localStorage
+    localStorage.setItem(
+      `optimizationStatus_${intersectionId}`,
+      JSON.stringify({ status: "optimising" }),
+    );
 
     try {
       const authToken = getAuthToken();
@@ -368,73 +422,75 @@ const SimulationResults: React.FC = () => {
       const optResult = await optResponse.json();
       console.log("Optimization result:", optResult);
 
-      if (optResult.improved) {
-        setOptimizationStatus(
-          "Optimization completed successfully! Fetching optimized data...",
+      setOptimizationStatus(
+        "Optimization completed successfully! Fetching optimized data...",
+      );
+
+      // Step 2: Fetch optimized simulation data
+      const optDataResponse = await fetch(
+        `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        },
+      );
+
+      if (!optDataResponse.ok) {
+        throw new Error(
+          `Failed to fetch optimized data: ${optDataResponse.statusText}`,
         );
-
-        // Step 2: Fetch optimized simulation data
-        const optDataResponse = await fetch(
-          `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
-          {
-            headers: { Authorization: `Bearer ${authToken}` },
-          },
-        );
-
-        if (!optDataResponse.ok) {
-          throw new Error(
-            `Failed to fetch optimized data: ${optDataResponse.statusText}`,
-          );
-        }
-
-        const optData: ApiSimulationResponse = await optDataResponse.json();
-
-        if (!optData.output) {
-          throw new Error(
-            "Invalid optimized simulation data received from server",
-          );
-        }
-
-        // Process traffic lights for optimized data if they exist
-        if (
-          optData.output.intersection &&
-          optData.output.intersection.trafficLights
-        ) {
-          const processedTrafficLights = processTrafficLights(
-            optData.output.intersection.trafficLights,
-          );
-          const newOptData = {
-            ...optData.output,
-            intersection: {
-              ...optData.output.intersection,
-              trafficLights: processedTrafficLights,
-            },
-          };
-          setOptimizedData(newOptData);
-        } else {
-          setOptimizedData(optData.output);
-        }
-
-        setOptimizedApiResults(optData.results);
-        setCanBeOptimized(true);
-        setShowOptimized(true);
-        setOptimizationStatus("Optimization completed successfully!");
-
-        // Update the intersection status to "optimised" in the backend
-        await updateIntersectionStatus(intersectionId, "optimised");
-
-        // Refresh intersection data to get updated status
-        await fetchIntersectionData();
-
-        setTimeout(() => {
-          setOptimizationStatus("");
-        }, 3000);
-      } else {
-        setOptimizationStatus("No improvement found in optimization.");
-        setTimeout(() => {
-          setOptimizationStatus("");
-        }, 3000);
       }
+
+      const optData: ApiSimulationResponse = await optDataResponse.json();
+
+      if (!optData.output) {
+        throw new Error(
+          "Invalid optimized simulation data received from server",
+        );
+      }
+
+      // Process traffic lights for optimized data if they exist
+      if (
+        optData.output.intersection &&
+        optData.output.intersection.trafficLights
+      ) {
+        const processedTrafficLights = processTrafficLights(
+          optData.output.intersection.trafficLights,
+        );
+        const newOptData = {
+          ...optData.output,
+          intersection: {
+            ...optData.output.intersection,
+            trafficLights: processedTrafficLights,
+          },
+        };
+        setOptimizedData(newOptData);
+      } else {
+        setOptimizedData(optData.output);
+      }
+
+      setOptimizedApiResults(optData.results);
+      setIsOptimized(true);
+      setShowOptimized(true);
+      setOptimizationStatus("Optimization completed successfully!");
+
+      // Save optimized data to localStorage
+      localStorage.setItem(
+        `optimizationStatus_${intersectionId}`,
+        JSON.stringify({
+          status: "optimised",
+          data: optData,
+        }),
+      );
+
+      // Update the intersection status to "optimised" in the backend
+      await updateIntersectionStatus(
+        intersectionId,
+        "INTERSECTION_STATUS_OPTIMISED",
+      );
+
+      setTimeout(() => {
+        setOptimizationStatus("");
+      }, 3000);
     } catch (error) {
       console.error("Error running optimization:", error);
       setOptimizationStatus(
@@ -496,35 +552,6 @@ const SimulationResults: React.FC = () => {
     }
   };
 
-  // Function to fetch intersection data (including status)
-  const fetchIntersectionData = async () => {
-    if (!intersectionId) return;
-
-    try {
-      const authToken = getAuthToken();
-      if (!authToken) return;
-
-      const response = await fetch(
-        `${API_BASE_URL}/intersections/${intersectionId}`,
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        },
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setIntersectionData(data);
-
-        // Check if intersection has been optimized
-        if (data.status === "optimised") {
-          setCanBeOptimized(true);
-        }
-      }
-    } catch (error) {
-      console.error("Failed to fetch intersection data:", error);
-    }
-  };
-
   const fetchData = async () => {
     if (!intersectionId) {
       setError("No intersection ID provided.");
@@ -538,12 +565,9 @@ const SimulationResults: React.FC = () => {
       const authToken = getAuthToken();
       const headers = { Authorization: `Bearer ${authToken}` };
 
-      // Fetch all three pieces of data in parallel
-      const [simRes, optRes, intersectionRes] = await Promise.all([
+      // Fetch simulation and intersection data in parallel
+      const [simRes, intersectionRes] = await Promise.all([
         fetch(`${API_BASE_URL}/intersections/${intersectionId}/simulate`, {
-          headers,
-        }),
-        fetch(`${API_BASE_URL}/intersections/${intersectionId}/optimise`, {
           headers,
         }),
         fetch(`${API_BASE_URL}/intersections/${intersectionId}`, { headers }),
@@ -567,23 +591,27 @@ const SimulationResults: React.FC = () => {
         await intersectionRes.json();
       setIntersectionData(intersectionResponseData);
 
-      // Check if intersection has been optimized
-      if (intersectionResponseData.status === "optimised") {
-        setCanBeOptimized(true);
-      }
+      // If intersection is optimized, fetch optimization data
+      if (intersectionResponseData.status === "INTERSECTION_STATUS_OPTIMISED") {
+        setIsOptimized(true);
+        const optRes = await fetch(
+          `${API_BASE_URL}/intersections/${intersectionId}/optimise`,
+          {
+            headers,
+          },
+        );
 
-      // Process optimization data if available
-      if (optRes.ok) {
-        const optResponseData: ApiSimulationResponse = await optRes.json();
-        setOptimizedData(optResponseData.output);
-        setOptimizedApiResults(optResponseData.results);
-        setCanBeOptimized(true);
-        // If the user came from the "Optimizations" table, show the comparison by default
-        if (type === "optimizations") {
-          setShowOptimized(true);
+        if (optRes.ok) {
+          const optResponseData: ApiSimulationResponse = await optRes.json();
+          setOptimizedData(optResponseData.output);
+          setOptimizedApiResults(optResponseData.results);
+          // If the user came from the "Optimizations" table, show the comparison by default
+          if (type === "optimizations") {
+            setShowOptimized(true);
+          }
         }
       } else {
-        setCanBeOptimized(false);
+        setIsOptimized(false);
       }
     } catch (err: unknown) {
       setError(
@@ -598,14 +626,25 @@ const SimulationResults: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, [intersectionId, type]);
-
-  // Fetch intersection data on mount to get latest status
-  useEffect(() => {
-    if (intersectionId) {
-      fetchIntersectionData();
+    const savedStatus = localStorage.getItem(
+      `optimizationStatus_${intersectionId}`,
+    );
+    if (savedStatus) {
+      const { status, data } = JSON.parse(savedStatus);
+      if (status === "optimised") {
+        setOptimizedData(data.output);
+        setOptimizedApiResults(data.results);
+        setIsOptimized(true);
+        setShowOptimized(true);
+      } else if (status === "optimising") {
+        setIsOptimizing(true);
+        // You might want to add polling logic here to check for completion
+      }
     }
+  }, [intersectionId]);
+
+  useEffect(() => {
+    fetchData();
   }, [intersectionId]);
 
   // Chart creation and updates
@@ -692,7 +731,7 @@ const SimulationResults: React.FC = () => {
         legend: {
           display: showOptimized,
           labels: {
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 12 },
           },
         },
@@ -706,14 +745,25 @@ const SimulationResults: React.FC = () => {
       },
       scales: {
         x: {
-          grid: { color: "rgba(255,255,255,0.1)" },
-          ticks: { color: "#ccc", maxTicksLimit: 10 },
-          title: { display: true, color: "#fff", font: { size: 14 } },
+          grid: {
+            color: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+          },
+          title: {
+            display: true,
+            color: isDarkMode ? "#fff" : "#333",
+            font: { size: 14 },
+          },
         },
         y: {
-          grid: { color: "rgba(255,255,255,0.1)" },
-          ticks: { color: "#ccc" },
-          title: { display: true, color: "#fff", font: { size: 14 } },
+          grid: {
+            color: isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.1)",
+          },
+          ticks: { color: isDarkMode ? "#ccc" : "#666" },
+          title: {
+            display: true,
+            color: isDarkMode ? "#fff" : "#777777ff",
+            font: { size: 14 },
+          },
           beginAtZero: true,
         },
       },
@@ -815,7 +865,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Average Speed Over Time",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
@@ -843,7 +893,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Vehicle Count Over Time",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
@@ -871,7 +921,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Histogram of Final Speeds",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
@@ -902,7 +952,7 @@ const SimulationResults: React.FC = () => {
           title: {
             display: true,
             text: "Histogram of Total Distance",
-            color: "#fff",
+            color: isDarkMode ? "#fff" : "#777777ff",
             font: { size: 18 },
           },
         },
@@ -927,7 +977,7 @@ const SimulationResults: React.FC = () => {
       chartInstances.current.forEach((c) => c?.destroy());
       chartInstances.current = [];
     };
-  }, [simData, showOptimized, optimizedData]);
+  }, [simData, showOptimized, optimizedData, isDarkMode]);
 
   const handleViewRendering = () => {
     if (intersectionId) {
@@ -935,6 +985,8 @@ const SimulationResults: React.FC = () => {
         state: {
           originalIntersectionId: intersectionId,
           originalIntersectionName: intersectionData?.name || "Simulation",
+          simulationData: simData,
+          optimizedData: optimizedData,
         },
       });
     } else {
@@ -991,13 +1043,15 @@ const SimulationResults: React.FC = () => {
           0,
         ),
       }
-    : { numPhases: 0, totalCycle: 0 };
+    : { numPhases: undefined, totalCycle: undefined };
 
-  const trafficDensityLabel =
-    intersectionData?.traffic_density
-      .replace("TRAFFIC_DENSITY_", "")
-      .replace("_", " ")
-      .toLowerCase() || "N/A";
+  // Define trafficDensityLabel from intersectionData
+  const trafficDensityLabel = intersectionData?.traffic_density
+    ? intersectionData.traffic_density.replace(/_/g, " ").toLowerCase()
+    : "unknown";
+
+  const displayedName = getStreetName(name || intersectionData?.name);
+  const displayedDescription = cleanDescription(description);
 
   return (
     <div className="simulation-results-page bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 min-h-screen">
@@ -1007,11 +1061,11 @@ const SimulationResults: React.FC = () => {
           <div className="mb-10 flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
             <div className="flex-1 text-left">
               <h1 className="simName text-4xl font-extrabold bg-gradient-to-r from-teal-400 to-emerald-500 bg-clip-text text-transparent mb-2 text-left">
-                {name || intersectionData?.name || "Simulation Results"}
+                {displayedName}
               </h1>
-              {description && (
+              {displayedDescription && (
                 <p className="simDesc text-lg text-gray-400 mb-4 leading-relaxed text-left">
-                  {description}
+                  {displayedDescription}
                 </p>
               )}
             </div>
@@ -1024,36 +1078,34 @@ const SimulationResults: React.FC = () => {
               </button>
 
               {/* Optimization Button */}
-              <button
-                onClick={runOptimization}
-                disabled={isOptimizing || canBeOptimized}
-                className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
-                  isOptimizing
-                    ? "bg-gray-600 cursor-not-allowed"
-                    : canBeOptimized
-                      ? "bg-green-600 cursor-not-allowed"
+              {!isOptimized && (
+                <button
+                  onClick={runOptimization}
+                  disabled={isOptimizing}
+                  className={`px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out focus:outline-none focus:ring-4 ${
+                    isOptimizing
+                      ? "bg-gray-600 cursor-not-allowed"
                       : "bg-gradient-to-r from-orange-600 to-orange-700 shadow-orange-500/50 hover:scale-105 hover:shadow-xl hover:shadow-orange-500/60 focus:ring-orange-300"
-                }`}
-              >
-                {isOptimizing ? (
-                  <div className="flex items-center justify-center space-x-2">
-                    <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
-                    <span>Optimizing...</span>
-                  </div>
-                ) : canBeOptimized ? (
-                  "Already Optimized"
-                ) : (
-                  "Run Optimization"
-                )}
-              </button>
+                  }`}
+                >
+                  {isOptimizing ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                      <span>Optimizing...</span>
+                    </div>
+                  ) : (
+                    "Run Optimization"
+                  )}
+                </button>
+              )}
 
               {/* Show Optimization Results Button */}
-              {canBeOptimized && (
+              {isOptimized && (
                 <button
                   onClick={() => setShowOptimized(!showOptimized)}
                   className="px-8 py-3 text-base font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 ease-in-out hover:scale-105 focus:outline-none focus:ring-4 bg-gradient-to-r from-green-600 to-green-700 shadow-green-500/50 hover:shadow-xl hover:shadow-green-500/60 focus:ring-green-300"
                 >
-                  {showOptimized ? "Hide Optimization" : "Show Optimization"}
+                  Show/Hide Optimization
                 </button>
               )}
             </div>
@@ -1066,7 +1118,7 @@ const SimulationResults: React.FC = () => {
                 optimizationStatus.includes("failed") ||
                 optimizationStatus.includes("No improvement")
                   ? "bg-red-500/20 border border-red-500/30 text-red-300"
-                  : "bg-green-500/20 border border-green-500/30 text-green-300"
+                  : "bg-green-600 border border-green-700 text-white dark:bg-green-700/20 dark:border-green-700/30 dark:text-green-300"
               }`}
             >
               <p className="font-semibold">{optimizationStatus}</p>
@@ -1145,7 +1197,7 @@ const SimulationResults: React.FC = () => {
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
-                  # Vehicles
+                  Throughput
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
                   {apiResults ? apiResults.total_vehicles : "..."}
@@ -1158,7 +1210,7 @@ const SimulationResults: React.FC = () => {
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
-                  # TL Phases
+                  # Light Phases
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
                   {numPhases}
@@ -1166,7 +1218,7 @@ const SimulationResults: React.FC = () => {
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
-                  TL Cycle
+                  Light Cycle
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
                   {totalCycle} <span className="text-sm font-normal">s</span>
@@ -1212,3 +1264,12 @@ const SimulationResults: React.FC = () => {
 };
 
 export default SimulationResults;
+export {
+  computeStats,
+  getAllTimes,
+  getAverageSpeedOverTime,
+  getVehicleCountOverTime,
+  getTotalDistancePerVehicle,
+  getStreetName,
+  cleanDescription,
+};

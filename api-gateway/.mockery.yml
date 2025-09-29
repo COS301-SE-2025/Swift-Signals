@@ -1,5 +1,5 @@
 with-expecter: true
-
+recursive: true
 resolve-type-alias: false
 disable-version-string: true
 issue-845-fix: true
@@ -28,7 +28,7 @@ packages:
       AdminServiceInterface:
       ProfileServiceInterface:
 
-  github.com/COS301-SE-2025/Swift-Signals/protos/gen/intersection:
+  github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1:
     config:
       dir: "internal/mocks/grpc_client"
       filename: "{{.InterfaceName}}.go"
@@ -38,7 +38,7 @@ packages:
       IntersectionServiceClient:
       IntersectionService_GetAllIntersectionsClient:
 
-  github.com/COS301-SE-2025/Swift-Signals/protos/gen/optimisation:
+  github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/optimisation/v1:
     config:
       dir: "internal/mocks/grpc_client"
       filename: "{{.InterfaceName}}.go"
@@ -47,7 +47,7 @@ packages:
     interfaces:
       OptimisationServiceClient:
 
-  github.com/COS301-SE-2025/Swift-Signals/protos/gen/user:
+  github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/user/v1:
     config:
       dir: "internal/mocks/grpc_client"
       filename: "{{.InterfaceName}}.go"

@@ -138,6 +138,7 @@ func (s *Service) UpdateIntersection(
 	id string,
 	name string,
 	details model.IntersectionDetails,
+	status model.IntersectionStatus,
 ) (*model.Intersection, error) {
 	logger := util.LoggerFromContext(ctx)
 
@@ -152,7 +153,7 @@ func (s *Service) UpdateIntersection(
 	}
 
 	logger.Debug("updating intersection")
-	intersection, err := s.repo.UpdateIntersection(ctx, id, name, details)
+	intersection, err := s.repo.UpdateIntersection(ctx, id, name, details, status)
 	if err != nil {
 		var svcErr *errs.ServiceError
 		if errors.As(err, &svcErr) {

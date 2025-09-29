@@ -136,6 +136,7 @@ func (r *MongoIntersectionRepo) UpdateIntersection(
 	id string,
 	name string,
 	details model.IntersectionDetails,
+	status model.IntersectionStatus,
 ) (*model.Intersection, error) {
 	logger := util.LoggerFromContext(ctx)
 	logger.Debug("updating intersection")
@@ -145,7 +146,17 @@ func (r *MongoIntersectionRepo) UpdateIntersection(
 		"$set": bson.M{
 			"name":    name,
 			"details": details,
+			"status":  status,
 		},
+	}
+
+	if status == model.IntersectionStatus("INTERSECTION_STATUS_UNSPECIFIED") {
+		update = bson.M{
+			"$set": bson.M{
+				"name":    name,
+				"details": details,
+			},
+		}
 	}
 
 	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
@@ -243,12 +254,12 @@ func (r *MongoIntersectionRepo) UpdateBestParams(
 	filter := bson.M{"id": id}
 	update := bson.M{
 		"$set": bson.M{
-			"best_parameters": params,
-			"last_run_at":     time.Now(),
-			"status":          model.Optimised,
+			"bestparameters": params,
+			"lastrunat":      time.Now(),
+			"status":         model.Optimised,
 		},
 		"$inc": bson.M{
-			"run_count": 1,
+			"runcount": 1,
 		},
 	}
 

@@ -1,0 +1,29 @@
+FROM golang:1.25.1-alpine AS build
+
+RUN apk add --no-cache \
+    protobuf \
+    protobuf-dev \
+    make \
+    git \
+    curl \
+    unzip
+
+WORKDIR /app
+COPY protos/swiftsignals/user protos/swiftsignals/user
+COPY protos/swiftsignals/makefile protos/swiftsignals/makefile
+COPY shared/ shared/
+COPY user-service/ user-service/
+RUN find . -name "test" -type d -exec rm -rf {} + || true
+
+WORKDIR /app/protos/swiftsignals/
+RUN make user-service
+
+WORKDIR /app/user-service/
+RUN make dockerfile-production
+
+FROM alpine:edge
+
+WORKDIR /app
+COPY --from=build /app/user-service/bin/user-service .
+ENTRYPOINT ["/app/user-service"]
+

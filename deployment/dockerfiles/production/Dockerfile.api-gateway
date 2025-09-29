@@ -1,0 +1,27 @@
+FROM golang:1.25.1-alpine AS build
+
+RUN apk add --no-cache \
+    protobuf \
+    protobuf-dev \
+    make \
+    git \
+    curl \
+    unzip
+
+WORKDIR /app
+COPY protos/ protos/
+COPY shared/ shared/
+COPY api-gateway/ api-gateway/
+RUN find . -name "test" -type d -exec rm -rf {} + || true
+
+WORKDIR /app/protos/swiftsignals/
+RUN make api-gateway
+
+WORKDIR /app/api-gateway/
+RUN make dockerfile-production
+
+FROM alpine:edge
+
+WORKDIR /app
+COPY --from=build /app/api-gateway/bin/api-gateway .
+ENTRYPOINT ["/app/api-gateway"]

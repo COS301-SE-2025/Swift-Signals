@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Eye, Trash2, ChevronDown } from "lucide-react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
 import type { LatLng } from "leaflet";
-import "../styles/Simulations.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
-import HelpMenu from "../components/HelpMenu";
+import { Eye, Trash2, ChevronDown } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { useNavigate } from "react-router-dom";
 
-const API_BASE_URL = "http://localhost:9090";
+import Footer from "../components/Footer";
+import HelpMenu from "../components/HelpMenu";
+import Navbar from "../components/Navbar";
+import "../styles/Simulations.css";
+
+import "leaflet/dist/leaflet.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
+import { API_BASE_URL } from "../config";
 
 const getAuthToken = () => {
   return localStorage.getItem("authToken");
@@ -1380,7 +1381,8 @@ const StreetSearchComponent: React.FC<{
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
             Intersecting Street
             <span className="text-xs text-gray-500 block">
-              Streets that actually intersect with "{selectedFirstStreet.name}"
+              Streets that actually intersect with &quot;
+              {selectedFirstStreet.name}&quot;
             </span>
           </label>
           <div className="relative">
@@ -1712,9 +1714,11 @@ const SimulationTable: React.FC<{
 
   const statusClass = (status: string) => {
     switch (status) {
-      case "optimised":
+      case "Optimised":
         return "bg-green-200 text-green-800 border-green-300";
-      case "unoptimised":
+      case "Optimising":
+        return "bg-orange-200 text-green-800 border-orange-300";
+      case "Unoptimised":
         return "bg-yellow-200 text-yellow-800 border-yellow-300";
       case "Failed":
         return "bg-red-200 text-red-800 border-red-300";
@@ -1982,14 +1986,16 @@ const Simulations: React.FC = () => {
 
     const mapApiStatus = (apiStatus?: string): string => {
       switch (apiStatus) {
-        case "optimised":
-          return "optimised";
-        case "unoptimised":
-          return "unoptimised";
+        case "INTERSECTION_STATUS_OPTIMISED":
+          return "Optimised"; // Frontend display string
+        case "INTERSECTION_STATUS_OPTIMISING":
+          return "Optimising"; // Frontend display string
+        case "unoptimised": // Assuming backend still sends "unoptimised" for unoptimized
+          return "Unoptimised"; // Frontend display string
         case "Failed":
           return "Failed";
         default:
-          return "unoptimised";
+          return "Unoptimised";
       }
     };
 
@@ -2000,17 +2006,27 @@ const Simulations: React.FC = () => {
     });
 
     //  UPDATED: Mapped API data to the new SimulationData structure
-    const allSims = sortedIntersections.map((intersection, index) => ({
-      id: index + 1,
-      backendId: intersection.id,
-      intersection: intersection.details?.address || intersection.name,
-      trafficDensity: formatTrafficDensity(intersection.traffic_density),
-      speed: intersection.default_parameters?.simulation_parameters?.speed || 0,
-      status: mapApiStatus(intersection.status),
-    }));
+    const allSims = sortedIntersections.map((intersection, index) => {
+      const displayName = (intersection.name || "Unnamed Intersection").split(
+        " [",
+      )[0];
+      const displayAddress = (
+        intersection.details?.address || displayName
+      ).split(",")[0];
+
+      return {
+        id: index + 1,
+        backendId: intersection.id,
+        intersection: displayAddress,
+        trafficDensity: formatTrafficDensity(intersection.traffic_density),
+        speed:
+          intersection.default_parameters?.simulation_parameters?.speed || 0,
+        status: mapApiStatus(intersection.status),
+      };
+    });
 
     //  UPDATED: Filter optimizations based on actual "optimised" status
-    const opts = allSims.filter((sim) => sim.status === "optimised");
+    const opts = allSims.filter((sim) => sim.status === "Optimised");
 
     return { sims: allSims, opts };
   };

@@ -6,7 +6,8 @@ import (
 
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/model"
 	"github.com/COS301-SE-2025/Swift-Signals/api-gateway/internal/util"
-	simulationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/simulation"
+	commonpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/common/v1"
+	simulationpb "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/simulation/v1"
 	errs "github.com/COS301-SE-2025/Swift-Signals/shared/error"
 	"google.golang.org/grpc"
 )
@@ -30,7 +31,7 @@ func (sc *SimulationClient) GetSimulationResults(
 	id string,
 	simulation_parameters model.SimulationParameters,
 ) (*simulationpb.SimulationResultsResponse, error) {
-	intersection, ok := simulationpb.IntersectionType_value[simulation_parameters.IntersectionType]
+	intersection, ok := commonpb.IntersectionType_value[simulation_parameters.IntersectionType]
 
 	if !ok {
 		return nil, errs.NewValidationError("invalid simulation parameters", map[string]any{})
@@ -38,8 +39,8 @@ func (sc *SimulationClient) GetSimulationResults(
 
 	req := &simulationpb.SimulationRequest{
 		IntersectionId: id,
-		SimulationParameters: &simulationpb.SimulationParameters{
-			IntersectionType: simulationpb.IntersectionType(intersection),
+		SimulationParameters: &commonpb.SimulationParameters{
+			IntersectionType: commonpb.IntersectionType(intersection),
 			Green:            int32(simulation_parameters.Green),
 			Yellow:           int32(simulation_parameters.Yellow),
 			Red:              int32(simulation_parameters.Red),
@@ -48,7 +49,7 @@ func (sc *SimulationClient) GetSimulationResults(
 		},
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
 	resp, err := sc.client.GetSimulationResults(ctx, req)
@@ -63,7 +64,7 @@ func (sc *SimulationClient) GetSimulationOutput(
 	id string,
 	simulation_parameters model.SimulationParameters,
 ) (*simulationpb.SimulationOutputResponse, error) {
-	intersection, ok := simulationpb.IntersectionType_value[simulation_parameters.IntersectionType]
+	intersection, ok := commonpb.IntersectionType_value[simulation_parameters.IntersectionType]
 
 	if !ok {
 		return nil, errs.NewValidationError("invalid simulation parameters", map[string]any{})
@@ -71,8 +72,8 @@ func (sc *SimulationClient) GetSimulationOutput(
 
 	req := &simulationpb.SimulationRequest{
 		IntersectionId: id,
-		SimulationParameters: &simulationpb.SimulationParameters{
-			IntersectionType: simulationpb.IntersectionType(intersection),
+		SimulationParameters: &commonpb.SimulationParameters{
+			IntersectionType: commonpb.IntersectionType(intersection),
 			Green:            int32(simulation_parameters.Green),
 			Yellow:           int32(simulation_parameters.Yellow),
 			Red:              int32(simulation_parameters.Red),
@@ -81,7 +82,7 @@ func (sc *SimulationClient) GetSimulationOutput(
 		},
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 
 	resp, err := sc.client.GetSimulationOutput(ctx, req)

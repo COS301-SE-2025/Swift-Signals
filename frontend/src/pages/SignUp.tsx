@@ -1,10 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/SignUp.css";
-import Footer from "../components/Footer";
-import logo from "../../src/assets/logo.png";
+import { Check } from "lucide-react";
 
-const API_BASE_URL = "http://localhost:9090";
+import logo from "../../src/assets/logo.png";
+import Footer from "../components/Footer";
+import "../styles/SignUp.css";
+
+import { API_BASE_URL } from "../config";
 
 interface TrafficLightProps {
   redActive: boolean;
@@ -64,10 +66,50 @@ const TrafficLight = ({
   );
 };
 
+const getFriendlyErrorMessage = (backendError: string): string => {
+  if (!backendError) {
+    return "An unexpected error occurred. Please try again.";
+  }
+
+  if (backendError.includes("User with this email already exists")) {
+    return "This email is already registered. Please try logging in or use a different email.";
+  }
+  if (backendError.includes("Invalid password format")) {
+    return "Password does not meet the required criteria. Please ensure it has at least one lowercase, one uppercase, one number, one special character, and is at least 8 characters long.";
+  }
+  if (backendError.includes("Invalid email format")) {
+    return "Please enter a valid email address.";
+  }
+  if (backendError.includes("Username already taken")) {
+    return "This username is already taken. Please choose a different one.";
+  }
+  if (
+    backendError.includes(
+      "An unexpected response was received from the server.",
+    )
+  ) {
+    return "A problem occurred while processing the server's response. Please try again.";
+  }
+  if (backendError.includes("Failed to fetch")) {
+    return "Could not connect to the server. Please check your internet connection or try again later.";
+  }
+
+  // Generic fallback for any other errors
+  return "An unexpected error occurred during registration. Please try again later.";
+};
+
 const SignUp = () => {
   const [username, setUsername] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [passwordRequirements, setPasswordRequirements] = React.useState({
+    lowercase: false,
+    special: false,
+    uppercase: false,
+    length: false,
+    number: false,
+  });
+  const [isPasswordFocused, setIsPasswordFocused] = React.useState(false);
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -115,7 +157,7 @@ const SignUp = () => {
       if (!response.ok) {
         const errorMessage =
           data?.message || "An unexpected error occurred. Please try again.";
-        throw new Error(errorMessage);
+        throw new Error(getFriendlyErrorMessage(errorMessage));
       }
 
       console.log("Registration successful:", data);
@@ -127,9 +169,11 @@ const SignUp = () => {
     } catch (err: unknown) {
       console.error("Sign-up error:", err);
       if (err instanceof Error) {
-        setError(err.message);
+        setError(getFriendlyErrorMessage(err.message));
       } else {
-        setError("An unexpected sign-up error occurred.");
+        setError(
+          getFriendlyErrorMessage("An unexpected sign-up error occurred."),
+        );
       }
     } finally {
       setIsLoading(false);
@@ -139,7 +183,7 @@ const SignUp = () => {
   return (
     <div className="min-h-screen min-w-screen w-full h-full flex flex-col sm:flex-row items-center justify-center font-sans from-slate-100 to-sky-100 p-4">
       <div
-        className="welcomeMessage absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-2 z-10 animate-fade-in-down"
+        className="welcomeMessage absolute top-8 left-1/2 transform -translate-x-1/2 flex flex-row items-center justify-center space-x-4 z-10 animate-fade-in-down"
         style={{ minWidth: 350 }}
       >
         <img
@@ -225,9 +269,19 @@ const SignUp = () => {
               id="password"
               name="password"
               value={password}
+              onFocus={() => setIsPasswordFocused(true)}
+              onBlur={() => setIsPasswordFocused(false)}
               onChange={(e) => {
                 e.preventDefault();
-                setPassword(e.target.value);
+                const newPassword = e.target.value;
+                setPassword(newPassword);
+                setPasswordRequirements({
+                  lowercase: /[a-z]/.test(newPassword),
+                  special: /\W/.test(newPassword),
+                  uppercase: /[A-Z]/.test(newPassword),
+                  length: newPassword.length >= 8,
+                  number: /[0-9]/.test(newPassword),
+                });
               }}
               placeholder="Password"
               className="w-full px-4 py-3 border-2 border-[#388BFD] rounded-full bg-gray-100 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors"
@@ -235,6 +289,49 @@ const SignUp = () => {
               disabled={isLoading}
             />
           </div>
+          {isPasswordFocused && (
+            <div className="grid grid-cols-2 gap-x-4 text-sm text-gray-600 dark:text-gray-400 mt-2">
+              <div
+                className={`flex items-center ${
+                  passwordRequirements.lowercase ? "text-green-500" : ""
+                }`}
+              >
+                <Check size={16} className="mr-2" />
+                One lowercase character
+              </div>
+              <div
+                className={`flex items-center ${
+                  passwordRequirements.special ? "text-green-500" : ""
+                }`}
+              >
+                <Check size={16} className="mr-2" />
+                One special character
+              </div>
+              <div
+                className={`flex items-center ${
+                  passwordRequirements.uppercase ? "text-green-500" : ""
+                }`}
+              >
+                <Check size={16} className="mr-2" />
+                One uppercase character
+              </div>
+              <div
+                className={`flex items-center ${
+                  passwordRequirements.length ? "text-green-500" : ""
+                }`}
+              >
+                <Check size={16} className="mr-2" />8 characters minimum
+              </div>
+              <div
+                className={`flex items-center ${
+                  passwordRequirements.number ? "text-green-500" : ""
+                }`}
+              >
+                <Check size={16} className="mr-2" />
+                One number
+              </div>
+            </div>
+          )}
           <div>
             <button
               type="submit"

@@ -2,13 +2,13 @@ import os
 import logging
 
 import grpc
-from simulation_pb2 import (
+from swiftsignals.common.v1.simulation_pb2 import SimulationParameters
+from swiftsignals.common.v1.types_pb2 import IntersectionType
+from swiftsignals.simulation.v1.simulation_pb2 import (
     SimulationRequest,
-    SimulationParameters,
-    IntersectionType,
     SimulationResultsResponse,
 )
-from simulation_pb2_grpc import SimulationServiceStub
+from swiftsignals.simulation.v1.simulation_pb2_grpc import SimulationServiceStub
 
 # Configuration
 SIMU_GRPC_ADDR = os.environ.get("SIMU_GRPC_ADDR", "localhost:50053")
@@ -19,7 +19,7 @@ channel = grpc.insecure_channel(SIMU_GRPC_ADDR)
 stub = SimulationServiceStub(channel)
 
 
-def run_simulation(individual_params: list) -> dict | None:
+def run_simulation(individual_params: list, traffic_density: int = 2) -> dict | None:
     """
     Runs a simulation using the gRPC service and returns a dictionary of results.
 

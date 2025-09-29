@@ -15,13 +15,11 @@ if "SimLoad" not in sys.modules:
 
 
 class TestSimLoad(unittest.TestCase):
-
     @patch("builtins.input", side_effect=["params_test.json"])
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open")
     @patch("sys.argv", new=["scriptname"])
     def test_loadParams(self, mock_open_file, mock_exists, mock_input):
-
         def open_side_effect(file, mode="r", *args, **kwargs):
             if file == "params_test.json":
                 return StringIO(

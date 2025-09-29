@@ -1,10 +1,11 @@
+import { X } from "lucide-react";
 import React, {
   useEffect,
   useLayoutEffect,
   useState,
   useCallback,
 } from "react";
-import { X } from "lucide-react";
+import "../styles/InteractiveTutorial.css";
 
 export type TutorialStep = {
   selector: string;
@@ -13,7 +14,7 @@ export type TutorialStep = {
   position?: "top" | "bottom" | "left" | "right" | "center";
   action?: () => void;
   autoAdvance?: boolean;
-  waitFor?: string; // CSS selector to wait for before auto-advancing
+  waitFor?: string;
 };
 
 type Position = {
@@ -25,9 +26,14 @@ type Position = {
 type Props = {
   steps: TutorialStep[];
   onClose: () => void;
+  tutorialType: string;
 };
 
-const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
+const InteractiveTutorial: React.FC<Props> = ({
+  steps,
+  onClose,
+  tutorialType,
+}) => {
   const [stepIndex, setStepIndex] = useState(0);
   const [position, setPosition] = useState<Position | null>(null);
   const [highlightRect, setHighlightRect] = useState<DOMRect | null>(null);
@@ -57,7 +63,6 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
     }
   }, [currentStep]);
 
-  // Auto-advance logic
   useEffect(() => {
     if (!currentStep?.autoAdvance) return;
 
@@ -73,13 +78,11 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
             } else {
               onClose();
             }
-          }, 500); // Small delay to ensure smooth transition
+          }, 500);
         } else {
-          // Keep checking every 100ms
           timeoutId = setTimeout(checkForAdvance, 100);
         }
       } else {
-        // Auto-advance after action without waiting for element
         timeoutId = setTimeout(() => {
           if (stepIndex < steps.length - 1) {
             setStepIndex(stepIndex + 1);
@@ -152,23 +155,31 @@ const InteractiveTutorial: React.FC<Props> = ({ steps, onClose }) => {
     let popoverTop = 0;
     let popoverLeft = 0;
 
-    switch (currentStep.position) {
-      case "top":
-        popoverTop = rect.top - popoverRect.height - 20;
-        popoverLeft = rect.left + rect.width / 2 - popoverRect.width / 2;
-        break;
-      case "left":
-        popoverTop = rect.top + rect.height / 2 - popoverRect.height / 2;
-        popoverLeft = rect.left - popoverRect.width - 20;
-        break;
-      case "right":
-        popoverTop = rect.top + rect.height / 2 - popoverRect.height / 2;
-        popoverLeft = rect.right + 20;
-        break;
-      default:
-        popoverTop = rect.bottom + 20;
-        popoverLeft = rect.left + rect.width / 2 - popoverRect.width / 2;
-        break;
+    if (tutorialType === "navigation" && stepIndex === 2) {
+      popoverTop = rect.top - popoverRect.height - 90;
+      popoverLeft = rect.left + rect.width / 2 - popoverRect.width / 2;
+    } else if (tutorialType === "comparison-view" && stepIndex === 2) {
+      popoverTop = rect.top + 90;
+      popoverLeft = rect.left + rect.width / 2 - popoverRect.width / 2;
+    } else {
+      switch (currentStep.position) {
+        case "top":
+          popoverTop = rect.top - popoverRect.height - 20;
+          popoverLeft = rect.left + rect.width / 2 - popoverRect.width / 2;
+          break;
+        case "left":
+          popoverTop = rect.top + rect.height / 2 - popoverRect.height / 2;
+          popoverLeft = rect.left - popoverRect.width - 20;
+          break;
+        case "right":
+          popoverTop = rect.top + rect.height / 2 - popoverRect.height / 2;
+          popoverLeft = rect.right + 20;
+          break;
+        default:
+          popoverTop = rect.bottom + 20;
+          popoverLeft = rect.left + rect.width / 2 - popoverRect.width / 2;
+          break;
+      }
     }
 
     const popoverStyles: React.CSSProperties = {

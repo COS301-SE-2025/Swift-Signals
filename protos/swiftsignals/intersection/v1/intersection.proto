@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package swiftsignals.intersection.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+import "swiftsignals/common/v1/types.proto";
+import "swiftsignals/common/v1/simulation.proto";
+
+option go_package = "github.com/COS301-SE-2025/Swift-Signals/protos/gen/swiftsignals/intersection/v1";
+
+service IntersectionService {
+  rpc CreateIntersection(CreateIntersectionRequest)
+      returns (IntersectionResponse);
+  rpc GetIntersection(IntersectionIDRequest) returns (IntersectionResponse);
+  rpc GetAllIntersections(GetAllIntersectionsRequest)
+      returns (stream IntersectionResponse);
+  rpc UpdateIntersection(UpdateIntersectionRequest)
+      returns (IntersectionResponse);
+  rpc DeleteIntersection(IntersectionIDRequest) returns (google.protobuf.Empty);
+  rpc PutOptimisation(PutOptimisationRequest) returns (PutOptimisationResponse);
+}
+
+message IntersectionIDRequest { string id = 1; }
+
+message IntersectionResponse {
+  string id = 1;
+  string name = 2;
+  IntersectionDetails details = 3;
+  google.protobuf.Timestamp created_at = 4;
+  google.protobuf.Timestamp last_run_at = 5;
+  swiftsignals.common.v1.IntersectionStatus status = 6;
+  int32 run_count = 7;
+  swiftsignals.common.v1.TrafficDensity traffic_density = 8;
+  swiftsignals.common.v1.OptimisationParameters default_parameters = 9;
+  swiftsignals.common.v1.OptimisationParameters best_parameters = 10;
+  swiftsignals.common.v1.OptimisationParameters current_parameters = 11;
+}
+
+message CreateIntersectionRequest {
+  string name = 1;
+  IntersectionDetails details = 2;
+  swiftsignals.common.v1.TrafficDensity traffic_density = 3;
+  swiftsignals.common.v1.OptimisationParameters default_parameters = 4;
+}
+
+message GetAllIntersectionsRequest {
+  int32 page = 1;
+  int32 page_size = 2;
+  string filter = 3;
+}
+
+message UpdateIntersectionRequest {
+  string id = 1;
+  string name = 2;
+  IntersectionDetails details = 3;
+  swiftsignals.common.v1.IntersectionStatus status = 4;
+}
+
+message PutOptimisationRequest {
+  string id = 1;
+  swiftsignals.common.v1.OptimisationParameters parameters = 2;
+}
+
+message PutOptimisationResponse { bool improved = 1; }
+
+message IntersectionDetails {
+  string address = 1;
+  string city = 2;
+  string province = 3;
+}
