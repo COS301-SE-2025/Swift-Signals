@@ -15,7 +15,6 @@
 [![API Gateway](https://img.shields.io/github/actions/workflow/status/COS301-SE-2025/Swift-Signals/api-gateway.yml?branch=dev&style=for-the-badge&label=API%20Gateway&logo=github&logoColor=white)](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/apiGateway.yml)
 [![React Frontend](https://img.shields.io/github/actions/workflow/status/COS301-SE-2025/Swift-Signals/react.yml?branch=dev&style=for-the-badge&label=React%20Frontend&logo=react&logoColor=white)](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/react.yml)
 [![Simulation Service](https://img.shields.io/github/actions/workflow/status/COS301-SE-2025/Swift-Signals/intersection-service.yml?branch=dev&style=for-the-badge&label=Simulation%20Service&logo=aws&logoColor=white)](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/intersection-service.yml)
-[![Unified Testing](https://img.shields.io/github/actions/workflow/status/COS301-SE-2025/Swift-Signals/main.yml?branch=dev&style=for-the-badge&label=Unified%20Testing&logo=jest&logoColor=white)](https://github.com/COS301-SE-2025/Swift-Signals/actions/workflows/main.yml)
 [![Live Website](https://img.shields.io/badge/🚀_Live_Site-swiftsignals.seebranhome.co.za-28A745?style=for-the-badge&logo=vercel&logoColor=white)](https://swiftsignals.seebranhome.co.za/)
 
 </div>
@@ -95,7 +94,7 @@ Swift Signals is a data-driven, simulation-powered traffic light optimization pl
 | **Testing Policy**            | [View Document](docs/Demo4/Testing%20Policy.pdf)                                     |
 | **User Testing**            | [View Document](docs/Demo4/User%20Testing.pdf)                                     |
 | **Team Wiki**                                 | [View Wiki](https://github.com/COS301-SE-2025/Swift-Signals/wiki)                                                                           |
-| **Demo 4 Video**                              | [Watch Video](https://drive.google.com/file/d/1jwd5ZOZnacllvD1cR0Qc2rUw_mRHZ2dk/view?usp=drive_link)                                        |
+| **Demo 4 Video**                              | [Watch Video](https://drive.google.com/file/d/1b-unQy0JMKYX5AHnmbvFy7zX-LwUFR8v/view?usp=drive_link)                                        |
 
 ### Demo 3
 
