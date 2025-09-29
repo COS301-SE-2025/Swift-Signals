@@ -169,7 +169,7 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
 
 
 def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    server = grpc.server(futures.ThreadPoolExecutor(max_workers=1))
     pb_grpc.add_SimulationServiceServicer_to_server(SimulationServicer(), server)
 
     SERVICE_NAMES = (
