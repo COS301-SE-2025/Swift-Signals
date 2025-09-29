@@ -402,7 +402,7 @@ const Dashboard: React.FC = () => {
       case "INTERSECTION_STATUS_OPTIMISED":
         return "Optimised";
       case "INTERSECTION_STATUS_OPTIMISING":
-        return "Optimising";  
+        return "Optimising";
       case "unoptimised":
         return "Unoptimised";
       case "Failed":

@@ -626,7 +626,9 @@ const SimulationResults: React.FC = () => {
   };
 
   useEffect(() => {
-    const savedStatus = localStorage.getItem(`optimizationStatus_${intersectionId}`);
+    const savedStatus = localStorage.getItem(
+      `optimizationStatus_${intersectionId}`,
+    );
     if (savedStatus) {
       const { status, data } = JSON.parse(savedStatus);
       if (status === "optimised") {

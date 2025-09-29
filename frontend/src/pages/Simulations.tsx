@@ -1717,7 +1717,7 @@ const SimulationTable: React.FC<{
       case "Optimised":
         return "bg-green-200 text-green-800 border-green-300";
       case "Optimising":
-        return "bg-orange-200 text-green-800 border-orange-300";  
+        return "bg-orange-200 text-green-800 border-orange-300";
       case "Unoptimised":
         return "bg-yellow-200 text-yellow-800 border-yellow-300";
       case "Failed":
