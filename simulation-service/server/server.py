@@ -61,6 +61,7 @@ class SimulationServicer(pb_grpc.SimulationServiceServicer):
             )
         }
         req_dict["intersection"]["traffic density"] = 1
+        req_dict["intersection"]["Traffic Density"] = 1
         req_dict["intersection"]["simulation_parameters"]["Green"] = req_dict[
             "intersection"
         ]["simulation_parameters"]["green"]
