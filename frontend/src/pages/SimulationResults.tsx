@@ -383,6 +383,12 @@ const SimulationResults: React.FC = () => {
     setIsOptimizing(true);
     setOptimizationStatus("Running optimization...");
 
+    // Save optimization status to localStorage
+    localStorage.setItem(
+      `optimizationStatus_${intersectionId}`,
+      JSON.stringify({ status: "optimising" }),
+    );
+
     try {
       const authToken = getAuthToken();
       if (!authToken) {
@@ -466,6 +472,15 @@ const SimulationResults: React.FC = () => {
       setIsOptimized(true);
       setShowOptimized(true);
       setOptimizationStatus("Optimization completed successfully!");
+
+      // Save optimized data to localStorage
+      localStorage.setItem(
+        `optimizationStatus_${intersectionId}`,
+        JSON.stringify({
+          status: "optimised",
+          data: optData,
+        }),
+      );
 
       // Update the intersection status to "optimised" in the backend
       await updateIntersectionStatus(
@@ -609,6 +624,24 @@ const SimulationResults: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const savedStatus = localStorage.getItem(
+      `optimizationStatus_${intersectionId}`,
+    );
+    if (savedStatus) {
+      const { status, data } = JSON.parse(savedStatus);
+      if (status === "optimised") {
+        setOptimizedData(data.output);
+        setOptimizedApiResults(data.results);
+        setIsOptimized(true);
+        setShowOptimized(true);
+      } else if (status === "optimising") {
+        setIsOptimizing(true);
+        // You might want to add polling logic here to check for completion
+      }
+    }
+  }, [intersectionId]);
 
   useEffect(() => {
     fetchData();
@@ -1164,7 +1197,7 @@ const SimulationResults: React.FC = () => {
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-teal-500/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
-                  # Vehicles
+                  Throughput
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
                   {apiResults ? apiResults.total_vehicles : "..."}
@@ -1177,7 +1210,7 @@ const SimulationResults: React.FC = () => {
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
-                  # TL Phases
+                  # Light Phases
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
                   {numPhases}
@@ -1185,7 +1218,7 @@ const SimulationResults: React.FC = () => {
               </div>
               <div className="stat-cube bg-white dark:bg-[#161B22] border border-yellow-400/30 outline outline-2 outline-gray-300 dark:outline-[#388BFD] rounded-xl p-4 text-center shadow-md min-w-[160px]">
                 <div className="text-sm font-bold text-gray-600 mb-1">
-                  TL Cycle
+                  Light Cycle
                 </div>
                 <div className="text-xl font-bold text-[#0F5BA7]">
                   {totalCycle} <span className="text-sm font-normal">s</span>

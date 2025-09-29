@@ -1716,6 +1716,8 @@ const SimulationTable: React.FC<{
     switch (status) {
       case "Optimised":
         return "bg-green-200 text-green-800 border-green-300";
+      case "Optimising":
+        return "bg-orange-200 text-green-800 border-orange-300";
       case "Unoptimised":
         return "bg-yellow-200 text-yellow-800 border-yellow-300";
       case "Failed":
@@ -1986,6 +1988,8 @@ const Simulations: React.FC = () => {
       switch (apiStatus) {
         case "INTERSECTION_STATUS_OPTIMISED":
           return "Optimised"; // Frontend display string
+        case "INTERSECTION_STATUS_OPTIMISING":
+          return "Optimising"; // Frontend display string
         case "unoptimised": // Assuming backend still sends "unoptimised" for unoptimized
           return "Unoptimised"; // Frontend display string
         case "Failed":
