@@ -13,7 +13,7 @@ user-service: install-protoc-go clean-gen generate-user-service
 
 intersection-service: install-protoc-go clean-gen generate-intersection-service
 
-api-gateway: install-protoc-go install-protoc-py clean-gen generate
+api-gateway: install-protoc-go clean-gen generate-go
 
 generate: clean-gen generate-go generate-py
 
@@ -38,6 +38,16 @@ generate-go:
 
 generate-py: 
 	. $(VENV_DIR)/bin/activate && $(PYTHON) -m grpc_tools.protoc -I .. \
+		--python_out=$(GEN_DIR) \
+		--pyi_out=$(GEN_DIR) \
+		--grpc_python_out=$(GEN_DIR) \
+		swiftsignals/common/v1/types.proto \
+		swiftsignals/common/v1/simulation.proto \
+		swiftsignals/simulation/v1/simulation.proto \
+		swiftsignals/optimisation/v1/optimisation.proto
+
+generate-py-dockerfile: 
+	$(PYTHON) -m grpc_tools.protoc -I .. \
 		--python_out=$(GEN_DIR) \
 		--pyi_out=$(GEN_DIR) \
 		--grpc_python_out=$(GEN_DIR) \

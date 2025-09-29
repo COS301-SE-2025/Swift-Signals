@@ -16,7 +16,7 @@ COPY protos/ protos/
 
 WORKDIR /app/protos/swiftsignals
 RUN make clean-gen 
-RUN make generate-py
+RUN make generate-py-dockerfile
 
 WORKDIR /app
 RUN find protos/gen -type d -exec touch {}/__init__.py \; 

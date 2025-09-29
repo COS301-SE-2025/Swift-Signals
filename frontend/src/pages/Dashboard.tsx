@@ -374,6 +374,11 @@ const Dashboard: React.FC = () => {
           statusColor: "bg-statusGreen",
           textColor: "text-statusTextGreen",
         };
+      case "Optimising":
+        return {
+          statusColor: "bg-statusOrange",
+          textColor: "text-statusTextOrange",
+        };
       case "Unoptimised":
         return {
           statusColor: "bg-statusYellow",
@@ -396,6 +401,8 @@ const Dashboard: React.FC = () => {
     switch (status) {
       case "INTERSECTION_STATUS_OPTIMISED":
         return "Optimised";
+      case "INTERSECTION_STATUS_OPTIMISING":
+        return "Optimising";
       case "unoptimised":
         return "Unoptimised";
       case "Failed":
