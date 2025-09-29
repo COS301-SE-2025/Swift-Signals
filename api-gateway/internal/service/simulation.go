@@ -203,26 +203,55 @@ func (s *SimulationService) OptimiseIntersection(
 		logger.Warn("Could not update intersection status to 'INTERSECTION_STATUS_OPTIMISING'")
 	}
 
-	logger.Debug("calling optimisation service to optimise intersection")
-	response, err := s.optiClient.RunOptimisation(
-		ctx,
-		util.RPCOptiParamToOptiParam(intersection.DefaultParameters),
-	)
-	if err != nil {
-		return model.OptimisationResponse{}, err
-	}
+	resultChan := make(chan model.OptimisationResponse, 1)
+	errChan := make(chan error, 1)
 
-	logger.Debug("updating intersection with optimised parameters")
-	resp, err := s.intrClient.PutOptimisation(
-		ctx,
-		intersectionID,
-		util.RPCOptiParamToOptiParamOp(response),
-	)
-	if err != nil {
-		return model.OptimisationResponse{}, err
-	}
+	go func() {
+		ctx := context.Background()
+		logger.Debug("calling optimisation service to optimise intersection")
+		response, err := s.optiClient.RunOptimisation(
+			ctx,
+			util.RPCOptiParamToOptiParam(intersection.DefaultParameters),
+		)
+		if err != nil {
+			errChan <- err
+			return
+		}
 
-	return model.OptimisationResponse{Improved: resp.Improved}, nil
+		logger.Debug("updating intersection with optimised parameters")
+		resp, err := s.intrClient.PutOptimisation(
+			ctx,
+			intersectionID,
+			util.RPCOptiParamToOptiParamOp(response),
+		)
+		if err != nil {
+			errChan <- err
+			return
+		}
+		logger.Debug(
+			"calling intersection service to change status to 'INTERSECTION_STATUS_OPTIMISED'",
+		)
+		_, err = s.intrClient.UpdateIntersectionStatus(
+			ctx,
+			intersection.Id,
+			intersection.Name,
+			util.RPCDetailsToDetails(intersection.Details),
+			commonpb.IntersectionStatus_INTERSECTION_STATUS_OPTIMISED,
+		)
+		if err != nil {
+			logger.Warn("Could not update intersection status to 'INTERSECTION_STATUS_OPTIMISED'")
+		}
+		resultChan <- model.OptimisationResponse{Improved: resp.Improved}
+	}()
+
+	select {
+	case result := <-resultChan:
+		return result, nil
+	case err := <-errChan:
+		return model.OptimisationResponse{}, err
+	case <-ctx.Done():
+		return model.OptimisationResponse{}, ctx.Err()
+	}
 }
 
 func (s *SimulationService) GetUserIntersectionIDs(
