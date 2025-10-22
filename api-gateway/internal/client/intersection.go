@@ -102,6 +102,28 @@ func (ic *IntersectionClient) UpdateIntersection(
 	return resp, nil
 }
 
+func (ic *IntersectionClient) UpdateIntersectionStatus(
+	ctx context.Context,
+	id, name string,
+	details model.Details,
+	status commonpb.IntersectionStatus,
+) (*intersectionpb.IntersectionResponse, error) {
+	req := &intersectionpb.UpdateIntersectionRequest{
+		Id:      id,
+		Name:    name,
+		Details: convertDetailsToProto(details),
+		Status:  status,
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	resp, err := ic.client.UpdateIntersection(ctx, req)
+	if err != nil {
+		return nil, util.GrpcErrorToErr(err)
+	}
+	return resp, nil
+}
+
 func (ic *IntersectionClient) DeleteIntersection(
 	ctx context.Context,
 	id string,
@@ -151,6 +173,12 @@ type IntersectionClientInterface interface {
 		ctx context.Context,
 		id, name string,
 		details model.Details,
+	) (*intersectionpb.IntersectionResponse, error)
+	UpdateIntersectionStatus(
+		ctx context.Context,
+		id, name string,
+		details model.Details,
+		status commonpb.IntersectionStatus,
 	) (*intersectionpb.IntersectionResponse, error)
 	DeleteIntersection(ctx context.Context, id string) (*emptypb.Empty, error)
 	PutOptimisation(

@@ -54,6 +54,7 @@ message UpdateIntersectionRequest {
   string id = 1;
   string name = 2;
   IntersectionDetails details = 3;
+  swiftsignals.common.v1.IntersectionStatus status = 4;
 }
 
 message PutOptimisationRequest {

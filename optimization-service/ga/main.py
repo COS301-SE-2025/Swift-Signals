@@ -21,8 +21,8 @@ def main(traffic_density: int = 2) -> dict:
     random.seed(1408)
 
     # GA parameters
-    ngen = 5
-    pop_size = 10
+    ngen = 30
+    pop_size = 50
     cxpb = 0.5
     mutpb = 0.3
 

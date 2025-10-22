@@ -1,4 +1,4 @@
-name: Combined CI Workflow
+name: Microservice Backend Unified Testing
 
 on:
   push:
@@ -7,6 +7,7 @@ on:
     branches: [main, dev, quality-assurance]
 
 jobs:
+
   python-standard-check:
     runs-on: ubuntu-latest
 
