@@ -92,7 +92,7 @@ const LoadingAnimation: React.FC = () => (
 
     {/* Progress bar */}
     <div className="w-64 h-2 bg-gray-700 rounded-full overflow-hidden">
-      <div className="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full animate-pulse"></div>
+      <div className="h-full bg-gradient-to-r from-teal-400 to-emerald-500 rounded-full animate-progress-pulse"></div>
     </div>
   </div>
 );
@@ -342,10 +342,11 @@ const SimulationResults: React.FC = () => {
   const { intersectionIds, name, description, type } = location.state || {};
 
   console.log("name from location.state:", name);
-  console.log("intersectionData?.name:", intersectionData?.name);
+  // console.log("intersectionData?.name:", intersectionData?.name); // Removed debugging log
 
   // Get intersectionId from URL params first, then fall back to location.state
   const intersectionId = params.intersectionId || intersectionIds?.[0];
+  console.log("SimulationResults: intersectionId:", intersectionId);
 
   const [isDarkMode, setIsDarkMode] = useState(
     document.documentElement.classList.contains("dark"),
@@ -478,7 +479,7 @@ const SimulationResults: React.FC = () => {
         `optimizationStatus_${intersectionId}`,
         JSON.stringify({
           status: "optimised",
-          data: optData,
+          // data: optData, // Removed to prevent QuotaExceededError
         }),
       );
 
@@ -1089,8 +1090,8 @@ const SimulationResults: React.FC = () => {
                   }`}
                 >
                   {isOptimizing ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <div className="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full"></div>
+                    <div className="flex items-center justify-center space-x-2 animate-pulse">
+                      <div className="animate-spin inline-block w-5 h-5 border-3 border-current border-t-transparent rounded-full"></div>
                       <span>Optimizing...</span>
                     </div>
                   ) : (
@@ -1114,13 +1115,18 @@ const SimulationResults: React.FC = () => {
           {/* Optimization Status Message */}
           {optimizationStatus && (
             <div
-              className={`mb-6 p-4 rounded-lg text-center ${
+              className={`mb-6 p-4 rounded-lg text-center flex items-center justify-center gap-2 ${
                 optimizationStatus.includes("failed") ||
                 optimizationStatus.includes("No improvement")
                   ? "bg-red-500/20 border border-red-500/30 text-red-300"
                   : "bg-green-600 border border-green-700 text-white dark:bg-green-700/20 dark:border-green-700/30 dark:text-green-300"
               }`}
             >
+              {isOptimizing &&
+                !optimizationStatus.includes("completed") &&
+                !optimizationStatus.includes("failed") && (
+                  <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                )}
               <p className="font-semibold">{optimizationStatus}</p>
             </div>
           )}

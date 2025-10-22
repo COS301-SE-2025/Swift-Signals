@@ -71,27 +71,55 @@ const getFriendlyErrorMessage = (backendError: string): string => {
     return "An unexpected error occurred. Please try again.";
   }
 
-  if (backendError.includes("User with this email already exists")) {
+  const lowerCaseError = backendError.toLowerCase();
+
+  if (
+    lowerCaseError.includes("email already exists") ||
+    lowerCaseError.includes("alreadyexists")
+  ) {
     return "This email is already registered. Please try logging in or use a different email.";
   }
-  if (backendError.includes("Invalid password format")) {
+  if (
+    lowerCaseError.includes("invalid password format") ||
+    lowerCaseError.includes("password does not meet criteria")
+  ) {
     return "Password does not meet the required criteria. Please ensure it has at least one lowercase, one uppercase, one number, one special character, and is at least 8 characters long.";
   }
-  if (backendError.includes("Invalid email format")) {
+  if (
+    lowerCaseError.includes("invalid email format") ||
+    lowerCaseError.includes("invalid email")
+  ) {
     return "Please enter a valid email address.";
   }
-  if (backendError.includes("Username already taken")) {
+  if (
+    lowerCaseError.includes("username already taken") ||
+    lowerCaseError.includes("username exists")
+  ) {
     return "This username is already taken. Please choose a different one.";
   }
   if (
-    backendError.includes(
-      "An unexpected response was received from the server.",
-    )
+    lowerCaseError.includes("invalid input") ||
+    lowerCaseError.includes("validation error")
   ) {
-    return "A problem occurred while processing the server's response. Please try again.";
+    return "Invalid input provided. Please check your details.";
   }
-  if (backendError.includes("Failed to fetch")) {
+  if (
+    lowerCaseError.includes("failed to fetch") ||
+    lowerCaseError.includes("network error")
+  ) {
     return "Could not connect to the server. Please check your internet connection or try again later.";
+  }
+  if (
+    lowerCaseError.includes("unauthorized") ||
+    lowerCaseError.includes("authentication failed")
+  ) {
+    return "Authentication failed. Please check your credentials.";
+  }
+  if (
+    lowerCaseError.includes("internal server error") ||
+    lowerCaseError.includes("unexpected error")
+  ) {
+    return "An unexpected server error occurred. Please try again later.";
   }
 
   // Generic fallback for any other errors
