@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 
 import logo from "../../src/assets/logo.png";
@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import "../styles/Login.css";
 
 import { API_BASE_URL } from "../config";
+import { UserContext } from "../context/UserContext";
 
 interface TrafficLightProps {
   redActive: boolean;
@@ -71,6 +72,7 @@ const Login = () => {
   const [resetEmail, setResetEmail] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
+  const { refetchUser } = useContext(UserContext)!;
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -97,24 +99,35 @@ const Login = () => {
 
       const responseText = await response.text();
       if (!response.ok) {
-        let serverMessage = `Status: ${response.status}`;
+        let genericMessage = "Login failed. Please check your credentials.";
         try {
           const errorData = JSON.parse(responseText);
-          serverMessage = errorData?.message || serverMessage;
+          const serverMessage = errorData?.message || "";
+
+          if (
+            serverMessage.includes("incorrect password") ||
+            serverMessage.includes("user does not exist")
+          ) {
+            genericMessage = "Incorrect email or password.";
+          } else if (serverMessage.includes("invalid credentials")) {
+            genericMessage = "Invalid credentials provided.";
+          }
+          // Add more specific mappings if needed
         } catch (e) {
-          console.error(e);
           console.error(
             "Could not parse error response as JSON:",
             responseText,
+            e,
           );
         }
-        throw new Error(`Login failed. Server says: "${serverMessage}"`);
+        throw new Error(genericMessage);
       }
 
       const data = JSON.parse(responseText);
 
       if (data?.token) {
         localStorage.setItem("authToken", data.token);
+        refetchUser();
         console.log("Login successful:", data.message);
         navigate("/dashboard");
       } else {
@@ -227,7 +240,7 @@ const Login = () => {
               Username
             </label>
             <input
-              type="text"
+              type="email"
               id="username"
               name="username"
               value={username}

@@ -1,6 +1,7 @@
 //import { useState } from 'react';
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AuthGuard from "./components/AuthGuard";
 
 //import Navbar from './components/Navbar';
 // import Footer from './components/Footer';
@@ -28,18 +29,63 @@ function App() {
           <Routes>
             <Route path="/" element={<WelcomePage />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/logout" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/simulations" element={<Simulations />} />
-            <Route path="/intersections" element={<Intersections />} />
-            <Route path="/Users" element={<Users />} />
-            <Route path="/simulation-results" element={<SimulationResults />} />
+            <Route
+              path="/dashboard"
+              element={
+                <AuthGuard>
+                  <Dashboard />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/simulations"
+              element={
+                <AuthGuard>
+                  <Simulations />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/intersections"
+              element={
+                <AuthGuard>
+                  <Intersections />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/Users"
+              element={
+                <AuthGuard requiredRole="admin">
+                  <Users />
+                </AuthGuard>
+              }
+            />
+            <Route
+              path="/simulation-results"
+              element={
+                <AuthGuard>
+                  <SimulationResults />
+                </AuthGuard>
+              }
+            />
             <Route
               path="/simulation-results/:intersectionId"
-              element={<SimulationResults />}
+              element={
+                <AuthGuard>
+                  <SimulationResults />
+                </AuthGuard>
+              }
             />
-            <Route path="/comparison-rendering" element={<ComparisonView />} />
+            <Route
+              path="/comparison-rendering"
+              element={
+                <AuthGuard>
+                  <ComparisonView />
+                </AuthGuard>
+              }
+            />
             {/* Add more routes as needed */}
           </Routes>
         </ErrorBoundary>

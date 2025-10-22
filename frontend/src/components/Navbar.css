@@ -125,10 +125,40 @@
   justify-content: center;
   margin-left: 0.5rem;
   margin-right: 1rem;
+  background-color: transparent;
+  color: #333; /* Dark gray for light mode */
+  border: none; /* Ensure no default button border */
+  padding: 0; /* Remove default button padding */
 }
 
 .dark .logout-icon {
-  color: #dadada;
+  color: #dadada; /* Light gray for dark mode */
+}
+
+.logout-icon:hover {
+  background-color: transparent; /* Ensure transparent on hover */
+}
+
+.dark .logout-icon:hover {
+  background-color: transparent; /* Ensure transparent on hover in dark mode */
+}
+
+.mobile-user-profile .logout-icon {
+  margin-right: 0;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: transparent;
+}
+
+.mobile-user-profile .logout-icon:hover {
+  background-color: transparent;
+  color: #dc3545;
+  transform: scale(1.1);
+}
+
+.dark .mobile-user-profile .logout-icon:hover {
+  background-color: transparent;
 }
 
 .mobile-menu-toggle {

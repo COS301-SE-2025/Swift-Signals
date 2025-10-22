@@ -94,3 +94,26 @@ div {
   border: none !important;
   box-shadow: none !important;
 }
+
+@keyframes progress-pulse {
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+  50.1% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+
+.animate-progress-pulse {
+  animation: progress-pulse 2s infinite ease-in-out;
+}

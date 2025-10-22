@@ -3,7 +3,7 @@ import { FaCircleUser } from "react-icons/fa6";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IoIosLogOut } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import logo from "../../src/assets/logo.png";
 // import { API_BASE_URL } from "../config";
@@ -14,8 +14,13 @@ function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [username, setUsername] = useState("");
   const location = useLocation();
-  const userContext = useContext(UserContext);
+  const { user, logout } = useContext(UserContext)!;
+  const navigate = useNavigate();
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
@@ -26,10 +31,12 @@ function Navbar() {
   const isActive: IsActiveFn = (path) => location.pathname === path;
 
   useEffect(() => {
-    if (userContext?.user) {
-      setUsername(userContext.user.username);
+    if (user) {
+      setUsername(user.username);
+    } else {
+      setUsername("");
     }
-  }, [userContext]);
+  }, [user]);
 
   return (
     <nav className="navbar">
@@ -75,7 +82,7 @@ function Navbar() {
               Simulations
             </a>
           </li>
-          {userContext?.user?.role === "admin" && (
+          {user?.role === "admin" && (
             <li>
               <a
                 href="/users"
@@ -90,9 +97,9 @@ function Navbar() {
         <div className="mobile-user-profile">
           <FaCircleUser size={45} />
           <span>{username || "Loading..."}</span>
-          <a href="/" className="logout-icon" onClick={toggleMobileMenu}>
+          <button className="logout-icon" onClick={handleLogout}>
             <IoIosLogOut size={35} />
-          </a>
+          </button>
         </div>
       </div>
 
@@ -100,9 +107,9 @@ function Navbar() {
         <div className="user-profile">
           <FaCircleUser size={45} />
           <span>{username || "Loading..."}</span>
-          <a href="/" className="logout-icon">
+          <button className="logout-icon" onClick={handleLogout}>
             <IoIosLogOut size={35} />
-          </a>
+          </button>
         </div>
       </div>
     </nav>
