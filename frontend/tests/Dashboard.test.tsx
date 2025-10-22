@@ -90,7 +90,9 @@ describe("Dashboard Component", () => {
   test("renders total intersections, active simulations, and optimization runs", async () => {
     render(
       <MemoryRouter>
-        <UserContext.Provider value={{ user: { name: 'Test User' }, logout: () => {} } as any}>
+        <UserContext.Provider
+          value={{ user: { name: "Test User" }, logout: () => {} } as any}
+        >
           <Dashboard />
         </UserContext.Provider>
       </MemoryRouter>,
@@ -110,7 +112,9 @@ describe("Dashboard Component", () => {
   test("renders recent intersections list and allows viewing details", async () => {
     render(
       <MemoryRouter>
-        <UserContext.Provider value={{ user: { name: 'Test User' }, logout: () => {} } as any}>
+        <UserContext.Provider
+          value={{ user: { name: "Test User" }, logout: () => {} } as any}
+        >
           <Dashboard />
         </UserContext.Provider>
       </MemoryRouter>,
@@ -138,7 +142,9 @@ describe("Dashboard Component", () => {
   test("opens new intersection, run simulation, and map modals", async () => {
     render(
       <MemoryRouter>
-        <UserContext.Provider value={{ user: { name: 'Test User' }, logout: () => {} } as any}>
+        <UserContext.Provider
+          value={{ user: { name: "Test User" }, logout: () => {} } as any}
+        >
           <Dashboard />
         </UserContext.Provider>
       </MemoryRouter>,
@@ -167,7 +173,9 @@ describe("Dashboard Component", () => {
 
     render(
       <MemoryRouter>
-        <UserContext.Provider value={{ user: { name: 'Test User' }, logout: () => {} } as any}>
+        <UserContext.Provider
+          value={{ user: { name: "Test User" }, logout: () => {} } as any}
+        >
           <Dashboard />
         </UserContext.Provider>
       </MemoryRouter>,

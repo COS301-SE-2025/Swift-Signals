@@ -24,7 +24,15 @@ describe("Navbar Component", () => {
   it("renders logo and title", () => {
     render(
       <MemoryRouter>
-        <UserContext.Provider value={{ user: { username: 'Test User', role: 'test' }, logout: () => {}, setUser: () => {}, refetchUser: () => {}, isLoading: false }}>
+        <UserContext.Provider
+          value={{
+            user: { username: "Test User", role: "test" },
+            logout: () => {},
+            setUser: () => {},
+            refetchUser: () => {},
+            isLoading: false,
+          }}
+        >
           <Navbar />
         </UserContext.Provider>
       </MemoryRouter>,
@@ -36,7 +44,15 @@ describe("Navbar Component", () => {
   it("renders nav links with correct active class", () => {
     render(
       <MemoryRouter initialEntries={["/dashboard"]}>
-        <UserContext.Provider value={{ user: { username: 'Test User', role: 'test' }, logout: () => {}, setUser: () => {}, refetchUser: () => {}, isLoading: false }}>
+        <UserContext.Provider
+          value={{
+            user: { username: "Test User", role: "test" },
+            logout: () => {},
+            setUser: () => {},
+            refetchUser: () => {},
+            isLoading: false,
+          }}
+        >
           <Navbar />
         </UserContext.Provider>
       </MemoryRouter>,
@@ -51,12 +67,22 @@ describe("Navbar Component", () => {
   it("toggles mobile menu when hamburger is clicked", () => {
     render(
       <MemoryRouter>
-        <UserContext.Provider value={{ user: { username: 'Test User', role: 'test' }, logout: () => {}, setUser: () => {}, refetchUser: () => {}, isLoading: false }}>
+        <UserContext.Provider
+          value={{
+            user: { username: "Test User", role: "test" },
+            logout: () => {},
+            setUser: () => {},
+            refetchUser: () => {},
+            isLoading: false,
+          }}
+        >
           <Navbar />
         </UserContext.Provider>
       </MemoryRouter>,
     );
-    const toggleButton = document.querySelector(".mobile-menu-toggle") as HTMLButtonElement;
+    const toggleButton = document.querySelector(
+      ".mobile-menu-toggle",
+    ) as HTMLButtonElement;
     const navCenter = document.querySelector(".navbar-center")!;
 
     fireEvent.click(toggleButton);
@@ -86,7 +112,15 @@ describe("Navbar Component", () => {
   it("shows 'Loading...' initially before fetch resolves", () => {
     render(
       <MemoryRouter>
-        <UserContext.Provider value={{ user: { username: 'Test User', role: 'test' }, logout: () => {}, setUser: () => {}, refetchUser: () => {}, isLoading: false }}>
+        <UserContext.Provider
+          value={{
+            user: { username: "Test User", role: "test" },
+            logout: () => {},
+            setUser: () => {},
+            refetchUser: () => {},
+            isLoading: false,
+          }}
+        >
           <Navbar />
         </UserContext.Provider>
       </MemoryRouter>,
@@ -98,12 +132,22 @@ describe("Navbar Component", () => {
   it("closes mobile menu when a nav link is clicked", () => {
     render(
       <MemoryRouter>
-        <UserContext.Provider value={{ user: { username: 'Test User', role: 'test' }, logout: () => {}, setUser: () => {}, refetchUser: () => {}, isLoading: false }}>
+        <UserContext.Provider
+          value={{
+            user: { username: "Test User", role: "test" },
+            logout: () => {},
+            setUser: () => {},
+            refetchUser: () => {},
+            isLoading: false,
+          }}
+        >
           <Navbar />
         </UserContext.Provider>
       </MemoryRouter>,
     );
-    const toggleButton = document.querySelector(".mobile-menu-toggle") as HTMLButtonElement;
+    const toggleButton = document.querySelector(
+      ".mobile-menu-toggle",
+    ) as HTMLButtonElement;
 
     fireEvent.click(toggleButton);
 
@@ -117,7 +161,15 @@ describe("Navbar Component", () => {
   it("renders logout icons in desktop and mobile views", () => {
     render(
       <MemoryRouter>
-        <UserContext.Provider value={{ user: { username: 'Test User', role: 'test' }, logout: () => {}, setUser: () => {}, refetchUser: () => {}, isLoading: false }}>
+        <UserContext.Provider
+          value={{
+            user: { username: "Test User", role: "test" },
+            logout: () => {},
+            setUser: () => {},
+            refetchUser: () => {},
+            isLoading: false,
+          }}
+        >
           <Navbar />
         </UserContext.Provider>
       </MemoryRouter>,
