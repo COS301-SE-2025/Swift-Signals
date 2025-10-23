@@ -179,7 +179,7 @@ For detailed branching strategy, workflow commands, and best practices, see [**G
    cd Swift-Signals
 2. Start the application:
    ```sh
-   cd deployments/development
+   cd deployment/dockerfiles/production
    docker-compose up -d
 3. Access the frontend at ```http://localhost:80```.
 
